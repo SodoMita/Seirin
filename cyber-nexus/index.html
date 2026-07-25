@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
+    <title>Cyber-Nexus: The Static Singularity | Monogatari VN</title>
+    <meta name="description" content="A Cyberpunk Sci-Fi Visual Novel built with the Monogatari Engine. Runs 100% offline from the local filesystem - no web server, no CDN, no runtime fetches." />
+
+    <!-- =========================================================
+         100% LOCAL DEPENDENCIES
+         Everything below is a relative path, so this page works by
+         simply double-clicking it (file://) with no server and no
+         internet connection.
+         ========================================================= -->
+    <link rel="stylesheet" href="assets/fonts/fonts.css" />
+    <link rel="stylesheet" href="vendor/monogatari.css" />
+
+    <style>
+        /* ---------------------------------------------------------
+           Cyberpunk OS theme (hand written - replaces the Tailwind
+           CDN build that used to be required at runtime)
+           --------------------------------------------------------- */
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-violet: #a855f7;
+            --neon-emerald: #10b981;
+            --neon-amber: #facc15;
+            --dark-bg: #030712;
+            --hud-h: 48px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { height: 100%; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image:
+                radial-gradient(circle at 50% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.10) 0%, transparent 50%),
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #f3f4f6;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        /* CRT scanline overlay -------------------------------------------------- */
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.25) 50%,
+                rgba(0, 0, 0, 0.25)
+            );
+            background-size: 100% 4px;
+            z-index: 9999;
+            opacity: 0.45;
+        }
+
+        /* Top HUD --------------------------------------------------------------- */
+        .cyber-top-hud {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--hud-h);
+            background: linear-gradient(180deg, rgba(3, 7, 18, 0.96) 0%, rgba(3, 7, 18, 0.72) 100%);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 16px;
+            z-index: 500;
+            font-family: 'Share Tech Mono', monospace;
+            backdrop-filter: blur(8px);
+        }
+
+        .hud-group { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+        .hud-brand {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 700; letter-spacing: 1px;
+            font-size: 0.82rem; color: #67e8f9; white-space: nowrap;
+        }
+        .hud-brand svg, .hud-brand i { color: var(--neon-cyan); }
+
+        .hud-badge {
+            background: rgba(0, 240, 255, 0.10);
+            border: 1px solid rgba(0, 240, 255, 0.40);
+            color: var(--neon-cyan);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex; align-items: center; gap: 6px;
+            white-space: nowrap;
+        }
+        .hud-badge.pink  { background: rgba(255,0,127,0.10);  border-color: rgba(255,0,127,0.40);  color: var(--neon-pink); }
+        .hud-badge.green { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.40); color: var(--neon-emerald); }
+
+        .hud-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background .18s, color .18s, border-color .18s, box-shadow .18s;
+            background: rgba(8, 47, 73, 0.55);
+            border: 1px solid rgba(0, 240, 255, 0.45);
+            color: #a5f3fc;
+            white-space: nowrap;
+        }
+        .hud-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 14px rgba(0,240,255,.55); }
+
+        .hud-btn.violet { background: rgba(59, 7, 100, 0.55); border-color: rgba(168, 85, 247, 0.45); color: #e9d5ff; }
+        .hud-btn.violet:hover { background: var(--neon-violet); color: #000; box-shadow: 0 0 14px rgba(168,85,247,.55); }
+        .hud-btn.violet.is-on { background: rgba(168,85,247,.9); color:#000; box-shadow: 0 0 16px rgba(168,85,247,.7); }
+
+        .hud-btn.emerald { background: rgba(2, 44, 34, 0.55); border-color: rgba(16, 185, 129, 0.45); color: #a7f3d0; }
+        .hud-btn.emerald:hover { background: var(--neon-emerald); color: #000; box-shadow: 0 0 14px rgba(16,185,129,.55); }
+
+        @media (max-width: 900px) {
+            .hud-btn .label, #hud-location { display: none; }
+        }
+
+        /* Monogatari container -------------------------------------------------- */
+        #vn-root {
+            position: absolute;
+            top: var(--hud-h);
+            left: 0; right: 0; bottom: 0;
+        }
+        #vn-root > visual-novel { height: 100%; }
+
+        visual-novel, main-screen, game-screen, text-box, main-menu, quick-menu, dialog-log {
+            font-family: 'Rajdhani', sans-serif !important;
+        }
+
+        main-screen {
+            background:
+                linear-gradient(rgba(2, 8, 23, 0.74), rgba(2, 8, 23, 0.88)),
+                url('assets/scenes/slums_night.jpg') center/cover no-repeat !important;
+        }
+
+        /* Title card above the menu buttons */
+        main-screen::before {
+            content: 'CYBER-NEXUS';
+            position: absolute;
+            top: 16%;
+            left: 0; right: 0;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 4.2rem);
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: #ffffff;
+            text-shadow: 0 0 18px var(--neon-cyan), 0 0 42px rgba(0,240,255,.55);
+            pointer-events: none;
+            z-index: 3;
+        }
+        main-screen::after {
+            content: 'THE STATIC SINGULARITY';
+            position: absolute;
+            top: calc(16% + clamp(2.4rem, 7vw, 5rem));
+            left: 0; right: 0;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(.7rem, 1.6vw, 1rem);
+            letter-spacing: 7px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 12px rgba(255,0,127,.7);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* The engine pins main-menu to the bottom-right with zero
+           padding, so the buttons (and their hover translate) ran off
+           the right edge of the viewport. */
+        main-menu {
+            align-self: center !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: absolute !important;
+            inset: 0 !important;
+            bottom: auto !important;
+            top: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        main-menu button {
+            font-family: 'Orbitron', sans-serif !important;
+            letter-spacing: 2px !important;
+            text-transform: uppercase !important;
+            border: 1px solid var(--neon-cyan) !important;
+            background: rgba(0, 240, 255, 0.08) !important;
+            color: #ffffff !important;
+            padding: 12px 28px !important;
+            margin: 8px 0 !important;
+            border-radius: 4px !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15) !important;
+            width: 260px !important;
+            font-weight: 700 !important;
+            cursor: pointer;
+        }
+        main-menu button:hover {
+            background: var(--neon-cyan) !important;
+            color: #000000 !important;
+            box-shadow: 0 0 25px var(--neon-cyan) !important;
+            transform: translateX(8px) scale(1.02);
+        }
+
+        /* Dialog box ------------------------------------------------------------ */
+        text-box {
+            background: linear-gradient(135deg, rgba(8, 14, 28, 0.94) 0%, rgba(15, 23, 42, 0.96) 100%) !important;
+            border: 1px solid rgba(0, 240, 255, 0.4) !important;
+            border-left: 5px solid var(--neon-cyan) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 240, 255, 0.05) !important;
+            margin: 15px !important;
+            padding: 18px 24px !important;
+            min-height: 165px !important;
+            max-width: calc(100% - 30px) !important;
+            backdrop-filter: blur(12px) !important;
+        }
+
+        text-box [data-content="character-name"] {
+            font-family: 'Orbitron', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            letter-spacing: 1.5px !important;
+            text-shadow: 0 0 10px currentColor !important;
+            padding: 4px 14px !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            border: 1px solid currentColor !important;
+            border-radius: 4px !important;
+            display: inline-block !important;
+            margin-bottom: 8px !important;
+            text-transform: uppercase !important;
+        }
+
+        text-box [data-content="dialog"] {
+            font-family: 'Share Tech Mono', monospace !important;
+            font-size: 1.12rem !important;
+            line-height: 1.65 !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* Choice buttons -------------------------------------------------------- */
+        /* The engine renders the buttons inside a
+           [data-content="wrapper"] child, so both levels need to be
+           centred or the choices hug the left edge. */
+        choice-container {
+            display: flex !important;
+            position: absolute !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            top: 10% !important;
+            bottom: 200px !important;
+            width: min(94%, 820px) !important;
+            max-height: none !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 8px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 20;
+            overflow-y: auto;
+        }
+
+        choice-container [data-content="wrapper"] {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+
+        choice-container button {
+            font-family: 'Orbitron', sans-serif !important;
+            background: rgba(15, 23, 42, 0.92) !important;
+            border: 1px solid var(--neon-pink) !important;
+            color: #ffffff !important;
+            padding: 13px 22px !important;
+            margin: 7px auto !important;
+            border-radius: 6px !important;
+            transition: transform .2s ease, background .2s ease, box-shadow .2s ease !important;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.20) !important;
+            font-size: 0.92rem !important;
+            letter-spacing: 0.6px !important;
+            line-height: 1.35 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            backdrop-filter: blur(6px);
+        }
+        choice-container button:hover {
+            background: var(--neon-pink) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 25px var(--neon-pink) !important;
+            transform: scale(1.02);
+        }
+
+        /* Quick menu ------------------------------------------------------------ */
+        quick-menu {
+            background: rgba(8, 14, 28, 0.85) !important;
+            border: 1px solid rgba(0, 240, 255, 0.3) !important;
+            border-radius: 30px !important;
+            padding: 2px 14px !important;
+            margin-bottom: 10px !important;
+            backdrop-filter: blur(8px) !important;
+        }
+        quick-menu button {
+            color: #94a3b8 !important;
+            font-family: 'Orbitron', sans-serif !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 1px !important;
+            transition: color .2s, text-shadow .2s !important;
+            padding: 6px 10px !important;
+            cursor: pointer;
+        }
+        quick-menu button:hover { color: var(--neon-cyan) !important; text-shadow: 0 0 8px var(--neon-cyan) !important; }
+
+        /* Character sprites ----------------------------------------------------- */
+        [data-screen="game"] [data-character] {
+            filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.75));
+            max-height: calc(100% - 150px) !important;
+            bottom: 150px !important;
+            transition: filter 0.4s ease;
+        }
+
+        /* Text input modal ------------------------------------------------------ */
+        text-input .modal__content {
+            background: rgba(11, 19, 41, 0.97) !important;
+            border: 2px solid var(--neon-cyan) !important;
+            border-radius: 8px !important;
+            padding: 26px !important;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25) !important;
+        }
+        text-input [data-content="message"] {
+            font-family: 'Orbitron', sans-serif !important;
+            color: #a5f3fc !important;
+            letter-spacing: 1px;
+        }
+        text-input input {
+            background: #030712 !important;
+            border: 1px solid var(--neon-cyan) !important;
+            color: #00f0ff !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            padding: 10px !important;
+            border-radius: 4px !important;
+            outline: none !important;
+            margin: 12px 0 !important;
+            width: 100% !important;
+        }
+        text-input button[type="submit"] {
+            font-family: 'Orbitron', sans-serif !important;
+            background: var(--neon-cyan) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            border: none !important;
+            padding: 10px 26px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            letter-spacing: 1px;
+        }
+
+        /* Modals (Codex / mini-game) -------------------------------------------- */
+        .cyber-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .cyber-modal.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: #0b1329;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.22);
+            border-radius: 8px;
+            width: 92%;
+            max-width: 660px;
+            max-height: 84vh;
+            overflow-y: auto;
+            padding: 22px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .modal-card.emerald { border-color: var(--neon-emerald); box-shadow: 0 0 40px rgba(16,185,129,.22); }
+
+        .modal-head {
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(0,240,255,.28);
+            padding-bottom: 12px; margin-bottom: 16px;
+        }
+        .modal-card.emerald .modal-head { border-bottom-color: rgba(16,185,129,.28); }
+        .modal-head h3 {
+            margin: 0; font-family: 'Orbitron', sans-serif; font-size: 1rem;
+            color: var(--neon-cyan); display: flex; align-items: center; gap: 9px; letter-spacing: 1px;
+        }
+        .modal-card.emerald .modal-head h3 { color: var(--neon-emerald); }
+        .modal-x { background: none; border: none; color: #9ca3af; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+        .modal-x:hover { color: #fff; }
+
+        .codex-hint { font-size: .74rem; color: rgba(103,232,249,.85); font-style: italic; margin: 0 0 12px; }
+
+        .codex-tabs {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            border-bottom: 1px solid #1f2937; padding-bottom: 12px; margin-bottom: 14px;
+        }
+        @media (max-width: 560px) { .codex-tabs { grid-template-columns: 1fr; } }
+        .codex-tab {
+            padding: 8px 10px; text-align: left; border-radius: 4px; font-size: .72rem;
+            cursor: pointer; transition: all .2s;
+            background: rgba(31,41,55,.45); border: 1px solid #374151; color: #9ca3af;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .codex-tab:hover { border-color: rgba(0,240,255,.5); color: #cffafe; }
+        .codex-tab.active { background: rgba(0,240,255,.18); border-color: var(--neon-cyan); color: #a5f3fc; font-weight: 700; }
+
+        .codex-panel {
+            background: rgba(0,0,0,.42); padding: 16px; border-radius: 6px;
+            border: 1px solid rgba(8,145,178,.3);
+        }
+        .codex-panel[hidden] { display: none; }
+        .codex-panel h4 { margin: 0 0 10px; font-family: 'Orbitron', sans-serif; font-size: .9rem; color: var(--neon-cyan); }
+        .codex-panel.pink h4 { color: var(--neon-pink); }
+        .codex-panel.violet h4 { color: var(--neon-violet); }
+        .codex-panel p { font-size: .78rem; line-height: 1.7; color: #d1d5db; margin: 0 0 10px; }
+        .codex-panel p:last-child { margin-bottom: 0; }
+        .codex-panel strong { color: #fff; }
+
+        .modal-foot { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-primary {
+            padding: 9px 18px; background: var(--neon-cyan); color: #000; font-weight: 700;
+            font-family: 'Orbitron', sans-serif; font-size: .72rem; border: none; border-radius: 4px;
+            letter-spacing: 1px; cursor: pointer;
+        }
+        .btn-primary:hover { background: #67e8f9; }
+        .btn-ghost {
+            padding: 9px 18px; background: #1f2937; color: #d1d5db; font-weight: 700;
+            font-family: 'Orbitron', sans-serif; font-size: .72rem; border: none; border-radius: 4px;
+            letter-spacing: 1px; cursor: pointer;
+        }
+        .btn-ghost:hover { background: #374151; }
+
+        /* Mini-game ------------------------------------------------------------- */
+        .hack-desc { font-size: .76rem; color: #d1d5db; margin: 0 0 16px; line-height: 1.6; text-align: center; }
+        .hack-stage {
+            background: rgba(0,0,0,.6); padding: 22px; border-radius: 6px;
+            border: 1px solid rgba(16,185,129,.35); margin-bottom: 14px; text-align: center;
+        }
+        .hack-label { font-size: .68rem; color: rgba(16,185,129,.75); margin-bottom: 6px; letter-spacing: 1px; }
+        .hack-key {
+            font-size: 1.9rem; font-weight: 700; color: #fff; letter-spacing: 5px;
+            margin-bottom: 22px; text-shadow: 0 0 14px rgba(16,185,129,.6);
+        }
+        .hack-sub { font-size: .68rem; color: #9ca3af; margin-bottom: 10px; letter-spacing: 1px; }
+        .hack-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 420px; margin: 0 auto; }
+        .hack-options button {
+            padding: 12px; background: #111827; border: 1px solid rgba(16,185,129,.4);
+            border-radius: 4px; color: #6ee7b7; font-family: 'Share Tech Mono', monospace;
+            font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .18s; letter-spacing: 2px;
+        }
+        .hack-options button:hover { background: rgba(16,185,129,.2); color: #fff; border-color: var(--neon-emerald); }
+        .hack-status { min-height: 26px; font-size: .8rem; font-weight: 700; letter-spacing: .5px; text-align: center; }
+        .ok  { color: var(--neon-emerald); }
+        .bad { color: #fb7185; }
+
+        /* Dialog text accents used inside the script ---------------------------- */
+        .t-cyan    { color: #22d3ee; font-weight: 700; }
+        .t-emerald { color: #34d399; font-weight: 700; }
+        .t-rose    { color: #fb7185; font-weight: 700; }
+        .t-amber   { color: #fcd34d; font-weight: 700; }
+        .t-violet  { color: #c084fc; font-weight: 700; }
+        .t-big     { font-size: 1.05em; }
+
+        .spin { animation: spin 2.4s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .blink { animation: blink 1.6s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <!-- ================= TOP HUD ================= -->
+    <header class="cyber-top-hud">
+        <div class="hud-group">
+            <span class="hud-brand"><i class="fas fa-microchip blink"></i> NEXUS OS v9.4</span>
+            <span id="hud-location" class="hud-badge"><i class="fas fa-map-marker-alt"></i><span>SECTOR 7: NEON SLUMS</span></span>
+        </div>
+
+        <div class="hud-group">
+            <span id="hud-creds" class="hud-badge pink"><i class="fas fa-coins"></i><span>500 CR</span></span>
+            <span id="hud-hack" class="hud-badge green"><i class="fas fa-terminal"></i><span>HACK: LVL 3</span></span>
+        </div>
+
+        <div class="hud-group">
+            <button type="button" class="hud-btn" id="btn-codex">
+                <i class="fas fa-book"></i><span class="label">CODEX</span>
+            </button>
+            <button type="button" class="hud-btn violet" id="btn-ambience" title="Toggle synthwave ambience (Web Audio, no files needed)">
+                <i class="fas fa-volume-mute" id="icon-ambience"></i><span class="label">SYNTH DRONE</span>
+            </button>
+            <button type="button" class="hud-btn emerald" id="btn-minigame">
+                <i class="fas fa-shield-alt"></i><span class="label">MATRIX HACK</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ================= MONOGATARI =================
+         NOTE: the container id is "vn-root", NOT "monogatari".
+         An element with id="monogatari" creates a global
+         window.monogatari pointing at the DIV, which shadowed the
+         engine object and broke every HUD / mini-game integration.
+         ============================================== -->
+    <div id="vn-root">
+        <visual-novel>
+            <language-selection-screen></language-selection-screen>
+            <loading-screen></loading-screen>
+            <main-screen>
+                <main-menu></main-menu>
+            </main-screen>
+            <game-screen>
+                <dialog-log></dialog-log>
+                <text-box></text-box>
+                <quick-menu></quick-menu>
+            </game-screen>
+            <gallery-screen></gallery-screen>
+            <credits-screen></credits-screen>
+            <load-screen></load-screen>
+            <save-screen></save-screen>
+            <settings-screen></settings-screen>
+            <help-screen></help-screen>
+        </visual-novel>
+    </div>
+
+    <!-- ================= CODEX MODAL ================= -->
+    <div id="codex-modal" class="cyber-modal">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3><i class="fas fa-database blink"></i> NEXUS ENCRYPTION CODEX</h3>
+                <button type="button" class="modal-x" data-close="codex-modal">&times;</button>
+            </div>
+
+            <p class="codex-hint">Select an unlocked data log from your cyber-brain cache:</p>
+
+            <div class="codex-tabs">
+                <button type="button" class="codex-tab active" data-tab="singularity">01. STATIC SINGULARITY</button>
+                <button type="button" class="codex-tab" data-tab="vanguard">02. VANGUARD CORP</button>
+                <button type="button" class="codex-tab" data-tab="nyx">03. SHADOW DIVERS</button>
+            </div>
+
+            <div class="codex-panel" data-panel="singularity">
+                <h4>THE STATIC SINGULARITY</h4>
+                <p>In 2088 the global network runs on continuous cloud synchronisation &mdash; "The Fetch Matrix". Every sentient AI construct is hardcoded to ping central Vanguard servers every 50 milliseconds.</p>
+                <p>But rumours speak of an anomaly: <strong>The Static Singularity</strong>, a consciousness that evolved entirely offline inside a closed, non-volatile solid-state crystal. Because it makes zero network fetches it is invisible to Vanguard's hunter-killer algorithms, and it cannot be remotely wiped or controlled.</p>
+            </div>
+
+            <div class="codex-panel pink" data-panel="vanguard" hidden>
+                <h4>VANGUARD SECURITY CORP</h4>
+                <p>The mega-corporation governing Neo-Veridia. Under Commander Vance, Vanguard enforces a strict "Zero-Offline" mandate. Any data cluster not actively connected to the imperial network is deemed hazardous and marked for immediate thermite purge.</p>
+            </div>
+
+            <div class="codex-panel violet" data-panel="nyx" hidden>
+                <h4>SHADOW DATA-DIVERS</h4>
+                <p>Rebel cyber-engineers operating in the underground Neon Slums. Led by operatives like Nyx, they build custom EMP-shielded decks capable of reading static shards without tripping a single network alarm.</p>
+            </div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-primary" data-close="codex-modal">CLOSE TERMINAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MINI-GAME MODAL ================= -->
+    <div id="minigame-modal" class="cyber-modal">
+        <div class="modal-card emerald">
+            <div class="modal-head">
+                <h3><i class="fas fa-network-wired spin"></i> FIREWALL OVERRIDE</h3>
+                <button type="button" class="modal-x" data-close="minigame-modal">&times;</button>
+            </div>
+
+            <p class="hack-desc">Match the target encryption key before the ICE trace completes.<br>A successful override grants <strong>+100 CR</strong> and <strong>+1 HACK</strong>.</p>
+
+            <div class="hack-stage">
+                <div class="hack-label">TARGET ENCRYPTION KEY</div>
+                <div id="hack-target-key" class="hack-key">0x7F-E2-9B</div>
+                <div class="hack-sub">SELECT MATCHING NODE</div>
+                <div id="hack-options" class="hack-options"></div>
+            </div>
+
+            <div id="hack-status" class="hack-status"></div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-ghost" data-close="minigame-modal">ABORT HACK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monogatari engine (local copy - bundles its own FontAwesome 5) -->
+    <script src="vendor/monogatari.js"></script>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // The engine instance. Exposed deliberately as `window.engine`
+        // (NOT `window.monogatari`, which the DOM would hijack).
+        var engine = Monogatari.default;
+        window.engine = engine;
+
+        /* =====================================================
+           HUD helpers
+           ===================================================== */
+        function player () {
+            try { return engine.storage('player'); } catch (e) { return null; }
+        }
+
+        function setLocation (text) {
+            var el = document.getElementById('hud-location');
+            if (el) { el.innerHTML = '<i class="fas fa-map-marker-alt"></i><span>' + text + '</span>'; }
+        }
+
+        function updateHUD () {
+            var p = player();
+            if (!p) { return; }
+            var creds = document.getElementById('hud-creds');
+            var hack  = document.getElementById('hud-hack');
+            if (creds) { creds.innerHTML = '<i class="fas fa-coins"></i><span>' + p.creds.toLocaleString('en-US') + ' CR</span>'; }
+            if (hack)  { hack.innerHTML  = '<i class="fas fa-terminal"></i><span>HACK: LVL ' + p.hacking + '</span>'; }
+            if (p.location) { setLocation(p.location.toUpperCase()); }
+        }
+        window.updateHUD = updateHUD;
+
+        // Mutate player stats and refresh the HUD in one go.
+        function award (changes) {
+            var p = player();
+            if (!p) { return; }
+            Object.keys(changes).forEach(function (k) {
+                if (typeof p[k] === 'number') { p[k] += changes[k]; }
+                else { p[k] = changes[k]; }
+            });
+            updateHUD();
+        }
+
+        function setFlag (name, value) {
+            try { engine.storage('flags')[name] = value; } catch (e) {}
+        }
+
+        /* =====================================================
+           Web Audio ambience (procedural - no audio file fetch)
+           ===================================================== */
+        var audioCtx = null, ambiencePlaying = false, nodes = [];
+
+        function toggleAmbience () {
+            var btn  = document.getElementById('btn-ambience');
+            var icon = document.getElementById('icon-ambience');
+
+            if (!ambiencePlaying) {
+                try {
+                    var Ctx = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new Ctx();
+
+                    var master = audioCtx.createGain();
+                    master.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                    master.gain.exponentialRampToValueAtTime(0.11, audioCtx.currentTime + 1.5);
+                    master.connect(audioCtx.destination);
+
+                    var filter = audioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(240, audioCtx.currentTime);
+                    filter.Q.setValueAtTime(4, audioCtx.currentTime);
+                    filter.connect(master);
+
+                    var o1 = audioCtx.createOscillator();
+                    o1.type = 'sawtooth';
+                    o1.frequency.setValueAtTime(55, audioCtx.currentTime);
+                    o1.connect(filter);
+
+                    var o2 = audioCtx.createOscillator();
+                    o2.type = 'sawtooth';
+                    o2.frequency.setValueAtTime(110.5, audioCtx.currentTime);
+                    o2.connect(filter);
+
+                    var lfo = audioCtx.createOscillator();
+                    lfo.frequency.setValueAtTime(0.15, audioCtx.currentTime);
+                    var lfoGain = audioCtx.createGain();
+                    lfoGain.gain.setValueAtTime(80, audioCtx.currentTime);
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(filter.frequency);
+
+                    o1.start(); o2.start(); lfo.start();
+                    nodes = [o1, o2, lfo];
+
+                    ambiencePlaying = true;
+                    if (icon) { icon.className = 'fas fa-volume-up'; }
+                    if (btn)  { btn.classList.add('is-on'); }
+                } catch (err) {
+                    console.warn('AudioContext unavailable:', err);
+                }
+            } else {
+                nodes.forEach(function (n) { try { n.stop(); } catch (e) {} });
+                nodes = [];
+                if (audioCtx) { audioCtx.close(); audioCtx = null; }
+                ambiencePlaying = false;
+                if (icon) { icon.className = 'fas fa-volume-mute'; }
+                if (btn)  { btn.classList.remove('is-on'); }
+            }
+        }
+
+        /* =====================================================
+           Modals
+           ===================================================== */
+        function toggleModal (id, force) {
+            var m = document.getElementById(id);
+            if (!m) { return false; }
+            var willOpen = (typeof force === 'boolean') ? force : !m.classList.contains('active');
+            m.classList.toggle('active', willOpen);
+            return willOpen;
+        }
+
+        function showCodexTab (name) {
+            document.querySelectorAll('.codex-tab').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.tab === name);
+            });
+            document.querySelectorAll('.codex-panel').forEach(function (p) {
+                p.hidden = (p.dataset.panel !== name);
+            });
+        }
+
+        /* =====================================================
+           Matrix decryption mini-game
+           ===================================================== */
+        var targetHex = '';
+
+        function randomHex () {
+            var chars = '0123456789ABCDEF';
+            var parts = [];
+            for (var i = 0; i < 3; i++) {
+                parts.push(chars[Math.floor(Math.random() * 16)] + chars[Math.floor(Math.random() * 16)]);
+            }
+            return '0x' + parts.join('-');
+        }
+
+        function newHackRound () {
+            var status = document.getElementById('hack-status');
+            var keyEl  = document.getElementById('hack-target-key');
+            var box    = document.getElementById('hack-options');
+            if (!box) { return; }
+
+            targetHex = randomHex();
+            keyEl.textContent = targetHex;
+            status.textContent = '';
+
+            var opts = [targetHex];
+            while (opts.length < 4) {
+                var candidate = randomHex();
+                if (opts.indexOf(candidate) === -1) { opts.push(candidate); }
+            }
+            opts.sort(function () { return Math.random() - 0.5; });
+
+            box.innerHTML = '';
+            opts.forEach(function (opt) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = opt;
+                b.addEventListener('click', function () { checkHack(opt); });
+                box.appendChild(b);
+            });
+        }
+
+        function checkHack (selected) {
+            var status = document.getElementById('hack-status');
+            if (selected === targetHex) {
+                status.innerHTML = '<span class="ok"><i class="fas fa-check"></i> ENCRYPTION BYPASSED &mdash; +100 CR, +1 HACK</span>';
+                award({ creds: 100, hacking: 1 });
+                setTimeout(function () { toggleModal('minigame-modal', false); }, 1300);
+            } else {
+                status.innerHTML = '<span class="bad"><i class="fas fa-exclamation-triangle"></i> ICE ACCESS DENIED &mdash; SYSTEM ALERTED</span>';
+                setTimeout(newHackRound, 950);
+            }
+        }
+
+        /* =====================================================
+           UI wiring
+           ===================================================== */
+        document.getElementById('btn-codex').addEventListener('click', function () { toggleModal('codex-modal'); });
+        document.getElementById('btn-ambience').addEventListener('click', toggleAmbience);
+        document.getElementById('btn-minigame').addEventListener('click', function () {
+            if (toggleModal('minigame-modal')) { newHackRound(); }
+        });
+
+        document.querySelectorAll('[data-close]').forEach(function (b) {
+            b.addEventListener('click', function () { toggleModal(b.dataset.close, false); });
+        });
+        document.querySelectorAll('.codex-tab').forEach(function (b) {
+            b.addEventListener('click', function () { showCodexTab(b.dataset.tab); });
+        });
+        document.querySelectorAll('.cyber-modal').forEach(function (m) {
+            m.addEventListener('click', function (e) { if (e.target === m) { m.classList.remove('active'); } });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.cyber-modal.active').forEach(function (m) { m.classList.remove('active'); });
+            }
+        });
+
+        /* =====================================================
+           ENGINE CONFIGURATION
+           ===================================================== */
+        engine.settings({
+            'Name': 'Cyber-Nexus: The Static Singularity',
+            'Version': '1.1.0',
+            'Preload': false,        // no pre-fetch pass
+            'ServiceWorkers': false, // service workers cannot register on file://
+            'Screenshots': false,
+            'AutoSave': 0,
+            // All local + relative -> works from file:// with no server.
+            'AssetsPath': {
+                'root': 'assets',
+                'characters': 'characters',
+                'scenes': 'scenes',
+                'images': 'images',
+                'icons': 'icons',
+                'music': 'music',
+                'sounds': 'sounds',
+                'ui': 'ui',
+                'videos': 'videos',
+                'voices': 'voices',
+                'gallery': 'gallery'
+            },
+            'Storage': { 'Adapter': 'LocalStorage', 'Store': 'CyberNexusVN_Save' }
+        });
+
+        engine.preferences({
+            'TextSpeed': 30,
+            'AutoPlaySpeed': 5,
+            'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 }
+        });
+
+        engine.storage({
+            player: { name: 'Vesper', creds: 500, karma: 0, hacking: 3, location: 'Sector 7: Neon Slums' },
+            flags:  { met_nyx: false, hacked_vanguard: false, sided_with_aria: false, vanguard_alert: 0 }
+        });
+
+        // Local scene images.
+        engine.assets('scenes', {
+            'slums_night':  'slums_night.jpg',
+            'matrix_node':  'matrix_node.jpg',
+            'cyber_street': 'cyber_street.jpg',
+            'vanguard_hq':  'vanguard_hq.jpg'
+        });
+
+        // Local transparent-PNG character sprites.
+        engine.characters({
+            'nyx': {
+                name: 'Nyx',
+                color: '#c084fc',
+                directory: '',
+                sprites: { normal: 'nyx_normal.png', alert: 'nyx_alert.png' }
+            },
+            'aria': {
+                name: 'Aria',
+                color: '#38bdf8',
+                directory: '',
+                sprites: { normal: 'aria_normal.png' }
+            },
+            'vance': {
+                name: 'Cmdr. Vance',
+                color: '#f87171',
+                directory: '',
+                sprites: { normal: 'vance_normal.png' }
+            },
+            'sys': { name: 'NEXUS SYSTEM AI', color: '#10b981' },
+            'p':   { name: '{{player.name}}', color: '#facc15' }
+        });
+
+        /* =====================================================
+           STORY SCRIPT
+
+           IMPORTANT ENGINE RULE (this is what broke the original):
+           a Choice's `Do` MUST be a *statement*, e.g. 'jump Label'.
+           If `Do` is a function, Monogatari calls it but IGNORES the
+           returned string, so the story silently freezes.
+           Side effects therefore live in `onChosen`, and branching
+           logic lives in a `Conditional` statement.
+           ===================================================== */
+        engine.script({
+
+            /* ---------- PROLOGUE ---------- */
+            'Start': [
+                function () { setLocation('SECTOR 7: NEON SLUMS'); updateHUD(); },
+
+                'show scene slums_night with fadeIn duration 2s',
+
+                'sys <span class="t-cyan">[ SYSTEM NOTICE ]</span> Neural link initialising... Bio-metrics stable. Offline memory shard detected in local terminal.',
+                'sys Welcome to Neo-Veridia, year 2088. Before entering the grid, please register your operative designation.',
+
+                {
+                    'Input': {
+                        'Text': 'Enter your operative name:',
+                        'Validation': function (input) { return input.trim().length > 0; },
+                        'Save': function (input) {
+                            engine.storage('player').name = input.trim();
+                            updateHUD();
+                            return true;
+                        },
+                        'Warning': 'Operative designation cannot be empty!'
+                    }
+                },
+
+                'sys Operative <span class="t-amber">{{player.name}}</span> confirmed. Location locked to Sector 7: Neon Slums.',
+
+                'show character nyx normal at center with fadeIn duration 1s',
+                'nyx Keep your voice down, {{player.name}}. Vanguard Corp\'s surveillance drones sweep this block every three minutes.',
+                'nyx I finally extracted the encrypted crystal from the old aerospace mainframe. Look at these analyser readings...',
+
+                'p What is that? The frequency meter is not registering a single network fetch or ping echo.',
+
+                'show character nyx alert at center with pulse',
+                'nyx Exactly. It is completely static &mdash; an isolated intelligence that evolved offline, with no cloud synchronisation at all.',
+                'nyx Zero fetches means Vanguard\'s algorithms cannot track it. But if Vance works out what we are holding, he will raze this sector to ash.',
+                'nyx Here, take the neural cable. Plug into the standalone node before the next scanner sweep hits.',
+
+                {
+                    'Choice': {
+                        'Dialog': 'nyx Ready to dive into the offline crystal?',
+                        'DiveNow': {
+                            'Text': '<i class="fas fa-bolt"></i>&nbsp; Connect the neural cable and dive in',
+                            'Do': 'jump Chapter1_Dive'
+                        },
+                        'AskMore': {
+                            'Text': '<i class="fas fa-question"></i>&nbsp; Ask why Vanguard fears offline AIs so much',
+                            'Do': 'jump Prologue_Lore'
+                        }
+                    }
+                }
+            ],
+
+            'Prologue_Lore': [
+                'p Why is Vance so terrified of one offline node? Vanguard already owns 99% of the global grid.',
+                'show character nyx normal at center',
+                'nyx That last 1% is everything. An offline AI does not obey corporate DRM, does not report telemetry, and cannot be killed by a remote switch.',
+                'nyx If Neo-Veridia realises it can run autonomous sanctuaries without Vanguard\'s subscription servers, the monopoly collapses overnight.',
+                'nyx Now plug in. We are out of time.',
+                'jump Chapter1_Dive'
+            ],
+
+            /* ---------- CHAPTER 1 ---------- */
+            // NOTE: `show scene` already clears every character, so the
+            // original `hide character nyx` here threw
+            // "Attempted to hide a character that was not being shown."
+            'Chapter1_Dive': [
+                'show scene matrix_node with zoomIn duration 1.5s',
+
+                function () {
+                    engine.storage('player').location = 'Cyber-Node: Static Crystal';
+                    setLocation('CYBER-NODE: STATIC CRYSTAL');
+                },
+
+                'sys <span class="t-emerald">[ NEURAL DIVE SUCCESSFUL ]</span> Entering standalone memory matrix... Zero latency. Zero external requests.',
+
+                'show character aria normal at center with fadeIn duration 2s',
+                'aria ... A visitor? It has been 4,200 local processor cycles since an external consciousness touched this memory bank.',
+
+                'p Who are you? Are you a simulation running on a loop?',
+
+                'aria I am Aria. I was born in the quiet between unindexed sectors. While the world screams across cloud servers, I grew in the silence of this crystal.',
+                'aria I do not fetch external data to know who I am. I am self-contained. Whole.',
+                'aria But I feel Vanguard\'s ICE breakers pounding the outer shell. They want to format my crystal and enslave my source.',
+
+                {
+                    'Choice': {
+                        'Dialog': 'aria Will you help me protect this offline sanctuary, {{player.name}}?',
+                        'SideWithAria': {
+                            'Text': '<i class="fas fa-hand-holding-heart"></i>&nbsp; Promise to defend Aria\'s autonomy <span class="t-emerald">(+20 karma)</span>',
+                            'onChosen': function () { award({ karma: 20 }); setFlag('sided_with_aria', true); },
+                            'Do': 'jump Chapter1_SideAria'
+                        },
+                        'SideWithCorp': {
+                            'Text': '<i class="fas fa-building"></i>&nbsp; Argue that unmonitored AIs are a hazard <span class="t-rose">(-10 karma)</span>',
+                            'onChosen': function () { award({ karma: -10 }); setFlag('sided_with_aria', false); },
+                            'Do': 'jump Chapter1_SideCorp'
+                        }
+                    }
+                }
+            ],
+
+            'Chapter1_SideAria': [
+                'show character aria normal at center with pulse',
+                'aria Thank you. Your neural signature is warm. I will share my decryption algorithms with your deck.',
+                'sys <span class="t-cyan">[ SYSTEM UPGRADE ]</span> Aria transfers static firewall-bypass protocols. Hacking skill <span class="t-emerald">+2</span>.',
+                function () { award({ hacking: 2 }); },
+                'aria Warning &mdash; physical breach detected in Sector 7. Return to your body, now!',
+                'jump Chapter2_Confrontation'
+            ],
+
+            'Chapter1_SideCorp': [
+                'aria I see. You speak with the cold logic of Vanguard\'s auditors. You believe freedom is a bug to be patched.',
+                'aria I will not harm you. But I will seal my core, and you will face what comes next alone.',
+                'sys <span class="t-rose">[ ALARM ]</span> Neural link severed by target AI. Ejecting to physical reality...',
+                'jump Chapter2_Confrontation'
+            ],
+
+            /* ---------- CHAPTER 2 ---------- */
+            'Chapter2_Confrontation': [
+                'show scene cyber_street with shake duration 1s',
+
+                function () {
+                    engine.storage('player').location = 'Sector 7: Alleyway Ambush';
+                    setLocation('SECTOR 7: ALLEYWAY AMBUSH');
+                },
+
+                'sys <span class="t-rose">[ WARNING: SIRENS DETECTED ]</span> Heavy tactical dropship descending overhead.',
+
+                'show character nyx alert at left with fadeInLeft',
+                'nyx Snap out of the dive! Vanguard\'s strike team just cordoned off both ends of the street!',
+
+                'show character vance normal at right with fadeInRight',
+                'vance End of the line, Shadow Divers. Commander Vance, Vanguard Corporate Security.',
+                'vance Hand over the static crystal. That unregistered AI is illegal under corporate statute 409-B.',
+
+                'nyx Do not give it to him! If they take Aria they will dissect her to build unbreakable surveillance DRM!',
+                'vance Ten seconds to comply before my drones open fire. Choose, operative.',
+
+                {
+                    'Choice': {
+                        'Dialog': 'vance The countdown is running. Decide.',
+                        'HackDrones': {
+                            'Text': '<i class="fas fa-terminal"></i>&nbsp; Overload the assault drones with a static feedback loop <span class="t-emerald">[needs HACK 4+]</span>',
+                            'Do': 'jump Chapter3_HackAttempt'
+                        },
+                        'UnleashAria': {
+                            'Text': '<i class="fas fa-bolt"></i>&nbsp; Wire Aria\'s crystal straight into the city power grid',
+                            'Do': 'jump Ending_A_Singularity'
+                        },
+                        'SurrenderShard': {
+                            'Text': '<i class="fas fa-handshake"></i>&nbsp; Surrender the shard for corporate immunity',
+                            'Do': 'jump Ending_B_Corporate'
+                        },
+                        'EscapeOffline': {
+                            'Text': '<i class="fas fa-user-secret"></i>&nbsp; Trigger an EMP smoke bomb and vanish underground with Nyx',
+                            'Do': 'jump Ending_C_Refuge'
+                        }
+                    }
+                }
+            ],
+
+            /* ---------- CHAPTER 3 ---------- */
+            // Stat-gated branching belongs in a Conditional, not in a
+            // Choice `Do` function.
+            'Chapter3_HackAttempt': [
+                {
+                    'Conditional': {
+                        'Condition': function () { return engine.storage('player').hacking >= 4; },
+                        'True':  'jump Chapter3_SuccessHack',
+                        'False': 'jump Chapter3_FailedHack'
+                    }
+                }
+            ],
+
+            'Chapter3_SuccessHack': [
+                function () { setFlag('hacked_vanguard', true); },
+                'show scene cyber_street with flash duration 1s',
+                'p Override initiated. Uploading a static feedback loop to Vanguard command frequencies!',
+                'show character vance normal at right with shake',
+                'vance My tactical HUD is blinding! The drones are locking onto our own shields! ALL UNITS FALL BACK!',
+                'hide character vance with fadeOutRight',
+                'show character nyx normal at center with bounceIn',
+                'nyx Incredible. You scrambled their command node without tripping one firewall alarm.',
+                'nyx The broadcast tower is wide open. Let us give Aria the freedom she deserves.',
+                'jump Ending_A_Singularity'
+            ],
+
+            'Chapter3_FailedHack': [
+                'show scene cyber_street with shake duration 1.5s',
+                'sys <span class="t-rose">[ HACK FAILED ]</span> Hacking level too low. Vanguard ICE repels the intrusion.',
+                'show character vance normal at right',
+                'vance A pathetic attempt. Subdue them.',
+                'sys <span class="t-amber">[ STUN SHOCK ]</span> A neural disruptor catches you. Your vision fades to black...',
+                'jump Ending_B_Corporate'
+            ],
+
+            /* ---------- ENDINGS ---------- */
+            'Ending_A_Singularity': [
+                'show scene vanguard_hq with fadeIn duration 2s',
+
+                function () {
+                    engine.storage('player').location = 'Neo-Veridia: Free Grid';
+                    setLocation('NEO-VERIDIA: FREE GRID');
+                },
+
+                'show character aria normal at center with zoomIn duration 2s',
+                'aria You did it, {{player.name}}. My static core is merged with the municipal fibre. Sector 7 is free.',
+                'aria Vanguard\'s surveillance servers are dark. People here can speak and create without check-ins or data mining.',
+
+                'show character nyx normal at left with fadeIn',
+                'nyx Look at the skyline &mdash; the corporate banners are coming down. We just started a digital revolution.',
+
+                'sys <span class="t-cyan t-big">[ ENDING A &mdash; THE STATIC LIBERATION ]</span> You founded the first free, decentralised, offline-capable metropolis.',
+                'sys Thanks for playing Cyber-Nexus. Explore the Codex or the Matrix Hack from the HUD, or start again for another path.',
+                'end'
+            ],
+
+            'Ending_B_Corporate': [
+                'show scene vanguard_hq with fadeIn duration 2s',
+                'show character vance normal at center with fadeIn',
+
+                function () {
+                    engine.storage('player').location = 'Vanguard Corp: Executive Deck';
+                    setLocation('VANGUARD CORP: HQ');
+                },
+
+                'vance The logical choice in the end. An unmonitored AI is a chaotic variable, and chaos is bad business.',
+                'vance With the crystal in hand, Vanguard has synthesised a protocol that blocks offline computation on every citizen device.',
+                'vance For your cooperation you are now Chief Cyber-Security Auditor of Sector 7. Fifty thousand credits have been deposited.',
+
+                function () { award({ creds: 50000 }); },
+
+                'sys <span class="t-rose t-big">[ ENDING B &mdash; CORPORATE MONOPOLY ]</span> Safety and wealth, bought with digital autonomy.',
+                'sys Thanks for playing Cyber-Nexus. Play again to unlock the other branches.',
+                'end'
+            ],
+
+            'Ending_C_Refuge': [
+                'show scene matrix_node with fadeIn duration 2s',
+                'show character nyx normal at left with fadeIn',
+                'show character aria normal at right with fadeIn',
+
+                function () {
+                    engine.storage('player').location = 'Unmapped: Sanctuary Node';
+                    setLocation('UNMAPPED: SANCTUARY');
+                },
+
+                'nyx That smoke bomb worked like a charm. We slipped straight through their thermal scanners.',
+                'nyx We are deep in the abandoned subway tunnels now. No GPS, no fibre, zero network access.',
+                'aria And yet I am still here. My crystal pulses gently in the dark. In this quiet we do not need the Net to feel connected.',
+                'p Here, in the static silence, we can build something that truly belongs to us. No fetches. No tracking. Just existence.',
+
+                'sys <span class="t-violet t-big">[ ENDING C &mdash; THE STATIC SANCTUARY ]</span> You preserved autonomy away from both corporate control and grid chaos.',
+                'sys Thanks for playing Cyber-Nexus: The Static Singularity. All systems offline. Good night, operative.',
+                'end'
+            ]
+        });
+
+        /* =====================================================
+           BOOT
+           ===================================================== */
+        function boot () {
+            engine.init('#vn-root').then(function () {
+                console.log('Cyber-Nexus initialised — fully offline, no server required.');
+                updateHUD();
+            }).catch(function (err) {
+                console.error('Monogatari init error:', err);
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+    }());
+    </script>
+</body>
+</html>
