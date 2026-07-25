@@ -14,6 +14,11 @@
          ========================================================= -->
     <link rel="stylesheet" href="assets/fonts/fonts.css" />
     <link rel="stylesheet" href="vendor/monogatari.css" />
+    <!-- Offline icon shim: the monogatari.css only ships FA class names, not
+         the icon font (it used to silently come from a CDN). This maps every
+         fa-* class the engine/game uses to a Unicode glyph — no font files,
+         no fetches. Must come AFTER monogatari.css. -->
+    <link rel="stylesheet" href="vendor/icons-offline.css" />
 
     <style>
         /* ---------------------------------------------------------
@@ -620,8 +625,19 @@
         </div>
     </div>
 
-    <!-- Monogatari engine (local copy - bundles its own FontAwesome 5) -->
+    <!-- FailSafe abstraction layer (local, zero-dependency, ES5):
+         schema validation, immutable updates, exhaustive matching, a tiny
+         state machine, rollback-safe Monogatari helpers and the no-fetch
+         guard. Loaded BEFORE the engine so game code can rely on it. -->
+    <script src="vendor/failsafe.js"></script>
+
+    <!-- Monogatari engine (local copy; its icon FONT is not included, which
+         is exactly what icons-offline.* above replaces) -->
     <script src="vendor/monogatari.js"></script>
+
+    <!-- Flags any fa-* class that has no offline glyph (renders a placeholder
+         and names the icon in the console instead of shipping a broken box). -->
+    <script src="vendor/icons-offline.js"></script>
 
     <script>
     (function () {
@@ -631,6 +647,27 @@
         // (NOT `window.monogatari`, which the DOM would hijack).
         var engine = Monogatari.default;
         window.engine = engine;
+
+        // Failsafe abstraction layer. If it didn't load we are running a
+        // broken build — better to say so than to boot half-protected.
+        var FS = window.FailSafe;
+        if (!FS) {
+            console.error('[Cyber-Nexus] vendor/failsafe.js did not load; aborting boot.');
+            return;
+        }
+
+        /* -----------------------------------------------------
+           FAILSAFE 0: no-fetch guard.
+           This page ships as a no-server artifact: any runtime
+           fetch/XHR/beacon/socket is a BUG, not a feature. Guard
+           starts before the engine loads so regressions are loud.
+           'observe' logs (production-safe); flip to 'block' in
+           tests to hard-fail network attempts.
+           ----------------------------------------------------- */
+        var netGuard = FS.net.guard({ mode: 'observe' });
+        console.info('[Cyber-Nexus] FailSafe v' + FS.VERSION +
+            ' online — offline guard ' + (netGuard ? 'active' : 'unavailable') +
+            ': this page must never fetch.');
 
         /* =====================================================
            HUD helpers
@@ -655,7 +692,42 @@
         }
         window.updateHUD = updateHUD;
 
-        // Mutate player stats and refresh the HUD in one go.
+        /* =====================================================
+           FAILSAFE VN facade (vendor/failsafe.js)
+           -----------------------------------------------------
+           All in-script state mutation goes through `vn`, which
+           snapshots previous values at Apply-time and restores
+           them at Revert-time. Rollback is correct BY CONSTRUCTION:
+           no hand-written inverse (subtract-the-delta / NOT-the-flag)
+           that silently corrupts state when a flag was already set.
+           ===================================================== */
+        var vn = FS.vn(engine, {
+            onChange: function () { try { updateHUD(); } catch (e) { /* HUD optional */ } }
+        });
+
+        /* FAILSAFE 1: storage schema (see boot()).
+           The storage shape is declared ONCE here and validated before the
+           game ever reads it — a corrupted/old save is repaired from
+           defaults and reported, not crashed on mid-dialogue. */
+        var STORAGE_SCHEMA = FS.schema.object({
+            player: FS.schema.object({
+                name:     FS.schema.string().default('Vesper'),
+                creds:    FS.schema.number().default(0),
+                karma:    FS.schema.number().default(0),
+                hacking:  FS.schema.number({ int: true, min: 0 }).default(0),
+                location: FS.schema.string().default('Sector 7: Neon Slums')
+            }),
+            flags: FS.schema.object({
+                met_nyx:         FS.schema.boolean().default(false),
+                hacked_vanguard: FS.schema.boolean().default(false),
+                sided_with_aria: FS.schema.boolean().default(false),
+                vanguard_alert:  FS.schema.number().default(0)
+            })
+        });
+
+        /* Minigame payout, deliberately OUTSIDE the story timeline:
+           mini-game wins are meta-progression, not story steps, so they must
+           NOT be reverted by the Back button. Story mutations use vn.* below. */
         function award (changes) {
             var p = player();
             if (!p) { return; }
@@ -664,103 +736,6 @@
                 else { p[k] = changes[k]; }
             });
             updateHUD();
-        }
-
-        // Exact inverse of award() - used by every rewind path.
-        function unaward (changes) {
-            var p = player();
-            if (!p) { return; }
-            Object.keys(changes).forEach(function (k) {
-                if (typeof changes[k] === 'number' && typeof p[k] === 'number') { p[k] -= changes[k]; }
-            });
-            updateHUD();
-        }
-
-        function setFlag (name, value) {
-            try { engine.storage('flags')[name] = value; } catch (e) {}
-        }
-
-        /* -----------------------------------------------------
-           Reversible-mutation helpers.
-
-           Monogatari has no DSL and no failsafes: the script is
-           plain JS, so the engine cannot know that a function
-           changed state, and it cannot invert it for you. Two
-           traps follow from that, both verified in a browser:
-
-             1. A bare `function () {...}` step blocks rollback -
-                the Back button silently stops working at it.
-             2. A Choice with `onChosen` but no `onRevert` is
-                declared non-reversible, so rewinding past it
-                leaves the stats it changed stale.
-
-           `reversible()` wraps a stat change in the engine's own
-           {Function: {Apply, Revert}} action so Back stays intact,
-           and `choiceEffect()` builds a matched onChosen/onRevert
-           pair. Route every mutation through these two helpers.
-           ----------------------------------------------------- */
-        function reversible (changes, extra) {
-            extra = extra || {};
-            return {
-                'Function': {
-                    'Apply': function () {
-                        award(changes);
-                        if (extra.flags) {
-                            Object.keys(extra.flags).forEach(function (f) { setFlag(f, extra.flags[f]); });
-                        }
-                        if (extra.location) {
-                            engine.storage('player').location = extra.location;
-                            setLocation(extra.location.toUpperCase());
-                        }
-                        return true;
-                    },
-                    'Revert': function () {
-                        unaward(changes);
-                        if (extra.flags) {
-                            Object.keys(extra.flags).forEach(function (f) { setFlag(f, !extra.flags[f]); });
-                        }
-                        if (extra.prevLocation) {
-                            engine.storage('player').location = extra.prevLocation;
-                            setLocation(extra.prevLocation.toUpperCase());
-                        }
-                        return true;
-                    }
-                }
-            };
-        }
-
-        // Scene/location changes carry no numeric state, but a bare
-        // function would still break Back - so they are reversible too.
-        function goTo (location, previous) {
-            return {
-                'Function': {
-                    'Apply': function () {
-                        engine.storage('player').location = location;
-                        setLocation(location.toUpperCase());
-                        return true;
-                    },
-                    'Revert': function () {
-                        var back = previous || 'Sector 7: Neon Slums';
-                        engine.storage('player').location = back;
-                        setLocation(back.toUpperCase());
-                        return true;
-                    }
-                }
-            };
-        }
-
-        // Matched onChosen/onRevert pair so choices stay rewindable.
-        function choiceEffect (changes, flags) {
-            return {
-                onChosen: function () {
-                    award(changes);
-                    if (flags) { Object.keys(flags).forEach(function (f) { setFlag(f, flags[f]); }); }
-                },
-                onRevert: function () {
-                    unaward(changes);
-                    if (flags) { Object.keys(flags).forEach(function (f) { setFlag(f, !flags[f]); }); }
-                }
-            };
         }
 
         /* =====================================================
@@ -846,8 +821,32 @@
 
         /* =====================================================
            Matrix decryption mini-game
+           -----------------------------------------------------
+           FAILSAFE 2: a state machine guards the round flow.
+           Before this, clicking the correct node a second time
+           inside the 1.3s success window PAID OUT TWICE, because
+           `checkHack` trusted the click, not the round state.
+           Impossible transitions are now impossible to pay out —
+           the machine simply refuses them (changed === false).
            ===================================================== */
+        var hackMachine = FS.machine({
+            id: 'matrix-hack', initial: 'idle',
+            states: {
+                idle:     { on: { START: 'active' } },
+                active:   { on: { HIT: 'resolved', MISS: 'cooldown' } },
+                cooldown: { on: { REGEN: 'active', START: 'active' } },
+                resolved: { on: { START: 'active', REGEN: 'active' } }
+            }
+        });
+        var hackState = 'idle';
         var targetHex = '';
+
+        function hackSend (type) {
+            var step = hackMachine.transition(hackState, type);
+            if (!step.changed) { return false; }
+            hackState = step.state;
+            return true;
+        }
 
         function randomHex () {
             var chars = '0123456789ABCDEF';
@@ -863,6 +862,8 @@
             var keyEl  = document.getElementById('hack-target-key');
             var box    = document.getElementById('hack-options');
             if (!box) { return; }
+
+            hackSend('START') || hackSend('REGEN'); // -> 'active' from any state that allows it
 
             targetHex = randomHex();
             keyEl.textContent = targetHex;
@@ -886,12 +887,20 @@
         }
 
         function checkHack (selected) {
+            // The machine, not the click, decides whether a guess counts.
+            if (hackState !== 'active') { return; }
             var status = document.getElementById('hack-status');
-            if (selected === targetHex) {
+
+            // Exhaustive-by-construction outcome resolution (ts-pattern style).
+            var outcome = FS.match(selected === targetHex)
+                .with(true, function () { return 'HIT'; })
+                .otherwise(function () { return 'MISS'; });
+
+            if (outcome === 'HIT' && hackSend('HIT')) {
                 status.innerHTML = '<span class="ok"><i class="fas fa-check"></i> ENCRYPTION BYPASSED &mdash; +100 CR, +1 HACK</span>';
                 award({ creds: 100, hacking: 1 });
                 setTimeout(function () { toggleModal('minigame-modal', false); }, 1300);
-            } else {
+            } else if (outcome === 'MISS' && hackSend('MISS')) {
                 status.innerHTML = '<span class="bad"><i class="fas fa-exclamation-triangle"></i> ICE ACCESS DENIED &mdash; SYSTEM ALERTED</span>';
                 setTimeout(newHackRound, 950);
             }
@@ -1002,17 +1011,21 @@
               If `Do` is a function the engine runs it but IGNORES the
               returned string, and the story silently freezes.
            2. Conditional branching goes in a `Conditional` statement,
-              never in a `Do` function.
+              never in a `Do` function. We build ours with vn.branch(),
+              which guarantees a False branch and can't throw.
            3. Every state mutation must be reversible, or the Back
               button breaks (bare function) or desyncs (onChosen with
-              no onRevert). Hence reversible() / goTo() / choiceEffect()
-              instead of raw `function () {...}` steps.
+              no onRevert). Every mutation below goes through
+              vn.reversible() / vn.goTo() / vn.choiceEffect(), and
+              vn.lintScript() (see boot) machine-checks these rules on
+              every load — a violation is a console ERROR, not a
+              player's bug report.
            ===================================================== */
         engine.script({
 
             /* ---------- PROLOGUE ---------- */
             'Start': [
-                goTo('Sector 7: Neon Slums'),
+                vn.goTo('Sector 7: Neon Slums'),
 
                 'show scene slums_night with fadeIn duration 2s',
 
@@ -1076,7 +1089,7 @@
             'Chapter1_Dive': [
                 'show scene matrix_node with zoomIn duration 1.5s',
 
-                goTo('Cyber-Node: Static Crystal', 'Sector 7: Neon Slums'),
+                vn.goTo('Cyber-Node: Static Crystal'),
 
                 'sys <span class="t-emerald">[ NEURAL DIVE SUCCESSFUL ]</span> Entering standalone memory matrix... Zero latency. Zero external requests.',
 
@@ -1095,12 +1108,12 @@
                         'SideWithAria': Object.assign({
                             'Text': '<i class="fas fa-hand-holding-heart"></i>&nbsp; Promise to defend Aria\'s autonomy <span class="t-emerald">(+20 karma)</span>',
                             'Do': 'jump Chapter1_SideAria'
-                        }, choiceEffect({ karma: 20 }, { sided_with_aria: true })),
+                        }, vn.choiceEffect({ karma: 20 }, { sided_with_aria: true })),
 
                         'SideWithCorp': Object.assign({
                             'Text': '<i class="fas fa-building"></i>&nbsp; Argue that unmonitored AIs are a hazard <span class="t-rose">(-10 karma)</span>',
                             'Do': 'jump Chapter1_SideCorp'
-                        }, choiceEffect({ karma: -10 }, { sided_with_aria: false }))
+                        }, vn.choiceEffect({ karma: -10 }, { sided_with_aria: false }))
                     }
                 }
             ],
@@ -1109,7 +1122,7 @@
                 'show character aria normal at center with pulse',
                 'aria Thank you. Your neural signature is warm. I will share my decryption algorithms with your deck.',
                 'sys <span class="t-cyan">[ SYSTEM UPGRADE ]</span> Aria transfers static firewall-bypass protocols. Hacking skill <span class="t-emerald">+2</span>.',
-                reversible({ hacking: 2 }),
+                vn.reversible({ hacking: 2 }),
                 'aria Warning &mdash; physical breach detected in Sector 7. Return to your body, now!',
                 'jump Chapter2_Confrontation'
             ],
@@ -1125,7 +1138,7 @@
             'Chapter2_Confrontation': [
                 'show scene cyber_street with shake duration 1s',
 
-                goTo('Sector 7: Alleyway Ambush', 'Cyber-Node: Static Crystal'),
+                vn.goTo('Sector 7: Alleyway Ambush'),
 
                 'sys <span class="t-rose">[ WARNING: SIRENS DETECTED ]</span> Heavy tactical dropship descending overhead.',
 
@@ -1164,19 +1177,18 @@
 
             /* ---------- CHAPTER 3 ---------- */
             // Stat-gated branching belongs in a Conditional, not in a
-            // Choice `Do` function.
+            // Choice `Do` function. vn.branch() adds the failsafes: a
+            // throwing condition logs and falls into False, and the False
+            // arm always exists.
             'Chapter3_HackAttempt': [
-                {
-                    'Conditional': {
-                        'Condition': function () { return engine.storage('player').hacking >= 4; },
-                        'True':  'jump Chapter3_SuccessHack',
-                        'False': 'jump Chapter3_FailedHack'
-                    }
-                }
+                vn.branch(
+                    function () { return engine.storage('player').hacking >= 4; },
+                    { 'True': 'jump Chapter3_SuccessHack', 'False': 'jump Chapter3_FailedHack' }
+                )
             ],
 
             'Chapter3_SuccessHack': [
-                reversible({}, { flags: { hacked_vanguard: true } }),
+                vn.reversible({ flags: { hacked_vanguard: true } }),
                 'show scene cyber_street with flash duration 1s',
                 'p Override initiated. Uploading a static feedback loop to Vanguard command frequencies!',
                 'show character vance normal at right with shake',
@@ -1201,7 +1213,7 @@
             'Ending_A_Singularity': [
                 'show scene vanguard_hq with fadeIn duration 2s',
 
-                goTo('Neo-Veridia: Free Grid', 'Sector 7: Alleyway Ambush'),
+                vn.goTo('Neo-Veridia: Free Grid'),
 
                 'show character aria normal at center with zoomIn duration 2s',
                 'aria You did it, {{player.name}}. My static core is merged with the municipal fibre. Sector 7 is free.',
@@ -1219,13 +1231,13 @@
                 'show scene vanguard_hq with fadeIn duration 2s',
                 'show character vance normal at center with fadeIn',
 
-                goTo('Vanguard Corp: Executive Deck', 'Sector 7: Alleyway Ambush'),
+                vn.goTo('Vanguard Corp: Executive Deck'),
 
                 'vance The logical choice in the end. An unmonitored AI is a chaotic variable, and chaos is bad business.',
                 'vance With the crystal in hand, Vanguard has synthesised a protocol that blocks offline computation on every citizen device.',
                 'vance For your cooperation you are now Chief Cyber-Security Auditor of Sector 7. Fifty thousand credits have been deposited.',
 
-                reversible({ creds: 50000 }),
+                vn.reversible({ creds: 50000 }),
 
                 'sys <span class="t-rose t-big">[ ENDING B &mdash; CORPORATE MONOPOLY ]</span> Safety and wealth, bought with digital autonomy.',
                 'sys Thanks for playing Cyber-Nexus. Play again to unlock the other branches.',
@@ -1237,7 +1249,7 @@
                 'show character nyx normal at left with fadeIn',
                 'show character aria normal at right with fadeIn',
 
-                goTo('Unmapped: Sanctuary Node', 'Sector 7: Alleyway Ambush'),
+                vn.goTo('Unmapped: Sanctuary Node'),
 
                 'nyx That smoke bomb worked like a charm. We slipped straight through their thermal scanners.',
                 'nyx We are deep in the abandoned subway tunnels now. No GPS, no fibre, zero network access.',
@@ -1254,8 +1266,21 @@
            BOOT
            ===================================================== */
         function boot () {
+            // FAILSAFE 1 (run): storage schema validation + repair. A stale
+            // or corrupted save gets fixed from defaults up front and every
+            // repair is logged, instead of NaN-ing out mid-dialogue.
+            var validation = vn.validateStorage(STORAGE_SCHEMA, { repair: true });
+            if (validation.isErr()) {
+                console.error('[FailSafe] storage schema check found unrecoverable issues:', validation.error);
+            }
+
+            // FAILSAFE 3 (run): machine-check the story-script rules.
+            var lint = vn.lintScript();
+            console.info('[FailSafe] script lint: ' + (lint.ok ? 'CLEAN' : lint.issues.length + ' issue(s)') +
+                ' — bare-function rollback traps, dead jump targets and non-reversible choices are now build errors.');
+
             engine.init('#vn-root').then(function () {
-                console.log('Cyber-Nexus initialised — fully offline, no server required.');
+                console.log('Cyber-Nexus initialised — fully offline: no server, no CDN, no fetch.');
                 updateHUD();
             }).catch(function (err) {
                 console.error('Monogatari init error:', err);

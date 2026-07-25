@@ -1,8 +1,19 @@
-"""Regression test for reversibility: Back must both work and restore stats."""
+"""Regression test for reversibility: Back must both work and restore stats.
+
+Requires a real browser via Playwright (dev-only):
+    pip install playwright && playwright install chromium
+    python tests/test_rewind.py
+
+For environments without a browser, the zero-dependency unit tests and the
+jsdom offline smoke test cover the same guarantees:
+    node --test tests/failsafe.test.mjs
+    node tests/offline-smoke.mjs        # needs `npm i jsdom` (dev-only)
+"""
 import asyncio
+from pathlib import Path
 from playwright.async_api import async_playwright
 
-URL = "file:///home/user/cyber-nexus/index.html"
+URL = (Path(__file__).resolve().parent.parent / "index.html").as_uri()
 
 async def main():
     async with async_playwright() as p:

@@ -1,10 +1,30 @@
 # Cyber-Nexus: The Static Singularity
 
-A Monogatari visual novel that runs **100% offline from the local filesystem**.
+A Monogatari visual novel that runs **100% offline from the local filesystem**,
+guarded by **FailSafe** (`vendor/failsafe.js`) — a zero-dependency abstraction
+layer that makes the game logic hard to break: storage schema validation,
+rollback-safe mutations, a script linter, a tiny state machine, exhaustive
+matching, and an active no-fetch guard.
 
 ## How to run
 
 Double-click **`index.html`**. That's it — no web server, no build step, no internet.
+
+## Tests
+
+```bash
+# 1. Unit tests for the failsafe library + icon shim — zero dependencies
+node --test tests/failsafe.test.mjs tests/icons-offline.test.mjs
+
+# 2. Offline smoke test — loads the real page over file:// and asserts:
+#    no remote requests, no runtime fetch, lint CLEAN, icons mapped,
+#    rollback restores snapshots. Needs jsdom (dev-only, never shipped):
+#    `npm i jsdom` anywhere on the module path, e.g. cyber-nexus/node_modules
+node tests/offline-smoke.mjs
+
+# 3. Full browser regression (Playwright, optional)
+python tests/test_rewind.py
+```
 
 ## What was broken, and what I changed
 
@@ -25,14 +45,15 @@ advanced past the end of the label and froze. Confirmed by instrumenting the
 engine: the game got stuck at `Chapter1_Dive` step 12 with no way forward, and
 clicking did nothing.
 
-Fixed by splitting the two concerns the way the engine expects:
+Fixed by splitting the two concerns the way the engine expects (today the
+choice side effects are built with `vn.choiceEffect`, which pairs `onChosen`
+with a snapshot-correct `onRevert` — see rule 5):
 
 ```js
-'SideWithAria': {
+'SideWithAria': Object.assign({
     'Text': '...',
-    'onChosen': function () { award({ karma: 20 }); setFlag('sided_with_aria', true); },
     'Do': 'jump Chapter1_SideAria'
-}
+}, vn.choiceEffect({ karma: 20 }, { sided_with_aria: true }))
 ```
 
 Stat-gated branching (the "needs HACK 4+" option) can't be expressed in `Do`
@@ -40,13 +61,12 @@ at all, so it now routes through a `Conditional` statement, which *is* the
 engine's supported mechanism:
 
 ```js
-'Chapter3_HackAttempt': [{
-    'Conditional': {
-        'Condition': function () { return engine.storage('player').hacking >= 4; },
-        'True':  'jump Chapter3_SuccessHack',
-        'False': 'jump Chapter3_FailedHack'
-    }
-}]
+'Chapter3_HackAttempt': [
+    vn.branch(
+        function () { return engine.storage('player').hacking >= 4; },
+        { 'True': 'jump Chapter3_SuccessHack', 'False': 'jump Chapter3_FailedHack' }
+    )
+]
 ```
 
 ### 2. `window.monogatari` was hijacked by the DOM
@@ -73,11 +93,25 @@ cut-out sprites with transparent alpha channels.
 Removed the runtime dependencies on the Tailwind CDN, the FontAwesome CDN, the
 Google Fonts CDN and the jsDelivr Monogatari build. Also removed the
 `Content-Security-Policy` meta tag (`default-src 'self'` is hostile to
-`file://`) and the Pexels `AssetsPath` root. Tailwind's utility classes were
-replaced with hand-written CSS, and FontAwesome now uses the copy the
-Monogatari bundle already ships — that bundle is **v5**, so the v6 `fa-solid` /
-`fa-location-dot` names were silently rendering nothing and are now v5 names
-(`fas` / `fa-map-marker-alt`).
+`file://`) and the Pexels `AssetsPath` root. Engine settings pin this down:
+`'ServiceWorkers': false` (service workers cannot register on `file://`) and
+`'Preload': false`.
+
+**Icon gap, fixed properly this time:** earlier revisions claimed "FontAwesome
+uses the copy the Monogatari bundle already ships" — but `monogatari.css` only
+contains the FA class *names*, not the icon *font*, so every `<i class="fas
+fa-…">` glyph (quick menu, settings, HUD, choices) silently rendered as an
+empty box after the CDN link was removed. Icons are now provided by
+`vendor/icons-offline.css` (every fa-* class the engine and game use is mapped
+to a Unicode glyph — zero font files, zero fetches) plus
+`vendor/icons-offline.js`, a failsafe that marks and names any *unmapped* icon
+in the console instead of shipping a broken box. The v6 `fa-solid` /
+`fa-location-dot` names were also reverted to the v5 names the engine emits.
+
+Finally, `FailSafe.net.guard()` wraps `fetch`/`XMLHttpRequest`/`sendBeacon`/
+`WebSocket`/`EventSource` at boot: in a page that must never need a server, a
+network attempt is a bug, and now it's a loud one (console error with a stack
+trace; `mode: 'block'` for tests).
 
 ### 5. Rewind (Back button) corrupted or froze the game state
 
@@ -97,14 +131,24 @@ keep the karma while standing before the choice again.
 
 This mattered because fix #1 moved all the side effects into `onChosen`.
 
-Fixed by routing **every** mutation through three helpers, so nothing in the
-script mutates state directly:
+Fixed by routing **every** mutation through the `FailSafe.vn` facade, so
+nothing in the script mutates state directly. The facade snapshots the
+previous values at Apply-time and restores them at Revert-time — rollback is
+correct *by construction*, unlike the earlier hand-written inverses
+(subtract-the-delta, boolean-NOT-the-flag), which corrupted state whenever a
+flag was already true before the choice that set it (the previous
+`!flags[f]` revert would wrongly clear it):
 
-| Helper | Use for | Mechanism |
+| FailSafe helper | Use for | Mechanism |
 |---|---|---|
-| `reversible(changes, extra)` | stat / flag changes | engine's own `{Function: {Apply, Revert}}` action |
-| `goTo(location, previous)` | location + HUD changes | same, with the previous location restored |
-| `choiceEffect(changes, flags)` | choice side effects | matched `onChosen` / `onRevert` pair |
+| `vn.reversible(spec)` | stat / flag changes | engine `{Function: {Apply, Revert}}` + LIFO snapshot stack |
+| `vn.goTo(location)` | location + HUD changes | same; previous location captured at apply-time |
+| `vn.choiceEffect(deltas, flags)` | choice side effects | matched `onChosen` / `onRevert` with snapshot restore |
+| `vn.branch(cond, {True, False})` | stat-gated branching | Conditional that can't throw and always has False |
+| `vn.validateStorage(schema)` | saves / boot storage | zod-lite validation + default repair, reported not crashed |
+| `vn.lintScript()` | the whole script | machine-checks the rules above on every boot (console) |
+| `FS.machine(...)` | route/phase state (mini-game) | impossible state transitions become impossible |
+| `FS.match(v)...exhaustive()` | outcome resolution | unhandled cases throw in dev console |
 
 Verified:
 
@@ -162,11 +206,20 @@ Matrix-Hack widgets updating the HUD (HACK 3 → 4, 500 → 600 CR).
 
 ```
 index.html
-vendor/     monogatari.js, monogatari.css   (engine, local copy)
+vendor/
+  monogatari.js, monogatari.css   (engine, local copy)
+  failsafe.js                     (abstraction layer: schema, state machine,
+                                   match, immut, result, vn glue, net guard)
+  icons-offline.css, icons-offline.js  (FA-class → Unicode glyph shim + failsafe)
 assets/
   scenes/       4 backgrounds (jpg)
   characters/   4 sprites (transparent png)
   fonts/        Orbitron, Rajdhani, Share Tech Mono (woff2) + fonts.css
+tests/
+  failsafe.test.mjs     (node --test; failsafe library unit tests, zero dependencies)
+  icons-offline.test.mjs(node --test; icon glyph-map coverage, zero dependencies)
+  offline-smoke.mjs   (file:// boot verification; needs dev-only jsdom)
+  test_rewind.py      (full-browser rollback regression; needs playwright)
 ```
 
 ## Note on the artwork

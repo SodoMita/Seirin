@@ -1,3 +1,55 @@
-uploads/
-*.tmp
+# ---------------------------------------------------------------------------
+# Seirin .gitignore
+# Project ASSETS (backgrounds/, characters/, cg/, references/, plans/) are the
+# product and stay tracked on purpose — the archive tooling in tools/ commits
+# them deliberately. This file keeps junk, tooling and regenerable artifacts
+# out of Git. Do NOT add asset directories here.
+# ---------------------------------------------------------------------------
+
+# OS junk
 .DS_Store
+Thumbs.db
+desktop.ini
+.directory
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.fleet/
+
+# Scratch spaces & uploads (never part of the game or the asset set)
+uploads/
+scratch/
+tmp/
+*.tmp
+*.bak
+*.orig
+
+# JavaScript tooling (failsafe unit tests are dependency-free; jsdom is a
+# dev-only dependency of the offline smoke test and must never ship)
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-error.log*
+.npx-cache/
+
+# Python tooling (browser regression test)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+playwright-report/
+test-results/
+
+# Logs & profiling
+*.log
+*.tgz
+*.cpuprofile
+
+# Note: archives/*.tar.gz + archives/*.bundle are INTENTIONAL, small project
+# snapshots produced by tools/ and stay tracked. If you ever generate
+# throwaway archives elsewhere, ignore those paths individually instead.
