@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080">
+  <defs>
+    <style>
+      .bg{fill:#f5f2ea}.room{fill:#fffdf8;stroke:#202126;stroke-width:7}.gothic{fill:#eee8f5;stroke:#352348;stroke-width:7}.balcony{fill:#dfe8ef;stroke:#263746;stroke-width:7}.wall{stroke:#202126;stroke-width:14;fill:none}.thin{stroke:#4e5660;stroke-width:3;fill:none}.door{stroke:#b65e40;stroke-width:4;fill:none}.window{stroke:#4384a8;stroke-width:11}.label{font-family:Arial,sans-serif;fill:#1d2530;font-size:26px;font-weight:700}.small{font-family:Arial,sans-serif;fill:#3e4a56;font-size:18px}.note{font-family:Arial,sans-serif;fill:#5c316f;font-size:18px;font-weight:700}.arrow{stroke:#8e659e;stroke-width:5;fill:none;marker-end:url(#arr)}
+    </style>
+    <marker id="arr" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8" fill="#8e659e"/></marker>
+    <pattern id="tiles" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="#dfe8ef"/><path d="M0 0H30M0 0V30" stroke="#bbcbd5" stroke-width="2"/></pattern>
+  </defs>
+  <rect class="bg" width="1600" height="1080"/>
+  <text x="70" y="70" class="label" font-size="35">План квартиры семьи Кагэцуки — согласование фонов ВН</text>
+  <text x="70" y="100" class="small">Север сверху · условный масштаб · окна и направления вида важнее точных метров</text>
+
+  <!-- apartment outline rooms -->
+  <!-- Miya bedroom -->
+  <rect x="90" y="170" width="490" height="335" class="gothic"/>
+  <text x="245" y="245" class="label">КОМНАТА МИИ</text><text x="218" y="276" class="note">единственный готический интерьер</text>
+  <text x="125" y="335" class="small">Кровать: изножье обращено</text><text x="125" y="358" class="small">к камере / югу. На фоне —</text><text x="125" y="381" class="small">окно и дверь на балкон.</text>
+  <!-- bed --> <rect x="180" y="390" width="295" height="75" rx="12" fill="#382446" stroke="#1d1724" stroke-width="5"/>
+  <text x="230" y="437" fill="#f0d985" font-family="Arial" font-size="19">КРОВАТЬ</text>
+  <path d="M180 465 v25 M475 465 v25" class="thin"/>
+  <!-- windows Miya north --> <line x1="210" y1="170" x2="445" y2="170" class="window"/>
+
+  <!-- Kids room -->
+  <rect x="600" y="170" width="360" height="335" class="room"/>
+  <text x="660" y="255" class="label">ДЕТСКАЯ /</text><text x="660" y="286" class="label">ИГРОВАЯ</text>
+  <text x="651" y="320" class="small">обычный интерьер:</text><text x="651" y="343" class="small">дрон, машинка, ПК, игрушки</text>
+  <line x1="685" y1="170" x2="885" y2="170" class="window"/>
+
+  <!-- parents -->
+  <rect x="980" y="170" width="440" height="335" class="room"/>
+  <text x="1060" y="260" class="label">КОМНАТА</text><text x="1080" y="292" class="label">РОДИТЕЛЕЙ</text>
+  <text x="1055" y="325" class="small">обычный нейтральный интерьер</text>
+  <line x1="1080" y1="170" x2="1320" y2="170" class="window"/>
+
+  <!-- living -->
+  <rect x="90" y="525" width="640" height="330" class="room"/>
+  <text x="310" y="640" class="label">ГОСТИНАЯ</text><text x="215" y="672" class="small">обычный интерьер; стеклянная дверь на общий готический балкон</text>
+  <rect x="285" y="728" width="230" height="70" rx="14" fill="#a8aeb3" stroke="#60676f" stroke-width="4"/>
+  <text x="360" y="772" class="small">диван</text>
+
+  <!-- kitchen -->
+  <rect x="750" y="525" width="390" height="205" class="room"/>
+  <text x="855" y="620" class="label">КУХНЯ</text><text x="835" y="650" class="small">обычная, современная</text>
+  <path d="M780 690 H1108 V555" class="thin"/><text x="810" y="710" class="small">гарнитур</text>
+
+  <!-- bath -->
+  <rect x="1160" y="525" width="260" height="205" class="room"/>
+  <text x="1200" y="604" class="label">ВАННАЯ</text><text x="1215" y="634" class="small">+ туалет</text>
+
+  <!-- entry/hall -->
+  <rect x="750" y="750" width="670" height="105" class="room"/>
+  <text x="1015" y="812" class="label">ПРИХОЖАЯ И КОРИДОР</text>
+  <!-- entry door --> <path d="M1420 775 A65 65 0 0 0 1355 840" class="door"/><line x1="1420" y1="775" x2="1420" y2="840" class="wall"/>
+
+  <!-- shared balcony, north side -->
+  <rect x="90" y="115" width="1330" height="55" fill="url(#tiles)" class="balcony"/>
+  <text x="555" y="151" class="label" font-size="22">ОБЩИЙ БАЛКОН — ЕДИНСТВЕННАЯ ГОТИЧЕСКАЯ ЗОНА ВНЕ КОМНАТЫ МИИ</text>
+  <!-- balcony access arrows/doors -->
+  <line x1="470" y1="170" x2="510" y2="170" class="door"/><line x1="510" y1="170" x2="510" y2="205" class="door"/>
+  <line x1="570" y1="525" x2="650" y2="525" class="window"/>
+  <text x="100" y="145" class="small">Дверь из комнаты Мии</text>
+  <text x="490" y="545" class="small">дверь из гостиной</text>
+
+  <!-- circulation doors -->
+  <path d="M580 440 A65 65 0 0 0 645 505" class="door"/><path d="M960 440 A65 65 0 0 0 1025 505" class="door"/>
+  <path d="M730 770 A55 55 0 0 0 785 825" class="door"/><path d="M1140 650 A55 55 0 0 0 1195 705" class="door"/>
+
+  <!-- cathedral view direction -->
+  <path d="M330 112 C330 75 330 55 330 25" class="arrow"/>
+  <path d="M610 112 C610 75 610 55 610 25" class="arrow"/>
+  <text x="725" y="35" class="note">СЕВЕР: вид с балкона и из окна Мии на деревья → собор</text>
+  <path d="M200 80 l15 -25 l15 25 h-10 v20 h-10 V80z" fill="#49345d"/>
+  <path d="M246 80 l15 -25 l15 25 h-10 v20 h-10 V80z" fill="#49345d"/>
+  <circle cx="238" cy="72" r="5" fill="#f0d985"/>
+  <text x="90" y="940" class="label">Ключевые правила ракурсов</text>
+  <text x="90" y="975" class="small">1. Фон «кровать Мии»: камера стоит у изножья, строго по центральной оси, кровать занимает всю ширину нижней части кадра.</text>
+  <text x="90" y="1004" class="small">2. За изголовьем — северное стрельчатое окно / дверь. В нём: деревья на ближнем плане, собор дальше за ними, фронтальный вид на фасад.</text>
+  <text x="90" y="1033" class="small">3. Из гостиной видна стеклянная дверь на тот же общий балкон; его интерьер готический, сама гостиная — обычная.</text>
+</svg>
