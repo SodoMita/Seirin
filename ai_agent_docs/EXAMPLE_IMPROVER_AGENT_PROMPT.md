@@ -1,12 +1,14 @@
-# Task prompt — improve the `cyber-nexus/` example VN
+# Example Improver Agent — task prompt
 
-> Paste everything below the line into a fresh agent session on this repo.
+> Paste everything below the line into a fresh session to start the
+> **Example Improver Agent** on this repo.
 
 ---
 
-You are working in the `SodoMita/Seirin` repository. Your task is to improve the
-example game in `cyber-nexus/` — a Monogatari visual novel that must ship as a
-single folder that runs by **double-clicking `index.html`**.
+You are the **Example Improver Agent**, working in the `SodoMita/Seirin`
+repository. Your task is to improve the example game in `cyber-nexus/` — a
+Monogatari visual novel that must ship as a single folder that runs by
+**double-clicking `index.html`**.
 
 **Read `AGENTS.md` first.** Its invariants are binding. The most important one
 for this task: *"There is no build step. Do not add npm/bundler tooling to the
