@@ -79,7 +79,54 @@ Monogatari bundle already ships — that bundle is **v5**, so the v6 `fa-solid` 
 `fa-location-dot` names were silently rendering nothing and are now v5 names
 (`fas` / `fa-map-marker-alt`).
 
-### 5. Smaller fixes
+### 5. Rewind (Back button) corrupted or froze the game state
+
+Monogatari has **no story DSL and no failsafe abstractions** — the script is
+raw JS objects. The engine therefore cannot tell that a function mutated state,
+and it has no way to invert one for you. Two consequences, both reproduced in a
+browser:
+
+**(a) A bare `function () {...}` step silently disables Back.** The engine's
+rollback stops dead at it — the Back button just does nothing.
+
+**(b) A Choice with `onChosen` but no `onRevert` is declared non-reversible.**
+`Choice.willRevert` rejects with *"The choice taken is not reversible because it
+did not defined a `onRevert` function."* The story rewinds past the choice but
+the stats it changed stay applied — take the +20 karma option, hit Back, and you
+keep the karma while standing before the choice again.
+
+This mattered because fix #1 moved all the side effects into `onChosen`.
+
+Fixed by routing **every** mutation through three helpers, so nothing in the
+script mutates state directly:
+
+| Helper | Use for | Mechanism |
+|---|---|---|
+| `reversible(changes, extra)` | stat / flag changes | engine's own `{Function: {Apply, Revert}}` action |
+| `goTo(location, previous)` | location + HUD changes | same, with the previous location restored |
+| `choiceEffect(changes, flags)` | choice side effects | matched `onChosen` / `onRevert` pair |
+
+Verified:
+
+```
+TEST 1 rollback across reversible():
+   start 1 -> fwd 4 (hack 5) -> back 1 (hack 3)
+   [PASS] Back actually moves (was blocked by bare fn before)
+   [PASS] hacking un-awarded on rewind
+
+TEST 2 rollback across choice onChosen/onRevert:
+   before  karma=0  aria=False
+   chosen  karma=20 aria=True
+   rewound karma=0  aria=False
+   [PASS] karma restored to pre-choice value
+   [PASS] sided_with_aria flag restored
+   [PASS] no 'not reversible' warning
+```
+
+The one remaining bare function in the script is the `Conditional.Condition`,
+which only *reads* state — that one is correct as-is.
+
+### 6. Smaller fixes
 
 * `Chapter1_Dive` called `hide character nyx` after `show scene`, which already
   clears characters → console error "Attempted to hide a character that was not

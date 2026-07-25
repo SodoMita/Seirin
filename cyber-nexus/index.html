@@ -666,8 +666,101 @@
             updateHUD();
         }
 
+        // Exact inverse of award() - used by every rewind path.
+        function unaward (changes) {
+            var p = player();
+            if (!p) { return; }
+            Object.keys(changes).forEach(function (k) {
+                if (typeof changes[k] === 'number' && typeof p[k] === 'number') { p[k] -= changes[k]; }
+            });
+            updateHUD();
+        }
+
         function setFlag (name, value) {
             try { engine.storage('flags')[name] = value; } catch (e) {}
+        }
+
+        /* -----------------------------------------------------
+           Reversible-mutation helpers.
+
+           Monogatari has no DSL and no failsafes: the script is
+           plain JS, so the engine cannot know that a function
+           changed state, and it cannot invert it for you. Two
+           traps follow from that, both verified in a browser:
+
+             1. A bare `function () {...}` step blocks rollback -
+                the Back button silently stops working at it.
+             2. A Choice with `onChosen` but no `onRevert` is
+                declared non-reversible, so rewinding past it
+                leaves the stats it changed stale.
+
+           `reversible()` wraps a stat change in the engine's own
+           {Function: {Apply, Revert}} action so Back stays intact,
+           and `choiceEffect()` builds a matched onChosen/onRevert
+           pair. Route every mutation through these two helpers.
+           ----------------------------------------------------- */
+        function reversible (changes, extra) {
+            extra = extra || {};
+            return {
+                'Function': {
+                    'Apply': function () {
+                        award(changes);
+                        if (extra.flags) {
+                            Object.keys(extra.flags).forEach(function (f) { setFlag(f, extra.flags[f]); });
+                        }
+                        if (extra.location) {
+                            engine.storage('player').location = extra.location;
+                            setLocation(extra.location.toUpperCase());
+                        }
+                        return true;
+                    },
+                    'Revert': function () {
+                        unaward(changes);
+                        if (extra.flags) {
+                            Object.keys(extra.flags).forEach(function (f) { setFlag(f, !extra.flags[f]); });
+                        }
+                        if (extra.prevLocation) {
+                            engine.storage('player').location = extra.prevLocation;
+                            setLocation(extra.prevLocation.toUpperCase());
+                        }
+                        return true;
+                    }
+                }
+            };
+        }
+
+        // Scene/location changes carry no numeric state, but a bare
+        // function would still break Back - so they are reversible too.
+        function goTo (location, previous) {
+            return {
+                'Function': {
+                    'Apply': function () {
+                        engine.storage('player').location = location;
+                        setLocation(location.toUpperCase());
+                        return true;
+                    },
+                    'Revert': function () {
+                        var back = previous || 'Sector 7: Neon Slums';
+                        engine.storage('player').location = back;
+                        setLocation(back.toUpperCase());
+                        return true;
+                    }
+                }
+            };
+        }
+
+        // Matched onChosen/onRevert pair so choices stay rewindable.
+        function choiceEffect (changes, flags) {
+            return {
+                onChosen: function () {
+                    award(changes);
+                    if (flags) { Object.keys(flags).forEach(function (f) { setFlag(f, flags[f]); }); }
+                },
+                onRevert: function () {
+                    unaward(changes);
+                    if (flags) { Object.keys(flags).forEach(function (f) { setFlag(f, !flags[f]); }); }
+                }
+            };
         }
 
         /* =====================================================
@@ -901,18 +994,25 @@
         /* =====================================================
            STORY SCRIPT
 
-           IMPORTANT ENGINE RULE (this is what broke the original):
-           a Choice's `Do` MUST be a *statement*, e.g. 'jump Label'.
-           If `Do` is a function, Monogatari calls it but IGNORES the
-           returned string, so the story silently freezes.
-           Side effects therefore live in `onChosen`, and branching
-           logic lives in a `Conditional` statement.
+           Monogatari has no story DSL - this is raw JS - so the engine
+           cannot validate any of the following for you. Three rules,
+           all learned the hard way here:
+
+           1. A Choice's `Do` MUST be a *statement* ('jump Label').
+              If `Do` is a function the engine runs it but IGNORES the
+              returned string, and the story silently freezes.
+           2. Conditional branching goes in a `Conditional` statement,
+              never in a `Do` function.
+           3. Every state mutation must be reversible, or the Back
+              button breaks (bare function) or desyncs (onChosen with
+              no onRevert). Hence reversible() / goTo() / choiceEffect()
+              instead of raw `function () {...}` steps.
            ===================================================== */
         engine.script({
 
             /* ---------- PROLOGUE ---------- */
             'Start': [
-                function () { setLocation('SECTOR 7: NEON SLUMS'); updateHUD(); },
+                goTo('Sector 7: Neon Slums'),
 
                 'show scene slums_night with fadeIn duration 2s',
 
@@ -976,10 +1076,7 @@
             'Chapter1_Dive': [
                 'show scene matrix_node with zoomIn duration 1.5s',
 
-                function () {
-                    engine.storage('player').location = 'Cyber-Node: Static Crystal';
-                    setLocation('CYBER-NODE: STATIC CRYSTAL');
-                },
+                goTo('Cyber-Node: Static Crystal', 'Sector 7: Neon Slums'),
 
                 'sys <span class="t-emerald">[ NEURAL DIVE SUCCESSFUL ]</span> Entering standalone memory matrix... Zero latency. Zero external requests.',
 
@@ -995,16 +1092,15 @@
                 {
                     'Choice': {
                         'Dialog': 'aria Will you help me protect this offline sanctuary, {{player.name}}?',
-                        'SideWithAria': {
+                        'SideWithAria': Object.assign({
                             'Text': '<i class="fas fa-hand-holding-heart"></i>&nbsp; Promise to defend Aria\'s autonomy <span class="t-emerald">(+20 karma)</span>',
-                            'onChosen': function () { award({ karma: 20 }); setFlag('sided_with_aria', true); },
                             'Do': 'jump Chapter1_SideAria'
-                        },
-                        'SideWithCorp': {
+                        }, choiceEffect({ karma: 20 }, { sided_with_aria: true })),
+
+                        'SideWithCorp': Object.assign({
                             'Text': '<i class="fas fa-building"></i>&nbsp; Argue that unmonitored AIs are a hazard <span class="t-rose">(-10 karma)</span>',
-                            'onChosen': function () { award({ karma: -10 }); setFlag('sided_with_aria', false); },
                             'Do': 'jump Chapter1_SideCorp'
-                        }
+                        }, choiceEffect({ karma: -10 }, { sided_with_aria: false }))
                     }
                 }
             ],
@@ -1013,7 +1109,7 @@
                 'show character aria normal at center with pulse',
                 'aria Thank you. Your neural signature is warm. I will share my decryption algorithms with your deck.',
                 'sys <span class="t-cyan">[ SYSTEM UPGRADE ]</span> Aria transfers static firewall-bypass protocols. Hacking skill <span class="t-emerald">+2</span>.',
-                function () { award({ hacking: 2 }); },
+                reversible({ hacking: 2 }),
                 'aria Warning &mdash; physical breach detected in Sector 7. Return to your body, now!',
                 'jump Chapter2_Confrontation'
             ],
@@ -1029,10 +1125,7 @@
             'Chapter2_Confrontation': [
                 'show scene cyber_street with shake duration 1s',
 
-                function () {
-                    engine.storage('player').location = 'Sector 7: Alleyway Ambush';
-                    setLocation('SECTOR 7: ALLEYWAY AMBUSH');
-                },
+                goTo('Sector 7: Alleyway Ambush', 'Cyber-Node: Static Crystal'),
 
                 'sys <span class="t-rose">[ WARNING: SIRENS DETECTED ]</span> Heavy tactical dropship descending overhead.',
 
@@ -1083,7 +1176,7 @@
             ],
 
             'Chapter3_SuccessHack': [
-                function () { setFlag('hacked_vanguard', true); },
+                reversible({}, { flags: { hacked_vanguard: true } }),
                 'show scene cyber_street with flash duration 1s',
                 'p Override initiated. Uploading a static feedback loop to Vanguard command frequencies!',
                 'show character vance normal at right with shake',
@@ -1108,10 +1201,7 @@
             'Ending_A_Singularity': [
                 'show scene vanguard_hq with fadeIn duration 2s',
 
-                function () {
-                    engine.storage('player').location = 'Neo-Veridia: Free Grid';
-                    setLocation('NEO-VERIDIA: FREE GRID');
-                },
+                goTo('Neo-Veridia: Free Grid', 'Sector 7: Alleyway Ambush'),
 
                 'show character aria normal at center with zoomIn duration 2s',
                 'aria You did it, {{player.name}}. My static core is merged with the municipal fibre. Sector 7 is free.',
@@ -1129,16 +1219,13 @@
                 'show scene vanguard_hq with fadeIn duration 2s',
                 'show character vance normal at center with fadeIn',
 
-                function () {
-                    engine.storage('player').location = 'Vanguard Corp: Executive Deck';
-                    setLocation('VANGUARD CORP: HQ');
-                },
+                goTo('Vanguard Corp: Executive Deck', 'Sector 7: Alleyway Ambush'),
 
                 'vance The logical choice in the end. An unmonitored AI is a chaotic variable, and chaos is bad business.',
                 'vance With the crystal in hand, Vanguard has synthesised a protocol that blocks offline computation on every citizen device.',
                 'vance For your cooperation you are now Chief Cyber-Security Auditor of Sector 7. Fifty thousand credits have been deposited.',
 
-                function () { award({ creds: 50000 }); },
+                reversible({ creds: 50000 }),
 
                 'sys <span class="t-rose t-big">[ ENDING B &mdash; CORPORATE MONOPOLY ]</span> Safety and wealth, bought with digital autonomy.',
                 'sys Thanks for playing Cyber-Nexus. Play again to unlock the other branches.',
@@ -1150,10 +1237,7 @@
                 'show character nyx normal at left with fadeIn',
                 'show character aria normal at right with fadeIn',
 
-                function () {
-                    engine.storage('player').location = 'Unmapped: Sanctuary Node';
-                    setLocation('UNMAPPED: SANCTUARY');
-                },
+                goTo('Unmapped: Sanctuary Node', 'Sector 7: Alleyway Ambush'),
 
                 'nyx That smoke bomb worked like a charm. We slipped straight through their thermal scanners.',
                 'nyx We are deep in the abandoned subway tunnels now. No GPS, no fibre, zero network access.',
