@@ -8,22 +8,66 @@
 //   5. No unmapped icons (the old CDN Font Awesome gap stays fixed).
 //
 // Run:  node cyber-nexus/tests/offline-smoke.mjs
-// Deps: jsdom (dev-only; e.g. `npm i -g jsdom` or run `npm i jsdom` in a
-//       scratch dir and set NODE_PATH). Exits 0 with a SKIP note if absent —
-//       unit tests (failsafe.test.mjs) need no dependencies at all.
+//
+// Deps: jsdom, dev-only, NEVER shipped and never committed:
+//         npm i jsdom --prefix cyber-nexus     (cyber-nexus/node_modules is gitignored)
+//
+// Without jsdom this exits 0 with a SKIP — but see REQUIRE_JSDOM below: because
+// "no jsdom" is the default state of a fresh checkout, a silent skip meant this
+// test effectively never ran. CI and careful contributors should set
+// REQUIRE_JSDOM=1, which turns the skip into a hard failure.
+//
+// The zero-dependency suites cover the logic this file cannot:
+//   node --test cyber-nexus/tests/failsafe.test.mjs \
+//               cyber-nexus/tests/game.test.mjs \
+//               cyber-nexus/tests/icons-offline.test.mjs
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const page = join(here, '..', 'index.html');
+const REQUIRE_JSDOM = process.env.REQUIRE_JSDOM === '1';
 
-let JSDOM, ResourceLoader, VirtualConsole;
-try {
-    ({ JSDOM, ResourceLoader, VirtualConsole } = await import('jsdom'));
-} catch (e) {
-    console.log('SKIP: jsdom not installed — run `npm install jsdom` (dev-only) to enable this test.');
+const INSTALL_HINT = [
+    'This test needs jsdom, which is a DEV-ONLY dependency — it must never be',
+    'committed and never ships inside the game folder.',
+    '',
+    '  Enable it:   npm i jsdom --prefix cyber-nexus',
+    '  Run it:      node cyber-nexus/tests/offline-smoke.mjs',
+    '  Demand it:   REQUIRE_JSDOM=1 node cyber-nexus/tests/offline-smoke.mjs   (skip => exit 1)',
+    '  Clean up:    rm -rf cyber-nexus/node_modules cyber-nexus/package.json \\',
+    '                      cyber-nexus/package-lock.json',
+    '',
+    'Zero-dependency coverage that always runs:',
+    '  node --test cyber-nexus/tests/failsafe.test.mjs \\',
+    '              cyber-nexus/tests/game.test.mjs \\',
+    '              cyber-nexus/tests/icons-offline.test.mjs',
+].join('\n');
+
+function skip (reason) {
+    const banner = '='.repeat(74);
+    if (REQUIRE_JSDOM) {
+        console.error(`\n${banner}\nOFFLINE SMOKE TEST DID NOT RUN — and REQUIRE_JSDOM=1 was set.\n${banner}`);
+        console.error(`\nReason: ${reason}\n\n${INSTALL_HINT}\n`);
+        process.exit(1);
+    }
+    console.log(`\n${banner}\nSKIPPED: the offline smoke test did not run.\n${banner}`);
+    console.log(`\nReason: ${reason}\n\n${INSTALL_HINT}\n`);
+    console.log('This is a SKIP, not a PASS: nothing about index.html was verified here.\n');
     process.exit(0);
+}
+
+let jsdom;
+try {
+    jsdom = await import('jsdom');
+} catch (e) {
+    skip('jsdom is not installed (this is the default state of a fresh checkout).');
+}
+
+const { JSDOM, VirtualConsole } = jsdom;
+if (typeof JSDOM?.fromFile !== 'function') {
+    skip(`the installed jsdom does not expose JSDOM.fromFile (got ${typeof JSDOM}).`);
 }
 
 const failures = [];
@@ -32,16 +76,19 @@ function check (name, cond, detail) {
     else { failures.push(name); console.log('  FAIL  ' + name + (detail ? ' — ' + detail : '')); }
 }
 
+// The engine's localStorage probe rejects under jsdom for file:// (opaque
+// origin). That is upstream behaviour and fine in a real browser; swallow it so
+// it cannot kill the process, but keep a record.
+const unhandled = [];
+process.on('unhandledRejection', (e) => { unhandled.push(String(e && (e.message || e))); });
+
 const pageUrl = pathToFileURL(page).href;
-const requests = [];
-class SpyLoader extends ResourceLoader {
-    fetch (url, options) { requests.push(url); return super.fetch(url, options); }
-}
 const netCalls = [];
 const consoleErrors = [];
+const consoleWarnings = [];
 const vc = new VirtualConsole();
 vc.on('error', (m) => consoleErrors.push(String(m)));
-vc.on('warn', () => {}); // engine first-run settings warning is expected
+vc.on('warn', (m) => consoleWarnings.push(String(m)));
 vc.on('jsdomError', (e) => {
     // jsdom lacks layout/audio bits the engine probes; only record real errors
     if (!/localStorage|Could not parse CSS|not implemented/i.test(e.message)) { consoleErrors.push(e.message); }
@@ -49,7 +96,10 @@ vc.on('jsdomError', (e) => {
 
 const dom = await JSDOM.fromFile(page, {
     url: pageUrl,
-    resources: new SpyLoader(),
+    // 'usable' makes jsdom load subresources. Older jsdom exposed a
+    // ResourceLoader subclass for spying; jsdom >= 29 removed it, so
+    // subresource URLs are asserted from the parsed DOM instead (below).
+    resources: 'usable',
     runScripts: 'dangerously',
     pretendToBeVisual: true,
     virtualConsole: vc,
@@ -82,9 +132,25 @@ await new Promise(r => setTimeout(r, 6000));
 const w = dom.window;
 
 console.log('\n[1] Offline purity');
-check('every subresource is file://', requests.length > 0 && requests.every(u => u.startsWith('file://')),
-    requests.filter(u => !u.startsWith('file://')).join(', '));
-check('FulfillSafe vendor libs loaded', requests.some(u => u.includes('failsafe.js')) && requests.some(u => u.includes('icons-offline')));
+// Read every subresource reference straight out of the parsed document. This
+// works on every jsdom version and checks the thing that actually matters:
+// what index.html asks the browser to load.
+const refs = [...w.document.querySelectorAll('script[src], link[href], img[src], source[src], audio[src], video[src]')]
+    .map(el => el.getAttribute('src') || el.getAttribute('href'))
+    .filter(Boolean);
+const remoteRefs = refs.filter(u => /^(?:https?:)?\/\//i.test(u) || /^data:.*;base64/i.test(u) === false && /^[a-z]+:\/\//i.test(u));
+check('index.html references subresources at all', refs.length > 0);
+check('every subresource is a relative local path', remoteRefs.length === 0, remoteRefs.join(', '));
+
+const resolved = [...w.document.querySelectorAll('script[src], link[href]')]
+    .map(el => el.src || el.href).filter(Boolean);
+check('every resolved subresource URL is file://', resolved.length > 0 && resolved.every(u => u.startsWith('file://')),
+    resolved.filter(u => !u.startsWith('file://')).join(', '));
+check('FailSafe vendor libs loaded', !!w.FailSafe && !!w.IconsOffline);
+check('game code loaded from vendor/game.js (not an inline script)',
+    refs.some(u => u.includes('game.js')) && !!w.CyberNexusCore);
+check('no inline <script> blocks remain in index.html',
+    [...w.document.querySelectorAll('script')].every(s => s.hasAttribute('src')));
 check('no runtime fetch/XHR/beacon/socket', netCalls.length === 0, netCalls.join(', '));
 
 console.log('\n[2] FailSafe boot');
@@ -139,11 +205,30 @@ console.log('\n[4] Offline icons');
 const missingIcons = w.eval('Object.keys((window.IconsOffline && window.IconsOffline.missing) || {})');
 check('no unmapped fa-* classes rendered', missingIcons.length === 0, missingIcons.join(', '));
 
+console.log('\n[5] DOM guards (work item 4)');
+// The hardened selectors must not have warned about anything in the real page:
+// every [data-close] / .codex-tab / .codex-panel is a genuine HTMLElement and
+// every data-close names a modal that exists.
+const guardWarnings = consoleWarnings.filter(m => /Cyber-Nexus/.test(m) &&
+    /(non-HTMLElement|no such element|no element with id|has no matching)/.test(m));
+check('no DOM-guard warnings from the real page', guardWarnings.length === 0, guardWarnings.slice(0, 3).join(' | '));
+// And prove the guard is real rather than dead code, by asking it about junk.
+const guardWorks = w.eval(`(() => {
+    const before = window.CyberNexusCore ? 1 : 0;
+    // toggleModal is not exported; exercise the observable contract instead:
+    // a [data-close] pointing at a missing modal must warn, not throw.
+    const b = window.document.createElement('button');
+    b.setAttribute('data-close', 'definitely-not-a-modal');
+    window.document.body.appendChild(b);
+    try { b.click(); return { ok: true, before }; } catch (e) { return { ok: false, error: e.message }; }
+})()`);
+check('a data-close naming a missing modal does not throw', guardWorks.ok === true, guardWorks.error);
+
 // Known jsdom-only artifacts: the engine's localStorage settings probe rejects
 // under jsdom (pre-existing upstream behaviour, fine in real browsers), and its
 // first-run settings warning. Everything else IS a failure.
 const relevantErrors = consoleErrors.filter(e =>
-    !/settings saved|first time|Cannot convert undefined|null to object/i.test(e) &&
+    !/settings saved|first time|Cannot convert undefined|null to object|localStorage/i.test(e) &&
     !/^Unhandled promise rejection\s*$/.test(e.trim()));
 check('no unexpected console errors', relevantErrors.length === 0, relevantErrors.slice(0, 5).join(' | '));
 

@@ -39,12 +39,35 @@ test('every known icon has a glyph rule in icons-offline.css (CSS/JS maps in syn
     }
 });
 
-test('all fa-* classes used by index.html are covered by the glyph map', () => {
-    const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
-    const used = [...new Set([...html.matchAll(/fa-[a-z0-9-]+/g)].map(m => m[0]))]
+// Every first-party file that can emit an <i class="fas fa-…"> must be scanned.
+// The game's icons used to live inside index.html's inline <script>; they now
+// live in vendor/game.js, so scanning index.html alone would silently stop
+// covering the HUD, codex and mini-game icons.
+const ICON_SOURCES = [
+    join(here, '..', 'index.html'),
+    join(here, '..', 'vendor', 'game.js'),
+];
+
+test('all fa-* classes used by index.html and vendor/game.js are covered by the glyph map', () => {
+    for (const file of ICON_SOURCES) {
+        const src = readFileSync(file, 'utf8');
+        const used = [...new Set([...src.matchAll(/fa-[a-z0-9-]+/g)].map(m => m[0]))]
+            .filter(c => IconsOffline.isIconClass(c));
+        const missing = used.filter(c => !IconsOffline.knownIcons.includes(c));
+        assert.deepEqual(missing, [], `unmapped icons used in ${file}: ${missing.join(', ')}`);
+    }
+});
+
+test('the game icons really are found in vendor/game.js (extraction did not lose coverage)', () => {
+    // Guards the guard: if game.js ever stops being scanned (moved/renamed),
+    // this fails instead of the suite quietly covering nothing.
+    const game = readFileSync(join(here, '..', 'vendor', 'game.js'), 'utf8');
+    const used = [...new Set([...game.matchAll(/fa-[a-z0-9-]+/g)].map(m => m[0]))]
         .filter(c => IconsOffline.isIconClass(c));
-    const missing = used.filter(c => !IconsOffline.knownIcons.includes(c));
-    assert.deepEqual(missing, [], `unmapped icons used in index.html: ${missing.join(', ')}`);
+    assert.ok(used.length >= 5, `expected the game script to use several icons, found ${used.length}`);
+    for (const c of ['fa-map-marker-alt', 'fa-coins', 'fa-terminal']) {
+        assert.ok(used.includes(c), `expected HUD icon ${c} to be scanned from vendor/game.js`);
+    }
 });
 
 test('all fa-* icons emitted by the vendored engine markup are covered', () => {

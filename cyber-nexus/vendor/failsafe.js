@@ -665,19 +665,24 @@
             function add (severity, label, index, rule, detail) {
                 issues.push({ severity: severity, label: label, step: index, rule: rule, detail: detail || '' });
             }
+            /* NOTE: declared as a function *expression* at function scope, not as
+             * a `function checkTarget()` declaration inside the `else` block —
+             * function declarations in blocks are illegal in strict-mode ES5 and
+             * this file's contract is ES5 compatibility. It closes over
+             * `labelSet`, which is assigned below before any call happens. */
+            var labelSet = {};
+            var JUMP_RE = /^(jump|call)\s+(.+)$/;
+            var checkTarget = function (label, index, statement) {
+                var m = (typeof statement === 'string') ? statement.trim().match(JUMP_RE) : null;
+                if (m && !labelSet[m[2]]) {
+                    add('error', label, index, 'missing-label', '"' + m[0] + '" targets a label that does not exist');
+                }
+            };
             if (!isPlainObject(script)) {
                 add('error', '?', -1, 'no-script', 'engine.script() did not return a label map');
             } else {
                 var labels = Object.keys(script);
-                var labelSet = {};
                 labels.forEach(function (l) { labelSet[l] = true; });
-                var JUMP_RE = /^(jump|call)\s+(.+)$/;
-                function checkTarget (label, index, statement) {
-                    var m = (typeof statement === 'string') ? statement.trim().match(JUMP_RE) : null;
-                    if (m && !labelSet[m[2]]) {
-                        add('error', label, index, 'missing-label', '"' + m[0] + '" targets a label that does not exist');
-                    }
-                }
                 labels.forEach(function (label) {
                     var steps = script[label];
                     if (!Array.isArray(steps)) {
@@ -773,10 +778,24 @@
             var g = typeof window !== 'undefined' ? window
                 : (typeof self !== 'undefined' ? self : globalThis);
 
+            /* fetch() accepts a string, a URL or a Request. Only Request has a
+             * `.url` property, so reading `.url` unconditionally reported
+             * `fetch(new URL(...))` violations with target `undefined` — the
+             * guard fired but the report was useless. Cover all three shapes
+             * and never fall through to undefined. */
+            function fetchTarget (input) {
+                if (typeof input === 'string') { return input; }
+                if (input === null || input === undefined) { return String(input); }
+                if (typeof URL === 'function' && input instanceof URL) { return input.href; }
+                if (typeof input.url === 'string') { return input.url; }        // Request
+                if (typeof input.href === 'string') { return input.href; }      // URL-alike
+                return String(input);
+            }
+
             if (typeof g.fetch === 'function') {
                 var origFetch = g.fetch;
                 g.fetch = function (input, init) {
-                    var target = (typeof input === 'string') ? input : (input && input.url);
+                    var target = fetchTarget(input);
                     record('fetch', target);
                     if (mode === 'block') { return Promise.reject(new Error('[FailSafe.net] blocked fetch: ' + target)); }
                     return origFetch.apply(this, arguments);
@@ -785,6 +804,13 @@
             }
             if (typeof g.XMLHttpRequest === 'function') {
                 var OrigXHR = g.XMLHttpRequest;
+                /* The instance handed back is a genuine OrigXHR (a constructor
+                 * returning an object overrides `this`), which is what makes
+                 * the per-instance `open` patch work. On its own that leaves a
+                 * broken *constructor*: no readyState constants on
+                 * `XMLHttpRequest.DONE`, and a `.prototype` unrelated to the
+                 * real one. Both are repaired below so the guarded global is
+                 * substitutable for the original. */
                 var Wrapped = function () {
                     var xhr = new OrigXHR();
                     var origOpen = xhr.open;
@@ -795,6 +821,18 @@
                     };
                     return xhr;
                 };
+                Wrapped.prototype = OrigXHR.prototype;   // instanceof + prototype methods
+                /* Static readyState constants (UNSENT … DONE) are non-enumerable
+                 * own properties of the constructor, so copy them by name and
+                 * then sweep anything else the host exposes. */
+                ['UNSENT', 'OPENED', 'HEADERS_RECEIVED', 'LOADING', 'DONE'].forEach(function (k) {
+                    if (k in OrigXHR) { try { Wrapped[k] = OrigXHR[k]; } catch (e) {} }
+                });
+                Object.getOwnPropertyNames(OrigXHR).forEach(function (k) {
+                    if (k === 'prototype' || k === 'length' || k === 'name' || k === 'caller' || k === 'arguments') { return; }
+                    if (Object.prototype.hasOwnProperty.call(Wrapped, k)) { return; }
+                    try { Wrapped[k] = OrigXHR[k]; } catch (e) {}
+                });
                 g.XMLHttpRequest = Wrapped;
                 net._restoreFns.push(function () { g.XMLHttpRequest = OrigXHR; });
             }

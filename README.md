@@ -3,7 +3,7 @@
 Visual-novel project assets and design documents for **Seirin: Night Shift — Resonance 2030**.
 
 ## Directories
-- `cyber-nexus/` — runnable Monogatari example VN ("Cyber-Nexus: The Static Singularity"). **Runs with no server, no CDN and no runtime fetch**: double-click `index.html`. Guarded by `vendor/failsafe.js` (schema validation, rollback-safe mutations, state machine, lint, no-fetch guard) and `vendor/icons-offline.*` (local icon glyphs — no font CDN).
+- `cyber-nexus/` — runnable Monogatari example VN ("Cyber-Nexus: The Static Singularity"). **Runs with no server, no CDN and no runtime fetch**: double-click `index.html`. Game code lives in `vendor/game.js` (story script, HUD, codex, mini-game); guarded by `vendor/failsafe.js` (schema validation, rollback-safe mutations, state machine, lint, no-fetch guard) and `vendor/icons-offline.*` (local icon glyphs — no font CDN).
 - `backgrounds/` — generated scene backgrounds
 - `characters/` — character references and iterations
 - `cg/` — event CG art
