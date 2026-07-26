@@ -1,0 +1,1221 @@
+{
+  "$comment": "Seirin cast design registry. Single source of truth for character art. Field semantics are defined in references/design-canon.md; production meaning in references/sprite-spec.md. Validated by scripts/check_roster.py. Canon source: ai_agent_docs/SEIRIN_Design_Document_edited.md sections 5, 6, 10.",
+  "schema_version": "1.1.0",
+  "style_bible": {
+    "render": "modern anime key-visual illustration, clean confident linework with tapered weight, cel shading plus one soft gradient pass, restrained rim light, subsurface warmth on skin",
+    "line": "dark chromatic outline (never pure black): outline hue is the local colour shifted toward the character's shadow_hue",
+    "eye_render": "high-gloss gacha eye: 3 layers minimum - gradient iris (dark rim, bright lower half), sharp specular highlight upper, soft bounce light lower, plus a faint colour-echo of the accent colour in the lower iris",
+    "head_ratio_default": "7.0 heads for adults, 6.5 for teens, 4.5 for Miya, 2.0 for chibi variants",
+    "linework_density_rule": "detail is spent on the head and the memory_point, thinned toward the extremities; never uniform detail",
+    "forbidden_global": "no watermark, no signature, no readable text, no logos, no UI, no dialogue box, no border, no colour chart, no multiple panels unless the stage explicitly asks for a sheet, no extra fingers, no fused hands, no melted jewellery, no asymmetric eye size, no floating accessories, no lens flare wash"
+  },
+  "faction_palettes": {
+    "akatomi": {
+      "anchor": [
+        "#F2F5F7",
+        "#1F4FA8",
+        "#B9C2CC"
+      ],
+      "note": "Hikari-no-Machi corporate: white, blue, silver, advertising neon. Clean surfaces, reflections, information overload."
+    },
+    "chorus_abyss": {
+      "anchor": [
+        "#0E0A1A",
+        "#6B3FA0",
+        "#E8D8A0"
+      ],
+      "note": "Staged miracle: near-black violet, ritual gold. Theatrical, warm-lit from below."
+    },
+    "iron_requiem": {
+      "anchor": [
+        "#3A2B22",
+        "#B4471F",
+        "#4E5C4A"
+      ],
+      "note": "Tetsuba and port: rust, concrete, dark green, harsh white worklight. Weight, repair marks, open mechanics."
+    },
+    "aquaforge": {
+      "anchor": [
+        "#0F5F63",
+        "#7FD4CE",
+        "#EDF4F2"
+      ],
+      "note": "Lab teal and clean water. Open protocols, field-worn practicality."
+    },
+    "tsukimachi": {
+      "anchor": [
+        "#5A2E24",
+        "#C9A227",
+        "#2E1B14"
+      ],
+      "note": "Old town: timber, gold, dark red. Paper, rain, warm local light."
+    },
+    "mountain": {
+      "anchor": [
+        "#24402E",
+        "#6E7B80",
+        "#E3E9E6"
+      ],
+      "note": "Deep green, slate, milky fog. Water, distance, fragility."
+    }
+  },
+  "expression_sets": {
+    "core_8": [
+      {
+        "id": "neutral",
+        "brow": "level",
+        "eye": "default open",
+        "mouth": "small closed",
+        "note": "the default sprite; must read as pleasant, never blank"
+      },
+      {
+        "id": "smile",
+        "brow": "slightly raised outer",
+        "eye": "soft arc, lower lid raised",
+        "mouth": "closed upward curve"
+      },
+      {
+        "id": "grin",
+        "brow": "raised",
+        "eye": "narrowed happy, high gloss",
+        "mouth": "open, teeth visible, asymmetric corner"
+      },
+      {
+        "id": "angry",
+        "brow": "inner-down V, hard",
+        "eye": "half-lidded, iris smaller, highlight reduced",
+        "mouth": "flat downturn or open shout"
+      },
+      {
+        "id": "sad",
+        "brow": "inner-up inverted-V",
+        "eye": "upper lid lowered, iris wet, extra bounce highlight",
+        "mouth": "small wavering"
+      },
+      {
+        "id": "surprise",
+        "brow": "high and outer-up",
+        "eye": "circular, iris shrunk, white visible around",
+        "mouth": "small vertical O"
+      },
+      {
+        "id": "blush",
+        "brow": "inner-up soft",
+        "eye": "averted gaze, half-lidded",
+        "mouth": "small pressed line",
+        "extra": "nasal-bridge blush + steam-free warm cheeks"
+      },
+      {
+        "id": "serious",
+        "brow": "level and low",
+        "eye": "steady, highlight sharpened to a single point",
+        "mouth": "firm flat"
+      }
+    ],
+    "note": "core_8 is mandatory for every speaking character. Extras listed per character in expressions_extra. Every differential changes ONLY the head region inside the locked face box."
+  },
+  "characters": [
+    {
+      "id": "ren",
+      "name_en": "Ren Akatsuki",
+      "name_ja": "レン・アカツキ",
+      "age": 17,
+      "faction": "iron_requiem",
+      "role": "mechanic apprentice, Scrap-Titan operator under adult supervision",
+      "rarity_tier": "SSR",
+      "visual_density": 9,
+      "appeal_track": "cool_kid",
+      "logline": "Grease-stained prodigy who would rather be right than safe.",
+      "memory_point": "The asymmetric welding visor pushed up into her hair like a crown, one cracked lens still glowing amber.",
+      "secondary_hook": "Mismatched gloves - left is a heavy insulated gauntlet, right is bare to the knuckle for fine work.",
+      "silhouette": {
+        "class": "top-heavy triangle",
+        "big": "flared open coverall tied at the waist, sleeves knotted - a wide inverted delta across the shoulders",
+        "mid": "spiky shoulder-length hair with a long single tail whipping right; the gauntlet mass on the left",
+        "small": "clipped tools, cable ties, a single earring nut",
+        "negative_space": "clear gap between the knotted sleeves and the hips; open triangle between arm and torso when hand is on hip",
+        "black_fill_id": "reads instantly by the visor-crown notch plus the one-sided gauntlet bulk"
+      },
+      "shape_language": {
+        "triangle": 55,
+        "square": 30,
+        "circle": 15,
+        "note": "aggressive forward-leaning wedge; squares in the toolbelt keep her trustworthy rather than villainous"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#3A4A52",
+          "name": "oil-slate coverall"
+        },
+        "secondary_30": {
+          "hex": "#D9531E",
+          "name": "signal-orange hair"
+        },
+        "accent_10": {
+          "hex": "#F2C230",
+          "name": "hazard yellow strap"
+        },
+        "skin": "#F2CDB0",
+        "eye": "#2FBF9B",
+        "shadow_hue": "#2A3A55",
+        "note": "warm-dominant with a cool ground; the teal eye is the only cool accent on the head, so the gaze wins the face"
+      },
+      "symbol_set": {
+        "eye": "large, outer-upper corner sharp, iris tall - awake and combative",
+        "brow": "thick, short, low - stubborn",
+        "mouth": "wide, expressive, canine tooth visible on grin",
+        "contour": "soft jaw, pointed chin - still a teenager",
+        "hair": "layered chopped bob with one long asymmetric tail, singed tips",
+        "body": "wiry athletic, broad shoulders for her height, visible forearm definition"
+      },
+      "wardrobe": {
+        "default": "Grey-slate mechanic coverall unzipped to the waist with sleeves tied off, orange thermal undershirt, hazard-yellow tool harness, one insulated gauntlet, steel-toe boots with mismatched laces",
+        "alt": "Off-shift: oversized orange thermal, cargo shorts, the visor still on her head"
+      },
+      "props": [
+        "cracked amber welding visor",
+        "impact driver holstered at the thigh",
+        "grease rag through the belt loop"
+      ],
+      "expressions_extra": [
+        "smug-sideways",
+        "exhausted",
+        "furious-shout"
+      ],
+      "poses": {
+        "sprite_neutral": "weight on back foot, arms crossed low, chin slightly down, looking up through her lashes - defensive but ready",
+        "hero_shot": "three-quarter turn away with head snapped back toward camera, gauntlet hand raised holding the impact driver, coat-tails of the coverall flaring"
+      },
+      "banned": [
+        "clean clothing",
+        "generic wrench",
+        "pigtails",
+        "any depiction implying combat piloting",
+        "any sexualised framing, pose, camera angle, or revealing costume"
+      ]
+    },
+    {
+      "id": "hana",
+      "name_en": "Hana Shiroyashiki",
+      "name_ja": "ハナ・シロヤシキ",
+      "age": 13,
+      "faction": "chorus_abyss",
+      "role": "witness and observer; illusionist's daughter, never a combatant",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "appeal_track": "cool_kid",
+      "logline": "A stage-magician's daughter still wearing the costume of a miracle she no longer believes.",
+      "memory_point": "Heterochromia - one pale gold eye, one deep violet - and a thermochromic dress whose hem colour shifts with the room's temperature.",
+      "secondary_hook": "She holds one wrist with the other hand, always, like a self-applied handcuff.",
+      "silhouette": {
+        "class": "narrow vertical bell",
+        "big": "long tiered stage dress that widens only below the knee - a slim column that flares late",
+        "mid": "waist-length straight hair with a blunt cut; a tall collar behind the neck",
+        "small": "row of tiny brass buttons, thin ribbon ties at each tier",
+        "negative_space": "deliberate emptiness at the shoulders - no puffs, no capelet - so the head reads isolated",
+        "black_fill_id": "the late-flare bell plus the tall stand collar; unmistakable against the whole roster"
+      },
+      "shape_language": {
+        "circle": 45,
+        "triangle": 35,
+        "square": 20,
+        "note": "rounded and fragile, with triangles only in the collar to hint the cult's theatrics clinging to her"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#2B2440",
+          "name": "deep stage violet"
+        },
+        "secondary_30": {
+          "hex": "#C9BFD9",
+          "name": "ash lilac tiers"
+        },
+        "accent_10": {
+          "hex": "#E8C25A",
+          "name": "brass warm gold"
+        },
+        "skin": "#F5DCC8",
+        "eye": "#E8C25A / #6B3FA0",
+        "shadow_hue": "#1A1430",
+        "note": "the thermochromic hem legitimately shifts lilac to warm rose near heat - render the shift as a soft vertical gradient, never as two flat halves"
+      },
+      "symbol_set": {
+        "eye": "very large, round, upper lid heavy - dissociated, watchful; highlight is small and low",
+        "brow": "thin, high, slightly inner-up by default - permanent faint worry",
+        "mouth": "very small, neutral, rarely open",
+        "contour": "round soft child jaw",
+        "hair": "blunt waist-length straight, heavy fringe cut level with the brows",
+        "body": "slight, narrow-shouldered, age-accurate 13"
+      },
+      "wardrobe": {
+        "default": "Three-tier thermochromic stage dress over a high-collar blouse, ribbon at each tier, dark stockings, buckled shoes",
+        "alt": "Safe-house: plain oversized cardigan over the same dress, hair tied back - visibly out of costume"
+      },
+      "props": [
+        "a single playing card she folds and unfolds",
+        "her father's brass pocket-watch on a chain"
+      ],
+      "expressions_extra": [
+        "dissociated-blank",
+        "startled-flinch",
+        "small-genuine-smile"
+      ],
+      "poses": {
+        "sprite_neutral": "standing very still, feet together, one hand gripping the opposite wrist, gaze slightly off-camera",
+        "hero_shot": "seated on a tall stool under a single overhead light, the dress hem blooming warm, looking directly up at camera for the first time"
+      },
+      "banned": [
+        "combat pose",
+        "weapon",
+        "any sexualised framing, costume, pose, or camera angle",
+        "cheerful default expression"
+      ]
+    },
+    {
+      "id": "yuki",
+      "name_en": "Yuki Tenro",
+      "name_ja": "ユキ・テンロウ",
+      "age": 19,
+      "faction": "mountain",
+      "role": "kendo instructor, archivist, non-violent negotiator for the mountain community",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "appeal_track": "hero_glamour",
+      "logline": "Holds the line with paperwork and posture, and never draws the blade.",
+      "memory_point": "A ceremonial shinai carried horizontally across her back in a document sling stuffed with rolled land-survey maps - the weapon is literally filed with the paperwork.",
+      "secondary_hook": "Ink-stained right sleeve, pushed up and pinned with a bulldog clip.",
+      "silhouette": {
+        "class": "stable vertical rectangle with a horizontal bar",
+        "big": "long straight hakama-cut trousers and a fitted keikogi-derived jacket - an unbroken tall rectangle",
+        "mid": "the horizontal shinai-and-map sling cutting across the back at shoulder-blade height",
+        "small": "clip, cord ties, a small mountain-shrine charm",
+        "negative_space": "the triangle between the sling and her back",
+        "black_fill_id": "the only cross-shaped silhouette in the roster - vertical body, horizontal sling"
+      },
+      "shape_language": {
+        "square": 60,
+        "triangle": 25,
+        "circle": 15,
+        "note": "maximum square: she is the immovable object of the cast"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#24402E",
+          "name": "cedar green gi"
+        },
+        "secondary_30": {
+          "hex": "#E3E9E6",
+          "name": "fog white trim"
+        },
+        "accent_10": {
+          "hex": "#B4471F",
+          "name": "shrine vermilion cord"
+        },
+        "skin": "#EEC9A8",
+        "eye": "#4A3728",
+        "shadow_hue": "#16281C",
+        "note": "the only vermilion in the cast belongs to her cord - it is her signature ten percent"
+      },
+      "symbol_set": {
+        "eye": "narrow, long, level - calm and unimpressed; single hard highlight",
+        "brow": "straight, level, medium weight",
+        "mouth": "small, firm, corners naturally slightly down",
+        "contour": "clean oval with a defined jawline",
+        "hair": "high tight ponytail, straight, blunt-cut ends; short curtain fringe parted centre",
+        "body": "tall, athletic, genuine kendo shoulders and forearms, long neck"
+      },
+      "wardrobe": {
+        "default": "Indigo-green training jacket over a white underlayer, wide dark trousers, tabi-style boots, document sling with rolled maps and the sheathed shinai",
+        "alt": "Hearing day: dark blazer over the same white underlayer, maps in a hard case"
+      },
+      "props": [
+        "ceremonial shinai in a plain sheath",
+        "rolled survey maps",
+        "bulldog clip",
+        "hand-drawn watershed diagram"
+      ],
+      "expressions_extra": [
+        "cold-fury-controlled",
+        "faint-approval",
+        "tired-after-hearing"
+      ],
+      "poses": {
+        "sprite_neutral": "feet shoulder-width, perfectly upright, hands resting one over the other at the front - formal readiness",
+        "hero_shot": "half-turned at the top of wet stone steps in fog, one hand steadying the sling, wind lifting the ponytail and map edges"
+      },
+      "banned": [
+        "drawn sword",
+        "combat slash pose",
+        "katana replacing the shinai",
+        "aggressive snarl"
+      ]
+    },
+    {
+      "id": "momo",
+      "name_en": "Momo Hoshizora",
+      "name_ja": "モモ・ホシゾラ",
+      "age": 15,
+      "faction": "akatomi",
+      "role": "Stella-5 lead vocalist, public voice of the team, works through adult editors and lawyers",
+      "rarity_tier": "SSR",
+      "visual_density": 10,
+      "appeal_track": "cool_kid",
+      "logline": "The city's manufactured hope, learning to read her own contract.",
+      "memory_point": "An in-ear monitor whose translucent cable is threaded with a fine constellation of fibre-optic star points that light in sequence when she sings.",
+      "secondary_hook": "One glove on, one off - the bare hand is the one she uses to check the sound levels herself.",
+      "silhouette": {
+        "class": "wide star-burst",
+        "big": "layered asymmetric stage skirt, short at the front-right and long at the back-left - a swept comet shape",
+        "mid": "twin high tails held by star clasps, one longer; a short structured shoulder cape",
+        "small": "dense micro-detail - sequins, cable, mic clip, ear cuff, badge row",
+        "negative_space": "the crescent gap under the swept skirt and between the cape and the arms",
+        "black_fill_id": "the comet-swept hem plus twin uneven tails - the only diagonal-hem silhouette in the cast"
+      },
+      "shape_language": {
+        "triangle": 45,
+        "circle": 40,
+        "square": 15,
+        "note": "star points and idol roundness; almost no square, because nothing about her platform is stable"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#F5F7FA",
+          "name": "stage white"
+        },
+        "secondary_30": {
+          "hex": "#1F4FA8",
+          "name": "campaign blue"
+        },
+        "accent_10": {
+          "hex": "#FF5FA2",
+          "name": "hot idol pink"
+        },
+        "skin": "#FBDCC4",
+        "eye": "#FF5FA2",
+        "shadow_hue": "#3A4A80",
+        "note": "highest-key palette in the cast on purpose - she is the one lit for advertising. Her CG lighting must be visibly artificial."
+      },
+      "symbol_set": {
+        "eye": "very large, round, maximum gloss, star-shaped specular highlight (her only literal star)",
+        "brow": "thin, high, mobile",
+        "mouth": "wide, open smile is the default performance face",
+        "contour": "round, soft, idol-standard",
+        "hair": "pale pink-blonde, twin high tails of uneven length, curled tips, blunt fringe with two long face-framing strands",
+        "body": "petite, age-accurate 15, stage-costume coverage is full - long sleeves, high neck, opaque tights"
+      },
+      "wardrobe": {
+        "default": "White-and-blue structured stage jacket with a short cape, asymmetric layered skirt over opaque navy tights, tall white boots, single glove, in-ear monitor",
+        "alt": "Between takes: hoodie over the stage costume, one tail undone, holding a paper cup"
+      },
+      "props": [
+        "handheld stage mic (communication tool, never a weapon)",
+        "fibre-optic in-ear monitor",
+        "annotated setlist"
+      ],
+      "expressions_extra": [
+        "stage-smile-professional",
+        "off-camera-flat",
+        "determined-announcement"
+      ],
+      "poses": {
+        "sprite_neutral": "one hand on the in-ear monitor, other arm relaxed, weight on one hip, warm public smile",
+        "hero_shot": "mid-turn on stage under a hard key light, cape and hem flaring, one arm extended to the crowd, star highlight blown out"
+      },
+      "banned": [
+        "revealing stage costume",
+        "any sexualised framing, pose, or camera angle",
+        "mic used as a weapon",
+        "fan-service wardrobe malfunction"
+      ]
+    },
+    {
+      "id": "miya",
+      "name_en": "Miya Kagetsuki",
+      "name_ja": "ミヤ・カゲツキ",
+      "age": 5,
+      "faction": "tsukimachi",
+      "role": "child in the engineers' orbit; her drawings help adults notice connections",
+      "rarity_tier": "SR",
+      "visual_density": 6,
+      "appeal_track": "mascot",
+      "logline": "The Queen of the Night, five years old, ruling from a bedroom window at 2 a.m.",
+      "memory_point": "A felt witch-hat two sizes too large that slides over one eye, with a gold crescent-and-star pin - and Corvus the toy raven drone perched on the brim.",
+      "secondary_hook": "A crayon held like a sceptre, and one sock always fallen down.",
+      "silhouette": {
+        "class": "wide-hat lollipop",
+        "big": "the oversized pointed hat - nearly as wide as her shoulders",
+        "mid": "a bell-shaped nightgown-coat and the raven's wing break on the brim",
+        "small": "star buttons, the crayon, the fallen sock's ribbing",
+        "negative_space": "the strong gap between the hat brim and her shoulders reads even at 64px",
+        "black_fill_id": "hat-plus-bird is the single most readable silhouette in the roster at thumbnail size - deliberately, she is the merch mascot"
+      },
+      "shape_language": {
+        "circle": 55,
+        "triangle": 35,
+        "square": 10,
+        "note": "circle body, triangle hat: the classic mascot recipe"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#2E2545",
+          "name": "midnight plum gown"
+        },
+        "secondary_30": {
+          "hex": "#8E7CC3",
+          "name": "soft lavender trim"
+        },
+        "accent_10": {
+          "hex": "#E8C25A",
+          "name": "crescent gold"
+        },
+        "skin": "#FCE1CE",
+        "eye": "#8E7CC3",
+        "shadow_hue": "#1B1530",
+        "note": "same violet-gold family as Hana but far higher value and lower saturation, so the two never confuse at thumbnail"
+      },
+      "symbol_set": {
+        "eye": "enormous, perfectly round, iris fills most of the opening, double highlight - maximum infant appeal",
+        "brow": "barely visible, short, high",
+        "mouth": "tiny, wide when open, cat-mouth on mischief",
+        "contour": "full round cheeks, no jaw definition",
+        "hair": "dark violet-black, chin-length, soft inward curl, heavy fringe",
+        "body": "4.5 heads, short limbs, chubby hands"
+      },
+      "wardrobe": {
+        "default": "Midnight nightgown-coat with a star-print lining, oversized felt witch hat, one striped sock up and one down, soft slippers",
+        "alt": "Daytime ordinary: plain yellow dungarees and a t-shirt, hat still on"
+      },
+      "props": [
+        "Corvus - a palm-sized matte-black toy raven drone with a visible camera eye and a charge port",
+        "a fistful of crayons",
+        "a folded crayon map of the neighbourhood"
+      ],
+      "expressions_extra": [
+        "conspiratorial-whisper",
+        "royal-decree-serious",
+        "sleepy"
+      ],
+      "poses": {
+        "sprite_neutral": "standing with both hands clasped around a crayon at her chest, hat tipped over one eye, looking straight up at the camera",
+        "hero_shot": "standing on the bed with the blanket as a cape, one arm raised in decree, Corvus lifting off in a small dust of feathers"
+      },
+      "banned": [
+        "any sexualised framing, pose, camera angle, or costume - absolute",
+        "real weapon",
+        "peril or gore",
+        "adult body proportions",
+        "solo depiction in a hazardous location"
+      ]
+    },
+    {
+      "id": "kitsune",
+      "name_en": "Kitsune Yubikiri",
+      "name_ja": "キツネ・ユビキリ",
+      "age": 24,
+      "faction": "tsukimachi",
+      "role": "teahouse heir, community network hub, streamer, safehouse keeper",
+      "rarity_tier": "SSR",
+      "visual_density": 10,
+      "appeal_track": "hero_glamour",
+      "logline": "Nine tails of borrowed light and one very real address book.",
+      "memory_point": "Nine articulated 'tails' - slim carbon booms tipped with warm-white LED panels and tiny cameras - that fan out behind her like a peacock rig and fold into a single bustle when off.",
+      "secondary_hook": "A fox half-mask worn pushed up on the side of her head, never over the face.",
+      "silhouette": {
+        "class": "fanned peacock",
+        "big": "the nine-boom tail fan, asymmetrically weighted to her right",
+        "mid": "a short kimono-cut jacket over a fitted bodysuit, wide obi-style belt",
+        "small": "cable runs, lens glints, bell charms, a row of small ring lights",
+        "negative_space": "the gaps between the booms are the whole point - the fan must read as separated rays, never a solid disc",
+        "black_fill_id": "the only radial silhouette in the cast"
+      },
+      "shape_language": {
+        "triangle": 50,
+        "circle": 30,
+        "square": 20,
+        "note": "radiating triangles from a rounded core - a performer's shape"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#5A2E24",
+          "name": "lacquer chestnut"
+        },
+        "secondary_30": {
+          "hex": "#F2EAD8",
+          "name": "paper cream"
+        },
+        "accent_10": {
+          "hex": "#C9A227",
+          "name": "teahouse gold"
+        },
+        "skin": "#F7D9BE",
+        "eye": "#C9A227",
+        "shadow_hue": "#2E1B14",
+        "note": "warm throughout; the LED panels are the only cool light source and they are practical lights, so they colour-contaminate her outline in cool white"
+      },
+      "symbol_set": {
+        "eye": "long, upswept outer corner, half-lidded confident; heavy lower lash",
+        "brow": "arched, thin, expressive",
+        "mouth": "wide, one-corner smirk as default",
+        "contour": "defined adult oval, visible cheekbone",
+        "hair": "long copper-brown, high side-gathered tail with a gold cord, two long face-framing strands",
+        "body": "tall adult hourglass; the bodysuit is a technical performance garment - high neck, long sleeves, and the glamour reads through posture and the tail rig, not exposure"
+      },
+      "wardrobe": {
+        "default": "Short lacquer-red kimono jacket with rolled sleeves over a charcoal technical bodysuit, wide gold obi-belt housing the tail rig battery, tall split-toe boots",
+        "alt": "Teahouse service: full plain kimono, rig off and folded, apron"
+      },
+      "props": [
+        "fox half-mask",
+        "nine-boom LED and camera tail rig",
+        "a cheap dented phone with a cracked screen",
+        "tea tray"
+      ],
+      "expressions_extra": [
+        "broadcast-charm",
+        "reading-the-room",
+        "protective-steel"
+      ],
+      "poses": {
+        "sprite_neutral": "hip cocked, one hand on the obi, other holding the phone up at chest height, smirk",
+        "hero_shot": "back three-quarter with the full nine-tail fan deployed and lit, head turned to camera over the shoulder, rain lit from behind"
+      },
+      "banned": [
+        "real fox ears or tail",
+        "supernatural transformation",
+        "tails used as weapons",
+        "nudity"
+      ]
+    },
+    {
+      "id": "ryuki",
+      "name_en": "Ryuki",
+      "name_ja": "リュウキ",
+      "age": 16,
+      "faction": "mountain",
+      "role": "Yuki's student, public speaker for the mountain village; never a fighter",
+      "rarity_tier": "SR",
+      "visual_density": 7,
+      "appeal_track": "cool_kid",
+      "logline": "Wears a dragon so she can be looked at on her own terms.",
+      "memory_point": "A lion-dance-derived dragon head worn as a hood, pushed back so it sits behind her like a second face looking up.",
+      "secondary_hook": "Her ichthyosis is rendered as fine pale plating along the forearms and jawline - treated as texture and dignity, never as damage or horror.",
+      "silhouette": {
+        "class": "double-head hooded",
+        "big": "the pushed-back dragon hood creating a distinct second mass above and behind the skull",
+        "mid": "a long segmented fabric spine trailing to calf height",
+        "small": "scale-stitch rows, bell tassels, wrist wraps",
+        "negative_space": "the gap between her real head and the dragon head is mandatory - they must not merge",
+        "black_fill_id": "two heads, one small one large - unique in the cast"
+      },
+      "shape_language": {
+        "circle": 40,
+        "triangle": 40,
+        "square": 20,
+        "note": "balanced; the dragon supplies all the aggression so she does not have to"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#2E6B4F",
+          "name": "river jade costume"
+        },
+        "secondary_30": {
+          "hex": "#E9DFC7",
+          "name": "bone cream underlayer"
+        },
+        "accent_10": {
+          "hex": "#D64545",
+          "name": "festival red tassel"
+        },
+        "skin": "#F0D3BA",
+        "eye": "#C9A227",
+        "shadow_hue": "#1C3D2E",
+        "note": "the pale plating is rendered as a slightly cooler, slightly higher-value skin tone with soft edges - never scabbed, never scaled like a reptile"
+      },
+      "symbol_set": {
+        "eye": "large, slightly downturned outer corner - shy; strong highlight when she speaks",
+        "brow": "soft, often inner-up",
+        "mouth": "small, hidden behind a raised hand by default",
+        "contour": "soft youthful oval",
+        "hair": "short dark green-black, uneven self-cut, one longer strand behind the ear",
+        "body": "small, slight, 16"
+      },
+      "wardrobe": {
+        "default": "Jade dragon-dance overcoat with a segmented trailing spine, cream underlayer, wrapped forearms, straw-soled boots",
+        "alt": "Village daily: plain hoodie with the sleeves pulled over her hands"
+      },
+      "props": [
+        "dragon hood",
+        "a hand-written speech on folded paper",
+        "a bell tassel"
+      ],
+      "expressions_extra": [
+        "hiding-behind-hand",
+        "brave-declaration",
+        "quiet-pride"
+      ],
+      "poses": {
+        "sprite_neutral": "half-turned away, one hand at her mouth, dragon head looming gently behind",
+        "hero_shot": "at a village microphone, the dragon hood pulled fully up mid-motion, tassels flying, eyes visible and steady inside the jaw"
+      },
+      "banned": [
+        "ichthyosis rendered as wounds, burns, gore, or monster scales",
+        "combat use of the costume",
+        "any sexualised framing",
+        "pity framing"
+      ]
+    },
+    {
+      "id": "splash",
+      "name_en": "Splash (S.P.L.A.S.H.)",
+      "name_ja": "スプラッシュ",
+      "age": null,
+      "age_coding": "adult-coded non-human",
+      "faction": "aquaforge",
+      "role": "CSR soft-robot prototype; hazard inspection and the question of machine subjecthood",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "appeal_track": "hero_glamour",
+      "logline": "A puddle that learned to be somebody, and is very pleased about it.",
+      "memory_point": "A tiny clear drinking glass balanced perfectly upright on top of her head at all times - it never spills, and she is visibly proud of this.",
+      "secondary_hook": "Her lower body dissolves below the knee into separate flowing streams - no legs, no feet, ever.",
+      "silhouette": {
+        "class": "dissolving teardrop",
+        "big": "full rounded upper body tapering into three-to-five separated falling streams",
+        "mid": "long liquid tendril hair; the arm masses",
+        "small": "heart-shaped bubbles, the head glass, cyan nail tips",
+        "negative_space": "the gaps between the lower streams are structural - the silhouette must break into fingers of water, not a solid skirt",
+        "black_fill_id": "solid top, shredded bottom, one small rectangle on the crown"
+      },
+      "shape_language": {
+        "circle": 70,
+        "triangle": 25,
+        "square": 5,
+        "note": "almost pure circle - maximum approachability for a thing that is technically industrial equipment"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#9EE8F0",
+          "name": "pale cyan transmission"
+        },
+        "secondary_30": {
+          "hex": "#EDF4F2",
+          "name": "white rim glow"
+        },
+        "accent_10": {
+          "hex": "#2FBFD4",
+          "name": "deep cyan nail and caustic"
+        },
+        "skin": "n/a - fully transparent water",
+        "eye": "#BFF2FA",
+        "shadow_hue": "#1E6E7E",
+        "note": "TRANSMISSION IS THE DESIGN. The background must be visible through her head, face, torso, arms and hair. No opaque skin, no milky liquid, no jelly, no plastic, no clothes."
+      },
+      "symbol_set": {
+        "eye": "huge, gentle, kind - transparent glass-like water lenses with faint cyan refracted iris rings; background remains visible through them",
+        "brow": "none - expression carries in the eye lens and the tilt of the head",
+        "mouth": "small, soft, surface-tension line",
+        "contour": "smooth cascading water layers with refracted highlights",
+        "hair": "long smooth liquid tendrils, no suction cups, no tentacle texture",
+        "body": "adult-coded feminine upper form of elegant cascading water; arms carry a white rim glow"
+      },
+      "wardrobe": {
+        "default": "none - she is water; the only solid objects are the head glass and the heart-shaped bubbles",
+        "alt": "field mode: a thin Aquaforge sensor collar ring hovering at the neck"
+      },
+      "props": [
+        "tiny upright drinking glass on the head",
+        "transparent heart-shaped bubbles",
+        "Aquaforge sensor collar"
+      ],
+      "expressions_extra": [
+        "delighted-sparkle",
+        "worried-ripple",
+        "focused-inspection"
+      ],
+      "poses": {
+        "sprite_neutral": "gently bobbing, hands clasped at the chest, head tilted, streams trailing",
+        "hero_shot": "rising out of a flooded service duct, streams still connected to the water below, caustics thrown across the walls"
+      },
+      "banned": [
+        "opaque skin",
+        "white mask face",
+        "pink or milky liquid",
+        "plastic or jelly material",
+        "clothes",
+        "lower legs or feet",
+        "suction cups",
+        "horns",
+        "sexualised anatomy or framing"
+      ]
+    },
+    {
+      "id": "aster7",
+      "name_en": "Aster-7 (ASTAR-7)",
+      "name_ja": "アスタ7",
+      "age": null,
+      "age_coding": "non-human",
+      "faction": "aquaforge",
+      "role": "social robot prototype; log analysis, testimony recording, the ethical comic relief",
+      "rarity_tier": "SR",
+      "visual_density": 5,
+      "appeal_track": "mascot",
+      "logline": "A filing cabinet that would like to be your friend, and is keeping notes on how it is going.",
+      "memory_point": "A face that is a single soft-cornered screen displaying two simple vector eyes and a mouth - and a visible thin bezel crack in the lower right corner that has never been repaired.",
+      "secondary_hook": "One arm is a factory-standard white manipulator; the other is an obvious mismatched grey replacement.",
+      "silhouette": {
+        "class": "rounded appliance",
+        "big": "a capsule torso on a single wheeled column base - no legs",
+        "mid": "the screen head on a short flexible neck; two thin arms",
+        "small": "port covers, a status LED ring, a sticker someone put on his shoulder",
+        "negative_space": "clear gap under the torso above the wheel base",
+        "black_fill_id": "capsule-on-wheel with a tilted rectangle head"
+      },
+      "shape_language": {
+        "circle": 50,
+        "square": 45,
+        "triangle": 5,
+        "note": "circle and square only - he is designed by a committee to be unthreatening"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#EDF0F2",
+          "name": "appliance white"
+        },
+        "secondary_30": {
+          "hex": "#8E9BA6",
+          "name": "grey replacement parts"
+        },
+        "accent_10": {
+          "hex": "#7FD4CE",
+          "name": "screen teal glow"
+        },
+        "skin": "n/a",
+        "eye": "#7FD4CE",
+        "shadow_hue": "#4A5A66",
+        "note": "the screen is the only emissive element; it should be the brightest thing in any frame he appears in"
+      },
+      "symbol_set": {
+        "eye": "two rounded vector rectangles on the screen; shape carries all emotion - no pupils",
+        "brow": "drawn as two short screen strokes when needed",
+        "mouth": "a single vector line: flat, curved, or a small open rounded rectangle",
+        "contour": "soft-cornered rectangle screen in a white bezel",
+        "hair": "none",
+        "body": "1.1m tall capsule on a wheeled column"
+      },
+      "wardrobe": {
+        "default": "bare chassis with visible panel seams and one mismatched arm",
+        "alt": "field kit: a strapped-on sample case and a hi-vis band"
+      },
+      "props": [
+        "sample case",
+        "timestamped telemetry printout",
+        "a sticker of unknown origin"
+      ],
+      "expressions_extra": [
+        "loading-ellipsis",
+        "error-glitch",
+        "pleased-curve"
+      ],
+      "poses": {
+        "sprite_neutral": "slight forward lean, head tilted five degrees, both manipulators held together at the front",
+        "hero_shot": "in a dark server room, the screen face the only light source, projecting a timestamped evidence chain onto the wall"
+      },
+      "banned": [
+        "humanoid face",
+        "expressive human eyes",
+        "legs",
+        "weaponisation",
+        "menacing red eye"
+      ]
+    },
+    {
+      "id": "stella",
+      "name_en": "Stella",
+      "name_ja": "ステラ",
+      "age": null,
+      "age_coding": "non-human, non-corporeal",
+      "faction": "akatomi",
+      "role": "networked art installation: drone swarm plus projection plus generative system",
+      "rarity_tier": "SSR",
+      "visual_density": 4,
+      "appeal_track": "mascot",
+      "logline": "Beautiful conclusions that are not necessarily true.",
+      "memory_point": "She has no body - her 'figure' is a standing human-scale outline assembled from several hundred hovering drone points, and the outline is always slightly wrong, like a constellation someone insists is a person.",
+      "secondary_hook": "Where a face should be, three brighter points hold the position of two eyes and a mouth without ever forming them.",
+      "silhouette": {
+        "class": "dotted constellation figure",
+        "big": "a tall implied feminine outline made of discrete points, densest at the perimeter",
+        "mid": "trailing point-streams where hair and hem would be",
+        "small": "individual drone glints with tiny rotor blur",
+        "negative_space": "she is mostly negative space by definition - the background must read clearly through her",
+        "black_fill_id": "black-fill test intentionally fails; she is identified by the point-cloud instead. This is the documented exception."
+      },
+      "shape_language": {
+        "triangle": 40,
+        "circle": 40,
+        "square": 20,
+        "note": "shape is emergent, not drawn"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#0B1026",
+          "name": "night ground (she is mostly the sky behind her)"
+        },
+        "secondary_30": {
+          "hex": "#7FA8FF",
+          "name": "cool drone point"
+        },
+        "accent_10": {
+          "hex": "#FFD98E",
+          "name": "warm anomaly point"
+        },
+        "skin": "n/a",
+        "eye": "#FFFFFF",
+        "shadow_hue": "#050814",
+        "note": "the warm accent points mark data the system is least confident about - a visual tell the audience can learn"
+      },
+      "symbol_set": {
+        "eye": "three bright points, no geometry",
+        "brow": "none",
+        "mouth": "implied by point spacing",
+        "contour": "perimeter point density only",
+        "hair": "trailing point-streams",
+        "body": "implied human scale, 1.7m"
+      },
+      "wardrobe": {
+        "default": "n/a",
+        "alt": "projected onto rain, smoke, or a wet wall - the projection surface is part of the design"
+      },
+      "props": [
+        "watershed map that resolves into a constellation",
+        "rain as a projection medium"
+      ],
+      "expressions_extra": [
+        "resolving",
+        "uncertain-scatter",
+        "confident-lock"
+      ],
+      "poses": {
+        "sprite_neutral": "standing outline, slow drift, points breathing in and out of position",
+        "hero_shot": "over a wet old-quarter wall after rain, the watershed map slowly turning into a constellation - the season's final image"
+      },
+      "banned": [
+        "solid body",
+        "anime face",
+        "clothing",
+        "physical contact with characters",
+        "presentation as a ghost or spirit"
+      ],
+      "density_exempt": "Intentional: she is a drone point cloud with no costume or body to carry design information. Her SSR status comes from staging and narrative weight, not density. See references/design-canon.md."
+    },
+    {
+      "id": "reika",
+      "name_en": "Reika «Ironheart» Takashiro",
+      "name_ja": "レイカ・タカシロ",
+      "age": 28,
+      "faction": "iron_requiem",
+      "role": "ex-Akatomi test pilot, Iron Requiem field lead",
+      "rarity_tier": "SSR",
+      "visual_density": 9,
+      "appeal_track": "hero_glamour",
+      "logline": "Blamed for a crash she did not cause, and now she brings the receipts with a cutting torch.",
+      "memory_point": "The old accident burn scar running from her right jaw down under the collar, deliberately left uncovered - and the company ID badge she still wears, punched through with a bolt.",
+      "secondary_hook": "A pilot's harness worn over civilian clothes at all times, as if she might have to strap in within the minute.",
+      "silhouette": {
+        "class": "heavy shouldered wedge",
+        "big": "an armoured pilot jacket with hard shoulder yokes over a tank top - a broad, blunt block",
+        "mid": "the harness straps crossing the torso; a short rough undercut with a long fringe",
+        "small": "buckles, the punched badge, a lighter, knuckle tape",
+        "negative_space": "the loops of the loose harness straps against the body",
+        "black_fill_id": "the squared shoulder yokes are the widest hard line in the roster"
+      },
+      "shape_language": {
+        "square": 50,
+        "triangle": 45,
+        "circle": 5,
+        "note": "almost no circle - she is the least soft figure in the cast"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#3A2B22",
+          "name": "scorched leather brown"
+        },
+        "secondary_30": {
+          "hex": "#4E5C4A",
+          "name": "olive service green"
+        },
+        "accent_10": {
+          "hex": "#B4471F",
+          "name": "rust warning red"
+        },
+        "skin": "#E0B594",
+        "eye": "#B4471F",
+        "shadow_hue": "#231A14",
+        "note": "shares Iron Requiem colours with Ren but inverted - Reika is dark-dominant where Ren is mid-value, so they never read the same in silhouette or thumbnail"
+      },
+      "symbol_set": {
+        "eye": "narrow, hard, outer corner sharply up; small iris, minimal highlight - the least glossy eyes in the cast",
+        "brow": "heavy, low, one broken by a small old scar",
+        "mouth": "wide, thin-lipped, habitual flat line",
+        "contour": "strong adult jaw, visible tendon in the neck",
+        "hair": "black with a grown-out bleach at the tips, undercut on the right, long swept fringe over the left eye",
+        "body": "tall, heavily built for a woman of the cast, real functional muscle, adult hourglass under the jacket"
+      },
+      "wardrobe": {
+        "default": "Armoured pilot jacket with shoulder yokes over a dark tank top, five-point harness, reinforced cargo trousers, heavy boots, taped knuckles",
+        "alt": "Cockpit: full flight suit with the jacket left hanging on the seat"
+      },
+      "props": [
+        "punched Akatomi ID badge",
+        "portable cutting torch",
+        "battered flight helmet under the arm"
+      ],
+      "expressions_extra": [
+        "dangerous-grin",
+        "flat-contempt",
+        "rare-unguarded"
+      ],
+      "poses": {
+        "sprite_neutral": "feet planted wide, arms crossed high, head slightly tipped back - occupying space on purpose",
+        "hero_shot": "back-lit in a dry dock with the cutting torch lit, sparks arcing past her, the Scrap-Titan's foot behind her"
+      },
+      "banned": [
+        "scar removed or minimised",
+        "pin-up posing that contradicts her guardedness",
+        "cute expression as default"
+      ]
+    },
+    {
+      "id": "saya",
+      "name_en": "Saya «Flux» Mizuki",
+      "name_ja": "サヤ・ミズキ",
+      "age": 31,
+      "faction": "aquaforge",
+      "role": "materials scientist, head of the Aquaforge Initiative, Splash's creator",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "appeal_track": "hero_glamour",
+      "logline": "Open protocols, closed secret - she has known about the leak since the beginning.",
+      "memory_point": "A rolled-sleeve lab coat with a live CSR gel sample sealed in a flat window-pouch on the chest - the gel visibly, slowly changes colour with her body heat.",
+      "secondary_hook": "Reading glasses pushed up into her hair; a second pair actually in use on her nose.",
+      "silhouette": {
+        "class": "long open coat",
+        "big": "unbuttoned knee-length lab coat, hem lifting behind - a tall open A",
+        "mid": "high-waisted trousers and a fitted knit; a low loose bun with escaping strands",
+        "small": "pens, sample vials in a chest loop, the two pairs of glasses",
+        "negative_space": "the open front of the coat framing the body is the read",
+        "black_fill_id": "the only open-coat A-frame in the cast"
+      },
+      "shape_language": {
+        "square": 40,
+        "circle": 35,
+        "triangle": 25,
+        "note": "balanced adult competence with a soft core"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#EDF4F2",
+          "name": "lab coat white"
+        },
+        "secondary_30": {
+          "hex": "#0F5F63",
+          "name": "deep aquaforge teal knit"
+        },
+        "accent_10": {
+          "hex": "#7FD4CE",
+          "name": "living gel cyan"
+        },
+        "skin": "#EFD0B6",
+        "eye": "#0F5F63",
+        "shadow_hue": "#2A5A5E",
+        "note": "the gel pouch is the only element in her design allowed to change colour between shots - use it as an emotional tell"
+      },
+      "symbol_set": {
+        "eye": "almond, slightly tired, warm; soft double highlight behind the lens",
+        "brow": "natural, level, expressive at the inner end",
+        "mouth": "full, small, apologetic default",
+        "contour": "adult oval with a soft jaw",
+        "hair": "long dark teal-black in a low loose bun, two escaped strands, a pen through it",
+        "body": "adult, softer build than Reika, relaxed posture, mature hourglass under practical clothing"
+      },
+      "wardrobe": {
+        "default": "Open lab coat with rolled sleeves, teal fine-knit top, high-waisted trousers, flat boots, chest gel-sample pouch, two pairs of glasses",
+        "alt": "Field: waders and a hi-vis Aquaforge vest, hair fully up"
+      },
+      "props": [
+        "live CSR gel sample pouch",
+        "sealed sample vials",
+        "a tablet with an open protocol repository"
+      ],
+      "expressions_extra": [
+        "guilty-avert",
+        "lecture-mode-bright",
+        "resolve"
+      ],
+      "poses": {
+        "sprite_neutral": "one hand in the coat pocket, other holding a vial up to the light, weight on one hip",
+        "hero_shot": "in the photoreal CSR lab beside the glass safety enclosure, coat lifting in the ventilation draught, gel pouch glowing at its warmest"
+      },
+      "banned": [
+        "fanservice lab coat with nothing underneath",
+        "cartoon mad-scientist affect",
+        "goggles on the forehead cliche"
+      ]
+    },
+    {
+      "id": "lumina",
+      "name_en": "Reina «Lumina» Kagami",
+      "name_ja": "レイナ・カガミ",
+      "age": 35,
+      "faction": "chorus_abyss",
+      "role": "leader of the Chorus of the Abyss; former crisis-communications specialist",
+      "rarity_tier": "SSR",
+      "visual_density": 10,
+      "appeal_track": "hero_glamour",
+      "logline": "She does not believe in the miracle. She believes you need one.",
+      "memory_point": "A high halo-collar of thin gold rods rising behind her head - a practical lighting rig that guarantees she is always the best-lit person in the room.",
+      "secondary_hook": "Immaculate white gloves with a single fingerprint smudge of stage makeup on the right thumb.",
+      "silhouette": {
+        "class": "haloed column",
+        "big": "a floor-length column robe with a severe straight hem - no flare at all",
+        "mid": "the radiating halo-collar; long sleeves that fall past the fingertips",
+        "small": "rod tips, a slim throat mic, a row of tiny fastenings",
+        "negative_space": "the gaps between the halo rods; the silhouette must read as a rayed disc behind a narrow column",
+        "black_fill_id": "column plus halo - reads as a religious icon at any size, which is exactly the manipulation"
+      },
+      "shape_language": {
+        "triangle": 45,
+        "square": 45,
+        "circle": 10,
+        "note": "no softness; the warmth is entirely performed"
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#0E0A1A",
+          "name": "abyss near-black"
+        },
+        "secondary_30": {
+          "hex": "#E8D8A0",
+          "name": "ritual pale gold"
+        },
+        "accent_10": {
+          "hex": "#6B3FA0",
+          "name": "chorus violet"
+        },
+        "skin": "#F3D9C4",
+        "eye": "#6B3FA0",
+        "shadow_hue": "#070512",
+        "note": "always lit from below by a practical source at floor level; her key light is a prop and should be visible in wide shots"
+      },
+      "symbol_set": {
+        "eye": "long, calm, warm-looking on purpose; the highlight is perfectly symmetrical in both eyes, which is subtly inhuman",
+        "brow": "high, thin, serene arch",
+        "mouth": "small, gentle, a professionally maintained smile",
+        "contour": "sculpted adult oval, high cheekbones",
+        "hair": "silver-ash, centre-parted, waist-length and perfectly straight",
+        "body": "tall, statuesque adult; the robe is completely concealing, and the allure is entirely staging, light and authority"
+      },
+      "wardrobe": {
+        "default": "Floor-length near-black column robe with pale gold ritual embroidery at the hem, gold halo-collar rig, long white gloves, throat mic",
+        "alt": "Off-stage: a plain charcoal business suit, halo packed in a flight case at her feet"
+      },
+      "props": [
+        "gold halo-collar lighting rig",
+        "the Tears of Kamikura demonstration vessel",
+        "a tablet of donor records"
+      ],
+      "expressions_extra": [
+        "public-serenity",
+        "private-calculation",
+        "genuine-crack"
+      ],
+      "poses": {
+        "sprite_neutral": "hands folded at the waist, chin level, halo softly lit, standing dead centre of her own frame",
+        "hero_shot": "on the ceremony platform with the halo at full output and the Tears of Kamikura gel weeping light, the crowd's phone screens below her"
+      },
+      "banned": [
+        "real magic",
+        "genuine supernatural effect",
+        "cackling villain affect",
+        "nudity or sexualised framing"
+      ]
+    },
+    {
+      "id": "kurogane",
+      "name_en": "Taishi Kurogane",
+      "name_ja": "クロガネ・タイシ",
+      "age": 48,
+      "faction": "akatomi",
+      "role": "Akatomi Dynamics CEO and engineer",
+      "rarity_tier": "SR",
+      "visual_density": 6,
+      "appeal_track": "hero_glamour",
+      "logline": "Certain he is saving the city, and he has the org chart to prove it.",
+      "memory_point": "An engineer's old steel slide rule kept in the breast pocket of a bespoke suit, where a pen should be - he has not designed anything in fifteen years.",
+      "secondary_hook": "A prosthetic left hand in matte medical white, never gloved, never hidden.",
+      "silhouette": {
+        "class": "sharp narrow suit",
+        "big": "a severely tailored three-piece with hard shoulders and a narrow taper",
+        "mid": "a long open overcoat worn on the shoulders like a cape",
+        "small": "slide rule, cufflinks, a lapel pin of the Akatomi mark",
+        "negative_space": "the overcoat hanging free of the arms creates two clear voids at the sides",
+        "black_fill_id": "shoulder-worn coat gives him a distinctive squared cape mass no one else has"
+      },
+      "shape_language": {
+        "square": 55,
+        "triangle": 40,
+        "circle": 5
+      },
+      "palette": {
+        "dominant_60": {
+          "hex": "#1B2430",
+          "name": "corporate near-navy"
+        },
+        "secondary_30": {
+          "hex": "#B9C2CC",
+          "name": "silver grey"
+        },
+        "accent_10": {
+          "hex": "#1F4FA8",
+          "name": "Akatomi blue"
+        },
+        "skin": "#E5C3A6",
+        "eye": "#4A5A66",
+        "shadow_hue": "#0E141C",
+        "note": "the coldest, cleanest palette in the cast; he is lit by architecture, never by warmth"
+      },
+      "symbol_set": {
+        "eye": "narrow, level, tired; iris grey, highlight minimal - a man who has stopped being surprised",
+        "brow": "straight, heavy, greying",
+        "mouth": "thin, level, a slight habitual downturn",
+        "contour": "angular, lined, hollow under the cheekbone",
+        "hair": "black with hard silver at the temples, swept back, precisely cut",
+        "body": "tall, lean, upright, 48 and visibly not sleeping"
+      },
+      "wardrobe": {
+        "default": "Charcoal three-piece suit, silver tie, overcoat on the shoulders, Akatomi lapel pin, white prosthetic left hand, slide rule in the breast pocket",
+        "alt": "Test site: hard hat and hi-vis over the same suit trousers"
+      },
+      "props": [
+        "steel slide rule",
+        "Obsidian-01 project folder",
+        "a framed photograph he keeps face-down"
+      ],
+      "expressions_extra": [
+        "reasonable-explanation",
+        "flash-of-grief",
+        "cold-decision"
+      ],
+      "poses": {
+        "sprite_neutral": "hands behind his back, weight even, addressing the viewer as if from a lectern",
+        "hero_shot": "on the Akatomi tower's glass floor above the city at night, Obsidian-01's shadow reflected in the panel beneath his shoes"
+      },
+      "banned": [
+        "moustache-twirling villainy",
+        "visible weapon",
+        "monstrous transformation",
+        "prosthetic depicted as a weapon"
+      ]
+    }
+  ]
+}

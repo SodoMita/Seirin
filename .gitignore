@@ -20,6 +20,12 @@ desktop.ini
 *~
 .fleet/
 
+# Rejected/in-progress character generations. Approved assets AND their prompt
+# files (characters/<id>/prompts/) are committed on purpose — the prompts are
+# part of the product. Only _wip/ is throwaway.
+characters/*/_wip/
+characters/_wip/
+
 # Scratch spaces & uploads (never part of the game or the asset set)
 uploads/
 scratch/
@@ -36,10 +42,12 @@ npm-debug.log*
 yarn-error.log*
 .npx-cache/
 
-# Python tooling (browser regression test)
+# Python tooling (browser regression test; matting tools need Pillow + numpy,
+# install into a local venv — never commit it)
 __pycache__/
 *.py[cod]
 .venv/
+.venv-art/
 venv/
 .pytest_cache/
 playwright-report/
