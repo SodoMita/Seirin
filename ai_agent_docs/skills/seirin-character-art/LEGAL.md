@@ -140,6 +140,20 @@ anti-sexualisation entry. **Never remove, weaken, or disable that check.**
   This is the evidence base for any later provenance question — a rights
   dispute, a platform query, or a store listing that requires AI disclosure.
   Falsifying or backfilling that log is a violation, not untidiness.
+- **SynthID is present in every Gemini/Nano Banana output.** An invisible
+  provenance watermark is embedded in all images from the model family, and a
+  *visible* Gemini sparkle mark appears on some access tiers (free and Pro;
+  Ultra and AI Studio / Vertex outputs are reported clean, with SynthID and
+  C2PA metadata retained). Consequences for this project:
+  - **Never attempt to strip SynthID.** Google's terms discourage it, removal
+    degrades the image, and the mark is designed to survive editing. Doing so
+    to pass work off as non-AI would also violate the provenance rule above.
+  - **A visible sparkle mark must not ship in an asset.** If one appears,
+    regenerate on a tier that does not add it rather than painting it out —
+    painting it out is watermark removal.
+  - Check the licensing tier before producing final assets, and record which
+    tier produced each one. Some storefronts and print-on-demand platforms
+    apply their own rules to AI-marked images.
 - **AI-disclosure obligations are now live.** Steam requires AI-use disclosure
   in the store listing. The **EU AI Act Article 50 transparency obligations
   apply from 2 August 2026** and require machine-readable marking of

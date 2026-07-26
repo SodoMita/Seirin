@@ -20,6 +20,14 @@ jitter and sprites do not jump between scenes.
 Work at 2× and downsample: it hides generator micro-artifacts and gives an
 upscale path for a store page. Never upscale a delivered asset back up.
 
+**Do not expect the generator to hit these ratios directly.** Nano Banana
+outputs drift toward 1:1 and can ignore a requested aspect ratio — and the
+full-body sprite canvas is an extreme 1:2. Generate at a moderate ratio, then
+crop and composite onto the sprite canvas, and **verify the actual pixel
+dimensions of every output** rather than trusting the request. `check_assets.py`
+warns when a file is not one of the sizes in this table, which is the backstop
+for exactly this.
+
 **Straight (unpremultiplied) alpha**, always. The triangulation matte in
 `tools/triangulate_matte.py` produces straight alpha; premultiplying it will
 dark-fringe every sprite over a light background.

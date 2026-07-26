@@ -196,6 +196,100 @@ verify over backgrounds that are neither white nor black.
 instruction to flatten the figure onto both plates, which erases the
 transparency the technique exists to recover.
 
+## Nano Banana specifics (Gemini image models)
+
+Model-specific behaviour, gathered from practitioner reports with shown results.
+Applies to Nano Banana (Gemini 2.5 Flash Image), Nano Banana Pro (Gemini 3 Pro
+Image) and Nano Banana 2. Sources and confidence in `sources.md`.
+
+### Never write "transparent" in a prompt
+
+The model has **no alpha channel** — it outputs flat RGB. Asking for a
+transparent background makes it *paint a checkerboard*: solid grey-and-white
+squares imitating the Photoshop transparency grid. The community explanation is
+that training on stock images and Photoshop screenshots taught it
+"transparency = checkerboard". Google has confirmed transparency is
+unsupported.
+
+This is why the project mattes from white and black plates. That method is
+**independently the recommended workaround**, and the reported reason matches
+our own measurement: the model reproduces the subject consistently enough
+between runs that the difference between plates yields true alpha. Green screen
+(`#00FF00`) is the fallback, but the white/black pair gives cleaner soft edges —
+which is exactly why green is reserved for consistency sheets here.
+
+### Verbatim token reuse
+
+Describe a character's traits in **exactly the same words every time** —
+identical strings, not synonyms. Practitioners keep a text file and paste from
+it. Drift is subtle at first: hair lengthens slightly, a colour shifts, and two
+scenes later it is a different person. This is the single most-repeated
+consistency technique, and it is why the briefs say to copy the symbol set
+literally rather than paraphrasing.
+
+### Lead with art direction, not the character
+
+Front-load the style before naming the character. Leading with the character
+description makes the model default toward semi-realistic rendering. Our
+seven-section order already does this — STYLE precedes IDENTITY — and this is
+independent confirmation of it.
+
+### Film-direction language for expressions
+
+"Reacts with exaggerated surprise, eyebrows raised, mouth open" outperforms
+"surprised face", which tends to come back flat. Write expression prompts as a
+director's note to an actor, and overstate slightly.
+
+### Each edit degrades the image — so batch changes, but branch from the origin
+
+Two findings that pull in opposite directions, and the resolution matters:
+
+- Iterative editing **visibly degrades quality** with each pass; practitioners
+  attribute this partly to watermark re-encoding. The advice is to make all
+  changes in one prompt and keep the number of steps minimal.
+- One change per edit is what lets you learn *which* change worked.
+
+Resolution: **use one-change-per-edit while exploring, then apply the learned
+set in a single generation from the original anchor.** Never chain edit onto
+edit. When drift appears, return to the *first, best* reference — not the fifth
+generation. Composite small fixes in an image editor instead of spending
+another generation.
+
+### The "unchanged image" failure
+
+Reported at roughly 10–40% of edits: the model returns the original image with
+the requested change simply not applied. Google has acknowledged it. Mitigations
+that practitioners report working:
+
+- Phrase as `"Modify this image by …"` or `"Change only [X] while keeping
+  everything else identical"` rather than a bare instruction.
+- Re-upload the source and start a fresh session; session state contributes.
+- Treat it as a retry condition, not a prompt defect — but if the *same* edit
+  fails three times, rephrase rather than retrying.
+
+### Aspect ratio drift
+
+Outputs drift toward 1:1 and can ignore a requested ratio. **This matters for
+our 2048 × 4096 sprite canvas**, which is an extreme 1:2. Plan to generate at a
+more moderate ratio and crop/composite to the sprite canvas, and verify actual
+output dimensions rather than trusting the request.
+
+### Capacity limits (Nano Banana Pro)
+
+- Up to **14 reference images** in one prompt.
+- Up to **5 characters** held consistent. Beyond that the identity mechanism
+  fails and faces blend into generic or merged features.
+- With 3+ characters, map them explicitly: "A on the left, B centre, C right".
+- 1K / 2K / 4K output. 2K is sufficient for sheet and storyboard stages.
+
+### The whole sheet as reference
+
+Rather than a single portrait, pass the **entire approved turnaround sheet** as
+the reference for later generations. The model then has profile and back views
+in front of it and does not have to hallucinate blind spots. This is the
+workflow the skill already prescribes; practitioners report it as the single
+biggest consistency gain.
+
 ## Failure modes and the fix
 
 | Symptom | Cause | Fix |
@@ -207,6 +301,11 @@ transparency the technique exists to recover.
 | Sprites don't line up in engine | no anchor/framing instruction | state "feet on the bottom edge, head upright and centred" |
 | Silhouette lost in hero shot | figure and background at the same value | force value separation |
 | A translucent character comes out opaque | negation-only phrasing | describe transmission positively: "the background is clearly visible through the head, torso and arms" |
+| Output is a grey/white checkerboard | the word "transparent" appeared in the prompt | remove it; prompt a solid background and matte from white/black plates |
+| Edit returns the original unchanged | known model failure, 10–40% of edits | rephrase as "modify this image by…"; re-upload; new session; retry |
+| Quality drops over successive edits | edit chaining re-encodes the image | batch changes into one generation from the original anchor; composite small fixes manually |
+| Canvas comes back square | aspect-ratio drift toward 1:1 | generate at a moderate ratio, then crop/composite to the sprite canvas; verify dimensions |
+| Faces merge in a group image | more than 5 characters in one generation | split the image, or compose separately |
 | Matted sprite is opaque where it should be transparent | plates were flattened, not composited | never ask for "identical character pixels"; ask for honest compositing over each background |
 | Matted edges ghost or double | plates not registered | generate the black plate as an edit of the white plate |
 | Soft edges tinted green | green sheet used as a matting background | green is for consistency sheets only; matte from white/black plates |

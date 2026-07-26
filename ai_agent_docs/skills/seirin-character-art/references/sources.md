@@ -189,6 +189,62 @@ those enumerate *subjects* ("maid", "china dress") and encode the training
 distribution. A good Nano-Banana guide covers *mechanics* — editing, identity
 preservation across edits, plate consistency, resolution behaviour.
 
+## Nano Banana — sources consulted
+
+Gathered 2026-07. These are practitioner reports, not vendor documentation;
+they meet the two tests above (model-specific, results shown) but are not
+peer-reviewed. Confidence is marked.
+
+**High confidence — corroborated across independent sources, and consistent
+with our own measurement:**
+
+- **No alpha channel; "transparent" produces a painted checkerboard.**
+  Reported consistently across r/GeminiAI, r/nanobanana, r/GoogleGeminiAI and
+  vendor-adjacent write-ups, and stated as confirmed by Google on the Gemini
+  API forums. The recommended workaround is the **white/black two-render
+  method**, which is independently what this project already does — and the
+  stated reason (the model reproduces the subject consistently between runs)
+  matches our measured alpha error of 0.0000.
+  - https://transparify.app/blog/gemini-transparent-background
+  - https://www.reddit.com/r/GeminiAI/comments/1pfdanr/
+  - https://www.reddit.com/r/nanobanana/comments/1osh0ps/
+- **Verbatim token reuse for consistency.** The most-repeated technique across
+  every practitioner source found.
+  - https://www.reddit.com/r/aitubers/comments/1s9n2ke/
+- **Turnaround sheet as the reference image.** Give the model its own
+  multi-angle blueprint so it does not hallucinate blind spots.
+  - https://www.reddit.com/r/grok/comments/1shusnl/
+- **Edits degrade quality; return to the original anchor when drift appears.**
+  - https://www.reddit.com/r/GeminiAI/comments/1qx4b6s/
+  - https://christytuckerlearning.com/nano-banana-gemini-character-image-experiments/
+
+**Medium confidence — reported repeatedly, mechanism unclear or figures
+unverified:**
+
+- **"Unchanged image" edit failure at roughly 10–40% of edits**, acknowledged
+  by Google. The percentage is one developer's observation, not a measurement.
+  - https://www.reddit.com/r/GeminiAI/comments/1r71o6w/
+  - https://skywork.ai/blog/diagnose-failed-edits-gemini-nano-banana-image-guide/
+- **Aspect-ratio drift toward 1:1.** Widely reported; severity per-ratio not
+  established. Matters for our 1:2 sprite canvas.
+- **Lead with art direction before the character.** One detailed practitioner
+  report; plausible and matches our section ordering, but single-source.
+- **Capacity: 14 reference images, ~5 consistent characters, 1K/2K/4K.** Vendor
+  and vendor-adjacent figures; the 5-character ceiling and its failure mode
+  (blended faces) come from practitioner write-ups.
+
+**Low confidence — treat as unverified:**
+
+- Percentage consistency claims ("93% consistency", "95% with 8 angles") appear
+  in SEO-driven blog posts that cite each other and misattribute benchmarks.
+  **Do not repeat these numbers.** They are listed here only so a future agent
+  recognises them as unreliable rather than rediscovering them as fact.
+
+**Not applicable to this project:** guides oriented to photorealistic portraits
+and selfies-with-celebrities. Note also that the model refuses edits involving
+real people's likenesses, which is consistent with `LEGAL.md` §2 and is not a
+limitation we need to work around.
+
 ## Two cautions when adding sources
 
 **Beware AI-prompt listicles.** Searching for anime costume guidance returns
