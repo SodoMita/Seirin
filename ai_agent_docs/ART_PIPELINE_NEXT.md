@@ -1,5 +1,11 @@
 # Next art pipeline
 
+> **Character art is now governed by the `seirin-character-art` Agent Skill**
+> (`ai_agent_docs/skills/seirin-character-art/`). That skill supersedes this
+> file for characters: cast registry, per-character prompt cards, sprite spec
+> (canvas / locked face box / naming), iteration loop and validators. The notes
+> below remain accurate for the conventions they describe and for CGs.
+
 ## Current production direction
 
 ### Consistency sheets
@@ -38,9 +44,19 @@ White/black variants are final-matting assets, not consistency-generation backgr
 All four are registered in `src/content/story-data.ts` and inserted at their matching story beats.
 
 ## Final-matting tools
-- `tools/triangulate_matte.py`
-- `tools/apply_mask.py`
-- `tools/composite_over.py`
+
+The generators in use (Nano-Banana class) cannot output alpha; alpha is
+recovered from a white plate and a black plate. The difference between the two
+plates *is* the alpha, so the plates must composite the figure honestly over
+each background rather than paste it opaquely onto both.
+
+- `tools/triangulate_matte.py` — white + black pair -> RGBA (+ optional alpha map)
+- `tools/triangulate_sheet_extract.py` — same, for a sheet, sliced into named sprites
+- `tools/check_matte.py` — verify a matte over non-white/black backgrounds;
+  `--report` flags flattened plates, binary alpha and edge contamination
+- `tools/composite_over.py` — composite a sprite onto a background image
+
+(`apply_mask.py` was listed here historically but never existed in this repo.)
 
 ## Lyra consistency note
 In side view, the front dress panel must remain visibly in front rather than moving behind the body silhouette.
