@@ -340,23 +340,109 @@
     }
 
     /* =====================================================
+       DOM guards
+       -----------------------------------------------------
+       querySelectorAll() is typed to yield Element, but this
+       code reads HTMLElement-only properties (.dataset,
+       .hidden). Today every selector happens to match an
+       HTMLElement — but this is exactly the family of bug
+       that already bit this project once (window.monogatari
+       resolving to a <div>; see README §2), and it fails
+       mid-click, silently, in front of the player.
+
+       So: filter to real HTMLElements and NAME anything that
+       gets skipped, the same way icons-offline.js names an
+       unmapped icon instead of shipping a broken box.
+       ===================================================== */
+    function isHTMLElement (el) {
+        return !!el && typeof window.HTMLElement === 'function' && el instanceof window.HTMLElement;
+    }
+
+    function describe (el) {
+        if (!el) { return String(el); }
+        var name = (el.nodeName || '?').toLowerCase();
+        return name + (el.id ? '#' + el.id : '') +
+            (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).join('.') : '');
+    }
+
+    /* querySelectorAll + HTMLElement filter + a loud console warning naming
+       every element that was dropped. Returns a real Array. */
+    function queryElements (selector, context) {
+        var found = [];
+        try { found = Array.prototype.slice.call((context || document).querySelectorAll(selector)); }
+        catch (e) {
+            console.error('[Cyber-Nexus] bad selector "' + selector + '":', e.message);
+            return [];
+        }
+        var usable = [];
+        var skipped = [];
+        found.forEach(function (el) {
+            if (isHTMLElement(el)) { usable.push(el); } else { skipped.push(describe(el)); }
+        });
+        if (skipped.length) {
+            console.warn('[Cyber-Nexus] selector "' + selector + '" matched ' + skipped.length +
+                ' non-HTMLElement node(s), skipped: ' + skipped.join(', ') +
+                ' — these cannot carry .dataset/.hidden and would have thrown mid-interaction.');
+        }
+        return usable;
+    }
+
+    /* getElementById + a warning when the id is missing, so a renamed or
+       deleted element is reported instead of no-oping forever. */
+    function requireElement (id, why) {
+        var el = document.getElementById(id);
+        if (!el) {
+            console.warn('[Cyber-Nexus] no element with id "' + id + '"' +
+                (why ? ' (' + why + ')' : '') + ' — wiring skipped.');
+            return null;
+        }
+        return el;
+    }
+
+    function on (id, event, handler, why) {
+        var el = requireElement(id, why);
+        if (el) { el.addEventListener(event, handler); }
+        return el;
+    }
+
+    /* =====================================================
        Modals
        ===================================================== */
     function toggleModal (id, force) {
+        // `id` often comes from a data-close attribute, i.e. from the markup.
+        // A typo there used to be a silent no-op; now it is named in the
+        // console, consistent with how icons-offline.js reports a missing icon.
+        if (typeof id !== 'string' || !id) {
+            console.warn('[Cyber-Nexus] toggleModal() called without a modal id (got ' + String(id) +
+                ') — check the data-close attribute in index.html.');
+            return false;
+        }
         var m = document.getElementById(id);
-        if (!m) { return false; }
+        if (!m) {
+            console.warn('[Cyber-Nexus] toggleModal("' + id + '"): no such element — ' +
+                'a data-close attribute names a modal that does not exist.');
+            return false;
+        }
         var willOpen = (typeof force === 'boolean') ? force : !m.classList.contains('active');
         m.classList.toggle('active', willOpen);
         return willOpen;
     }
 
     function showCodexTab (name) {
-        document.querySelectorAll('.codex-tab').forEach(function (b) {
+        var tabs = queryElements('.codex-tab');
+        var panels = queryElements('.codex-panel');
+        tabs.forEach(function (b) {
             b.classList.toggle('active', b.dataset.tab === name);
         });
-        document.querySelectorAll('.codex-panel').forEach(function (p) {
+        panels.forEach(function (p) {
             p.hidden = (p.dataset.panel !== name);
         });
+        // A tab that names a panel nobody declares would leave the codex blank.
+        var known = panels.some(function (p) { return p.dataset.panel === name; });
+        if (!known) {
+            console.warn('[Cyber-Nexus] codex tab "' + name + '" has no matching ' +
+                '[data-panel="' + name + '"] panel — the codex will render empty.');
+        }
     }
 
     /* =====================================================
@@ -417,24 +503,24 @@
     /* =====================================================
        UI wiring
        ===================================================== */
-    document.getElementById('btn-codex').addEventListener('click', function () { toggleModal('codex-modal'); });
-    document.getElementById('btn-ambience').addEventListener('click', toggleAmbience);
-    document.getElementById('btn-minigame').addEventListener('click', function () {
+    on('btn-codex', 'click', function () { toggleModal('codex-modal'); }, 'codex button');
+    on('btn-ambience', 'click', toggleAmbience, 'ambience toggle');
+    on('btn-minigame', 'click', function () {
         if (toggleModal('minigame-modal')) { newHackRound(); }
-    });
+    }, 'mini-game button');
 
-    document.querySelectorAll('[data-close]').forEach(function (b) {
+    queryElements('[data-close]').forEach(function (b) {
         b.addEventListener('click', function () { toggleModal(b.dataset.close, false); });
     });
-    document.querySelectorAll('.codex-tab').forEach(function (b) {
+    queryElements('.codex-tab').forEach(function (b) {
         b.addEventListener('click', function () { showCodexTab(b.dataset.tab); });
     });
-    document.querySelectorAll('.cyber-modal').forEach(function (m) {
+    queryElements('.cyber-modal').forEach(function (m) {
         m.addEventListener('click', function (e) { if (e.target === m) { m.classList.remove('active'); } });
     });
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.cyber-modal.active').forEach(function (m) { m.classList.remove('active'); });
+            queryElements('.cyber-modal.active').forEach(function (m) { m.classList.remove('active'); });
         }
     });
 
