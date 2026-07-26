@@ -3,9 +3,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+import { findBlockScopedFunctionDeclarations, findEs6Syntax } from './es5-scan.mjs';
 
 const require = createRequire(import.meta.url);
 const FS = require('../vendor/failsafe.js');
+const here = dirname(fileURLToPath(import.meta.url));
 
 /* ---------------------------------------------------------------- result -- */
 test('result: ok/err mapping and unwrap', () => {
@@ -284,6 +290,17 @@ test('vn.lintScript: a clean script reports ok', () => {
 });
 
 /* ----------------------------------------------------------------- net ---- */
+/* net.guard() patches globals, so every test here installs its own fake
+ * `window`, always calls guard.stop(), and restores `global.window` in a
+ * `finally` — the suite must stay order-independent. */
+function withFakeWindow (fake, fn) {
+    const saved = Object.prototype.hasOwnProperty.call(global, 'window') ? global.window : undefined;
+    const had = Object.prototype.hasOwnProperty.call(global, 'window');
+    global.window = fake;
+    try { return fn(); }
+    finally { if (had) { global.window = saved; } else { delete global.window; } }
+}
+
 test('net.guard: block mode fails fetches and records violations', async () => {
     const target = { fetch: async () => 'remote' };
     const savedWindow = global.window;
@@ -298,6 +315,133 @@ test('net.guard: block mode fails fetches and records violations', async () => {
     } finally {
         if (savedWindow === undefined) { delete global.window; } else { global.window = savedWindow; }
     }
+});
+
+test('net.guard: records the full target for URL and Request inputs, never undefined', async () => {
+    // Regression: the old extractor was `typeof input === 'string' ? input : input.url`,
+    // and a URL object has no `.url`, so `fetch(new URL(...))` logged `undefined`.
+    const target = { fetch: async () => 'remote' };
+    await withFakeWindow(target, async () => {
+        const guard = FS.net.guard({ mode: 'block', onViolation: () => {} });
+        try {
+            await assert.rejects(target.fetch(new URL('https://x.test/a')), /blocked fetch/);
+            assert.equal(FS.net.violations.at(-1).target, 'https://x.test/a');
+
+            await assert.rejects(target.fetch({ url: 'https://x.test/req' }), /blocked fetch/); // Request-alike
+            assert.equal(FS.net.violations.at(-1).target, 'https://x.test/req');
+
+            await assert.rejects(target.fetch('https://x.test/str'), /blocked fetch/);
+            assert.equal(FS.net.violations.at(-1).target, 'https://x.test/str');
+
+            // Nothing may ever be reported as the literal string 'undefined'.
+            await assert.rejects(target.fetch({ toString: () => 'weird-input' }), /blocked fetch/);
+            assert.equal(FS.net.violations.at(-1).target, 'weird-input');
+            assert.ok(FS.net.violations.every(v => v.target !== 'undefined'));
+        } finally { guard.stop(); }
+    });
+});
+
+test('net.guard: guarded XMLHttpRequest keeps its constants, prototype and instanceof', () => {
+    // Regression: the wrapper was a plain function relying on "constructor
+    // returning an object overrides this", so XMLHttpRequest.DONE was gone and
+    // `.prototype` was unrelated to the real one.
+    class FakeXHR {
+        open () {} send () {} setRequestHeader () {}
+    }
+    FakeXHR.UNSENT = 0; FakeXHR.OPENED = 1; FakeXHR.HEADERS_RECEIVED = 2;
+    FakeXHR.LOADING = 3; FakeXHR.DONE = 4;
+    const origPrototype = FakeXHR.prototype;
+
+    const target = { XMLHttpRequest: FakeXHR };
+    withFakeWindow(target, () => {
+        const guard = FS.net.guard({ mode: 'observe', onViolation: () => {} });
+        try {
+            const Guarded = target.XMLHttpRequest;
+            assert.notEqual(Guarded, FakeXHR, 'guard should have replaced the constructor');
+            assert.equal(Guarded.UNSENT, 0);
+            assert.equal(Guarded.OPENED, 1);
+            assert.equal(Guarded.HEADERS_RECEIVED, 2);
+            assert.equal(Guarded.LOADING, 3);
+            assert.equal(Guarded.DONE, 4);
+            assert.equal(Guarded.prototype, origPrototype);
+
+            const xhr = new Guarded();
+            assert.ok(xhr instanceof Guarded, 'instances must satisfy instanceof the guarded ctor');
+            assert.ok(xhr instanceof FakeXHR, 'and still be real XHRs');
+            assert.equal(typeof xhr.send, 'function', 'prototype methods still reachable');
+
+            const before = FS.net.violations.length;
+            xhr.open('GET', 'https://x.test/xhr');
+            assert.equal(FS.net.violations.length, before + 1);
+            assert.equal(FS.net.violations.at(-1).kind, 'xhr');
+            assert.equal(FS.net.violations.at(-1).target, 'https://x.test/xhr');
+        } finally { guard.stop(); }
+        assert.equal(target.XMLHttpRequest, FakeXHR, 'stop() restores the original constructor');
+    });
+});
+
+test('net.guard: block mode throws on XHR open and stop() fully restores globals', () => {
+    class FakeXHR { open () {} send () {} }
+    FakeXHR.DONE = 4;
+    const target = { XMLHttpRequest: FakeXHR, fetch: async () => 'remote' };
+    withFakeWindow(target, () => {
+        const guard = FS.net.guard({ mode: 'block', onViolation: () => {} });
+        try {
+            const xhr = new target.XMLHttpRequest();
+            assert.throws(() => xhr.open('GET', 'https://x.test/blocked'), /blocked XHR/);
+        } finally { guard.stop(); }
+        assert.equal(target.XMLHttpRequest, FakeXHR);
+        assert.equal(target.fetch.name, '' + target.fetch.name); // restored, callable
+    });
+});
+
+/* ------------------------------------------------------------- ES5 shape -- */
+test('failsafe.js is ES5-safe: no block-scoped function declarations, no ES6 syntax', () => {
+    // Regression for the strict-mode-ES5 violation in lintScript(): a
+    // `function checkTarget () {}` declaration nested in an `else` block.
+    // Node itself will NOT catch this (it parses as ES2015+, where the
+    // declaration is merely block-scoped), so tests/es5-scan.mjs implements
+    // the check an ES5 parser would make.
+    const src = readFileSync(join(here, '..', 'vendor', 'failsafe.js'), 'utf8');
+
+    const blockFns = findBlockScopedFunctionDeclarations(src);
+    assert.deepEqual(blockFns, [],
+        'function declarations inside blocks are illegal in strict-mode ES5: ' +
+        blockFns.map(f => `${f.name}() at line ${f.line}`).join(', '));
+
+    const es6 = findEs6Syntax(src);
+    assert.deepEqual(es6, [],
+        'ES6+ syntax in shipped vendor code: ' +
+        es6.map(h => `${h.rule} at line ${h.line}`).join(', '));
+
+    assert.doesNotThrow(() => new Function('"use strict";\n' + src));
+});
+
+test('icons-offline.js is ES5-safe too', () => {
+    const src = readFileSync(join(here, '..', 'vendor', 'icons-offline.js'), 'utf8');
+    assert.deepEqual(findBlockScopedFunctionDeclarations(src), []);
+    assert.deepEqual(findEs6Syntax(src), []);
+});
+
+test('vn.lintScript: missing-label detection still works after the ES5 hoist', () => {
+    // checkTarget moved from a block-scoped declaration to a function-scoped
+    // expression; prove all three call sites (step, choice Do, Conditional) work.
+    const e = fakeEngine();
+    e._script = {
+        Start: [
+            'jump GhostA',
+            { Choice: { A: { Text: 'a', Do: 'jump GhostB' } } },
+            { Conditional: { Condition: () => true, True: 'jump GhostC', False: 'jump GhostD' } },
+            'jump End',
+        ],
+        End: ['end'],
+    };
+    const report = FS.vn(e, { silent: true }).lintScript({ silent: true });
+    const missing = report.issues.filter(i => i.rule === 'missing-label').map(i => i.detail);
+    assert.equal(missing.length, 4, JSON.stringify(report.issues));
+    ['GhostA', 'GhostB', 'GhostC', 'GhostD'].forEach(l => {
+        assert.ok(missing.some(d => d.includes(l)), `missing-label should flag ${l}`);
+    });
 });
 
 /* ------------------------------------------------------------ internals --- */
