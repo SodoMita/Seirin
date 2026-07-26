@@ -17,9 +17,190 @@
  *     double-clicking it from disk.
  *   - No fetch/XHR/beacon/socket, ever. FailSafe.net.guard() enforces it.
  *   - All story-state mutation goes through the FailSafe.vn facade.
+ *
+ * Testing hook: at the very bottom, under `typeof module !== 'undefined'`,
+ * the pure helpers are exported for `node --test` (same UMD pattern as
+ * vendor/failsafe.js). The browser never takes that path.
+ * ========================================================================== */
+/* ============================================================================
+ * PART 1 — the pure core (no DOM, no engine, no globals).
+ * ----------------------------------------------------------------------------
+ * Everything here is a plain function of its arguments, so `node --test` can
+ * exercise it with zero dependencies — no jsdom, no browser. The browser IIFE
+ * in PART 2 below is the only consumer at runtime; keeping the two apart is
+ * what makes the mini-game payout rules testable at all.
+ *
+ * Exposed as `window.CyberNexusCore` in the browser and, under Node, as
+ * `module.exports` — the same UMD pattern vendor/failsafe.js uses. There is no
+ * import/export syntax and the browser path is unchanged by the Node branch.
+ * ========================================================================== */
+(function (root, factory) {
+    'use strict';
+    var core = factory();
+    if (typeof module !== 'undefined' && module.exports) { module.exports = core; }
+    if (root) { root.CyberNexusCore = core; }
+}(typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : null), function () {
+    'use strict';
+
+    /* The storage shape is declared ONCE, here, and validated before the game
+       ever reads it — a corrupted/old save is repaired from defaults and
+       reported, not crashed on mid-dialogue. Built from the FailSafe schema
+       primitives, which are passed in so this stays dependency-free. */
+    function buildStorageSchema (FS) {
+        return FS.schema.object({
+            player: FS.schema.object({
+                name:     FS.schema.string().default('Vesper'),
+                creds:    FS.schema.number().default(0),
+                karma:    FS.schema.number().default(0),
+                hacking:  FS.schema.number({ int: true, min: 0 }).default(0),
+                location: FS.schema.string().default('Sector 7: Neon Slums')
+            }),
+            flags: FS.schema.object({
+                met_nyx:         FS.schema.boolean().default(false),
+                hacked_vanguard: FS.schema.boolean().default(false),
+                sided_with_aria: FS.schema.boolean().default(false),
+                vanguard_alert:  FS.schema.number().default(0)
+            })
+        });
+    }
+
+    /* FAILSAFE 2: the mini-game round flow is a state machine.
+       Before this, clicking the correct node a second time inside the 1.3s
+       success window PAID OUT TWICE, because `checkHack` trusted the click,
+       not the round state. Impossible transitions are now impossible to pay
+       out — the machine simply refuses them (changed === false). */
+    var HACK_MACHINE_CONFIG = {
+        id: 'matrix-hack', initial: 'idle',
+        states: {
+            idle:     { on: { START: 'active' } },
+            active:   { on: { HIT: 'resolved', MISS: 'cooldown' } },
+            cooldown: { on: { REGEN: 'active', START: 'active' } },
+            resolved: { on: { START: 'active', REGEN: 'active' } }
+        }
+    };
+
+    /* The payout for one win. Named so the test and the UI string can't drift. */
+    var HACK_REWARD = { creds: 100, hacking: 1 };
+
+    /* A hex key like "0x4A-1F-C3". `random` is injectable purely so tests can
+       be deterministic; the game always uses Math.random. */
+    function randomHex (random) {
+        var rand = random || Math.random;
+        var chars = '0123456789ABCDEF';
+        var parts = [];
+        for (var i = 0; i < 3; i++) {
+            parts.push(chars[Math.floor(rand() * 16)] + chars[Math.floor(rand() * 16)]);
+        }
+        return '0x' + parts.join('-');
+    }
+
+    /* Build the 4 round options: the target plus 3 distinct decoys, shuffled.
+       Bounded so a bad `random` can never hang the game. */
+    function buildRoundOptions (target, random) {
+        var rand = random || Math.random;
+        var opts = [target];
+        var guard = 0;
+        while (opts.length < 4 && guard++ < 1000) {
+            var candidate = randomHex(rand);
+            if (opts.indexOf(candidate) === -1) { opts.push(candidate); }
+        }
+        // Deterministic top-up if `random` is degenerate (all decoys collided).
+        while (opts.length < 4) { opts.push('0x00-00-0' + opts.length); }
+        opts.sort(function () { return rand() - 0.5; });
+        return opts;
+    }
+
+    /* The mini-game brain: owns round state and decides what a click is worth.
+       Holds NO DOM references — PART 2 renders whatever this returns. */
+    function createHackController (FS, options) {
+        options = options || {};
+        var machine = FS.machine(HACK_MACHINE_CONFIG);
+        var state = 'idle';
+        var target = '';
+        var random = options.random || Math.random;
+
+        /* Returns true only if the transition was legal and actually happened;
+           `false` means the machine refused it (this is the payout gate). */
+        function send (type) {
+            var step = machine.transition(state, type);
+            if (!step.changed) { return false; }
+            state = step.state;
+            return true;
+        }
+
+        return {
+            state: function () { return state; },
+            target: function () { return target; },
+            reward: HACK_REWARD,
+            send: send,
+            /* Begin a round. Mirrors the original `hackSend('START') ||
+               hackSend('REGEN')`: reach 'active' from whatever state allows it. */
+            startRound: function (forcedTarget) {
+                send('START') || send('REGEN');
+                target = forcedTarget || randomHex(random);
+                return { target: target, options: buildRoundOptions(target, random) };
+            },
+            /* Resolve one click. The machine, not the click, decides whether a
+               guess counts — so a second click inside the success window
+               returns { counted: false } and pays nothing. */
+            guess: function (selected) {
+                if (state !== 'active') { return { counted: false, outcome: null, reward: null }; }
+                // Exhaustive-by-construction outcome resolution (ts-pattern style).
+                var outcome = FS.match(selected === target)
+                    .with(true, function () { return 'HIT'; })
+                    .otherwise(function () { return 'MISS'; });
+                if (outcome === 'HIT' && send('HIT')) {
+                    return { counted: true, outcome: 'HIT', reward: HACK_REWARD };
+                }
+                if (outcome === 'MISS' && send('MISS')) {
+                    return { counted: true, outcome: 'MISS', reward: null };
+                }
+                return { counted: false, outcome: outcome, reward: null };
+            }
+        };
+    }
+
+    /* Apply a payout to a player object. Numbers add, everything else is set.
+       Deliberately OUTSIDE the story timeline: mini-game wins are
+       meta-progression, not story steps, so they must NOT be reverted by the
+       Back button. Story mutations use the vn.* facade instead. */
+    function applyAward (playerObject, changes) {
+        if (!playerObject || !changes) { return playerObject; }
+        Object.keys(changes).forEach(function (k) {
+            if (typeof playerObject[k] === 'number') { playerObject[k] += changes[k]; }
+            else { playerObject[k] = changes[k]; }
+        });
+        return playerObject;
+    }
+
+    return {
+        buildStorageSchema: buildStorageSchema,
+        HACK_MACHINE_CONFIG: HACK_MACHINE_CONFIG,
+        HACK_REWARD: HACK_REWARD,
+        randomHex: randomHex,
+        buildRoundOptions: buildRoundOptions,
+        createHackController: createHackController,
+        applyAward: applyAward
+    };
+}));
+
+/* ============================================================================
+ * PART 2 — the browser game: engine wiring, HUD, codex, story script, boot.
+ * Runs only in the page; under Node this whole IIFE is skipped (there is no
+ * `window`), which is what lets tests require() this file for PART 1 alone.
  * ========================================================================== */
 (function () {
     'use strict';
+
+    // Under Node (tests) there is no DOM and no engine — PART 1 above is all
+    // that is wanted. Bail out before touching any browser global.
+    if (typeof window === 'undefined' || typeof document === 'undefined') { return; }
+    if (typeof Monogatari === 'undefined') {
+        console.error('[Cyber-Nexus] vendor/monogatari.js did not load; aborting boot.');
+        return;
+    }
+
+    var core = window.CyberNexusCore;
 
     // The engine instance. Exposed deliberately as `window.engine`
     // (NOT `window.monogatari`, which the DOM would hijack).
@@ -83,25 +264,9 @@
         onChange: function () { try { updateHUD(); } catch (e) { /* HUD optional */ } }
     });
 
-    /* FAILSAFE 1: storage schema (see boot()).
-       The storage shape is declared ONCE here and validated before the
-       game ever reads it — a corrupted/old save is repaired from
-       defaults and reported, not crashed on mid-dialogue. */
-    var STORAGE_SCHEMA = FS.schema.object({
-        player: FS.schema.object({
-            name:     FS.schema.string().default('Vesper'),
-            creds:    FS.schema.number().default(0),
-            karma:    FS.schema.number().default(0),
-            hacking:  FS.schema.number({ int: true, min: 0 }).default(0),
-            location: FS.schema.string().default('Sector 7: Neon Slums')
-        }),
-        flags: FS.schema.object({
-            met_nyx:         FS.schema.boolean().default(false),
-            hacked_vanguard: FS.schema.boolean().default(false),
-            sided_with_aria: FS.schema.boolean().default(false),
-            vanguard_alert:  FS.schema.number().default(0)
-        })
-    });
+    /* FAILSAFE 1: storage schema (see boot()). Declared in PART 1 so the
+       tests validate the same schema the game boots with. */
+    var STORAGE_SCHEMA = core.buildStorageSchema(FS);
 
     /* Minigame payout, deliberately OUTSIDE the story timeline:
        mini-game wins are meta-progression, not story steps, so they must
@@ -109,10 +274,7 @@
     function award (changes) {
         var p = player();
         if (!p) { return; }
-        Object.keys(changes).forEach(function (k) {
-            if (typeof p[k] === 'number') { p[k] += changes[k]; }
-            else { p[k] = changes[k]; }
-        });
+        core.applyAward(p, changes);
         updateHUD();
     }
 
@@ -206,34 +368,12 @@
        `checkHack` trusted the click, not the round state.
        Impossible transitions are now impossible to pay out —
        the machine simply refuses them (changed === false).
+
+       The rules live in PART 1 (`core.createHackController`)
+       so tests can drive them without a DOM; everything below
+       is rendering only. Do NOT re-add payout logic here.
        ===================================================== */
-    var hackMachine = FS.machine({
-        id: 'matrix-hack', initial: 'idle',
-        states: {
-            idle:     { on: { START: 'active' } },
-            active:   { on: { HIT: 'resolved', MISS: 'cooldown' } },
-            cooldown: { on: { REGEN: 'active', START: 'active' } },
-            resolved: { on: { START: 'active', REGEN: 'active' } }
-        }
-    });
-    var hackState = 'idle';
-    var targetHex = '';
-
-    function hackSend (type) {
-        var step = hackMachine.transition(hackState, type);
-        if (!step.changed) { return false; }
-        hackState = step.state;
-        return true;
-    }
-
-    function randomHex () {
-        var chars = '0123456789ABCDEF';
-        var parts = [];
-        for (var i = 0; i < 3; i++) {
-            parts.push(chars[Math.floor(Math.random() * 16)] + chars[Math.floor(Math.random() * 16)]);
-        }
-        return '0x' + parts.join('-');
-    }
+    var hack = core.createHackController(FS);
 
     function newHackRound () {
         var status = document.getElementById('hack-status');
@@ -241,21 +381,12 @@
         var box    = document.getElementById('hack-options');
         if (!box) { return; }
 
-        hackSend('START') || hackSend('REGEN'); // -> 'active' from any state that allows it
-
-        targetHex = randomHex();
-        keyEl.textContent = targetHex;
+        var round = hack.startRound();
+        keyEl.textContent = round.target;
         status.textContent = '';
 
-        var opts = [targetHex];
-        while (opts.length < 4) {
-            var candidate = randomHex();
-            if (opts.indexOf(candidate) === -1) { opts.push(candidate); }
-        }
-        opts.sort(function () { return Math.random() - 0.5; });
-
         box.innerHTML = '';
-        opts.forEach(function (opt) {
+        round.options.forEach(function (opt) {
             var b = document.createElement('button');
             b.type = 'button';
             b.textContent = opt;
@@ -265,20 +396,19 @@
     }
 
     function checkHack (selected) {
-        // The machine, not the click, decides whether a guess counts.
-        if (hackState !== 'active') { return; }
         var status = document.getElementById('hack-status');
+        // The controller, not the click, decides whether a guess counts and
+        // whether it pays. A repeat click inside the success window returns
+        // counted:false — that is the double-payout fix.
+        var result = hack.guess(selected);
+        if (!result.counted) { return; }
 
-        // Exhaustive-by-construction outcome resolution (ts-pattern style).
-        var outcome = FS.match(selected === targetHex)
-            .with(true, function () { return 'HIT'; })
-            .otherwise(function () { return 'MISS'; });
-
-        if (outcome === 'HIT' && hackSend('HIT')) {
-            status.innerHTML = '<span class="ok"><i class="fas fa-check"></i> ENCRYPTION BYPASSED &mdash; +100 CR, +1 HACK</span>';
-            award({ creds: 100, hacking: 1 });
+        if (result.outcome === 'HIT') {
+            status.innerHTML = '<span class="ok"><i class="fas fa-check"></i> ENCRYPTION BYPASSED &mdash; +' +
+                result.reward.creds + ' CR, +' + result.reward.hacking + ' HACK</span>';
+            award(result.reward);
             setTimeout(function () { toggleModal('minigame-modal', false); }, 1300);
-        } else if (outcome === 'MISS' && hackSend('MISS')) {
+        } else {
             status.innerHTML = '<span class="bad"><i class="fas fa-exclamation-triangle"></i> ICE ACCESS DENIED &mdash; SYSTEM ALERTED</span>';
             setTimeout(newHackRound, 950);
         }
