@@ -203,6 +203,11 @@ The rules that repeatedly decide the result:
 - **Hex codes work.** Give the colour name *and* the hex.
 - **One change per edit.** Restate everything to preserve, then the single
   change.
+- **No emojis in place of description.** They collapse toward a generic style
+  bucket and cannot carry hexes or garment construction. The one exception is
+  an expression *label* (`😳 blush`) placed beside the brow/eye/mouth geometry —
+  untested on Nano Banana, so record the result if you try it. Emojis are for
+  agent-facing text, where they mark rules that must not be skimmed past.
 - **Never open with "anime girl"** or similar — generic openers pull the model
   to the training-set mean and erase the design.
 

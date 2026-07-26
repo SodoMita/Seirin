@@ -295,40 +295,62 @@ biggest consistency gain.
 Two different questions, with two different answers. Getting them confused
 produces worse art.
 
-### In the IMAGE prompt: no. Emojis lose information.
+### Token cost — emojis are usually cheaper, sometimes not
 
-Nano Banana and its class read natural-language prose. An emoji sent to an
-image model is a **lossy substitute for the description it replaces**:
+An emoji is normally 1–3 tokens; the word it replaces is often 1 token too.
+`🐘` vs `elephant`, `👧` vs `girl`, `😊` vs `smile` — the saving is real but
+small, and it reverses for emojis carrying variation selectors or skin-tone /
+ZWJ sequences (`🌧️`, `🧑‍🎨`), which can cost *more* tokens than the plain word.
 
-- **Emojis collapse into a generic bucket.** Testing on Midjourney's style
-  search found that different emojis — star, fruit, ghost — produce results
-  from a single shared "emoji" style pool, with *no significant variation
-  between them*. The model is not reading their literal meaning. That is the
-  exact failure this skill already warns about with "anime girl": input that
-  pulls toward a training-set mean and erases the design.
-- **They cannot carry the values that matter here.** `👗` cannot express
-  "unlined indigo work coat, sleeves pushed back and pinned, hem worn pale at
-  the front". `🎨` cannot express `Tops1 #3A4A52`. Every specific this skill
-  fights to establish — zone hexes, garment construction, the memory point —
-  is unrepresentable as an emoji.
-- **Emoji semantics are unstable across models and versions.** A prompt that
-  worked on one model silently means something else on the next.
-- **Reported behaviour is erratic**: a "no bicycles" sign produced a bicycle,
-  two motorcycles and a truck.
+So token economy is a weak argument either way at the scale of a character
+prompt. Prompts here are a few hundred tokens; the difference is noise. Decide
+on **whether the model renders the intent**, not on token count.
 
-**Rule: do not put emojis in a generation prompt.** If a prompt is too long,
-cut redundancy — do not compress meaning into pictograms.
+Where token saving does matter is long, repeated agent-facing instructions —
+see below.
 
-### In AGENT-FACING text: yes, sparingly, as signposts.
+### In the IMAGE prompt: no, with one exception
 
-There is a real, separately-evidenced effect for **LLM instructions** — which
-is what briefs, checklists and handoff blocks are. An emoji is a single token
-that resists being skimmed past, so it works as a **salience marker on a rule
-that must not be missed**. Practitioners report models decoding a small
-consistent set (🛑 stop, 🎯 objective, 🔎 verify) the same way on reverse
-testing.
+Emojis are a **lossy substitute for the description they replace**:
 
-Where that is worth using in this skill:
+- **They collapse into a generic bucket.** Testing on Midjourney's style search
+  found different emojis — star, fruit, ghost — producing results from a single
+  shared "emoji" style pool, with *no significant variation between them*. The
+  model was not reading their literal meaning. That is the same training-set-mean
+  collapse this skill warns about with "anime girl".
+- **They cannot carry what matters here.** `👗` cannot express "unlined indigo
+  work coat, sleeves pushed back and pinned, hem worn pale at the front".
+  `🎨` cannot express `Tops1 #3A4A52`. Every specific this skill exists to
+  establish — zone hexes, garment construction, the memory point — is
+  unrepresentable as a pictogram.
+- **Semantics are unstable** across models and versions.
+- **Behaviour is erratic**: a "no bicycles" sign produced a bicycle, two
+  motorcycles and a truck.
+
+**The exception — expressions.** For the eleven expression differentials, the
+emotion label is a *short, conventional* tag, not a construction description:
+`neutral`, `smile`, `angry`, `sad`, `surprise`, `blush`. Emoji faces map onto
+those with unusually little loss, and are worth **testing** as a compact tag
+alongside the geometry:
+
+```
+… change only the facial expression to: 😳 blush —
+brow inner-up soft, eyes averted and half-lidded, mouth small and pressed,
+warm cheeks.
+```
+
+Note the shape: the emoji is a *label*, the geometry still does the work. Never
+send `😳` alone — the brow/eye/mouth spec from the brief is what keeps the
+expression in character rather than generic. **Treat this as unverified until
+tested on Nano Banana**, and record the result in the character's iteration log.
+
+### In AGENT-FACING text: yes, sparingly, as signposts
+
+Briefs, checklists and handoff blocks are read by an LLM, not an image model.
+Here a single emoji resists being skimmed past, and works as a salience marker
+on a rule that must not be missed. Practitioners report models decoding a small
+consistent set the same way on reverse testing, and report meaningful token
+reduction when compressing long repeated instructions.
 
 | Marker | Meaning | Use on |
 |---|---|---|
@@ -340,15 +362,14 @@ Where that is worth using in this skill:
 Constraints, because this degrades fast if overused:
 
 - **One marker per rule, at the start of the line.** A wall of emojis is noise
-  and destroys the salience effect that justifies them.
-- **Never as the only carrier of meaning.** The words must stand alone if the
-  emoji is stripped, since rendering and tokenisation vary.
-- **Never in `LEGAL.md` prose itself** beyond the 🛑 marker — legal text is
-  read by humans and must not depend on pictograms.
+  and destroys the salience that justifies them.
+- **Never the sole carrier of meaning.** The words must stand alone if the
+  emoji is stripped — rendering and tokenisation vary.
 - **Never in filenames, IDs, JSON keys, or committed prompt text.**
 
-The distinction to remember: **emojis help an agent notice an instruction;
-they hurt an image model trying to render a garment.**
+The distinction to remember: **emojis help an agent notice an instruction, and
+work as compact labels for conventional emotions; they hurt an image model
+trying to render a garment.**
 
 ## Failure modes and the fix
 
@@ -366,7 +387,7 @@ they hurt an image model trying to render a garment.**
 | Quality drops over successive edits | edit chaining re-encodes the image | batch changes into one generation from the original anchor; composite small fixes manually |
 | Canvas comes back square | aspect-ratio drift toward 1:1 | generate at a moderate ratio, then crop/composite to the sprite canvas; verify dimensions |
 | Faces merge in a group image | more than 5 characters in one generation | split the image, or compose separately |
-| Output is generic despite a detailed brief | emojis used in the image prompt | replace each with the words it stood for |
+| Output is generic despite a detailed brief | emojis replacing description in the image prompt | replace each with the words it stood for; keep them only as expression labels beside the geometry |
 | Matted sprite is opaque where it should be transparent | plates were flattened, not composited | never ask for "identical character pixels"; ask for honest compositing over each background |
 | Matted edges ghost or double | plates not registered | generate the black plate as an edit of the white plate |
 | Soft edges tinted green | green sheet used as a matting background | green is for consistency sheets only; matte from white/black plates |

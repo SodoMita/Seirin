@@ -86,6 +86,15 @@ Answers go in `../assets/cast.json`. The art agent does not invent them.
 
 ---
 
+## Note for the prompt agent — expressions
+
+When writing the expression differentials, the emotion may be tagged with an
+emoji label beside the geometry (`😳 blush — brow inner-up soft, eyes averted
+…`). The geometry does the work; the label is shorthand. This is **untested on
+Nano Banana** — if you try it, record whether it helped in the iteration log.
+
+Nowhere else in an image prompt should an emoji replace a description.
+
 ## Before this character enters production
 
 - [ ] Main questionnaire answered (`questionnaire_answered: true`).

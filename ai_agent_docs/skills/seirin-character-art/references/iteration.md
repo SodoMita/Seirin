@@ -77,6 +77,20 @@ Verdicts: `KEEP` · `KEEP WITH EDIT` · `REJECT` · `PARTIAL` (some views usable
 
 Step 7 is the whole point. Without it every character pays the same tuition.
 
+## Open experiments worth recording
+
+Cheap tests where this project has no data yet. Run one when the opportunity
+comes up naturally, and write the result into the character's log so it stops
+being an opinion.
+
+- **Emoji expression labels.** Does `😳 blush` beside the brow/eye/mouth
+  geometry help, hurt, or do nothing versus the geometry alone? Two
+  differentials from the same sprite, one with the label, one without.
+- **Aspect-ratio drift.** How far does a 1:2 sprite request actually drift, and
+  is a moderate ratio plus crop more reliable?
+- **Green vs mid-grey sprite background.** Which gives cleaner soft edges
+  through the white/black matte?
+
 ## Stop rules
 
 Guard against burning generations on a losing prompt:
