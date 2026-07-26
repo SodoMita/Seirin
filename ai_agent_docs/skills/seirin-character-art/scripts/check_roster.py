@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Validate the Seirin cast question-set before any generation session.
 
-The registry holds OPEN QUESTIONS, not answers. This script checks that the
+The registry holds the WARDROBE-AND-REALITY SUPPLEMENT to the primary question
+set in ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md. It holds
+OPEN QUESTIONS, not answers. This script checks that the
 question set is intact, reports which characters are still unanswered, and
 enforces the machine-checkable parts of LEGAL.md on any character that has
 been answered and approved.
@@ -78,6 +80,12 @@ def main() -> int:
                 errors.append(f"duplicate character id '{c['id']}'")
             seen_ids.add(c["id"])
 
+        if c.get("approved") and not c.get("questionnaire_answered"):
+            errors.append(
+                f"[{cid}] approved:true but questionnaire_answered is false. "
+                "Answer Character_Design_Brief_AI_Agent_Questionnaire.md first — "
+                "it is the primary question set.")
+
         ans = c.get("answers")
         if ans is None:
             errors.append(f"[{cid}] missing 'answers' block")
@@ -110,8 +118,11 @@ def main() -> int:
                 notes.append(f"[{cid}] partially answered ({len(filled)}/"
                              f"{len(sections)}) — not yet approved")
 
+    q_done = [c["id"] for c in chars if c.get("questionnaire_answered")]
     notes.append(f"{len(chars)} characters: {len(answered)} approved, "
                  f"{len(unanswered)} awaiting answers")
+    notes.append(f"main questionnaire answered for {len(q_done)}/{len(chars)} "
+                 "(Character_Design_Brief_AI_Agent_Questionnaire.md)")
     if unanswered:
         notes.append("awaiting answers: " + ", ".join(unanswered))
         notes.append("The art agent must ASK these, not invent them. "

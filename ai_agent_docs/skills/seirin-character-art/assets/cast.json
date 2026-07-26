@@ -1,5 +1,5 @@
 {
-  "$comment": "Seirin cast — OPEN QUESTIONS, not answers. This file records what the design document actually fixes (name, age, role, faction) and then asks the questions whose answers become the character's visual design. Answers are supplied by the project owner or a design agent, NOT by the art agent. Until a question is answered its value stays null. See ../SKILL.md and ../references/wardrobe-questions.md.",
+  "$comment": "Seirin cast — OPEN QUESTIONS, not answers. Records what the design document fixes (name, age, role, faction) and asks the questions whose answers become the visual design. Answers come from the project owner or a design agent, NOT the art agent. PRIMARY QUESTION SET is ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md (sourced to 27 primary sources). The sections below are the WARDROBE-AND-REALITY SUPPLEMENT that the questionnaire does not cover — see ../references/wardrobe-questions.md.",
   "schema_version": "2.0.0",
   "status": "UNANSWERED — no character below has an approved visual design yet.",
   "how_to_use": {
@@ -10,10 +10,6 @@
   },
   "note_on_canon": "The existing design document is a draft and is itself AI-generated. Treat it as a starting point to interrogate, not as canon. Where it conflicts with a better answer, the better answer wins — record the change.",
   "question_template": {
-    "silhouette": [
-      "What shape is this person from 50 metres away, in one word?",
-      "Could you tell them from every other cast member as a black shape? What makes that true?"
-    ],
     "wardrobe": [
       "What does this person actually wear on an ordinary working day, given their job?",
       "Where do their clothes come from — inherited, issued, bought cheap, made, stolen?",
@@ -39,37 +35,9 @@
       "Seirin is coastal Honshu: what does this person wear in rain, in winter, in humid summer?",
       "Which garment choices are explained by climate or region rather than by taste?"
     ],
-    "identity": [
-      "What is the one detail someone describes when telling a friend about them?",
-      "What second detail is only noticed the second time you look?",
-      "Which of these details exists BECAUSE of who they are, rather than as decoration?"
-    ],
-    "face_and_body": [
-      "What face should this character have, and what does that face communicate before they speak?",
-      "What are the eyes doing when the character is not being addressed?",
-      "What body does this person's actual life give them — their work, age, health, habits?"
-    ],
     "physical_plausibility": [
       "If a height and weight are stated, do they survive arithmetic? Check BMI before it reaches a reference sheet.",
       "What does this person's actual life — work, age, health, habits — do to their body?"
-    ],
-    "colour": [
-      "What three colours, and why those?",
-      "Which single colour is reserved so it means something when it appears?",
-      "Do they read as themselves in the rain, at night, in a lit interior?"
-    ],
-    "expression": [
-      "What is their neutral, resting face — the one seen most often?",
-      "What is the difference between their public face and their private one?"
-    ],
-    "cast_contrast": [
-      "Placed beside every other cast member, what makes this one unmistakable?",
-      "Does the roster still read as one world — same stylistic rules — while staying distinct?",
-      "Which archetype is this character closest to, and is it being used straight or subverted? Either is fine; drifting is not."
-    ],
-    "boundaries": [
-      "What must this character NEVER look like, and why is that a risk worth naming?",
-      "Which visual cliché is this character most likely to collapse into if nobody resists it?"
     ]
   },
   "characters": [
@@ -83,19 +51,13 @@
       "role": "mechanic apprentice, Scrap-Titan operator under adult supervision",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "hana",
@@ -107,19 +69,13 @@
       "role": "witness and observer; illusionist's daughter, never a combatant",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "yuki",
@@ -131,19 +87,13 @@
       "role": "kendo instructor, archivist, non-violent negotiator for the mountain community",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "momo",
@@ -155,19 +105,13 @@
       "role": "Stella-5 lead vocalist, public voice of the team, works through adult editors and lawyers",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "miya",
@@ -179,19 +123,13 @@
       "role": "child in the engineers' orbit; her drawings help adults notice connections",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "kitsune",
@@ -203,19 +141,13 @@
       "role": "teahouse heir, community network hub, streamer, safehouse keeper",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "ryuki",
@@ -227,19 +159,13 @@
       "role": "Yuki's student, public speaker for the mountain village; never a fighter",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "splash",
@@ -251,19 +177,13 @@
       "role": "CSR soft-robot prototype; hazard inspection and the question of machine subjecthood",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "aster7",
@@ -275,19 +195,13 @@
       "role": "social robot prototype; log analysis, testimony recording, the ethical comic relief",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "stella",
@@ -299,19 +213,13 @@
       "role": "networked art installation: drone swarm plus projection plus generative system",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "reika",
@@ -323,19 +231,13 @@
       "role": "ex-Akatomi test pilot, Iron Requiem field lead",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "saya",
@@ -347,19 +249,13 @@
       "role": "materials scientist, head of the Aquaforge Initiative, Splash's creator",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "lumina",
@@ -371,19 +267,13 @@
       "role": "leader of the Chorus of the Abyss; former crisis-communications specialist",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     },
     {
       "id": "kurogane",
@@ -395,19 +285,18 @@
       "role": "Akatomi Dynamics CEO and engineer",
       "approved": false,
       "answers": {
-        "silhouette": null,
         "wardrobe": null,
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
-        "identity": null,
-        "face_and_body": null,
-        "physical_plausibility": null,
-        "colour": null,
-        "expression": null,
-        "cast_contrast": null,
-        "boundaries": null
-      }
+        "physical_plausibility": null
+      },
+      "questionnaire_answered": false
     }
-  ]
+  ],
+  "primary_question_set": {
+    "file": "ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md",
+    "note": "Answer this FIRST. It is derived from 27 primary sources with a principle-to-source attribution index, covering silhouette, kawaii/moe engineering, SD-chibi, physiognomic coding, transmedia flatness, worldview symbiosis, tiering, live-ops cadence, fan-art virality, merch and IP.",
+    "supplement_rationale": "It treats costume as a VARIABLE — how many variants per tier, what material — but never asks what the person actually wears on an ordinary day, where the clothes came from, or what they do in the rain. The sections in this file close that gap."
+  }
 }

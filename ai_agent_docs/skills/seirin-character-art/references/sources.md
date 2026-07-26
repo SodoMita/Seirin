@@ -150,17 +150,44 @@ changed if it stops working.
 
 Recorded so they are not silently forgotten.
 
-- **`Character_Design_Sourcebook_JP_CN_Manga_Anime_Gacha.pdf`** was uploaded to
-  this project and **has not been read**. The sandbox cleared `/home/user/uploads/`
-  before it could be opened, and uploads do not persist. If its contents should
-  inform this skill, re-upload it and say so — or commit it into the repo, which
-  does persist. Nothing in this skill currently derives from it.
+- **RESOLVED.** `Character_Design_Sourcebook_JP_CN_Manga_Anime_Gacha.pdf` is now
+  committed at `ai_agent_docs/`, together with `character_design_sources/JP/` and
+  `/CN/` (27 primary sources) and
+  `Character_Design_Brief_AI_Agent_Questionnaire.md`. Committing rather than
+  uploading is what made them persist. **The questionnaire is now the primary
+  question set for this project**; this skill's `cast.json` was reduced to the
+  wardrobe-and-reality supplement it does not cover.
+- **Still to read in full:** the sourcebook PDF itself and the 27 sources. The
+  questionnaire's Section G maps each principle to its source, so start there
+  when a specific claim needs checking.
 - **Costume-design primary texts** (Ingham & Covey; Cunningham; Arnold's
   *Patterns of Fashion*) are cited in `wardrobe-questions.md` from their
   documented content and standing, not from a full reading. The costume-plot
   technique is well attested; the finer detail is not verified here.
-- **CEDiL** (cedec.cesa.or.jp) remains unmined — free with registration, and
-  includes studio talks on character-art pipelines.
+- **CEDiL** (cedec.cesa.or.jp) — partly addressed: four CEDEC roadmap PDFs are
+  now in `character_design_sources/JP/`. The wider library remains unmined.
+
+## Image-generator guides — the useful kind
+
+Guides to the generator itself are worth collecting, but only when they meet
+both tests:
+
+1. **Model-specific.** Written for the model actually in use (Nano-Banana class),
+   not generic "AI art tips". Prompt behaviour does not transfer reliably
+   between models.
+2. **Confirmed results, not introductions.** Shows the prompt *and* the output
+   it produced, ideally with what failed first. A guide that lists prompt
+   fragments without showing results documents someone's guess.
+
+A source meeting both is evidence about the tool and belongs in
+`references/prompt-grammar.md`. This is a different category from the character-
+design sources above: it tells you how to operate the machine, not what to make.
+Keep the two separate — a generator guide must never become a design source.
+
+Note the distinction from the prompt-tag listicles cautioned against below:
+those enumerate *subjects* ("maid", "china dress") and encode the training
+distribution. A good Nano-Banana guide covers *mechanics* — editing, identity
+preservation across edits, plate consistency, resolution behaviour.
 
 ## Two cautions when adding sources
 

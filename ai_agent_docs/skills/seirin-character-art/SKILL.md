@@ -33,10 +33,20 @@ answers become a design, waits for the project owner or a design agent to
 answer them, and then executes precisely. Inventing a memory point, a palette
 or a wardrobe is out of scope — that is the single most important rule here.
 
-`assets/cast.json` holds the **question set** and whatever answers exist so far.
-`briefs/<id>.md` is the same questions per character, in readable form.
-Currently **no character is approved**: run `scripts/check_roster.py` to see the
-state.
+**The primary question set is
+`ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md`** — derived
+from 27 primary sources with a principle-to-source attribution index, covering
+silhouette, kawaii and moe engineering, SD/chibi, physiognomic coding,
+transmedia flatness, worldview symbiosis, rarity tiering, live-ops cadence,
+fan-art virality, merch and IP rights. Answer it first.
+
+`assets/cast.json` holds a **wardrobe-and-reality supplement** to it: what the
+person actually wears on an ordinary day, where the clothes came from, the
+costume plot, weather and climate, and physical plausibility. The questionnaire
+treats costume as a variable — how many variants for the tier, what material —
+and does not ask those. `briefs/<id>.md` is the supplement per character.
+
+Currently **no character is approved**: run `scripts/check_roster.py`.
 
 The existing design document is an early AI-generated draft. Treat it as a
 starting point to interrogate, not as canon — it fixes names, ages, roles and
@@ -121,8 +131,9 @@ Fix every ERROR before generating.
 
 ### 1. Open the character's brief
 
-`briefs/<id>.md` — the question set for that character. If it is unanswered,
-**stop and ask**; do not proceed to generation. Wardrobe questions in
+Answer the main questionnaire first, then `briefs/<id>.md` for the wardrobe
+supplement. If either is unanswered, **stop and ask**; do not proceed to
+generation. Wardrobe questions in
 particular deserve real answers: see `references/wardrobe-questions.md`, which
 names the three defaults that make characters forgettable (priest-robe sci-fi,
 the featureless bodysuit, the one-outfit character).
@@ -222,7 +233,10 @@ Approved assets and `characters/*/prompts/` are committed. `_wip/` is not.
   the project owner answers them.
 - `references/wardrobe-questions.md` — clothing questions and a catalogue of
   real garment traditions to draw on.
-- `assets/cast.json` — the question set and any approved answers.
+- `../../Character_Design_Brief_AI_Agent_Questionnaire.md` — **the primary
+  question set.** Answer first.
+- `../../character_design_sources/` — the 27 primary sources behind it.
+- `assets/cast.json` — the wardrobe supplement and any approved answers.
 - `references/design-canon.md` — the five levers in full, with sources.
 - `references/iteration.md` — prompt persistence, refinement loop, stop rules.
 - `references/prompt-grammar.md` — seven-section template, failure modes.

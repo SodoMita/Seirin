@@ -1,37 +1,31 @@
-# Ren Akatsuki — design questions
+# Ren Akatsuki — wardrobe & reality supplement
 
 `id: ren` · age 17 · iron_requiem
 
 **Role (from the design document):** mechanic apprentice, Scrap-Titan operator under adult supervision
 
-**Status: UNANSWERED.** No approved visual design exists for this
-character. Nothing below is decided.
+**Status: UNANSWERED.**
 
 ---
 
-## How to use this file
+## Answer the main questionnaire first
 
-These are questions for the **project owner or a design agent** to
-answer. The art agent does not answer them — it asks, waits, and then
-executes. Record answers in `../assets/cast.json` under this
-character's `answers`, and set `approved: true` once signed off.
+`ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md` is the
+primary question set — silhouette, kawaii/moe engineering, SD-chibi,
+physiognomic coding, tiering, fan-art virality, merch and IP, each traced
+to one of 27 primary sources. Work through it, then set
+`questionnaire_answered: true` in `../assets/cast.json`.
 
-The existing design document is an early AI-generated draft. Treat it as
-a starting point to interrogate, not as canon. A better answer replaces
-it — just record that it changed.
+**This file is a supplement, not a replacement.** The questionnaire treats
+costume as a variable — how many variants for the tier, what material —
+but does not ask what this person actually wears, where the clothes came
+from, or what they do when it rains. That gap is below.
 
-Wardrobe answers should draw on `../references/wardrobe-questions.md`,
-which catalogues real garment traditions, names the three defaults to
-avoid, and carries the costume-plot grid borrowed from theatre practice.
+Answers go in `../assets/cast.json`. The art agent does not invent them.
+Background and the catalogue of garment traditions:
+`../references/wardrobe-questions.md`.
 
 ---
-
-## Silhouette
-
-- What shape is this person from 50 metres away, in one word?
-- Could you tell them from every other cast member as a black shape? What makes that true?
-
-> **Answer:**
 
 ## Wardrobe
 
@@ -70,22 +64,6 @@ avoid, and carries the costume-plot grid borrowed from theatre practice.
 
 > **Answer:**
 
-## Identity
-
-- What is the one detail someone describes when telling a friend about them?
-- What second detail is only noticed the second time you look?
-- Which of these details exists BECAUSE of who they are, rather than as decoration?
-
-> **Answer:**
-
-## Face And Body
-
-- What face should this character have, and what does that face communicate before they speak?
-- What are the eyes doing when the character is not being addressed?
-- What body does this person's actual life give them — their work, age, health, habits?
-
-> **Answer:**
-
 ## Physical Plausibility
 
 - If a height and weight are stated, do they survive arithmetic? Check BMI before it reaches a reference sheet.
@@ -93,46 +71,13 @@ avoid, and carries the costume-plot grid borrowed from theatre practice.
 
 > **Answer:**
 
-## Colour
-
-- What three colours, and why those?
-- Which single colour is reserved so it means something when it appears?
-- Do they read as themselves in the rain, at night, in a lit interior?
-
-> **Answer:**
-
-## Expression
-
-- What is their neutral, resting face — the one seen most often?
-- What is the difference between their public face and their private one?
-
-> **Answer:**
-
-## Cast Contrast
-
-- Placed beside every other cast member, what makes this one unmistakable?
-- Does the roster still read as one world — same stylistic rules — while staying distinct?
-- Which archetype is this character closest to, and is it being used straight or subverted? Either is fine; drifting is not.
-
-> **Answer:**
-
-## Boundaries
-
-- What must this character NEVER look like, and why is that a risk worth naming?
-- Which visual cliché is this character most likely to collapse into if nobody resists it?
-
-> **Answer:**
-
 ---
 
 ## Before this character enters production
 
+- [ ] Main questionnaire answered (`questionnaire_answered: true`).
 - [ ] Every section above has an answer.
-- [ ] At least two outfits are specified, not one.
+- [ ] At least two outfits specified, not one.
 - [ ] A costume-plot row exists for this character.
-- [ ] The silhouette is distinguishable from all 13 others in black fill.
-- [ ] Someone can state the one memorable detail in a sentence.
 - [ ] `approved: true` is set in `cast.json`.
-
-Only then do the production stages in `../SKILL.md` apply.
 

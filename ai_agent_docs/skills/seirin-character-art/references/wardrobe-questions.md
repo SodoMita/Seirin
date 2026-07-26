@@ -4,6 +4,13 @@ Clothing is where most anime and AI-generated character design quietly fails.
 This file exists to make that failure visible and to widen the pool of answers.
 It contains **questions and options**, not decisions.
 
+**Relationship to the main questionnaire.**
+`ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md` is the primary
+question set and is better sourced than this file. It asks how many costume
+variants a rarity tier justifies and what material each element is — but not
+what the person actually wears on a Tuesday, where it came from, or what they
+do in the rain. This file covers that, and only that.
+
 ## The three default failures
 
 Name them so you can catch them.
