@@ -267,6 +267,6 @@ Density means *design information*, not rendering effort. A low-density characte
    skip the wardrobe questions — see `wardrobe-questions.md`.
 2. Check the silhouette class, dominant hue, shape majority and head ratio
    against every existing answered record — differ in **at least two**.
-3. Run `scripts/check_roster.py`, then generate the question brief.
+3. Generate the question brief and get the answers signed off.
 4. Only then generate. A character that enters the pipeline without a registry
    record will drift, because nothing anchors it.

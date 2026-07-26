@@ -6,7 +6,7 @@
     "1": "Read the question set in question_template. It applies to every character.",
     "2": "Answer per character, in this file, replacing null. Short answers are fine.",
     "3": "An answer is only 'canon' once the project owner approves it. Mark approved:true.",
-    "4": "The art agent may NOT invent answers. If a field is null, it asks."
+    "4": "The art agent may NOT invent answers. If a field is null, it asks. There is no linter for this — a human reviewer is the gate."
   },
   "note_on_canon": "The existing design document is a draft and is itself AI-generated. Treat it as a starting point to interrogate, not as canon. Where it conflicts with a better answer, the better answer wins — record the change.",
   "question_template": {

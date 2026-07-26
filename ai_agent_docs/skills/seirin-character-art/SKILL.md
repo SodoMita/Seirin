@@ -46,7 +46,8 @@ costume plot, weather and climate, and physical plausibility. The questionnaire
 treats costume as a variable — how many variants for the tier, what material —
 and does not ask those. `briefs/<id>.md` is the supplement per character.
 
-Currently **no character is approved**: run `scripts/check_roster.py`.
+Currently **no character is approved** — every `answers` field is `null` and
+every `approved` flag is `false`.
 
 The existing design document is an early AI-generated draft. Treat it as a
 starting point to interrogate, not as canon — it fixes names, ages, roles and
@@ -58,7 +59,7 @@ asset must be and why, and leave a handoff slot.
 
 ## Non-negotiables
 
-0. **`LEGAL.md` and `OPERATIONS.md` outrank everything here.** Read `LEGAL.md`
+0. 🛑 **`LEGAL.md` and `OPERATIONS.md` outrank everything here.** Read `LEGAL.md`
    before generating, storing or committing — depiction of minors, IP,
    disclosure, platform compliance. Read `OPERATIONS.md` before touching the
    repository — never destroy committed work, generation discipline, honest
@@ -120,17 +121,13 @@ allowlisted to package registries and GitHub only
 
 **Roster differentiation:** any two characters differ in at least two of
 {silhouette class, dominant hue, shape majority, head-ratio band}. Enforced by
-`scripts/check_roster.py`.
 
 ## Workflow
 
 ### 0. Validate — free, always
 
-```bash
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_roster.py
-```
-
-Fix every ERROR before generating.
+Read `briefs/<id>.md`. ❓ If its sections are unanswered, **stop and ask** —
+that is the whole gate. Do not proceed to generation on an unanswered brief.
 
 ### 1. Open the character's brief
 
@@ -212,8 +209,7 @@ The rules that repeatedly decide the result:
 ## Verification
 
 ```bash
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_roster.py
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_assets.py characters/
+python3 tools/check_matte.py <sprite> --report   # matted sprites only
 ```
 
 Then the verification block in `CONSTRAINTS.md`, and the eye passes in
@@ -247,4 +243,4 @@ Approved assets and `characters/*/prompts/` are committed. `_wip/` is not.
 - `references/appeal-and-safety.md` — appeal per age band, hard limits.
 - `references/qa-checklist.md` — pre-ship checks.
 - `references/sources.md` — the professional books and where to fetch them.
-- `scripts/check_roster.py` · `scripts/check_assets.py` — validators.
+

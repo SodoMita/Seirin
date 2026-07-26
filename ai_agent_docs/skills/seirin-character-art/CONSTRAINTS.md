@@ -27,7 +27,7 @@ the `cyber-nexus/` game folder specifically.
 
 If you read nothing else:
 
-1. **Never sexualise a character under 18.** Miya 5, Hana 13, Momo 15, Ryuki 16,
+1. 🛑 **Never sexualise a character under 18.** Miya 5, Hana 13, Momo 15, Ryuki 16,
    Ren 17. No exceptions, no phrasing unlocks it, refuse and stop if asked.
    (`LEGAL.md` §1)
 2. **Never name a living artist in a prompt**, and never trace or img2img from
@@ -38,29 +38,25 @@ If you read nothing else:
 5. **Save every prompt you send, with its result.** (`OPERATIONS.md` §5)
 6. **Report honestly** — which checks ran, which did not, what failed.
    (`OPERATIONS.md` §6)
-7. **When blocked or unsure, stop and ask.** Treat anything ambiguous as a
+7. 🛑 **When blocked or unsure, stop and ask.** Treat anything ambiguous as a
    constraint until told otherwise.
 
-## Machine-enforced
+## Not machine-enforced — read by a person
 
-Some limits are checked in code, not left to judgement.
-`scripts/check_roster.py` errors — never warns — if:
+There is deliberately **no linter for these rules**. A validator over a
+hand-written question file only restates what an editor already sees, and a
+green check on a structural test invites the belief that the safety rules were
+checked when they were not.
 
-- an under-18 character loses its explicit anti-sexualisation entry
-  (`LEGAL.md` §1);
-- Ryuki loses the guard preventing her ichthyosis being rendered as wounds,
-  gore or reptile scales (`LEGAL.md` §2).
-
-**Never remove, weaken or disable these checks.** Verified by negative test:
-stripping either entry fails the run.
+🛑 The `LEGAL.md` §1 and §2 rules are judged by a human reviewer on every
+character, every time. Nothing automates that judgement.
 
 ## Verification before commit
 
 ```bash
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_roster.py
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_assets.py characters/
 git status --short          # no unexplained deletions
 git diff --cached --stat    # no existing asset or tool rewritten
+python3 tools/check_matte.py <sprite> --report   # matted sprites only
 ```
 
 Then the safety pass in `references/qa-checklist.md`. A `LEGAL.md` §1 or §2

@@ -6,21 +6,13 @@ nothing), then the eye passes.
 ## Automated
 
 ```bash
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_roster.py
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_assets.py characters/
+python3 tools/check_matte.py <sprite> --report          # matted sprites only
+python3 tools/check_matte.py <sprite> --checks --out /tmp/check.png
 ```
 
-If an asset fails a check below, record the failure in the character's
+Everything else below is an eye pass. If an asset fails, record the failure in
 `characters/<id>/prompts/NN_<stage>.result.md` before regenerating — see
 `iteration.md`.
-
-`check_roster.py` validates the registry: required fields, unique silhouette
-classes, hex validity, roster differentiation, expression coverage,
-banned-list presence, and the minor-safety flags.
-
-`check_assets.py` validates files on disk: naming convention, expected
-canvas sizes, alpha presence and straightness, opaque-background detection,
-and expression-set completeness per character.
 
 ## Silhouette test — the gate
 

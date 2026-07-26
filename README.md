@@ -16,7 +16,7 @@ Visual-novel project assets and design documents for **Seirin: Night Shift — R
     hard limits (`LEGAL.md`, `OPERATIONS.md`, indexed by `CONSTRAINTS.md`),
     the cast registry (`assets/cast.json`),
     per-character art-direction briefs (`briefs/`), design grammar, sprite spec,
-    iteration loop and validators
+    iteration loop; matting tools live in `tools/`
   - `skills/monogatari-offline-vn/` — offline VN engine rules
 
 ## For AI agents

@@ -91,8 +91,8 @@ new vendor code must be plain ES5-compatible browser JS with zero deps.
   and gives the precedence order. `assets/cast.json` is the single source of
   truth for the cast; `briefs/<id>.md` is the art-direction brief per character
   (generator prompts are written by a separate prompt agent into the brief's
-  handoff block). Validate with `scripts/check_roster.py` before generating and
-  `scripts/check_assets.py characters/` after.
+  handoff block). There is no linter — an unanswered brief is the gate, and a
+  human reviews the safety rules on every character.
 - **Save every prompt you send.** Character prompts and their result notes live
   in `characters/<id>/prompts/` and are committed alongside the art — they are
   part of the product. Work-in-progress generations go in `characters/*/_wip/`

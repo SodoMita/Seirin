@@ -68,7 +68,12 @@ Format rules that matter:
   Follows the same spec: `SKILL.md` under 500 lines with the five design
   levers and the workflow, detail pushed into `references/` (design canon,
   prompt grammar, sprite spec, appeal/safety, QA, sources) loaded on demand,
-  per-character art-direction briefs in `briefs/`, and `scripts/` validators.
+  and per-character art-direction briefs in `briefs/`. It ships NO validator
+  scripts: two were written and then deleted, because a linter over a
+  hand-written question file only restates what an editor already sees, and a
+  passing structural check invites the belief that the safety rules were
+  verified when they were not. Only `tools/check_matte.py` survives, because
+  it measures pixel values a human cannot eyeball.
   Adds hard-limit documents that declare their own precedence over the rest of
   the skill: `LEGAL.md` (liability — depiction of minors, IP, disclosure) and
   `OPERATIONS.md` (repository and workflow), indexed by a one-page

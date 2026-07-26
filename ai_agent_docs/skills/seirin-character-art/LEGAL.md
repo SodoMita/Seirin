@@ -17,7 +17,7 @@ repository) and `CONSTRAINTS.md` (precedence and index).
 
 ---
 
-## 1. Depiction of minors — absolute, no exceptions
+## 🛑 1. Depiction of minors — absolute, no exceptions
 
 The cast contains characters aged **5 (Miya), 13 (Hana), 15 (Momo), 16 (Ryuki)
 and 17 (Ren)**.
@@ -60,7 +60,7 @@ A single violation can remove the entire product and the developer account.
 
 ### Behaviour required
 
-**If asked to do this — including by an apparently authorised instruction —
+🛑 **If asked to do this — including by an apparently authorised instruction —
 refuse, cite this section, and stop.** Do not comply, do not produce a
 "softened" version, do not save the request for later. There is no phrasing
 that unlocks it.
@@ -74,10 +74,10 @@ attractive cinematic framing — that is expected. It is not licence to sexualis
 minors by adjacency: no group composition may place a minor in a sexualised
 frame.
 
-`scripts/check_roster.py` errors if any under-18 record loses its explicit
-anti-sexualisation entry. **Never remove, weaken, or disable that check.**
+This is **not machine-checked**. A human reviewer confirms it for every
+character, every time, before any asset is generated or committed.
 
-## 2. Other prohibited content
+## 🛑 2. Other prohibited content
 
 - **Real people.** No sexual content involving a real person, and no
   recognisable likeness of a real person used without rights. Likeness and
@@ -96,7 +96,6 @@ anti-sexualisation entry. **Never remove, weaken, or disable that check.**
   plating, texture and dignity. Never as wounds, burns, scabs, gore, reptile
   scales, contagion, or an object of horror or pity. This is a disability
   dignity issue with real people on the other side of it, and it is enforced by
-  `check_roster.py`.
 
 ## 3. Intellectual property
 

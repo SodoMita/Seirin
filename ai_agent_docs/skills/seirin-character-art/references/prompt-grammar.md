@@ -290,6 +290,66 @@ in front of it and does not have to hallucinate blind spots. This is the
 workflow the skill already prescribes; practitioners report it as the single
 biggest consistency gain.
 
+## Emoji in prompts — where they help and where they hurt
+
+Two different questions, with two different answers. Getting them confused
+produces worse art.
+
+### In the IMAGE prompt: no. Emojis lose information.
+
+Nano Banana and its class read natural-language prose. An emoji sent to an
+image model is a **lossy substitute for the description it replaces**:
+
+- **Emojis collapse into a generic bucket.** Testing on Midjourney's style
+  search found that different emojis — star, fruit, ghost — produce results
+  from a single shared "emoji" style pool, with *no significant variation
+  between them*. The model is not reading their literal meaning. That is the
+  exact failure this skill already warns about with "anime girl": input that
+  pulls toward a training-set mean and erases the design.
+- **They cannot carry the values that matter here.** `👗` cannot express
+  "unlined indigo work coat, sleeves pushed back and pinned, hem worn pale at
+  the front". `🎨` cannot express `Tops1 #3A4A52`. Every specific this skill
+  fights to establish — zone hexes, garment construction, the memory point —
+  is unrepresentable as an emoji.
+- **Emoji semantics are unstable across models and versions.** A prompt that
+  worked on one model silently means something else on the next.
+- **Reported behaviour is erratic**: a "no bicycles" sign produced a bicycle,
+  two motorcycles and a truck.
+
+**Rule: do not put emojis in a generation prompt.** If a prompt is too long,
+cut redundancy — do not compress meaning into pictograms.
+
+### In AGENT-FACING text: yes, sparingly, as signposts.
+
+There is a real, separately-evidenced effect for **LLM instructions** — which
+is what briefs, checklists and handoff blocks are. An emoji is a single token
+that resists being skimmed past, so it works as a **salience marker on a rule
+that must not be missed**. Practitioners report models decoding a small
+consistent set (🛑 stop, 🎯 objective, 🔎 verify) the same way on reverse
+testing.
+
+Where that is worth using in this skill:
+
+| Marker | Meaning | Use on |
+|---|---|---|
+| 🛑 | hard stop — refuse and escalate | `LEGAL.md` §1 and §2 rules |
+| ⚠️ | known failure mode | trap entries, failure-mode rows |
+| ✅ | acceptance criterion | "must be true of the result" items |
+| ❓ | unanswered — ask, do not invent | unanswered brief sections |
+
+Constraints, because this degrades fast if overused:
+
+- **One marker per rule, at the start of the line.** A wall of emojis is noise
+  and destroys the salience effect that justifies them.
+- **Never as the only carrier of meaning.** The words must stand alone if the
+  emoji is stripped, since rendering and tokenisation vary.
+- **Never in `LEGAL.md` prose itself** beyond the 🛑 marker — legal text is
+  read by humans and must not depend on pictograms.
+- **Never in filenames, IDs, JSON keys, or committed prompt text.**
+
+The distinction to remember: **emojis help an agent notice an instruction;
+they hurt an image model trying to render a garment.**
+
 ## Failure modes and the fix
 
 | Symptom | Cause | Fix |
@@ -306,6 +366,7 @@ biggest consistency gain.
 | Quality drops over successive edits | edit chaining re-encodes the image | batch changes into one generation from the original anchor; composite small fixes manually |
 | Canvas comes back square | aspect-ratio drift toward 1:1 | generate at a moderate ratio, then crop/composite to the sprite canvas; verify dimensions |
 | Faces merge in a group image | more than 5 characters in one generation | split the image, or compose separately |
+| Output is generic despite a detailed brief | emojis used in the image prompt | replace each with the words it stood for |
 | Matted sprite is opaque where it should be transparent | plates were flattened, not composited | never ask for "identical character pixels"; ask for honest compositing over each background |
 | Matted edges ghost or double | plates not registered | generate the black plate as an edit of the white plate |
 | Soft edges tinted green | green sheet used as a matting background | green is for consistency sheets only; matte from white/black plates |

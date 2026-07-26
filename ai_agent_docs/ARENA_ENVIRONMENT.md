@@ -192,9 +192,10 @@ the workspace. Relevant limits for this project:
 2. **Never assume a Python library exists.** Install into a venv with an
    explicit timeout, or write standard-library-only code. The zero-dependency
    validators in this repo exist for exactly this reason.
-3. **Prefer stdlib for anything that must always run.** `check_roster.py` uses
-   no third-party packages so it works in a fresh checkout;
-   `check_assets.py` degrades gracefully when Pillow is missing.
+3. **Prefer stdlib for anything that must always run**, and prefer no script at
+   all to a script that only restates what a reader can see. This project
+   deleted two validators for that reason; `tools/check_matte.py` survives
+   because it measures pixels a human cannot eyeball.
 4. **Put durable knowledge in files, not in the conversation.** Context is lost
    between sessions; the repo is not. This is the same reasoning behind saving
    every generation prompt.

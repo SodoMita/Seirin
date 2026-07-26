@@ -132,8 +132,7 @@ Stop and ask the project owner when:
 ## Verification before commit
 
 ```bash
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_roster.py
-python3 ai_agent_docs/skills/seirin-character-art/scripts/check_assets.py characters/
+python3 tools/check_matte.py <sprite> --report   # matted sprites only
 node --test cyber-nexus/tests/*.test.mjs        # if the game folder was touched
 git status --short
 git diff --cached --stat

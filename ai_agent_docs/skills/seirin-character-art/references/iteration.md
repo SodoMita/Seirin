@@ -103,8 +103,8 @@ the two heads that jittered, not all eleven.
 
 An agent picking this up in a fresh session with no memory should:
 
-1. `python3 .../scripts/check_roster.py` — is the registry sound?
-2. `python3 .../scripts/check_assets.py characters/` — what exists, what's missing?
+1. Read `briefs/<id>.md` — is the character answered and approved at all?
+2. `ls characters/<id>/` — what exists.
 3. Read `characters/<id>/prompts/KEPT.md` — what already worked.
 4. Read the highest-numbered `.result.md` — what was being tried when work stopped.
 5. Continue from there.
@@ -120,6 +120,6 @@ obeys perfectly; two characters keep coming out similar; the memory point never
 survives. Check first whether the character's questions were actually answered,
 or whether someone quietly invented an answer to get moving.
 
-Fix it in `assets/cast.json` first, re-run `check_roster.py`, regenerate the
-prompt card, and start the stage over. Never patch a design flaw by piling
+Fix it in `assets/cast.json` first, regenerate the brief, and start the stage
+over. Never patch a design flaw by piling
 adjectives onto a prompt — the flaw will resurface in every later asset.
