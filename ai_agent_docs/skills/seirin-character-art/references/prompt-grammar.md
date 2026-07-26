@@ -13,6 +13,11 @@ exclusions — and leaves the wording to you. Assemble it with the grammar below
 Always in this order. The model weights early tokens more heavily, so identity
 comes before staging and exclusions come last.
 
+⚠️ **But if the prompt is near the tool's character limit, move the exclusions
+and the memory point up.** Truncation cuts from the end, and losing the EXCLUDE
+block is how a banned element reaches a committed asset. Order for weighting
+when you have room; order for survival when you do not.
+
 ```
 [1 FORMAT]     what kind of asset, canvas aspect, background
 [2 STYLE]      render style, line, eye rendering
@@ -295,43 +300,105 @@ biggest consistency gain.
 Two different questions, with two different answers. Getting them confused
 produces worse art.
 
-### Token cost — emojis are usually cheaper, sometimes not
+### Character budget — the real constraint
 
-An emoji is normally 1–3 tokens; the word it replaces is often 1 token too.
-`🐘` vs `elephant`, `👧` vs `girl`, `😊` vs `smile` — the saving is real but
-small, and it reverses for emojis carrying variation selectors or skin-tone /
-ZWJ sequences (`🌧️`, `🧑‍🎨`), which can cost *more* tokens than the plain word.
+The generator tool here enforces a **maximum prompt length in characters**.
+That is a hard wall, not an efficiency preference, and it changes the advice.
 
-So token economy is a weak argument either way at the scale of a character
-prompt. Prompts here are a few hundred tokens; the difference is noise. Decide
-on **whether the model renders the intent**, not on token count.
+Measured against the seven-section sprite prompt in this file:
 
-Where token saving does matter is long, repeated agent-facing instructions —
-see below.
+| | |
+|---|---|
+| Full sprite prompt as written | **~2130 characters** |
+| Typical tool ceiling | 1000–2000 |
 
-### In the IMAGE prompt: no, with one exception
+So the default prompt **does not fit** and must be shortened deliberately —
+otherwise the tool truncates it, and truncation silently drops whatever sits at
+the end. In our section order that is the EXCLUDE block, which is exactly the
+part that must not be lost.
 
-Emojis are a **lossy substitute for the description they replace**:
+⚠️ **Put the exclusions and the memory point early enough to survive
+truncation, and verify the sent prompt fits before generating.**
+
+#### What emojis actually recover
+
+Measured per swap, plain word → emoji:
+
+| Swap | Saved |
+|---|---|
+| `surprised` → `😮` | 8 |
+| `elephant` → `🐘` | 7 |
+| `neutral` → `😐` | 6 |
+| `ribbon` → `🎀`, `sleepy` → `😴` | 5 |
+| `girl` → `👧`, `coat` → `🧥`, `smug` → `😏` | 3 |
+| `sad` → `😢`, `rain` → `🌧️` | 1–2 |
+
+Roughly **3–8 characters per swap, averaging ~5**. On a 2130-char prompt with
+~15 swappable nouns that is **~75 characters, about 3.5%**.
+
+Caveats that matter when counting against a limit:
+
+- Some tools count **UTF-16 units**, where most emojis are 2 not 1 — halving
+  the saving. `🌧️` and other variation-selector or ZWJ emojis can be 3+.
+- Emojis only replace **concrete nouns and emotions**. They cannot replace hex
+  codes, garment construction, framing, or exclusions — which is where the bulk
+  of our characters sit.
+
+**Verdict: use them, but they are a trim, not a solution.** 3.5% does not close
+a 2× overage.
+
+#### Where the characters actually are
+
+Cut in this order. These recover far more than emoji swaps, and cost nothing in
+render quality:
+
+1. **Drop the style block after the first generation.** ~430 chars. Once a
+   reference image is attached, it carries the style — restating it is waste.
+2. **Compress exclusions to the ones that character actually risks.** ~250
+   chars. The global forbidden list is a checklist for authors, not something
+   the model needs recited in full every time.
+3. **Hex codes without colour names.** `Tops1 #3A4A52` not
+   `oil-slate coverall (#3A4A52)`. ~120 chars.
+4. **Drop zone entries that are not visible in this shot.** A waist-up frame
+   does not need `Bottom2` or `Shoes`.
+5. **Cut hedging and connectives.** "the whole body from the top of the head to
+   the soles of the feet" → "full body, head to feet". ~200 chars across a
+   prompt.
+6. **Then** swap concrete nouns for emojis. ~75 chars.
+
+Steps 1–5 recover roughly 1000 characters, which is the difference between
+fitting and not. Step 6 is the last 3.5%.
+
+#### Emoji shorthand worth using
+
+Where a swap is lossless because the word is a plain concrete noun or a
+conventional emotion:
+
+```
+😐 neutral · 😊 smile · 😠 angry · 😢 sad · 😮 surprise · 😳 blush
+😏 smug · 😴 sleepy · 🌧️ rain · ⚫ black · 🔴 red · 🔵 blue
+```
+
+Do **not** swap where the word is doing descriptive work. `👗` loses "unlined
+indigo work coat, sleeves pushed back and pinned"; `🎨` cannot express
+`#3A4A52`. A swap is only safe when the emoji and the word mean the *same
+single thing*.
+
+### In the IMAGE prompt: emojis as labels, never as descriptions
+
+Beyond the budget question, emojis have a rendering cost when they replace
+description:
 
 - **They collapse into a generic bucket.** Testing on Midjourney's style search
   found different emojis — star, fruit, ghost — producing results from a single
   shared "emoji" style pool, with *no significant variation between them*. The
-  model was not reading their literal meaning. That is the same training-set-mean
-  collapse this skill warns about with "anime girl".
-- **They cannot carry what matters here.** `👗` cannot express "unlined indigo
-  work coat, sleeves pushed back and pinned, hem worn pale at the front".
-  `🎨` cannot express `Tops1 #3A4A52`. Every specific this skill exists to
-  establish — zone hexes, garment construction, the memory point — is
-  unrepresentable as a pictogram.
+  model was not reading their literal meaning. Same training-set-mean collapse
+  this skill warns about with "anime girl".
 - **Semantics are unstable** across models and versions.
-- **Behaviour is erratic**: a "no bicycles" sign produced a bicycle, two
+- **Behaviour can be erratic**: a "no bicycles" sign produced a bicycle, two
   motorcycles and a truck.
 
-**The exception — expressions.** For the eleven expression differentials, the
-emotion label is a *short, conventional* tag, not a construction description:
-`neutral`, `smile`, `angry`, `sad`, `surprise`, `blush`. Emoji faces map onto
-those with unusually little loss, and are worth **testing** as a compact tag
-alongside the geometry:
+The safe pattern is emoji-as-**label**, with the specification still present:
 
 ```
 … change only the facial expression to: 😳 blush —
@@ -339,10 +406,10 @@ brow inner-up soft, eyes averted and half-lidded, mouth small and pressed,
 warm cheeks.
 ```
 
-Note the shape: the emoji is a *label*, the geometry still does the work. Never
-send `😳` alone — the brow/eye/mouth spec from the brief is what keeps the
-expression in character rather than generic. **Treat this as unverified until
-tested on Nano Banana**, and record the result in the character's iteration log.
+The emoji is shorthand; the geometry does the work. Never send `😳` alone.
+
+⚠️ **Untested on Nano Banana.** Record the result in the iteration log the
+first time it is tried — see the open experiments in `iteration.md`.
 
 ### In AGENT-FACING text: yes, sparingly, as signposts
 

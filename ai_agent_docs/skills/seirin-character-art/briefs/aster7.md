@@ -86,14 +86,22 @@ Answers go in `../assets/cast.json`. The art agent does not invent them.
 
 ---
 
-## Note for the prompt agent — expressions
+## Note for the prompt agent — character budget
 
-When writing the expression differentials, the emotion may be tagged with an
-emoji label beside the geometry (`😳 blush — brow inner-up soft, eyes averted
-…`). The geometry does the work; the label is shorthand. This is **untested on
-Nano Banana** — if you try it, record whether it helped in the iteration log.
+⚠️ The generator enforces a **maximum prompt length**. The full sprite prompt
+runs ~2130 characters, over most ceilings, and truncation cuts from the END —
+which is the exclusion block. Keep the exclusions and the memory point early
+enough to survive, and check the length before sending.
 
-Nowhere else in an image prompt should an emoji replace a description.
+Recover characters in this order: drop the style block once a reference image
+is attached · trim exclusions to this character's real risks · hexes without
+colour names · cut hedging · **then** emoji swaps (~5 chars each).
+
+Emoji swaps are safe only where the word is a plain noun or a conventional
+emotion — `😐 neutral`, `😳 blush`, `⚫ black`. Never where it carries
+description: no emoji expresses a garment's construction or a hex code. Use
+them as labels beside the specification, never instead of it. **Untested on
+Nano Banana** — record the result if you try it.
 
 ## Before this character enters production
 

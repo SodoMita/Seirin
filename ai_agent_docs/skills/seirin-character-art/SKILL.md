@@ -203,11 +203,18 @@ The rules that repeatedly decide the result:
 - **Hex codes work.** Give the colour name *and* the hex.
 - **One change per edit.** Restate everything to preserve, then the single
   change.
-- **No emojis in place of description.** They collapse toward a generic style
-  bucket and cannot carry hexes or garment construction. The one exception is
-  an expression *label* (`😳 blush`) placed beside the brow/eye/mouth geometry —
-  untested on Nano Banana, so record the result if you try it. Emojis are for
-  agent-facing text, where they mark rules that must not be skimmed past.
+- ⚠️ **Mind the character limit.** The generator enforces a maximum prompt
+  length, and the full seven-section sprite prompt is ~2130 characters — over
+  most ceilings. Truncation drops the *end* of the prompt, which is the
+  exclusion block. Shorten deliberately: drop the style block once a reference
+  image is attached (~430 chars), trim exclusions to this character's real
+  risks (~250), hexes without colour names (~120), cut hedging (~200). Only
+  then swap concrete nouns for emojis (~75). See `references/prompt-grammar.md`.
+- **Emojis are a trim, not a solution.** ~5 characters per swap, and only for
+  plain nouns and conventional emotions (`😳 blush`, `⚫ black`). They cannot
+  carry hexes or garment construction, and used *instead of* description they
+  collapse output toward a generic style bucket. Emoji-as-label beside the
+  geometry is fine; emoji-as-description is not.
 - **Never open with "anime girl"** or similar — generic openers pull the model
   to the training-set mean and erase the design.
 
