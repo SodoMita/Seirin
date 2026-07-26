@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Character Design Sourcebook — Cover</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: 794px 1123px; margin: 0; }
+  :root {
+    --c-bg: #f4f5f5;
+    --c-page: #ffffff;
+    --c-primary: #131515;
+    --c-secondary: #32454e;
+    --c-accent: #c23a50;
+    --c-accent-2: #1f6c92;
+    --c-muted: #747b7e;
+    --c-border: #acbdc5;
+    --c-card: #e8eaeb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 794px; height: 1123px;
+    margin: 0; padding: 0;
+    background: var(--c-bg);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    color: var(--c-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  @media screen {
+    html { height: auto; display: flex; justify-content: center; }
+    body { transform-origin: top center; }
+  }
+  .cover-page {
+    position: relative;
+    width: 794px;
+    height: 1123px;
+    background: var(--c-page);
+    overflow: hidden;
+  }
+
+  /* === Layer 1: Background — full-bleed subtle grid + JP kana watermark === */
+  .layer-bg {
+    position: absolute; inset: 0; z-index: 1; overflow: hidden;
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(50,69,78,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(50,69,78,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .kana-watermark {
+    position: absolute;
+    right: -30px;
+    bottom: 60px;
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: 180px;
+    color: rgba(194, 58, 80, 0.07);
+    letter-spacing: -8px;
+    line-height: 0.85;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .corner-mark-tl, .corner-mark-tr, .corner-mark-bl, .corner-mark-br {
+    position: absolute;
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--c-secondary);
+    z-index: 2;
+  }
+  .corner-mark-tl { top: 48px; left: 48px; border-right: none; border-bottom: none; }
+  .corner-mark-tr { top: 48px; right: 48px; border-left: none; border-bottom: none; }
+  .corner-mark-bl { bottom: 48px; left: 48px; border-right: none; border-top: none; }
+  .corner-mark-br { bottom: 48px; right: 48px; border-left: none; border-top: none; }
+
+  /* === Layer 2: Structural lines (positioned away from text by ≥40px) === */
+  .layer-struct { position: absolute; inset: 0; z-index: 2; }
+  .vline-anchor {
+    position: absolute;
+    left: 95px;
+    top: 220px;
+    bottom: 200px;
+    width: 6px;
+    background: var(--c-secondary);
+  }
+
+  /* === Layer 3: Content === */
+  .layer-content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+
+  /* Kicker block — top */
+  .kicker {
+    position: absolute;
+    top: 145px;
+    left: 145px;
+    right: 95px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    font-weight: 500;
+  }
+  .kicker .dot {
+    width: 6px; height: 6px;
+    background: var(--c-accent);
+    border-radius: 50%;
+  }
+  .kicker .sep {
+    flex: 1;
+    height: 1px;
+    background: var(--c-border);
+  }
+
+  /* Hero title */
+  .hero-title {
+    position: absolute;
+    top: 270px;
+    left: 145px;
+    right: 95px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 64px;
+    line-height: 1.05;
+    letter-spacing: -1.8px;
+    color: var(--c-primary);
+  }
+  .hero-title .accent {
+    color: var(--c-accent);
+  }
+  .hero-title .small {
+    display: block;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--c-secondary);
+    margin-top: 18px;
+    letter-spacing: -0.4px;
+    line-height: 1.25;
+  }
+
+  /* Subtitle bar */
+  .subtitle-bar {
+    position: absolute;
+    top: 555px;
+    left: 145px;
+    right: 95px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .subtitle-bar .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border: 1px solid var(--c-secondary);
+    color: var(--c-secondary);
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .subtitle-bar .chip.accent {
+    background: var(--c-accent);
+    color: white;
+    border-color: var(--c-accent);
+  }
+  .subtitle-bar .chip.cyan {
+    background: var(--c-accent-2);
+    color: white;
+    border-color: var(--c-accent-2);
+  }
+
+  /* Summary block */
+  .summary {
+    position: absolute;
+    top: 645px;
+    left: 145px;
+    right: 180px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--c-primary);
+    opacity: 0.88;
+    font-weight: 400;
+  }
+  .summary .lead {
+    color: var(--c-accent);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  /* Stats block */
+  .stats {
+    position: absolute;
+    top: 825px;
+    left: 145px;
+    right: 95px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 18px 0;
+    border-top: 1px solid var(--c-border);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .stat-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .stat-cell .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--c-primary);
+    line-height: 1;
+    letter-spacing: -1.2px;
+  }
+  .stat-cell .num .accent {
+    color: var(--c-accent);
+  }
+  .stat-cell .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  /* Footer block — well below the bottom hline */
+  .footer {
+    position: absolute;
+    bottom: 95px;
+    left: 145px;
+    right: 95px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .footer-left .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .footer-left .value {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--c-primary);
+    font-weight: 500;
+  }
+  .footer-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+  }
+  .footer-right .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .footer-right .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--c-secondary);
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  /* JP kana accent strip — bottom right area */
+  .jp-strip {
+    position: absolute;
+    bottom: 95px;
+    right: 95px;
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--c-accent);
+    letter-spacing: 5px;
+    writing-mode: horizontal-tb;
+  }
+</style>
+</head>
+<body>
+<div class="cover-page">
+
+  <!-- Layer 1: Background -->
+  <div class="layer-bg">
+    <div class="grid"></div>
+    <div class="kana-watermark">キャラクター<br>デザイン</div>
+  </div>
+
+  <!-- Corner marks -->
+  <div class="corner-mark-tl"></div>
+  <div class="corner-mark-tr"></div>
+  <div class="corner-mark-bl"></div>
+  <div class="corner-mark-br"></div>
+
+  <!-- Layer 2: Structural lines -->
+  <div class="layer-struct">
+    <div class="vline-anchor"></div>
+  </div>
+
+  <!-- Layer 3: Content -->
+  <div class="layer-content">
+
+    <div class="kicker">
+      <span class="dot"></span>
+      <span>OPEN-SOURCE INTELLIGENCE BRIEF</span>
+      <span class="sep"></span>
+      <span>EDITION 2026 / 01</span>
+    </div>
+
+    <div class="hero-title">
+      Character Design<br>
+      <span class="accent">Sourcebook</span>
+      <span class="small">Japanese &amp; Chinese Professional Manuals<br>for Manga, Anime &amp; Gacha Games</span>
+    </div>
+
+    <div class="subtitle-bar">
+      <span class="chip accent">JP &times; 17</span>
+      <span class="chip cyan">CN &times; 10</span>
+      <span class="chip">27 SOURCES</span>
+      <span class="chip">CC-BY &middot; OCW &middot; GOV &middot; GDC</span>
+    </div>
+
+    <div class="summary">
+      <span class="lead">EXECUTIVE BRIEF</span>
+      A reading orientation to the publicly-available primary literature on sellable character
+      creation for manga, anime, and gacha games &mdash; sourced from Kyoto Seika University, Tokyo
+      University of Technology, AJA, METI, Bunka-ch&#333;, CEDEC, F1000Research (CC-BY), miHoYo,
+      Hypergryph, Tencent, NetEase, and Taiwan NTMoFA. No copyrighted full texts reproduced;
+      commercial must-reads referenced bibliographically only.
+    </div>
+
+    <div class="stats">
+      <div class="stat-cell">
+        <div class="num">27</div>
+        <div class="lbl">Downloaded<br>Sources</div>
+      </div>
+      <div class="stat-cell">
+        <div class="num" style="color: var(--c-accent);">6</div>
+        <div class="lbl">CC-BY / OA<br>Papers</div>
+      </div>
+      <div class="stat-cell">
+        <div class="num">11</div>
+        <div class="lbl">Govt / Industry<br>Reports</div>
+      </div>
+      <div class="stat-cell">
+        <div class="num">10</div>
+        <div class="lbl">Commercial<br>Bibliographic</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-left">
+        <span class="label">PREPARED BY</span>
+        <span class="value">Z.ai Research &middot; Open Intelligence Desk</span>
+      </div>
+      <div class="footer-right">
+        <span class="label">CLASSIFICATION</span>
+        <span class="value">PUBLIC / FAIR-USE</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
