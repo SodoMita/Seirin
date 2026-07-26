@@ -35,6 +35,18 @@
       "Seirin is coastal Honshu: what does this person wear in rain, in winter, in humid summer?",
       "Which garment choices are explained by climate or region rather than by taste?"
     ],
+    "colour_zones": [
+      "Main colour (メインカラー): which colour does this character MEAN, stated as a decision — separate from whatever covers the most area?",
+      "Zone by zone, what colour and why: Head/hair, Skin, Eye, Tops1 outer, Tops2 inner, Waist, Bottom1, Bottom2, Shoes, Decoration1 one-point accent, Decoration2 trim.",
+      "Head normally uses exactly 3 colours (hair, skin, eyes) and the body 8 or fewer. Does this character fit, and if not, why is the extra complexity earned?",
+      "Which single colour is reserved so that its appearance means something?",
+      "Judged at full sprite size rather than as swatches, does any large area read brighter or darker than intended (area effect)?"
+    ],
+    "ensemble_colour": [
+      "Coloured beside the whole cast rather than alone, does this character still separate — in hue AND in greyscale value?",
+      "What is this group's shared colour logic (faction, uniform, region), and how does this character deviate from it?",
+      "Which existing cast member is this character closest to in colour, and what is the deliberate difference?"
+    ],
     "physical_plausibility": [
       "If a height and weight are stated, do they survive arithmetic? Check BMI before it reaches a reference sheet.",
       "What does this person's actual life — work, age, health, habits — do to their body?"
@@ -55,6 +67,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -73,6 +87,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -91,6 +107,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -109,6 +127,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -127,6 +147,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -145,6 +167,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -163,6 +187,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -181,6 +207,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -199,6 +227,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -217,6 +247,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -235,6 +267,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -253,6 +287,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -271,6 +307,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false
@@ -289,6 +327,8 @@
         "wardrobe_sources": null,
         "costume_plot": null,
         "function_and_climate": null,
+        "colour_zones": null,
+        "ensemble_colour": null,
         "physical_plausibility": null
       },
       "questionnaire_answered": false

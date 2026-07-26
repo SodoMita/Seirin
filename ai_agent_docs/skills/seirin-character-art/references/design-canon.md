@@ -94,23 +94,106 @@ The art agent does not choose the memory point. It asks the identity questions
 in the character's brief and works from the answer.
 
 
-## 3. Colour — 60-30-10
+## 3. Colour — measured, not assumed
 
-- **60% dominant** — the mass of the costume, decides the mood at distance.
-- **30% secondary** — supporting garments, hair, structural trim.
-- **10% accent** — reserved for the **memory point and the eyes**. Nothing else
-  may claim it.
+**The 60-30-10 rule does not describe anime characters.** This is the most
+important correction in this file, and it comes from a measured study rather
+than from repetition.
 
-Constraints:
+The general design guideline is base : assort : accent ≈ **7 : 2 : 1**. Mogi's
+Tokyo University of Technology doctoral thesis (§5.4) states plainly that
+character colouring *rarely conforms to it* — and explains why: **each part
+carries its own meaning.** Head and hair signal a character's interior
+qualities; clothing signals their exterior — job, faction, role, story
+position. Those meanings are assigned before any area-ratio aesthetics, so the
+ratios come out wherever the meanings put them.
 
-- **Three hues maximum**, plus neutrals.
-- **Temperature is a decision.** Unintentional mixed temperature is the most
-  common reason a design looks subtly wrong.
+Additionally, anime characters cannot borrow rules from fashion or interior
+design, because hair colour is frequently non-natural and costume is
+frequently non-everyday. They sit between fashion and fine art and obey
+neither cleanly.
+
+Treat 7:2:1 as a **sanity check on visual weight**, never as a target to hit.
+
+### What the measurement actually found
+
+Mogi surveyed **203 characters across 27 works** (2D and 3DCG animation, human
+or human-like, official art only so colours were consistent):
+
+| Measure | Finding |
+|---|---|
+| Colours per character | min 4, max 12; **90% use ≤11** |
+| Head | **90% use exactly 3** — hair, skin, eyes |
+| Everything below the head | min 1, max 9; **90% use ≤8** |
+
+So the earlier "three hues maximum plus neutrals" in this skill was **wrong for
+this medium** — far too restrictive. A well-designed anime character carries
+roughly 8–11 distinct colours. What keeps that from becoming noise is not
+scarcity, it is **zoning**.
+
+### The 11-zone model
+
+Colour is assigned per zone, and each zone is a decision:
+
+| Group | Zone | Carries |
+|---|---|---|
+| Head | `Head` | hair — interior character |
+| | `Skin` | |
+| | `Eye` | usually the strongest identity signal |
+| Upper | `Tops1` | outer layer, largest upper area |
+| | `Tops2` | inner layer |
+| | `Waist` | belt, obi, sash |
+| Lower | `Bottom1` | trousers or skirt, largest lower area |
+| | `Bottom2` | lower leg, socks, tights |
+| | `Shoes` | |
+| Accents | `Decoration1` | ribbon, tie, the one-point accent |
+| | `Decoration2` | shoulder, collar, trim lines |
+
+This is a better instrument than a percentage rule: it asks *eleven specific
+questions* instead of one vague one, and it maps directly onto the wardrobe
+questions — `Tops1/Tops2` only make sense once you have decided what the
+person is actually wearing and in what layers.
+
+### Area effect (面積効果)
+
+The same colour changes appearance with the area it covers: over a **large
+area**, a high-value colour reads brighter and more vivid than the swatch, and
+a low-value colour reads darker. Judge colours at the size they will actually
+occupy, never from a palette strip.
+
+This is also why bright, saturated palettes read well at scale — a point
+worth noting for AI-generated work, where highly-rated images skew bright,
+high-resolution and clean-palette. Brightness is doing real perceptual work,
+not just being fashionable.
+
+### Main colour (メインカラー)
+
+Where a work is realistic — everyone in black hair, or a uniformed cast — the
+designer's *intended* dominant colour becomes unreadable from area alone.
+Mogi's fix is to declare it explicitly: **name the main colour as a design
+decision**, separately from whatever happens to cover the most pixels.
+
+Our registry should record this per character rather than inferring it.
+
+### Ensemble colour is its own problem
+
+Mogi treats group colouring (集団キャラクターの配色) as a distinct discipline
+with its own simulation system, because giving every member of a cast a
+distinct *and* attractive identity is not achievable one character at a time.
+Two consequences:
+
+- Colour the **cast together**, not sequentially. A character approved alone
+  will collide with the next one.
+- Record the group's intent (集団の意図) — what the group *is* — because
+  faction reads through shared colour logic while individuals read through
+  deviation from it.
+
+### Still true
+
 - **Value separation, not just hue separation.** Convert the roster to
-  greyscale: if two characters merge, one must move.
-- Faction palettes describe the environments a character must stay readable
-  against, which is a different question from what they wear.
-
+  greyscale; if two characters merge, one must move.
+- **Temperature is a decision**, not an accident.
+- **Reserve one colour** so its appearance means something.
 
 ## 4. Shape language
 

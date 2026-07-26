@@ -1,4 +1,4 @@
-# Reika «Ironheart» Takashiro — wardrobe & reality supplement
+# Reika «Ironheart» Takashiro — wardrobe, colour & reality supplement
 
 `id: reika` · age 28 · iron_requiem
 
@@ -11,19 +11,14 @@
 ## Answer the main questionnaire first
 
 `ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md` is the
-primary question set — silhouette, kawaii/moe engineering, SD-chibi,
-physiognomic coding, tiering, fan-art virality, merch and IP, each traced
-to one of 27 primary sources. Work through it, then set
+primary question set. Work through it, then set
 `questionnaire_answered: true` in `../assets/cast.json`.
 
-**This file is a supplement, not a replacement.** The questionnaire treats
-costume as a variable — how many variants for the tier, what material —
-but does not ask what this person actually wears, where the clothes came
-from, or what they do when it rains. That gap is below.
+**This file supplements it** with what it does not ask: what the person
+actually wears and why, and per-zone colour. Background:
+`../references/wardrobe-questions.md` and `../references/design-canon.md` §3.
 
 Answers go in `../assets/cast.json`. The art agent does not invent them.
-Background and the catalogue of garment traditions:
-`../references/wardrobe-questions.md`.
 
 ---
 
@@ -64,6 +59,24 @@ Background and the catalogue of garment traditions:
 
 > **Answer:**
 
+## Colour Zones
+
+- Main colour (メインカラー): which colour does this character MEAN, stated as a decision — separate from whatever covers the most area?
+- Zone by zone, what colour and why: Head/hair, Skin, Eye, Tops1 outer, Tops2 inner, Waist, Bottom1, Bottom2, Shoes, Decoration1 one-point accent, Decoration2 trim.
+- Head normally uses exactly 3 colours (hair, skin, eyes) and the body 8 or fewer. Does this character fit, and if not, why is the extra complexity earned?
+- Which single colour is reserved so that its appearance means something?
+- Judged at full sprite size rather than as swatches, does any large area read brighter or darker than intended (area effect)?
+
+> **Answer:**
+
+## Ensemble Colour
+
+- Coloured beside the whole cast rather than alone, does this character still separate — in hue AND in greyscale value?
+- What is this group's shared colour logic (faction, uniform, region), and how does this character deviate from it?
+- Which existing cast member is this character closest to in colour, and what is the deliberate difference?
+
+> **Answer:**
+
 ## Physical Plausibility
 
 - If a height and weight are stated, do they survive arithmetic? Check BMI before it reaches a reference sheet.
@@ -79,5 +92,6 @@ Background and the catalogue of garment traditions:
 - [ ] Every section above has an answer.
 - [ ] At least two outfits specified, not one.
 - [ ] A costume-plot row exists for this character.
+- [ ] Colour checked against the whole cast, in hue and in greyscale.
 - [ ] `approved: true` is set in `cast.json`.
 

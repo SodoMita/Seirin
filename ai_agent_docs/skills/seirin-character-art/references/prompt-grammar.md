@@ -18,7 +18,7 @@ comes before staging and exclusions come last.
 [2 STYLE]      render style, line, eye rendering
 [3 IDENTITY]   name, age band, silhouette class, symbol set, hair, body
 [4 WARDROBE]   garments, props, memory point named as the focus
-[5 COLOR]      60-30-10 with hex, skin, eye, shadow hue, light direction
+[5 COLOR]      zone colours with hex, main colour, shadow hue, light direction
 [6 STAGING]    pose, camera, expression, framing, anchor
 [7 EXCLUDE]    global forbidden list + this character's banned array
 ```

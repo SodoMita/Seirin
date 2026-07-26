@@ -157,7 +157,25 @@ Recorded so they are not silently forgotten.
   uploading is what made them persist. **The questionnaire is now the primary
   question set for this project**; this skill's `cast.json` was reduced to the
   wardrobe-and-reality supplement it does not cover.
-- **Still to read in full:** the sourcebook PDF itself and the 27 sources. The
+- **READ (2026-07):** `JP/TEU_character_design_support.pdf` — Mogi, Tokyo
+  University of Technology doctoral thesis. The most useful single source in
+  the set for this skill. §5.4 is an empirical colour study of **203 characters
+  across 27 works**, and it **corrected a wrong rule in this skill**: anime
+  characters measurably do not follow 60-30-10. It supplies the 11-zone colour
+  model, the 3-head/≤8-body colour counts, main colour (メインカラー), area
+  effect (面積効果), and treats ensemble colour as a separate discipline.
+  §5.2 covers silhouette measurement for group casts; §5.3 the expression
+  scrapbook by brow/eye/mouth part — the same 記号学 decomposition this skill
+  already uses, independently arrived at.
+- **READ (2026-07):** `CN/francispress_color_in_animation_scenes.pdf` — Wu,
+  Academic Journal of Humanities & Social Sciences 6(4). General colour theory
+  applied to animated *scenes*: warm/cool emotional association, cultural
+  colour meaning, colour montage across scenes, and the rule that scene colour
+  must set off the moving character rather than compete with it. Confirms the
+  expectation that scene-colour writing is largely standard colour theory —
+  useful for backgrounds and CGs, not a source of character-specific rules.
+- **Still to read in full:** the sourcebook PDF itself and the remaining
+  sources. The
   questionnaire's Section G maps each principle to its source, so start there
   when a specific claim needs checking.
 - **Costume-design primary texts** (Ingham & Covey; Cunningham; Arnold's
@@ -244,6 +262,22 @@ unverified:**
 and selfies-with-celebrities. Note also that the model refuses edits involving
 real people's likenesses, which is consistent with `LEGAL.md` §2 and is not a
 limitation we need to work around.
+
+## On colour sources specifically
+
+Worth recording, because it was tested rather than assumed: **most colour
+writing in these sources is general colour theory** — warm/cool, cultural
+association, contrast, harmony — which is already well known and transfers from
+any art discipline. Scanning all 27 sources for colour content found only two
+with substantial coverage, and only one with anything anime-specific.
+
+The exception is worth the whole search: Mogi's measured study, because it
+**falsifies** a rule this skill had taken on trust. That is the shape of a
+source worth having — not one that restates known theory, but one that shows a
+widely-repeated rule does not hold in this medium.
+
+When evaluating a future colour source, ask: does it *measure* something, or
+does it restate the colour wheel?
 
 ## Two cautions when adding sources
 

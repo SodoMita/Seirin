@@ -15,7 +15,7 @@ If an asset fails a check below, record the failure in the character's
 `iteration.md`.
 
 `check_roster.py` validates the registry: required fields, unique silhouette
-classes, 60-30-10 hex validity, roster differentiation, core_8 coverage,
+classes, hex validity, roster differentiation, expression coverage,
 banned-list presence, and the minor-safety flags.
 
 `check_assets.py` validates files on disk: naming convention, expected
@@ -51,8 +51,16 @@ Downscale to 64px and 128px.
 - [ ] Secondary hook present but not competing for first read.
 - [ ] Symbol set matches the registry — eye shape, brow, mouth, contour, hair,
       body. This is where off-model drift shows first.
-- [ ] Palette matches: dominant, secondary, accent by hex. Accent used only on
-      the memory point and eyes.
+- [ ] Zone colours match the approved answers (Head, Skin, Eye, Tops1/2,
+      Waist, Bottom1/2, Shoes, Decoration1/2).
+- [ ] Head reads as 3 colours; body 8 or fewer, unless extra complexity was
+      explicitly justified.
+- [ ] The declared main colour is the one that actually reads as "theirs".
+- [ ] The reserved colour appears only where it is meant to.
+- [ ] Checked at full sprite size, not as swatches — large areas shift in
+      apparent brightness (area effect).
+- [ ] Placed beside the rest of the cast, this character separates in hue AND
+      in greyscale.
 - [ ] Head ratio matches the answered height/ratio for this character.
 - [ ] Wardrobe and props match the record.
 - [ ] Nothing from the character's `banned` array is present.

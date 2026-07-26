@@ -8,7 +8,7 @@ description: >-
   designs, character sheets, tachie standing sprites, expression differentials,
   hero-shot key visuals or CGs for this project, or when asked to "generate all
   characters", "make the sprites", "design the cast", or to raise art quality to
-  a sellable standard. Encodes the silhouette / memory-point / 60-30-10 palette
+  a sellable standard. Encodes the silhouette / memory-point / zoned-palette
   / symbol-set design grammar from the professional character-design
   literature, ready-to-send prompts per character, the locked-face-box sprite
   spec, and the white/black triangulation matting pipeline.
@@ -96,8 +96,11 @@ substitute for answers. Full treatment in `references/design-canon.md`.
 2. **One memory point.** The thing a player describes to a friend. Highest
    detail density, the accent colour, and present in *every* asset. A second
    competing focal point halves both — that is what `secondary_hook` is for.
-3. **60-30-10 colour.** Accent reserved for memory point and eyes. ≤3 hues plus
-   neutrals. Check greyscale: if two characters merge, one must move.
+3. **Colour by zone, not by percentage.** Anime characters measurably do *not*
+   follow 60-30-10: 90% use 3 head colours (hair, skin, eyes) and up to 8 body
+   colours, because each zone carries meaning. Assign the 11 zones and declare
+   a main colour. Colour the cast together and check greyscale separation. See
+   `references/design-canon.md` §3.
 4. **Shape language.** Circle warm/young, square stable, triangle sharp. The
    registry ratios are tuned so the roster does not converge — do not average
    them toward the middle.
