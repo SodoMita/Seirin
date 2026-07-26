@@ -62,9 +62,30 @@ Format rules that matter:
 - Authoring guidance: numbered steps, concrete code templates over prose,
   specify edge cases and what to skip; use forward slashes in paths.
 
-**Seirin uses it**: `ai_agent_docs/skills/monogatari-offline-vn/SKILL.md`
-packages this project's offline-VN rules so any skill-aware agent can load
-them on demand.
+**Seirin uses it** for two skills:
+- `skills/monogatari-offline-vn/` — offline-VN engine rules.
+- `skills/seirin-character-art/` — character design and sprite production.
+  Follows the same spec: `SKILL.md` under 500 lines with the five design
+  levers and the workflow, detail pushed into `references/` (design canon,
+  prompt grammar, sprite spec, appeal/safety, QA, sources) loaded on demand,
+  and per-character art-direction briefs in `briefs/`. It ships NO validator
+  scripts: two were written and then deleted, because a linter over a
+  hand-written question file only restates what an editor already sees, and a
+  passing structural check invites the belief that the safety rules were
+  verified when they were not. Only `tools/check_matte.py` survives, because
+  it measures pixel values a human cannot eyeball.
+  Adds hard-limit documents that declare their own precedence over the rest of
+  the skill: `LEGAL.md` (liability — depiction of minors, IP, disclosure) and
+  `OPERATIONS.md` (repository and workflow), indexed by a one-page
+  `CONSTRAINTS.md`. Splitting them matters because the two have different
+  audiences and review cadences: legal limits are reviewed by a human and change
+  with law and platform policy, operational limits accrete from incidents. A
+  pattern worth reusing for any skill an autonomous agent runs unsupervised,
+  since it gives the agent one short file to check before acting rather than
+  inferring limits from scattered prose. Its
+  design grammar is distilled from the professional Japanese character-design
+  literature and Chinese gacha production practice — citations and fetchable
+  links in that skill's `references/sources.md`.
 
 Sources:
 - https://agentskills.io (spec)
@@ -138,6 +159,14 @@ bundled setup, migrate module-for-module back to the originals.
   writing prompts (sections 4–6: tech base, factions, characters; section 10:
   visual & sound language).
 
-**Gap worth filling later**: a writing-prompt pack mirroring IMAGE_PROMPTS.md
-for *script/dialogue* generation (tone rules from design doc §1, §10, per-character
-voice cards from §6). File it next to IMAGE_PROMPTS.md when created.
+**Filled since**: character art is now driven by per-character briefs in
+`skills/seirin-character-art/briefs/`, derived from a validated cast registry.
+The briefs carry design intent and acceptance criteria; generator prompts are
+written into their handoff blocks by a separate prompt agent, so art direction
+and prompt engineering stay independently ownable. `IMAGE_PROMPTS.md` remains the source for
+*backgrounds* and the artifact-cleanup edit prompt.
+
+**Gap worth filling later**: a writing-prompt pack for *script/dialogue*
+generation (tone rules from design doc §1, §10, per-character voice cards from
+§6). The character registry already carries each character's logline, role and
+banned list, so a voice-card skill could derive from the same source of truth.
