@@ -55,8 +55,11 @@ new vendor code must be plain ES5-compatible browser JS with zero deps.
 
 ## Code conventions
 
-- Editing rules for `cyber-nexus/index.html` are encoded as machine-checkable
-  comments in the file itself — keep them accurate when you change behavior.
+- Game code (story script, HUD, codex, mini-game, boot) lives in
+  `cyber-nexus/vendor/game.js`, not in an inline `<script>`. `index.html` is
+  markup + CSS only. Editing rules for the story script are encoded as
+  machine-checkable comments in `vendor/game.js` — keep them accurate when you
+  change behavior.
 - `vendor/failsafe.js`: ES5, UMD (`window.FailSafe` + `module.exports`), no
   dependencies, every public function documented in the header block.
 - Docs/prompts for AI agents go in `ai_agent_docs/`; ready-to-load Agent

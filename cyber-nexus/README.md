@@ -205,11 +205,14 @@ Matrix-Hack widgets updating the HUD (HACK 3 → 4, 500 → 600 CR).
 ## Layout
 
 ```
-index.html
+index.html                        (markup + CSS only — no inline <script>)
 vendor/
   monogatari.js, monogatari.css   (engine, local copy)
   failsafe.js                     (abstraction layer: schema, state machine,
                                    match, immut, result, vn glue, net guard)
+  game.js                         (story script, HUD, codex, mini-game, boot;
+                                   extracted from index.html so it can be
+                                   linted and unit-tested)
   icons-offline.css, icons-offline.js  (FA-class → Unicode glyph shim + failsafe)
 assets/
   scenes/       4 backgrounds (jpg)
@@ -217,10 +220,21 @@ assets/
   fonts/        Orbitron, Rajdhani, Share Tech Mono (woff2) + fonts.css
 tests/
   failsafe.test.mjs     (node --test; failsafe library unit tests, zero dependencies)
+  game.test.mjs         (node --test; game.js pure helpers + payout regression, zero dependencies)
   icons-offline.test.mjs(node --test; icon glyph-map coverage, zero dependencies)
+  es5-scan.mjs          (helper: ES5-shape scanner used by the tests above)
   offline-smoke.mjs   (file:// boot verification; needs dev-only jsdom)
   test_rewind.py      (full-browser rollback regression; needs playwright)
 ```
+
+### Why the game code is a separate file
+
+It used to be a 653-line inline `<script>` inside `index.html`. Nothing could
+lint, unit-test or usefully open it there — the jsdom smoke test was the only
+thing that ever executed it, and that test skips by default. Moving it to
+`vendor/game.js` was a pure move (byte-for-byte identical body), and it is what
+makes `tests/game.test.mjs` possible. The file still ships as a plain ES5
+`<script src>`: no build step, no modules, no dependencies.
 
 ## Note on the artwork
 
