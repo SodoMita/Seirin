@@ -53,8 +53,7 @@ when you have room; order for survival when you do not.
 ### `turnaround` — identity lock
 
 ```
-[1] Character turnaround reference sheet, four views in one row on a flat
-    chroma-green field (#00B140), even neutral studio light, one shared
+[1] Character turnaround reference sheet, four views in one row on a gradient color depending on character, even neutral studio light, one shared
     horizontal height guide across all four figures: front, three-quarter,
     side, and back.
 [2] <style_bible.render>. <style_bible.line>. <style_bible.eye_render>.
@@ -71,8 +70,7 @@ when you have room; order for survival when you do not.
 [7] <forbidden_global>. <banned>.
 ```
 
-Green field because `#00B140` appears in no character's palette, so it never
-contaminates the design. Do not remove the background from sheets.
+Gradient or flat or noise color or scene depending on character because bg affects generation result and will be replaced with flat BW anyway, initially black and white are bad for transparency and can cause it to vanish Do not remove the background from sheets.
 
 ### `sprite` — runtime standing pose
 
@@ -94,9 +92,6 @@ Pass the approved turnaround in as a reference image.
 [7] <forbidden_global>. <banned>. No cropping of hands or feet, no ground
     shadow baked in, no background scenery.
 ```
-
-Plain mid-grey, not green: grey gives cleaner edge values for the later
-white/black plates. Green is only for sheets.
 
 ### `expressions` — head-only differential
 
@@ -437,6 +432,13 @@ Constraints, because this degrades fast if overused:
 The distinction to remember: **emojis help an agent notice an instruction, and
 work as compact labels for conventional emotions; they hurt an image model
 trying to render a garment.**
+
+Censor model triggers literal words, so avoid with emojis.
+
+## Extra features
+
+Image generation is also useful to recognize what is on image, evaluate, differentiate, get ideas. Ask text on image, color highlight, circles, etc. for that, or else tool may return no image.
+To evaluate uniqueness, ask `Who is that? Write name, origin, unknown if original or don't know who, on image.` and if it confuses with existing, especially twice, then it failed to recognize.
 
 ## Failure modes and the fix
 

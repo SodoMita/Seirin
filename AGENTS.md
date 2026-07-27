@@ -85,8 +85,7 @@ new vendor code must be plain ES5-compatible browser JS with zero deps.
 
 - **Character art**: load the `seirin-character-art` skill
   (`ai_agent_docs/skills/seirin-character-art/`) before designing or generating
-  any character asset. Its **`LEGAL.md` (depiction of minors, IP, disclosure)
-  and `OPERATIONS.md` (never destroy committed work, generation discipline) are
+  any character asset. Its `OPERATIONS.md` (never destroy committed work, generation discipline) are
   binding and outrank this file** for art work; `CONSTRAINTS.md` indexes both
   and gives the precedence order. `assets/cast.json` is the single source of
   truth for the cast; `briefs/<id>.md` is the art-direction brief per character

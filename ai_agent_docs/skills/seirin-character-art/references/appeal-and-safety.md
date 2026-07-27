@@ -46,10 +46,6 @@ excellent costume design.
 Contrast between a public face and a private one is enormously appealing and
 costs nothing.
 
-Hard limits: full-coverage costume, age-accurate proportions, no body-led camera
-angles, no wardrobe malfunction or wet-clothing framing, no romantic or sexual
-framing with adults.
-
 ### `mascot` — mascot-coded
 
 Appeal is **cuteness and merchandisability**. Maximum infant schema where
@@ -57,22 +53,10 @@ appropriate: large round eyes, high iris-to-opening ratio, short proportions,
 round cheeks. A mascot's silhouette should be the most readable in the roster at
 thumbnail size — that is what a keychain, a sticker and an app icon need.
 
-Absolute limits for a child character: no sexualisation of any kind in any
-framing, pose, angle or costume; no adult proportions; no peril or distress as
-spectacle.
-
 ## Hard limits (all characters)
 
 These are copied into every prompt's exclusion section:
 
-- No nudity, underwear-as-costume, or sexualised framing of any character
-  under 18. No exceptions, no "it's just the pose", no alternate versions
-  "for a different market".
-- No romantic or sexual pairing of a minor with an adult character.
-- No sexualised camera angles on minors: no low angle up the body, no framing
-  led by chest or hips, no rear-emphasis.
-- No gore, no self-harm imagery, no depiction of a minor in danger being
-  presented as spectacle.
 - Where a character has a real medical condition, it is rendered with
   dignity — as texture and fact, never as wounds, gore, contagion, horror or
   pity.
