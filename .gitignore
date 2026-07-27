@@ -61,3 +61,5 @@ test-results/
 # Note: archives/*.tar.gz + archives/*.bundle are INTENTIONAL, small project
 # snapshots produced by tools/ and stay tracked. If you ever generate
 # throwaway archives elsewhere, ignore those paths individually instead.
+last-frequency/assets/characters/_green/
+last-frequency/assets/characters/_check_composite.jpg
