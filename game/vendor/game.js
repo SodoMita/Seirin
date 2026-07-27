@@ -114,6 +114,17 @@ if (typeof window !== 'undefined' && window.Monogatari) {
             }
         });
 
+        engine.assets('scenes', {
+            'courtyard':  'courtyard.png',
+            'miya_room':  'miya_room.png',
+            'workshop':   'workshop.png',
+            'tsukimachi': 'tsukimachi.png',
+            'lab':        'lab.png',
+            'cathedral':  'cathedral.png',
+            'port':       'port.png',
+            'dojo':       'dojo.png'
+        });
+
         engine.characters({
             'ren':      { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal.png' } },
             'miya':     { name: 'Мия Кагэцуки (5 лет)', color: '#f472b6', directory: '', sprites: { normal: 'miya_normal.png' } },
@@ -136,6 +147,7 @@ if (typeof window !== 'undefined' && window.Monogatari) {
         engine.script({
             'Start': [
                 vn.goTo('Тэцуба: Улица'),
+                'show scene courtyard with fadeIn duration 1s',
                 'sys <span class="t-cyan">[ СЭЙРИН: НОЧНАЯ СМЕНА &mdash; РЕЗОНАНС 2030 ]</span>',
                 'p Утро в Сэйрине начинается с шороха старой метлы дворника во дворе. Ничего необычного.',
                 'show character miya normal at left with fadeIn',
@@ -186,6 +198,7 @@ if (typeof window !== 'undefined' && window.Monogatari) {
 
             'SoloRoute1': [
                 'vn.goTo("Квартира: Комната")',
+                'show scene workshop with fadeIn duration 1s',
                 'p Я запер дверь на два замка и опустил жалюзи. Зачем суетиться?',
                 'sys <span class="t-red">[ ТИХОЕ ПОРАЖЕНИЕ ]</span> Акатоми включили систему Резонанс. Город подчинен без боя.',
                 'end'
@@ -201,6 +214,7 @@ if (typeof window !== 'undefined' && window.Monogatari) {
 
             'MiyaRouteLabel': [
                 'vn.goTo("Цукимати: Комната Мии")',
+                'show scene miya_room with fadeIn duration 1s',
                 'show character miya normal at center with fadeIn',
                 'miya Смотри! Я нарисовала Большой Круг Очищения! Сегодня мы проведем Обряд Дружбы!',
                 'show character reika normal at left with fadeIn',
@@ -213,6 +227,7 @@ if (typeof window !== 'undefined' && window.Monogatari) {
 
             'AIRouteLabel': [
                 'vn.goTo("Aquaforge: Лаборатория")',
+                'show scene lab with fadeIn duration 1s',
                 'show character splash normal at left with fadeIn',
                 'splash Привет... Я... чувствую... ритм... твоего... сердца...',
                 'show character stella normal at right with fadeIn',
