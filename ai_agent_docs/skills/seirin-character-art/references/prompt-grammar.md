@@ -256,6 +256,59 @@ Held objects need a stated size relative to the body ("the ring light is as wide
 as her shoulders"), or they shrink until their negative space closes and the
 silhouette advantage is lost.
 
+
+## Background colour conditions the whole render — do not use flat chroma-green
+
+**Promoted 2026-07-27 from project-owner correction, with measurements.**
+
+The skill previously prescribed a flat `#00B140` field for identity sheets, on
+the logic that green appears in no character's palette and therefore cannot
+contaminate the design. **That reasoning is wrong in practice**, and it costs
+real colour quality.
+
+The background is part of the generated image, and the model *harmonises the
+figure against the field it is given*. A large flat field in a hue nobody wears
+drags the figure toward desaturation and flat lighting.
+
+Measured on identical characters, identical hex codes, same model —
+figure-only pixels, background excluded:
+
+| Sheet | Background | Figure saturation |
+|---|---|---|
+| Seirin group A | flat `#00B140` | 0.342 |
+| Seirin group A | sunset gradient in-palette | **0.540 (+58%)** |
+| Seirin group B | flat `#00B140` | 0.397 |
+| Seirin group B | lantern gradient in-palette | **0.592 (+49%)** |
+
+**Rule:** generate identity art — turnaround, lineup, hero — on a *beautiful
+colourful ground that agrees with the character*: a gradient or aurora in their
+main colour and its neighbours, or a real environment from their district. Keep
+the figure value-separated from the ground so the silhouette still reads.
+
+⚠️ This does **not** change the matting pipeline. Alpha is still recovered from
+white + black plates at the very end (`sprite-spec.md`). Colourful grounds are
+for the stages whose goal is the best possible character, not for matte plates.
+
+## Bright beats tasteful
+
+Same session. `design-canon.md` §3 already says it — *"bright, saturated
+palettes read well at scale... brightness is doing real perceptual work"* — and
+it is the easiest rule in the skill to violate while believing you are being
+sophisticated. A first pass at the Seirin cast produced mean zone saturation
+**0.32, with 8 of 14 characters below 0.35**, because each palette was chosen to
+be *plausible* rather than *vivid*.
+
+Check it numerically before generating; do not trust the eye on swatches, which
+is exactly what the area-effect rule warns about:
+
+```python
+# mean HSV saturation across a character's zone hexes; under 0.40 is a defect
+```
+
+Muted, "realistic" or "grounded" palettes are a trap in this idiom. Grounded
+*reasoning* (why does this person own this garment) is required; grounded
+*colour* is not.
+
 ## Nano Banana specifics (Gemini image models)
 
 Model-specific behaviour, gathered from practitioner reports with shown results.
