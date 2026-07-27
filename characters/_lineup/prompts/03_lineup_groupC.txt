@@ -1,0 +1,67 @@
+Character lineup reference sheet, four figures standing in one row on a flat
+chroma-green field (#00B140), even neutral studio light, one shared horizontal
+ground line, correct relative height. Clean anime visual-novel key art: cel shading
+with one soft secondary shadow tone, confident tapered ink line. Flat 2D, no 3D
+render, no photorealism.
+
+EXCLUDE, applies to every figure: no text, letters, numerals, captions, watermarks,
+signatures, logos, UI or borders. No sexualisation, no anatomical detail on the
+non-human figures, no cleavage, no pin-up posing, no low camera angle. No weapons.
+No magic or supernatural aura — every glow here is a manufactured light source.
+No fused or extra fingers.
+
+Left to right:
+
+1. SPLASH, adult-coded non-human, 168cm, comet silhouette. A figure made entirely
+of pale cyan (#8FD8E8) flowing TRANSLUCENT POLYMER GEL — the green background is
+clearly visible through her head, face, torso and arms, which are rendered at
+roughly 20% opacity with refraction and caustic highlights. Her torso is an
+ABSTRACT smooth translucent volume with no anatomical detail whatsoever. Long
+smooth liquid tendril hair curling outward in separate strands. Her lower body
+dissolves below the knee into several SEPARATE falling streams of gel that trail
+outward and thin to nothing — no legs, no feet, no ground contact. Balanced
+perfectly upright on top of her head, a SMALL CLEAR DRINKING GLASS. Huge gentle
+glass-lens eyes with a faint cyan refracted iris ring and no sclera. Small
+heart-shaped bubbles rising through her torso. Suspended INSIDE the gel, faint
+small pale micropump nodes and sensor beads, visible on close inspection. At the
+base of her throat one small WARM AMBER (#FFC46B) status node — the only warm
+colour on her. A narrow white rim light along her outer silhouette.
+
+2. ASTER-7, non-human service robot, 121cm, short and squat, stacked-boxes
+silhouette, deliberately top-heavy and slightly comic. A LARGE rounded-rectangle
+graphite (#33383D) screen head with a 12mm corner radius, sitting on a visible
+short neck post with clear daylight all around it, above a much smaller squat
+white (#E8EAED) barrel body. Its face is a low-resolution AMBER (#FFB03A) DOT-MATRIX
+panel drawing two simple dot-shape eyes and a single bent dot row for a mouth. The
+LOWER-LEFT CORNER of the screen bezel is visibly CRACKED and taped from the inside,
+with one dead pixel row running across it. A folding carry handle on top of the
+head. Two short service manipulator arms; the left holds a ruggedised tablet. A
+mint-green (#7FC8A9) stripe on the shell. Visible hex fasteners and consistent panel
+gaps. It rolls on small rubber tracks, not legs. A small red LED lit on its chest.
+Perched over the carry handle, a tiny hand-knitted woollen cap.
+
+3. STELLA, non-corporeal, tallest figure here, elongated 8-head proportions. She
+is NOT SOLID: a standing feminine figure assembled ENTIRELY from discrete points of
+light and flat overlapping planes of projected aurora-violet (#9A7FE0) and cool
+white-blue (#BFE3FF) light, with mint-green interference where the planes overlap.
+She has NO continuous outline, NO skin, NO fabric, NO cast shadow and NO ground
+contact — the figure is defined by the GAPS between its points, and is mostly empty
+space. Behind her shoulders, fanned wing-like shapes that are clearly FLAT
+PROJECTION PLANES rather than anatomical wings. A crown of separate points above
+her head. Her lower body trails away downward into a stream of separate points
+rather than ending in legs. Her eyes are two slightly brighter point clusters, no
+iris, no gloss. Among the many small lit drones composing her, ONE SINGLE DRONE IS
+DARK AND UNLIT (#2A2E38), clearly findable, in perfect formation with the rest.
+Small visible quadcopter bodies with rotor blur throughout.
+
+4. KUROGANE, 48, 178cm, tall and heavy-set, thick through chest and shoulders,
+softened at the waist. The most CLOSED silhouette here: a monolith, a wide strictly
+rectangular column with almost no taper from shoulder to hem. A pale silver-grey
+(#D7DDE3) suit cut deliberately boxy with NO waist suppression, an ink-navy shirt,
+a cold-blue tie with a flat knot, resoled black oxfords. His shirt cuffs run
+about a centimetre too long past the jacket sleeve. Standing in his breast pocket
+where a pocket square belongs, a pair of WORN STEEL ENGINEER'S CALIPERS with a
+scuffed used finish. Steel-grey hair receding at the temples, swept back, short.
+Flat grey eyes, straight angular lids, small iris, looking very slightly down, with
+tired lower lids. Broad square jaw, heavy brow, deep lines. Upright, still,
+reasonable — not hunched, not scheming, not a caricature villain.

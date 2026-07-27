@@ -201,6 +201,61 @@ verify over backgrounds that are neither white nor black.
 instruction to flatten the figure onto both plates, which erases the
 transparency the technique exists to recover.
 
+## Garment STATE — give the model a different object to draw
+
+**Promoted from the Seirin cast lineup, 2026-07-27** (`characters/_lineup/prompts/`).
+Verified on two characters in one pass, and it fixed a blocking safety defect.
+
+The negation rule above says positive phrasing beats "no X". There is a sharper
+form of it that these models obey much more reliably:
+
+> **When a garment is worn in a modified STATE, describe the resulting shape and
+> the visible body — never the modification of the garment.**
+
+The model renders the garment it knows and silently drops the modifier. Naming
+what you would actually *see* defeats that.
+
+| ❌ Modification phrasing (dropped ~50%) | ✅ State-as-shape phrasing (held first try) |
+|---|---|
+| "coverall worn off both shoulders, sleeves knotted at the waist" | "she is BARE-SHOULDERED in a sleeveless undershirt; the coverall hangs from her hips and its TWO LONG EMPTY SLEEVES are tied in a big knot in front of her stomach, ends dangling" |
+| "monitor cable taped along her jaw" | "a beltpack at her collarbone, and from it a thin clear coiled cable runs UP THE SIDE OF HER FACE, fixed to her cheek with two pieces of tape, ending at an earpiece in her right ear" |
+
+### The strongest version: substitute an inanimate object
+
+For a body that must **not** be rendered anatomically, a negative list fails —
+the model has a strong prior for human anatomy and will satisfy it. Give it a
+different object instead:
+
+- ❌ `no chest definition, no navel, no anatomical detail` → still rendered
+  anatomically
+- ✅ `her torso is a smooth featureless tapered column shaped like an elegant
+  glass vase — a plain unbroken glassy surface. Treat the torso as a plain
+  glass vase.` → correct, and repeatable
+
+This resolved a `banned`-array violation on Splash that the exclusion block
+alone did not prevent. **Where a rule is safety-relevant, do not rely on the
+EXCLUDE section — put a positive object in the IDENTITY section.**
+
+## Silhouette survives the fill, detail does not
+
+Also from the 2026-07-27 lineup, measured with a real black-fill test rather
+than judged by eye (`characters/_lineup/qa/SILHOUETTE_TEST.md`):
+
+A memory point that is **internal detail or a small held object disappears
+entirely** when the figure is filled black. Four of fourteen Seirin characters
+tested weak for exactly this reason. When writing a prompt for a character whose
+memory point is small, add an explicit instruction that it **breaks the outer
+contour**:
+
+```
+The <memory point> extends clearly BEYOND the outline of her body, so it
+changes the shape of her silhouette rather than sitting flat against it.
+```
+
+Held objects need a stated size relative to the body ("the ring light is as wide
+as her shoulders"), or they shrink until their negative space closes and the
+silhouette advantage is lost.
+
 ## Nano Banana specifics (Gemini image models)
 
 Model-specific behaviour, gathered from practitioner reports with shown results.
