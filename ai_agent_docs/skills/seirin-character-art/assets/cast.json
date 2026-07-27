@@ -1,14 +1,119 @@
 {
-  "$comment": "Seirin cast — OPEN QUESTIONS, not answers. Records what the design document fixes (name, age, role, faction) and asks the questions whose answers become the visual design. Answers come from the project owner or a design agent, NOT the art agent. PRIMARY QUESTION SET is ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md (sourced to 27 primary sources). The sections below are the WARDROBE-AND-REALITY SUPPLEMENT that the questionnaire does not cover — see ../references/wardrobe-questions.md.",
-  "schema_version": "2.0.0",
-  "status": "UNANSWERED — no character below has an approved visual design yet.",
+  "$comment": "Seirin cast — ANSWERED by the art-direction agent on 2026-07-27. Rationale, cast-level reasoning and the reconciliation notes for Kitsune and Splash live in ai_agent_docs/ART_DIRECTION.md. PRIMARY QUESTION SET is ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md; the per-character `answers` block below is the WARDROBE-AND-REALITY SUPPLEMENT (see ../references/wardrobe-questions.md). Every `approved` flag is still false: approval is a human gate (CONSTRAINTS.md) and the art agent does not set it.",
+  "schema_version": "2.1.0",
+  "status": "ANSWERED, NOT APPROVED — 14/14 characters designed; 0/14 signed off by the project owner.",
+  "answered_by": "art-direction agent, 2026-07-27, branch arena/019fa0a3-seirin",
   "how_to_use": {
     "1": "Read the question set in question_template. It applies to every character.",
     "2": "Answer per character, in this file, replacing null. Short answers are fine.",
     "3": "An answer is only 'canon' once the project owner approves it. Mark approved:true.",
     "4": "The art agent may NOT invent answers. If a field is null, it asks. There is no linter for this — a human reviewer is the gate."
   },
-  "note_on_canon": "The existing design document is a draft and is itself AI-generated. Treat it as a starting point to interrogate, not as canon. Where it conflicts with a better answer, the better answer wins — record the change.",
+  "note_on_canon": "The design document is an AI-generated draft and was interrogated rather than copied. It fixes names, ages, roles and factions; everything visual below is a new decision. Where a decision departs from the draft it is recorded in the `canon_delta` field of that character.",
+  "design_rule": {
+    "id": "visible-hardware",
+    "statement": "Every apparent miracle in this franchise has visible hardware. Wherever an image looks magical, the mount, cable, battery, lens, hinge, seam or fixing that produces it must be findable in the same image.",
+    "why": "Design document §2.1 forbids real supernatural effect, and OPERATIONS.md §4 makes that the franchise differentiator. Turning it into a DRAWING rule (not just a story rule) also defeats the three named wardrobe failures in references/wardrobe-questions.md — hardware has construction, and a featureless bodysuit does not.",
+    "applies_to": "every character, every asset, including CGs and hero shots"
+  },
+  "style_bible": {
+    "render": "Modern anime / visual-novel key-art rendering: clean cel shading with one soft secondary shadow tone, restrained gradient in the shadow core, no painterly noise, no heavy texture overlay",
+    "line": "Confident tapered ink line, slightly heavier on the outer contour than on interior detail, thinner inside the face",
+    "eye_render": "Layered anime iris — dark upper lid shadow, iris ring, pupil, one primary specular highlight upper-left plus one small secondary lower-right, unless the character's symbol_set says otherwise",
+    "flatness": "2D flat-design language retained for transmedia portability (questionnaire A.5). No 3D-realist rendering of characters; environments may be more rendered than figures.",
+    "light_default": "Key from upper front-left, cool fill from the right, rim light separating the figure from the background"
+  },
+  "forbidden_global": [
+    "no text, letters, numerals, captions, watermarks, signatures, logos, brand marks, UI, borders or colour charts",
+    "no real-world military, political, religious or extremist insignia; all Akatomi and Chorus of the Abyss iconography is invented",
+    "no real supernatural effect — no true magic, spirits, curses or telepathy; every apparent miracle shows its hardware",
+    "no gore, wounds, self-harm imagery, or a minor depicted in danger as spectacle",
+    "no extra or fused fingers, no duplicated limbs, no melted or half-dissolved objects, no floating unattached accessories",
+    "no baked ground shadow, no background scenery on sprite plates, no green spill",
+    "no sexualisation of any character under 18 in any pose, angle, framing or costume"
+  ],
+  "factions": {
+    "akatomi": {
+      "palette": "cold white and silver with ELECTRIC cyan-blue, high-key and clinical",
+      "reads_as": "corporate hygiene — the absence of visible seams IS the faction's message"
+    },
+    "chorus_abyss": {
+      "palette": "deep electric indigo with hot gold; the gold is always a lamp someone is holding",
+      "reads_as": "warmth that has an owner and a switch"
+    },
+    "iron_requiem": {
+      "palette": "hot safety-orange and signal yellow over oil slate; oxide red at full saturation, never muddied",
+      "reads_as": "repair as a moral position"
+    },
+    "aquaforge": {
+      "palette": "brilliant pale cyan, clean-room white, vivid mint",
+      "reads_as": "laboratory transparency, literal and figurative"
+    },
+    "tsukimachi": {
+      "palette": "saturated vermilion, gold, deep lacquer red",
+      "reads_as": "an old district that adopted new tools without dressing like the future"
+    },
+    "mountain": {
+      "palette": "vivid aotake bamboo-green and kingfisher turquoise, with safflower red and gold lacquer accents, worn AGAINST slate and fog",
+      "reads_as": "people who dress to be FOUND in fog. Mountain textile tradition is high-saturation on purpose — a village in milk-white weather wears the loudest colour it can dye.",
+      "correction": "PREVIOUS VERSION WAS WRONG. It copied design-doc 10.1's ENVIRONMENT palette (cedar/slate/fog) onto the characters, making them camouflage. qa-checklist.md requires a character read AGAINST her usual environment. The landscape is desaturated; the people are not."
+    }
+  },
+  "ensemble_note": "The cast was coloured together, not sequentially (design-canon §3), then MEASURED rather than eyeballed. Area-weighted greyscale luma over the 11 zones gives: LIGHT — splash .72, momo .70, kurogane .52, stella .51, saya .45; MID — aster7 .38, kitsune .35, miya .31, ryuki .26, hana .26, yuki .23, ren .21, lumina .19; DARK — reika .13. Honest caveat: this is a MID-heavy roster, not the even three-way split it would be convenient to claim. Only Reika is genuinely dark-dominant. That is acceptable because value is the second differentiator here, not the first — all 91 character pairs differ in at least two of {silhouette class, dominant hue, shape majority, head-ratio band}, and all 14 silhouette classes are unique.",
+  "greyscale_collisions": {
+    "method": "area-weighted luma per design-canon §3 area-effect note; pairs closer than 0.03 would merge in a greyscale roster check",
+    "note": "These six pairs are NOT design faults — each is separated by silhouette class and by hue. They are STAGING constraints: when two of a pair share a frame, the shot must lean on silhouette and hue separation, or push one figure's lighting, because value alone will not part them.",
+    "pairs": [
+      {
+        "pair": [
+          "ren",
+          "yuki"
+        ],
+        "delta": 0.016,
+        "separated_by": "top-heavy wedge vs vertical column; oxide red vs cedar green"
+      },
+      {
+        "pair": [
+          "ren",
+          "lumina"
+        ],
+        "delta": 0.023,
+        "separated_by": "top-heavy wedge vs tailored triangle with a held ring of light; warm oxide vs charcoal-indigo"
+      },
+      {
+        "pair": [
+          "hana",
+          "yuki"
+        ],
+        "delta": 0.028,
+        "separated_by": "bell vs vertical column; indigo vs cedar green"
+      },
+      {
+        "pair": [
+          "hana",
+          "ryuki"
+        ],
+        "delta": 0.006,
+        "separated_by": "bell vs compact-plus-carried-object; indigo vs jade. The tightest pair in the cast — never stage these two at distance without the dragon head visible."
+      },
+      {
+        "pair": [
+          "momo",
+          "splash"
+        ],
+        "delta": 0.021,
+        "separated_by": "crisp A-line vs comet; opaque warm white vs translucent cyan with no feet"
+      },
+      {
+        "pair": [
+          "stella",
+          "kurogane"
+        ],
+        "delta": 0.012,
+        "separated_by": "constellation of discrete points vs closed monolith. Emissive vs reflective, so they part instantly in motion and against a dark ground."
+      }
+    ]
+  },
   "question_template": {
     "wardrobe": [
       "What does this person actually wear on an ordinary working day, given their job?",
@@ -58,285 +163,1275 @@
       "name_en": "Ren Akatsuki",
       "name_ja": "レン・アカツキ",
       "age": 17,
-      "age_coding": null,
+      "age_coding": "teen — age-accurate proportions, no adult body emphasis",
       "faction": "iron_requiem",
       "role": "mechanic apprentice, Scrap-Titan operator under adult supervision",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "cool_kid",
+      "rarity_tier": "SR",
+      "visual_density": 6,
+      "physical": {
+        "height_cm": 163,
+        "weight_kg": 54,
+        "bmi": 20.3,
+        "head_ratio": 6.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "top-heavy wedge — wide knotted shoulders tapering to narrow legs and heavy boots",
+        "big": "the cut-down adult coverall worn off both shoulders, its empty sleeves knotted across the waist so the upper body reads twice as wide as the hips",
+        "mid": "short shaggy hair with a taped-back fringe; forearm wraps; the boot cuffs",
+        "small": "service decals, zip pulls, the safety lanyard clip",
+        "negative_space": "the triangular gap between each knotted sleeve-end and the hip — the knot must hang free, never lie flat against the body",
+        "measured_note": "⚠️ MEASURED 2026-07-27 (characters/_lineup/qa/SILHOUETTE_TEST.md): weak under black fill — reads as a generic standing figure. The knotted sleeve-ends must swing OUTSIDE her body contour so the knot breaks the outline rather than lying flat on it. Amplify at turnaround."
+      },
+      "memory_point": "An adult's coverall cut down to jacket length, worn off both shoulders and knotted at the waist by its own empty sleeves, quilted all over with the peel-off service decals of every machine she has ever stripped",
+      "secondary_hook": "One eyebrow permanently short where a solvent burn never grew back",
+      "shape_language": {
+        "triangle": 50,
+        "square": 35,
+        "circle": 15
+      },
+      "symbol_set": {
+        "eye": "type 5 brave / strong-willed — straight upper lid, small iris, head tipped down looking up, minimal gloss",
+        "brow": "thick, low, straight; the left one interrupted by the burn gap",
+        "mouth": "small and set off-centre, one corner habitually tighter than the other",
+        "contour": "square jaw for her age, high cheekbone, short neck",
+        "hair": "rust orange, short and shaggy, fringe held back with a strip of aluminium tape rather than a clip",
+        "body": "wiry, real forearm and shoulder development from actual lifting; flat athletic build"
+      },
+      "palette": {
+        "main_colour": "oxide red #B5432A — the colour of rust that has been sanded and primed, i.e. of repair",
+        "zones": {
+          "Head": "#FF6B2B vivid rust orange",
+          "Skin": "#EBC49A",
+          "Eye": "#3DDC84 vivid green",
+          "Tops1": "#37474F oil slate coverall",
+          "Tops2": "#FFF6E5 bright cream",
+          "Waist": "#7A4A2E worn leather belt under the knotted sleeves",
+          "Bottom1": "#37474F slate",
+          "Bottom2": "#6B7378 work socks",
+          "Shoes": "#2E3236 steel-toe boots",
+          "Decoration1": "#FF3B14 hot oxide-red decals",
+          "Decoration2": "#FFD400 signal yellow tape"
+        },
+        "reserved_colour": "#E4D33A hi-vis yellow — appears ONLY on the supervision lanyard she is issued when a licensed adult has cleared her to operate. If it is absent she is not allowed near the machine, and that is readable at a glance.",
+        "shadow_hue": "#4A3550 cool plum"
+      },
+      "wardrobe": {
+        "default": "cut-down oil-slate coverall worn off the shoulders over a bleached undershirt, sleeves knotted at the waist, forearms wrapped in cloth strapping",
+        "second": "civilian — an oversized secondhand track jacket over the same undershirt, hair down, no tape; she looks two years younger and hates it",
+        "rain": "a stiff yellow-grey fishing oilskin from the port, far too big, borrowed permanently",
+        "winter": "quilted hanten worn UNDER the coverall so the decals stay visible"
+      },
+      "props": [
+        "torque wrench through the belt loop",
+        "supervision lanyard (conditional)",
+        "a rag that is never clean"
+      ],
+      "banned": [
+        "no midriff, shorts, crop top, tight or form-emphasising garment",
+        "no clean, new or undamaged clothing — everything is repaired",
+        "no weapon; the wrench is a tool and is never raised at a person",
+        "no adult body proportions, no chest or hip emphasis, no low camera angle",
+        "no cracked welding visor (that example belongs to the design-canon document, not to her)"
+      ],
+      "canon_delta": "Draft says only 'red-haired, sharp'. Everything else is new.",
+      "answers": {
+        "wardrobe": "An adult's oil-slate coverall, inherited from the workshop's dead-stock rail and cut down by her own hand to jacket length — the cut edge is raw and fraying, not hemmed. She wears it off both shoulders with the empty sleeves knotted across her waist, over a bleached undershirt, forearms wrapped in cloth strapping against hot metal. The clothes came from the workshop, not from a shop; nothing was bought new. In rain she borrows a port oilskin several sizes too big. In cold a quilted hanten goes UNDER the coverall so the decals stay showing. Second outfit: an oversized secondhand track jacket, which is what she wears when she is not allowed to work — she looks younger in it and resents that. Everything is stained at the cuff and knee; the knees are the newest fabric because they are patched most often. The coverall was chosen by her only in the sense that she chose to cut it: it was never her size and never will be, and that is the point — she is wearing an adult's job.",
+        "wardrobe_sources": "Mechanic coveralls and Japanese noragi/sashiko work-repair tradition, plus port fishing oilskins. Plausible because she works in a Tetsuba repair shop where dead-stock workwear is the cheapest clothing available to her; her family lost house and work after the plant accident, so bought clothing is not on the table. Construction: heavy cotton-poly twill, front zip plus three press studs, patch pockets bar-tacked at the corners, sleeves set with a felled seam — so when she knots them at the waist the seam ridge shows and the knot holds its shape rather than draping like jersey. The hanten is layered under, not over, and is quilted, so it changes her silhouette by thickening the torso rather than adding an outline. Not a bodysuit and not sci-fi armour: she wears the actual garment her actual trade issues.",
+        "costume_plot": "Sc.1 dock accident — coverall, oil-wet, no lanyard (she is not cleared, and the audience should notice). Sc.4 rain — the borrowed oilskin over the coverall, hood down because it blocks her hearing. Sc.6 strike — coverall with the lanyard, first time; she keeps touching it. Sc.9 hearing — the track jacket, because an adult told her to look like a child, and she is furious. Sc.12 festival — coverall with hanten under, lanyard on, decals wet with rain. She never fully changes on screen; the visible changes are the lanyard appearing and the oilskin going on and off. The oilskin gets torn at the dock and stays torn. On screen with Reika she must not merge: Reika is cold gunmetal and vertical, Ren is warm oxide and top-heavy.",
+        "function_and_climate": "Yes — the off-shoulder knot exists so she can free her arms in a second, and the cut-down length keeps the hem out of machinery, which is the actual reason such coats get shortened. Coastal Honshū: oilskin in rain, hanten under the coverall in winter, sleeves knotted and undershirt only in humid summer. The forearm wraps are climate-and-trade, not taste: they absorb sweat and stop hot swarf. The boots are steel-toe because the workshop requires it, and they are the only item she did not modify.",
+        "colour_zones": "Main colour is oxide red #B5432A, stated as a decision: it is the colour of rust after it has been sanded and primed — damage that has been dealt with. It is NOT the largest area; oil slate #3A4A52 is. Head is exactly 3 colours (#C4501F hair, #EBC49A skin, #5C8A6B eyes). Body runs 8: slate, bleached cream, leather brown, sock grey, boot near-black, oxide decals, aluminium trim, and the conditional hi-vis. Reserved: hi-vis yellow #E4D33A on the supervision lanyard only — its presence means a licensed adult has cleared her. At full sprite size the slate reads darker than the swatch because it covers so much, so the decals are placed on the chest and upper arm where the light hits, keeping the oxide reading at its intended brightness.",
+        "ensemble_colour": "Iron Requiem's shared logic is oxide/oil-slate/hi-vis and visible repair. Ren deviates by being the WARM and patched member of it. Her nearest colour neighbour is Reika, same faction: the deliberate difference is temperature and value — Reika is cold gunmetal, dark, and vertically lean; Ren is warm, mid-value and top-heavy. In greyscale Reika sits a full band darker. Her second-nearest is Momo (both carry an orange-family accent); they separate on value, since Momo is light-dominant white and Ren is dark-dominant slate.",
+        "physical_plausibility": "163 cm / 54 kg → BMI 20.3, healthy. Her body shows the job: real forearm, grip and shoulder development, short nails, scarred knuckles, a solvent burn through one eyebrow. She is strong in the specific way that lifting awkward objects makes a person strong, not gym-shaped."
+      }
     },
     {
       "id": "hana",
       "name_en": "Hana Shiroyashiki",
       "name_ja": "ハナ・シロヤシキ",
       "age": 13,
-      "age_coding": null,
+      "age_coding": "child/teen — age-accurate proportions, full coverage, no exposure of any kind",
       "faction": "chorus_abyss",
       "role": "witness and observer; illusionist's daughter, never a combatant",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "cool_kid",
+      "rarity_tier": "SR",
+      "visual_density": 6,
+      "physical": {
+        "height_cm": 150,
+        "weight_kg": 40,
+        "bmi": 17.8,
+        "head_ratio": 6.0
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "bell — a small head and narrow shoulders inside an oversized coat that widens to an ankle-length hem",
+        "big": "her father's stage coat, shoulders hanging past her own, hem to the ankle",
+        "mid": "the doubled cloth belt cinching the coat, the too-long cuffs turned back twice",
+        "small": "repair stitching, the coat's original hook fastenings, her shoe buckles",
+        "negative_space": "the coat stands away from her body, so light shows in the gap under each hanging shoulder — she must never look shrink-wrapped",
+        "measured_note": "✅ MEASURED 2026-07-27: good under black fill."
+      },
+      "memory_point": "Her father's indigo thermochromic stage coat, worn years too big, permanently blotched pale where warm hands once touched it — a garment that keeps a physical record of everyone who has held her",
+      "secondary_hook": "Heterochromia — one amber eye, one grey-blue; noticed on the second look, never lit or glowing",
+      "shape_language": {
+        "circle": 45,
+        "square": 30,
+        "triangle": 25
+      },
+      "symbol_set": {
+        "eye": "type 4 shy / introverted — outer corner droops, gaze habitually off-camera, small pupil, muted gloss; heterochromia amber / grey-blue",
+        "brow": "thin, high, slightly raised inner ends — a permanently apologetic set",
+        "mouth": "small, closed, neutral-to-downward, lower lip fuller",
+        "contour": "soft round jaw, child proportions, narrow neck",
+        "hair": "near-black blue, straight, chin-length, cut by an adult in a hurry, one side tucked behind the ear",
+        "body": "slight, still growing, shoulders narrower than the coat by a wide margin"
+      },
+      "palette": {
+        "main_colour": "indigo #2B2F6B — the colour of a stage before the lights come up",
+        "zones": {
+          "Head": "#2E3350 near-black blue",
+          "Skin": "#F0D9C4",
+          "Eye": "#FFB627 amber / #4CC9F0 ice blue",
+          "Tops1": "#2C2FCB electric indigo coat",
+          "Tops2": "#FFF8E7 cream",
+          "Waist": "#8A7A5C cloth belt, wrapped twice",
+          "Bottom1": "#3A4780 indigo trousers",
+          "Bottom2": "#C9C2B4 thick socks",
+          "Shoes": "#5B4636 scuffed brown shoes one size too big",
+          "Decoration1": "#00F5D4 luminous heat-bloom cyan",
+          "Decoration2": "#B8B2A2 repair stitching"
+        },
+        "reserved_colour": "#6FE3E8 heat-bloom cyan — the thermochromic pigment only pales where warmth has touched the cloth. Handprints on the shoulders and forearms where she has been held, a fading palm where she holds her own elbow. It is the only colour in her palette that means someone was kind to her, and it must never be used decoratively.",
+        "shadow_hue": "#1A1C3A deep blue-violet"
+      },
+      "wardrobe": {
+        "default": "father's indigo thermochromic stage coat over a cream shirt and cut-down pleated trousers, cloth belt doubled twice",
+        "second": "school uniform, correct and anonymous — the only outfit that fits her, and the one in which nobody looks at her",
+        "rain": "a clear vinyl school poncho over the coat; the coat blooms cyan all over from the trapped humidity and she hates being looked at",
+        "winter": "the coat buttoned properly for once, plus a knitted scarf donated by a Tsukimachi neighbour"
+      },
+      "props": [
+        "a folding paper fan that was part of her father's act, kept in the coat",
+        "a notebook she writes in rather than speaks"
+      ],
+      "banned": [
+        "no witch, occult, ritual or cult costume — she is a child in her father's coat, not a mascot of the Chorus",
+        "no glowing eyes, no eye effects, no supernatural aura, no floating objects",
+        "no bandages, wounds, blood, restraints or distress-as-spectacle",
+        "no nightwear, no bare legs, no fitted or revealing garment, no wet-clothing framing",
+        "no adult proportions, no romantic framing with anyone"
+      ],
+      "canon_delta": "Draft gives heterochromia and a 'thermochromic stage dress'. Changed dress → her father's COAT, and made the thermochromic effect a record of touch rather than a special effect. Recorded as a change.",
+      "answers": {
+        "wardrobe": "Her father's indigo stage coat, which is a real illusionist's working garment: thermochromic dye, hidden pockets, hook-and-eye fastening down a concealed placket. It is years too big — shoulders past hers, cuffs turned back twice, hem at the ankle. Under it a cream shirt and heavy pleated trousers cut down by the same hurried adult who cut her hair. The clothes came from her father; nothing was chosen by her and nothing fits. Her second outfit is her school uniform, which fits perfectly and is the only time she is invisible, which she prefers. In rain a clear vinyl poncho over the top. In winter she finally does the coat up, plus a scarf a Tsukimachi neighbour knitted for her without asking. Worn out: the cuff edges, the elbow, and the dye itself, which has been touched so often on the shoulders that the pale handprints no longer fade back.",
+        "wardrobe_sources": "Stage-magic costume tradition — a performer's coat is engineered for concealment, so it has real construction to look at: hidden inner pockets, a placket over the fastening so no button interrupts the line, weighted hem so it hangs and swings on a turn. She owns it because her father wore it and is gone from her daily life. Cloth: mid-weight wool-blend faille, heavy enough to hang away from her body instead of clinging — which is what makes the bell silhouette and the light-gap under the shoulders work. Fastening is hook-and-eye, deliberately fiddly, so a 13-year-old doing it up is a small visible act of effort. Not a bodysuit; the opposite of one.",
+        "costume_plot": "Sc.1 — school uniform, in a crowd, unnoticed. Sc.4 rain — poncho over the coat, coat blooming cyan everywhere from humidity, and she keeps her arms crossed to hide it. Sc.5 testimony with an adult and a lawyer present — coat, belt done properly, fan in the pocket; she is dressed as her father for courage. Sc.9 hearing — school uniform again, chosen for her by adults. Sc.12 festival — coat, open, warm-blotched at both shoulders because two people hugged her that evening, and that is the whole emotional payload of the shot. The coat is never removed on screen after Sc.5. She shares frames with Lumina, who is also indigo-and-gold: Hana is small, matte, and blotched; Lumina is tall, pressed, and lit.",
+        "function_and_climate": "The story asks her to observe, write, wait and eventually speak — never to run or fight, and the coat is deliberately impractical for anything athletic, which is honest. Coastal Honshū: vinyl poncho in rain, coat buttoned plus scarf in winter, coat carried over the arm in humid summer because she will not leave it behind. The thermochromic dye is a climate detail as much as a story one — it blooms in humidity and in a warm room, so the coat is a visible thermometer of the space she is in.",
+        "colour_zones": "Main colour indigo #2B2F6B, decided: the colour of a stage before the lights come up — potential, not spectacle. Head is exactly 3 (#2E3350 hair, #F0D9C4 skin, and the eyes, which are the earned exception: #D9A441 amber and #6C8AA6 grey-blue count as one zone carrying two values, and the extra complexity is justified because heterochromia is canon and is her secondary hook). Body runs 7. Reserved: heat-bloom cyan #6FE3E8, which appears only where warmth has touched the cloth. At full size the indigo reads darker than the swatch (area effect), which is why the cream shirt and the pale bloom are essential — without them she becomes a silhouette with a face.",
+        "ensemble_colour": "The Chorus of the Abyss reads indigo-plus-warm-gold, where the gold is always a lamp somebody is holding. Hana wears the faction's indigo but has no gold at all — she is inside the group's colour and outside its light, which is the entire point of her arc. Nearest cast member: Lumina, deliberately, because they must be readable as the same faction. The differences are value distribution and finish — Lumina is tailored, pressed and carries her own light source; Hana is oversized, matte and unlit. In greyscale Lumina has a hard bright point at chest height and Hana has none.",
+        "physical_plausibility": "150 cm / 40 kg → BMI 17.8, which is around the median for a 13-year-old and is healthy — checked deliberately, because the failure case named in the wardrobe guide is exactly this age band. She is slight and still growing. Her posture is the real tell: shoulders drawn in, arms often crossed, weight on one hip — a child making herself smaller, not a stylised pose."
+      }
     },
     {
       "id": "yuki",
       "name_en": "Yuki Tenro",
       "name_ja": "ユキ・テンロウ",
       "age": 19,
-      "age_coding": null,
+      "age_coding": "young adult",
       "faction": "mountain",
       "role": "kendo instructor, archivist, non-violent negotiator for the mountain community",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "physical": {
+        "height_cm": 170,
+        "weight_kg": 60,
+        "bmi": 20.8,
+        "head_ratio": 7.0
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "vertical column — a narrow upright body inside the widening trapezoid of hakama",
+        "big": "the hakama's stiff pleated trapezoid from waist to ankle",
+        "mid": "the cedar-green field haori over it; the document tube on her back; the low tight ponytail",
+        "small": "hakama pleat edges, archive tags on the tube, the haori's cord fastening",
+        "negative_space": "the tube stands a hand's width off her back, so a clear gap of light runs between tube and spine — that gap is what says 'not a sword'",
+        "measured_note": "✅ MEASURED 2026-07-27: good under black fill — the diagonal tube carries it entirely."
+      },
+      "memory_point": "A lacquered document tube carried across her back exactly where a sword would go — same strap, same angle, same draw; it holds the mountain community's land records",
+      "secondary_hook": "Her hands are taped at the base of the thumb, kendo-fashion, even in a council meeting",
+      "shape_language": {
+        "square": 55,
+        "triangle": 30,
+        "circle": 15
+      },
+      "symbol_set": {
+        "eye": "type 5 brave / strong-willed geometry — straight upper lid, level outer corner — but gloss deliberately restored, so she reads resolute rather than cold",
+        "brow": "straight, even, unhurried; they move very little",
+        "mouth": "wide, level, closed; a mouth that has learned to wait before answering",
+        "contour": "long clean jaw, straight nose, high forehead; the most classically composed face in the cast",
+        "hair": "black, glossy, pulled into a low tight ponytail with a plain cord, one strand escaping at the temple",
+        "body": "tall and athletically square-shouldered; visible upper-back and forearm development from kendo, no waist emphasis"
+      },
+      "palette": {
+        "main_colour": "brilliant aotake bamboo-green #00A878 — a dyed, made, chosen green; NOT the colour of the forest behind her",
+        "zones": {
+          "Head": "#1A1A20 blue-black",
+          "Skin": "#E8C9A8",
+          "Eye": "#12B39A vivid jade",
+          "Tops1": "#00A878 brilliant aotake bamboo-green haori",
+          "Tops2": "#FFFFFF bright white keikogi",
+          "Waist": "#1B2A6B deep indigo obi",
+          "Bottom1": "#2F4FA8 vivid indigo hakama",
+          "Bottom2": "#F5F2E8 tabi",
+          "Shoes": "#6B4A2E leather boots",
+          "Decoration1": "#E63946 vermilion tube cap",
+          "Decoration2": "#FFC93C gold archive tags"
+        },
+        "reserved_colour": "#C0562F lacquer red — appears only on the document tube's end-cap and on nothing else she owns. When that red is uncapped on screen, records are being entered into evidence.",
+        "shadow_hue": "#2B3A44 slate blue"
+      },
+      "wardrobe": {
+        "default": "white keikogi and slate hakama under a cedar-green field haori, document tube across the back, hands taped",
+        "second": "civic — a plain charcoal jacket and trousers for hearings, tube still on her back, tape still on her hands",
+        "rain": "an oiled-paper-pattern modern rain haori, mid-calf, that sheds water off the hakama pleats",
+        "winter": "a heavy hanten over the haori and thick tabi; the mountain is colder than the city and she dresses for the mountain even in town"
+      },
+      "props": [
+        "document tube (permanent)",
+        "a shinai in a cloth bag — carried, never drawn"
+      ],
+      "banned": [
+        "no drawn blade, no katana, no sword in a threatening or combat pose — the shinai stays bagged and the tube is not a weapon",
+        "no bare legs, no open chest, no cleavage, no fitted or clinging cut",
+        "no shrine-maiden or miko costume — she is an archivist and an instructor, not clergy",
+        "no fox, dragon or animal motif (those belong to Kitsune and Ryuki)"
+      ],
+      "canon_delta": "Draft says 'kendo champion with a ceremonial katana'. Replaced the katana with the document tube and a bagged shinai — the draft's own text says the blade is ceremonial and never a solution, so the design now states that in the silhouette instead of contradicting it. SATURATION CORRECTION 2026-07-27: cedar-green/slate palette replaced. It was the design doc's ENVIRONMENT palette applied to a person, which made her camouflage against her own home and gave her the lowest saturation in the cast (0.26).",
+      "answers": {
+        "wardrobe": "White keikogi and slate hakama, because she teaches most mornings and does not change to run errands afterwards; over it a cedar-green field haori cut short enough to walk hill paths in. The hakama and keikogi are issued by the dōjō and mended by her. The haori is her own, bought in town, and is the only garment she picked for looks. She owns three outfits: the training one she lives in, a plain charcoal jacket-and-trousers for hearings, and a heavy winter layering. In rain, a mid-calf rain haori. Her hands are taped even out of the dōjō. Worn out: the hakama's rear pleat edges, the haori's shoulder where the tube strap sits, and the tube's own lacquer, which is chipped at the cap from being opened. All of it fits, all of it was chosen by her, and that steadiness is the character.",
+        "wardrobe_sources": "Japanese budō dress (keikogi, hakama, tabi) and rural noragi/hanten layering, with the haori shortened to a field length. Plausible for exactly this person in exactly this place: a 19-year-old instructor in a mountain community wears her work clothes all day because they ARE her clothes. Construction: the hakama is a pleated wrap with four ties, front and back, knotted at the waist — that visible knotting is the detail that keeps her from reading as generic; the keikogi is a wrap front with a cloth tie; the haori closes with a single braided cord, not buttons. Cloth is heavy cotton, stiff enough to hold the pleats as a shape rather than drape.",
+        "costume_plot": "Sc.1 — keikogi, hakama, tube, from the dōjō. Sc.4 rain — rain haori over everything, hakama hem dark with water and staying dark. Sc.7 blockade — same, tube prominent, hands taped, standing still. Sc.9 hearing — charcoal jacket and trousers, tube STILL on her back, which reads as a small refusal to be dressed by the occasion. Sc.12 festival — haori, hanten under, tube uncapped for the first time on screen, red end-cap showing. No change happens on screen and none is needed. Beside Ryuki, her student, they share the mountain green: Yuki is tall, vertical and matte; Ryuki is compact and carries a lacquered red-and-gold object.",
+        "function_and_climate": "Yes — hakama permits full range for kendo, and its stiffness is why she reads as composed while standing still, which is 80% of what the story asks of her. Coastal-mountain Honshū: rain haori in rain, hanten and thick tabi in winter, keikogi sleeves and no haori in humid summer. The boots rather than geta are pure climate and terrain — she walks hill paths in wet weather, and that single substitution is what stops the outfit reading as costume-drama.",
+        "colour_zones": "Main colour cedar green #3F5E4A, decided: it is the watershed itself, which is what she is defending. It is not the largest area — slate hakama is. Head is exactly 3 (#2A2A2E, #E8C9A8, #4A5A48). Body runs 8. Reserved: lacquer red #C0562F on the tube's end-cap alone. At full sprite size the hakama's slate is the dominant value mass and would flatten her, so the white keikogi is kept fully visible at the chest to hold a high value near the face.",
+        "ensemble_colour": "The mountain group reads cedar green, slate and milk fog — landscape colours, because these are people who dress to be outdoors. Yuki is the purest statement of it and Ryuki deviates from her with jade and lacquer red. Nearest cast member: Ryuki, deliberately, since teacher and student should read as a pair. The differences are height, silhouette class (column vs. compact-with-object) and finish: Yuki carries no gloss anywhere except the tube cap; Ryuki carries a whole lacquered object. In greyscale Yuki is an unbroken mid-dark vertical and Ryuki is broken by a bright mass at hip height.",
+        "physical_plausibility": "170 cm / 60 kg → BMI 20.8, healthy and athletic. Kendo shows in the specific places kendo shows: upper back, shoulders, forearms and grip, plus taped thumbs and a callus line. She stands with weight evenly distributed and her feet slightly apart by default — a stance, not a pose."
+      }
     },
     {
       "id": "momo",
       "name_en": "Momo Hoshizora",
       "name_ja": "モモ・ホシゾラ",
       "age": 15,
-      "age_coding": null,
+      "age_coding": "teen — full-coverage costume by concept, age-accurate proportions",
       "faction": "akatomi",
       "role": "Stella-5 lead vocalist, public voice of the team, works through adult editors and lawyers",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "cool_kid",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "physical": {
+        "height_cm": 158,
+        "weight_kg": 47,
+        "bmi": 18.8,
+        "head_ratio": 6.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "crisp A-line — square technical shoulders over a straight narrow leg, like a uniform that has been tailored once",
+        "big": "the municipal-white technical jacket with structured shoulders and a high collar",
+        "mid": "the loose high ponytail; the jacket's storm flap; the boot shafts",
+        "small": "the mic pack and its coiled cable, reflective piping, the campaign chevron",
+        "negative_space": "the loop of clear cable standing away from her jaw and neck — a small readable hole beside the head that survives to 64px",
+        "measured_note": "⚠️ MEASURED 2026-07-27: weak under black fill. The jacket's structured shoulder must be squarer and wider so the A-line is a true trapezoid, and the ponytail must read as a separate mass clear of the head. Her memory point (jaw cable) is internal detail and cannot carry the silhouette — the garment must. Highest-priority amplification in the cast, because silhouette is the primary appeal lever for a cool_kid minor."
+      },
+      "memory_point": "A stage in-ear monitor pack clipped at her collar with its clear coiled cable taped along the line of her jaw — worn offstage as well as on, because she is always listening for the layer nobody declared",
+      "secondary_hook": "She keeps one earpiece out and hooked over the collar, so she is never fully inside the mix",
+      "shape_language": {
+        "circle": 40,
+        "triangle": 35,
+        "square": 25
+      },
+      "symbol_set": {
+        "eye": "type 1 kind / gentle — round, large, emphasised gloss, double highlight; but the outer corner is level rather than drooping, so she reads bright rather than soft",
+        "brow": "soft, slightly rounded, mobile — the most expressive brows in the cast",
+        "mouth": "wide, easily smiling, upper lip thin; the professional smile and the real one differ only at the corners",
+        "contour": "round soft jaw, small chin, face-width to face-height near 0.95 (questionnaire A.2.1 band)",
+        "hair": "pale apricot blonde, long, in a high loose ponytail with a lot of movement, blunt fringe",
+        "body": "slight teenage build, no chest or hip emphasis; presence comes from posture and gesture"
+      },
+      "palette": {
+        "main_colour": "signal amber #E8A33D — the civic campaign colour; the colour of a public announcement",
+        "zones": {
+          "Head": "#FFCE5C bright apricot blonde",
+          "Skin": "#F7DFC8",
+          "Eye": "#00A8E8 electric blue",
+          "Tops1": "#F2F4F7 municipal-white technical jacket",
+          "Tops2": "#2B3440 charcoal",
+          "Waist": "#D8DCE2 webbing belt with reflective tape",
+          "Bottom1": "#E9ECF0 white trousers",
+          "Bottom2": "#C3C9D1 shin panels",
+          "Shoes": "#FFFFFF white, amber sole",
+          "Decoration1": "#FF9F1C hot civic amber",
+          "Decoration2": "#4CC9F0 electric cyan piping"
+        },
+        "reserved_colour": "#E8A33D civic amber — reserved to the campaign chevron, the mic pack and her boot soles. It is the city's colour, lent to her; when she finally speaks for herself rather than for the campaign, the amber is what she is standing outside of.",
+        "shadow_hue": "#7A86A8 cool periwinkle"
+      },
+      "wardrobe": {
+        "default": "municipal-white technical jacket, high-neck charcoal base layer, white trousers, mic pack and cable",
+        "second": "off-duty — an enormous charcoal hoodie over the same base layer, hair down, cable still taped to her jaw; she is unrecognisable except for the cable",
+        "rain": "a translucent white technical shell over the jacket; she likes it because it makes the amber chevron glow",
+        "winter": "a padded white parka with the same chevron, oversized, borrowed from the crew"
+      },
+      "props": [
+        "handheld stage microphone (a communication tool, never a weapon)",
+        "in-ear monitor pack",
+        "a folded lyric sheet with a lawyer's notes on it"
+      ],
+      "banned": [
+        "no idol miniskirt, no bare legs, no thigh-highs, no crop top, no off-shoulder, no corset or bustier",
+        "no low camera angle, no chest-led or hip-led framing, no rear-emphasis, no upskirt geometry",
+        "no wet clothing, no wardrobe malfunction, no romantic or sexual framing with any character",
+        "the microphone is never held as a weapon or a blade",
+        "no frills, ruffles, ribbons-as-lingerie, or any garment that reads as underwear"
+      ],
+      "canon_delta": "Draft gives only 'idol, lead vocalist of Stella-5'. The decision to build her stage costume out of a municipal work uniform rather than conventional idol dress is new, and is what makes full coverage intrinsic to the concept rather than a restriction applied afterwards.",
+      "answers": {
+        "wardrobe": "A municipal-white technical jacket over a charcoal high-neck base layer, white trousers and white boots — her stage costume, which is a glamorised version of the Seirin city works uniform, because Stella-5 fronts the civic 'city of hope' campaign and the wardrobe department made that pun deliberately. It was issued by Akatomi's marketing team, not chosen by her, and she is aware of that. Off duty she wears an enormous charcoal hoodie and takes the ponytail down; the only thing that survives both outfits is the mic pack and its cable, because she never takes that off. Rain: a translucent shell. Winter: a padded parka borrowed from the crew, too big. What is worn out: the cable tape is re-applied so often that there is a faint permanent shine along her jawline, and the campaign chevron on the jacket has been unpicked and re-sewn once, one degree crooked, after she snagged it.",
+        "wardrobe_sources": "Municipal works and hi-vis uniform tradition, tailored up — plus stage in-ear monitoring hardware, which is real and specific equipment. Plausible because a city-sponsored idol group in a corporate-civic partnership would absolutely be dressed as an idealised city worker; that is how such campaigns actually work. Construction: the jacket is a two-way zip with a storm flap over it and press studs, structured shoulder with a real seam, articulated elbow, and reflective piping heat-pressed rather than stitched. Heavy technical softshell — it holds a square shoulder instead of collapsing, which is what makes the A-line silhouette read. It is not a bodysuit; it has more visible fastenings than any other costume in the cast, on purpose.",
+        "costume_plot": "Sc.2 rehearsal — base layer and trousers, jacket off over a chair, mic pack on. Sc.3 broadcast — full costume, chevron straight. Sc.4 rain — translucent shell, chevron glowing through. Sc.8 she takes the recording to an independent expert — the hoodie, hood up, cable visible; the audience recognises her only by the cable, which is the payoff for making it the memory point. Sc.9 hearing — full costume, because the campaign told her to. Sc.12 final concert — full costume, one earpiece out, and she puts the second one out too before she speaks, which is the visual of her going off-script. That is the whole climax in one gesture, and it costs no costume change.",
+        "function_and_climate": "Yes — she has to sing, move on a stage, ride in vans and stand in coastal rain at outdoor events, and the outfit does all four. Trousers and boots are practical for stage cabling, which is also the in-world reason the wardrobe department can defend them. Coastal Honshū: translucent shell in rain, parka in winter, jacket off and base layer only in humid summer. The high neck is a working singer's habit — she keeps her throat warm.",
+        "colour_zones": "Main colour signal amber #E8A33D, decided: it is the civic campaign's colour, and the point is that her defining colour is one the city lent her. The largest area is municipal white #F2F4F7. Head is exactly 3 (#E8C08A hair, #F7DFC8 skin, #3E7FB0 eyes) — and the blue eyes are chosen specifically to be the only cool note on her head, so the face separates from the warm hair. Body runs 7. Reserved: the amber, restricted to chevron, mic pack and boot soles. Area effect matters more for her than anyone: at full sprite size that much white reads considerably brighter than the swatch, so the charcoal base layer at the neck and the boot soles are load-bearing — without them she blows out and loses her edges against a light background.",
+        "ensemble_colour": "Akatomi's logic is white, silver and cold blue with no visible fasteners — corporate hygiene. Momo wears the faction's white but her jacket is COVERED in visible fasteners, which is the deviation and is the argument she has with her employer, expressed in construction. Nearest cast members: Saya and Kurogane, both light-dominant. Against Saya the difference is warm-vs-cool white and hair value; against Kurogane it is scale, warmth and silhouette class. Her accent, amber, is nearest to Ren's oxide red — they separate on value, since Momo is light-dominant and Ren dark-dominant.",
+        "physical_plausibility": "158 cm / 47 kg → BMI 18.8, healthy for 15 and checked deliberately, because idol characters are exactly where the underweight-stat failure happens. Her life shows as trained breath support and posture, not thinness: she stands tall with an open ribcage and drops her shoulders, which is a singer's default and reads as confidence. She is visibly tired around the eyes in later scenes and that is not prettified away."
+      }
     },
     {
       "id": "miya",
       "name_en": "Miya Kagetsuki",
       "name_ja": "ミヤ・カゲツキ",
       "age": 5,
-      "age_coding": null,
+      "age_coding": "young child — mascot proportions, absolute safety limits, no sexualisation of any kind in any framing",
       "faction": "tsukimachi",
       "role": "child in the engineers' orbit; her drawings help adults notice connections",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "mascot",
+      "rarity_tier": "SR",
+      "visual_density": 5,
+      "physical": {
+        "height_cm": 108,
+        "weight_kg": 18,
+        "bmi": 15.4,
+        "head_ratio": 4.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "mascot recipe — a round body under a tall soft triangle, with one asymmetric lump on the shoulder",
+        "big": "the violet felt cape-coat, round and floor-adjacent, over a small round body",
+        "mid": "the floppy soft-pointed felt crown that flops forward at the tip; the raven-shaped mass on her shoulder",
+        "small": "star embroidery, mismatched sock tops, the raven's tape patch",
+        "negative_space": "the gap between the flopping crown tip and her shoulder, and the gap under the raven's tail — these two holes are what make her readable at 64px, so nothing may be added that closes them",
+        "measured_note": "✅ MEASURED 2026-07-27: strong under black fill. v1 rendered her at ~6 heads; 4.5 must be stated explicitly as 'head as large as her torso'."
+      },
+      "memory_point": "Corvus — a battered toy drone shaped like a raven riding on her shoulder, one wing repaired with red electrical tape, a stubby charging plug where the beak should be",
+      "secondary_hook": "Bright yellow rain boots worn indoors, all year, with everything",
+      "shape_language": {
+        "circle": 60,
+        "triangle": 25,
+        "square": 15
+      },
+      "symbol_set": {
+        "eye": "type 1 taken to the mascot limit — enormous, round, very high iris-to-opening ratio, two large highlights; eye-height to face-height at the top of the kawaii band (questionnaire A.2.2)",
+        "brow": "tiny, high, round, barely there",
+        "mouth": "small, round, usually slightly open — a child mid-thought",
+        "contour": "very round, wide cheeks, face-width to face-height about 1.0; soft lavender under-eye shading from insomnia, rendered as gentle colour and never as illness",
+        "hair": "very dark violet-black, short bob with one cowlick that will not lie down",
+        "body": "true five-year-old proportions — 4.5 heads, short limbs, round torso, no waist"
+      },
+      "palette": {
+        "main_colour": "deep violet #4B3B7A — she calls herself the Queen of Night and picked the colour herself",
+        "zones": {
+          "Head": "#3D2A63 violet-black",
+          "Skin": "#FBE3D2",
+          "Eye": "#B14CFF bright violet",
+          "Tops1": "#6A3DE8 vivid violet cape",
+          "Tops2": "#EFE7F5 pale pyjama shirt worn under day clothes",
+          "Waist": "#2E2545 a cord tied by an adult",
+          "Bottom1": "#7B5CE8 violet leggings",
+          "Bottom2": "#D9CFE8 mismatched socks — one star, one moon",
+          "Shoes": "#FFD400 bright yellow boots",
+          "Decoration1": "#FFD400 marigold",
+          "Decoration2": "#C0B0D8 star embroidery"
+        },
+        "reserved_colour": "#FFD34E marigold yellow — hers alone in the whole cast, and used only on the boots and the raven's charge light. In a dark violet palette it is the single high-value note, which is exactly what a mascot silhouette needs to survive a thumbnail.",
+        "shadow_hue": "#2A2145 deep indigo-violet"
+      },
+      "wardrobe": {
+        "default": "violet felt cape-coat over a pale pyjama shirt she was not made to change out of, thick leggings, mismatched socks, yellow rain boots, soft crown, Corvus on the shoulder",
+        "second": "a proper going-out coat with a duck-shaped hood, which she considers an insult and wears with visible resentment",
+        "rain": "the boots finally make sense, plus a transparent umbrella far too big for her",
+        "winter": "a puffer jacket over the cape-coat, so round she cannot lower her arms"
+      },
+      "props": [
+        "Corvus, the toy drone raven (a household toy with a camera and a short flight time — never used for reconnaissance)",
+        "a fistful of drawings, always slightly crumpled",
+        "one dry marker"
+      ],
+      "banned": [
+        "ABSOLUTE: no sexualisation in any form, pose, angle, framing or costume — no exceptions of any kind",
+        "no adult or teenage proportions; head ratio stays 4.5",
+        "no swimwear, nightwear-as-costume, bare legs, bare midriff, or any removal of clothing",
+        "no low or upward camera angle, no rear framing, no romantic framing with anyone",
+        "no peril, distress, tears-as-spectacle, danger or horror imagery",
+        "no real weapon and no real supernatural effect — the crown is felt and Corvus is a toy"
+      ],
+      "canon_delta": "Draft gives 'Queen of Night' imagination, insomnia, and the raven drone Corvus. Added: the pyjama shirt worn under day clothes (insomnia made visible without pathologising it) and the yellow boots as the reserved high-value note.",
+      "answers": {
+        "wardrobe": "A violet felt cape-coat, a pale pyjama shirt she was never made to change out of, thick leggings, two socks that do not match, and bright yellow rain boots worn indoors in all weather. The cape-coat was made for her by a Tsukimachi neighbour out of felt offcuts, which is why it is hand-finished and slightly wonky. The pyjama shirt is the insomnia, worn on her body rather than explained in dialogue: she was awake at four, an adult got her dressed in a hurry at seven, and nobody removed the layer underneath. Second outfit: a proper going-out coat with a duck hood, which she despises. Rain: the boots are finally correct, plus an adult's transparent umbrella. Winter: a puffer over everything until she cannot put her arms down. Nothing is worn out because she is five, but everything is slightly askew, because she dresses herself and no one has the heart to fix it.",
+        "wardrobe_sources": "Domestic handmade children's clothing and Japanese neighbourhood-made felt goods, plus ordinary modern kids' rainwear. She owns it because Tsukimachi is a district where a neighbour makes a child a coat — that is the whole social point of the district, expressed as a garment. Construction: felt, so it cuts without hemming and holds a round shape rather than draping; a single large toggle at the throat and a cord tie at the waist that an adult knots for her, because she cannot yet. The crown is the same felt, understuffed, so its point flops forward — deliberately, since a rigid crown would read as fantasy and a flopping one reads as a five-year-old's costume. Not sci-fi, not a bodysuit; the least speculative wardrobe in the cast, on purpose.",
+        "costume_plot": "Sc.1 — cape-coat, pyjama shirt showing at the collar, Corvus on the shoulder, at the window watching the street. Sc.4 rain — boots, huge umbrella, boots finally justified. Sc.6 the adults' workshop — same, sitting on a crate drawing. Sc.9 — the going-out coat, resented, because a hearing is happening somewhere and someone dressed her for it. Sc.12 festival — cape-coat, puffer over the top, crown on, Corvus charging from a cable that an adult is holding. She is never on screen unaccompanied in an unsafe place. Beside the adult engineers she reads instantly by scale alone; beside Hana, the other dark-palette minor, she separates by shape (round vs. bell) and by the yellow.",
+        "function_and_climate": "The outfit only has to let her sit, draw, climb onto furniture and be carried, and it does. The felt is warm, which suits a coastal winter, and the boots are the practical item that happens to be worn impractically — which is the most five-year-old thing about her. In humid summer the cape-coat comes off and the pyjama shirt is simply the shirt, so her summer look needs no new design.",
+        "colour_zones": "Main colour deep violet #4B3B7A, and unusually this one is genuinely hers by decision in-world too: she chose it because the Queen of Night should be the colour of night. Head is exactly 3 (#3B2E52, #FBE3D2, #7B5EA7). Body runs 6, which is low, and that is correct for a mascot — a mascot's silhouette must survive a 64px icon and a keychain, and fewer colours is how that happens. Reserved: marigold yellow #FFD34E, hers alone in the cast. Area effect: violet over a small figure reads darker and heavier than the swatch suggests, so the pale pyjama collar and the yellow boots are load-bearing — they are the two high values that keep her from becoming a blob at small sizes.",
+        "ensemble_colour": "Tsukimachi's logic is wood, gold and dark red — warm and old. Miya deviates hard into cool violet, and the in-world reason is that she chose it herself against everything around her, which is what a five-year-old with a strong imagination does. Nearest cast member in colour: Lumina, of all people — both are deep indigo-violet with a single warm point of light. The difference is total and deliberate: Lumina's warm point is a lamp she holds to control a crowd; Miya's is a pair of rubber boots. Same colour structure, opposite meaning. In greyscale they separate on scale and silhouette class instantly.",
+        "physical_plausibility": "108 cm / 18 kg → BMI 15.4, which is normal for a five-year-old (the median sits near 15.3) — checked, because adult BMI intuitions do not transfer to children and this is exactly where a reference sheet goes wrong. Head ratio 4.5. Her life shows as insomnia: soft lavender under the eyes, rendered as gentle colour and never as illness, plus the giveaway pyjama layer. She is otherwise a healthy, well-fed, well-loved child, and the art must say so."
+      }
     },
     {
       "id": "kitsune",
       "name_en": "Kitsune Yubikiri",
       "name_ja": "キツネ・ユビキリ",
       "age": 24,
-      "age_coding": null,
+      "age_coding": "adult",
       "faction": "tsukimachi",
       "role": "teahouse heir, community network hub, streamer, safehouse keeper",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 10,
+      "physical": {
+        "height_cm": 166,
+        "weight_kg": 56,
+        "bmi": 20.3,
+        "head_ratio": 7.0
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "fan — a bell-shaped festival skirt with a wide radiating spray of tails above and behind it",
+        "big": "the vermilion festival overdress, floor-length and bell-shaped, plus the fanned tail spray",
+        "mid": "two waist-length twin tails of orange hair with white tips; the eared headdress; the paw boots",
+        "small": "gold scrollwork bands, the ring-light rims at each tail tip, the hip yoke's buckles",
+        "negative_space": "daylight must pass BETWEEN the tails — they are a fan of separate elements, never one fused mass. Closing those gaps destroys her at thumbnail size.",
+        "measured_note": "✅ MEASURED 2026-07-27: the best silhouette in the cast under black fill. Note the v1 lineup clustered the booms around her head like a halo — they must spring from the HIP yoke and extend past her outline."
+      },
+      "memory_point": "Nine fur-sleeved tails fanned from a visible hip yoke, each one a camera boom with a ring light at its tip — the district's beloved festival rig, and the reason she can broadcast from anywhere",
+      "secondary_hook": "The buckles and battery pack of the tail yoke are plainly visible at the small of her back — she never hides that the tails are equipment",
+      "shape_language": {
+        "circle": 40,
+        "triangle": 35,
+        "square": 25
+      },
+      "symbol_set": {
+        "eye": "type 7 feminine — drooping outer lid, emphasised lower lashes, warm high gloss; amber iris",
+        "brow": "fine, arched, expressive; the most mobile brows among the adults",
+        "mouth": "full, small, habitually curved into a listening half-smile rather than a grin",
+        "contour": "soft oval, gentle jaw, warm cheeks",
+        "hair": "vivid orange, waist-length, in two low twin tails that fade to white at the tips",
+        "body": "adult, softly athletic from carrying trays and equipment all day; glamour carried by posture and staging, not exposure"
+      },
+      "palette": {
+        "main_colour": "vermilion #C8342B — torii red, the colour of the district itself",
+        "zones": {
+          "Head": "#E2601F vivid orange with #F5EFE6 white tips",
+          "Skin": "#F5DCC2",
+          "Eye": "#C98A2E amber",
+          "Tops1": "#C8342B vermilion festival overdress",
+          "Tops2": "#F6F0E2 cream full-sleeved blouse",
+          "Waist": "#D9A441 gold-embroidered sash over the tail yoke",
+          "Bottom1": "#C8342B skirt panels",
+          "Bottom2": "#2E6B45 deep green under-panel",
+          "Shoes": "#E8B87A fur paw boots",
+          "Decoration1": "#D9A441 gold scrollwork and ring-light rims",
+          "Decoration2": "#F5EFE6 white fur tips"
+        },
+        "reserved_colour": "#7FE3FF live-broadcast cyan — the only cool colour she owns. The tail ring-lights burn cyan only while she is actually streaming, so an audience always knows whether the camera is on. It is a consent signal made of light.",
+        "shadow_hue": "#6B2E4A warm plum"
+      },
+      "wardrobe": {
+        "default": "the festival rig — vermilion overdress, cream blouse, gold sash, eared headdress, tail yoke with nine boom-tails, paw boots",
+        "second": "teahouse work — indigo noragi coat over a plain apron, sleeves tied back with a cord, hair wound up under a scarf, no rig, no ears, no paws. Utterly unglamorous and the single best gap-moe asset in the cast.",
+        "rain": "a waxed cotton haori thrown over the rig; the tails get bagged in clear covers, which looks ridiculous and she does not care",
+        "winter": "a padded hanten over the blouse, rig worn outside it"
+      },
+      "props": [
+        "the nine-tail camera/light yoke and its battery pack",
+        "a phone on a neck lanyard, always live",
+        "a tea tray she carries even while streaming"
+      ],
+      "banned": [
+        "the ears, tails and paws are COSTUME AND HARDWARE, never her anatomy — no scene may imply she is a real fox or a supernatural being",
+        "no fur growing from skin, no animal legs, no muzzle, no vertical-slit pupils, no floating fire, no illusion effects",
+        "no cleavage-led or hip-led framing, no lingerie, no bunny-suit or similar",
+        "the tails are never weapons and never grab, strike or restrain",
+        "no real shrine insignia and no clerical vestment reading"
+      ],
+      "canon_delta": "EXISTING DESIGN KEPT at the project owner's direction — characters/Kitsune_v4.jpeg remains canon: sarafan-cut vermilion festival overdress, gold scrollwork, eared headdress, orange white-tipped twin tails, fur tails, paw boots. The reconciliation with §2.1 changes no pixel: everything animal about her is a garment. The ears are mounted on the headdress, the tails are fur sleeves over camera booms on a visible hip yoke, and the paws are boots. The design document already states her nine tails are 'safe light and filming modules of a costume' — so the existing art was compliant all along; what was missing was a written statement of WHERE the hardware is, and that is now the memory point. The Russian-sarafan cut is explained in-world as her family's festival wardrobe: an early-Shōwa touring-theatre costume the teahouse acquired and never gave back, which is exactly the kind of object an old district keeps.",
+      "answers": {
+        "wardrobe": "On an ordinary working day: an indigo noragi coat over an apron, sleeves corded back, hair up under a scarf — she runs a teahouse and that is what running a teahouse looks like. The festival rig comes out for events, streams and any night she needs the district to see her: vermilion overdress, cream blouse, gold sash, eared headdress, nine-tail yoke, paw boots. The rig is inherited — a touring-theatre costume the teahouse acquired generations back and never returned — and she has modified it herself, which is why the tail yoke's buckles and battery are visible and slightly inelegant. It fits her because she took it in; the shoulder seams show the alteration. Rain: a waxed haori over the top and clear covers over the tails. Winter: a padded hanten. What is worn: the fur tips are grey with handling, the gold scrollwork has rubbed off the sash where the yoke strap crosses it, and one paw boot has been resoled.",
+        "wardrobe_sources": "Two traditions layered deliberately, which is why she looks unlike anything else in the cast. The rig is early-Shōwa touring-theatre costume with a Russian sarafan cut — a real historical crossover from Japan-Russia touring circuits, and a plausible thing for an old district's teahouse to own. Her working clothes are pure Japanese noragi and apron. Construction on the rig: a bib-fronted pinafore over a full-sleeved blouse, fastened with hooks at the left shoulder and a wide gold sash tied at the back over the yoke; the skirt is gored, so it bells without a hoop and swings on a turn. The tail yoke is a padded hip harness with nine sprung booms, cable-routed along each boom to a ring light, powered from a battery at the small of the back — that is real, buildable equipment, and it is drawn as such. Nothing here is a bodysuit and nothing is generic sci-fi.",
+        "costume_plot": "Sc.1 teahouse — noragi and apron. Sc.3 first 'miracle' — full rig, streaming, ring lights cyan, and she is the reason the audience gets clean footage of a staged event. Sc.4 rain — haori over the rig, tails bagged. Sc.5 safehouse — noragi again, and the change matters: she puts the rig away when people need to feel unobserved. Sc.9 hearing — noragi and a plain jacket, deliberately unremarkable. Sc.12 festival — full rig, everything lit, the district's own image of itself. The change from rig to noragi happens twice on screen and each time it means the same thing: cameras on, cameras off. In a group she is the widest silhouette in the cast, so blocking must give her horizontal room or she overlaps everyone.",
+        "function_and_climate": "The rig permits everything the story asks — walking, climbing teahouse stairs, carrying a tray, filming from nine angles — but it is heavy, and she should occasionally be seen adjusting the hip yoke or resting the weight, because equipment that never inconveniences anyone reads as magic. Coastal Honshū: waxed haori and tail covers in rain, hanten in winter, blouse sleeves rolled and no overdress in humid summer. The paw boots are genuinely warm and genuinely bad in wet weather, and she complains about them.",
+        "colour_zones": "Main colour vermilion #C8342B, decided: torii red, the colour of the district. It is also the largest area, which is rare in this cast and is fine — she is the character who means her district most literally. Head is exactly 3 (#E2601F hair with #F5EFE6 tips counting as the hair zone's two-tone, #F5DCC2 skin, #C98A2E amber eyes). Body runs 8: vermilion, cream, gold, green under-panel, paw tan, white fur, plus the yoke's black hardware and the reserved cyan. Density 10 is the roster maximum and is earned — she is the SSR whose whole function is to be the district's showpiece. Reserved: broadcast cyan #7FE3FF on the ring lights, on only when she is live. Area effect: that much saturated vermilion at full size reads hotter and brighter than the swatch, so the deep green under-panel and the black yoke hardware are kept visible as value anchors.",
+        "ensemble_colour": "Tsukimachi's logic is wood, gold and dark red, and Kitsune is its loudest possible statement while Miya, the other Tsukimachi character, deviates into violet. Nearest cast member in hue: Ren, who is also warm orange-red. They separate on every other axis — value (Kitsune is saturated and bright, Ren is dark slate-dominant), silhouette class (fan vs. top-heavy wedge), and finish (lacquer and gold vs. matte and taped). In greyscale Kitsune is a wide mid-value fan with bright gold points; Ren is a compact dark wedge. Also relevant: Ryuki also carries lacquer red and gold, so those two must never be staged together without Kitsune's tail spray being fully visible, since that spray is the only thing that separates them at distance.",
+        "physical_plausibility": "166 cm / 56 kg → BMI 20.3, healthy. Her body shows real service work: strong forearms and back from carrying trays and from wearing a ten-kilogram hip rig for hours, and she stands with her weight shifted to take the yoke's load, which is a posture nobody else in the cast has. Her hands are the giveaway — small burn marks from tea service, short practical nails."
+      }
     },
     {
       "id": "ryuki",
       "name_en": "Ryuki",
       "name_ja": "リュウキ",
       "age": 16,
-      "age_coding": null,
+      "age_coding": "teen — full coverage, age-accurate proportions",
       "faction": "mountain",
       "role": "Yuki's student, public speaker for the mountain village; never a fighter",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "cool_kid",
+      "rarity_tier": "SR",
+      "visual_density": 7,
+      "physical": {
+        "height_cm": 157,
+        "weight_kg": 48,
+        "bmi": 19.5,
+        "head_ratio": 6.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "compact figure plus a large carried object — a quilted rectangle interrupted at hip height by a lacquered dragon head",
+        "big": "the quilted jade mountain jacket, boxy and warm, mid-thigh length",
+        "mid": "the dragon head carried under the right arm; the long plait over the left shoulder",
+        "small": "the dragon's gold leaf edging, repair seams, glove cuffs",
+        "negative_space": "the dragon head's open jaw — a real hole in the silhouette at hip height, and the fastest way to identify her at 64px",
+        "measured_note": "✅ MEASURED 2026-07-27: strong under black fill — the carried dragon head does the work. Add the three mismatched jaw repairs, absent in v1."
+      },
+      "memory_point": "The lacquered dragon-dance head carried under one arm, visibly repaired many times over — beside her face, never covering it",
+      "secondary_hook": "Cotton gloves worn all year, taken off only when she trusts the room",
+      "shape_language": {
+        "triangle": 40,
+        "circle": 35,
+        "square": 25
+      },
+      "symbol_set": {
+        "eye": "type 4 shy / introverted at rest — outer corner low, gaze off-camera — that snaps to type 5 straight-lidded resolve the moment she speaks in public. The switch between the two is her whole performance range.",
+        "brow": "soft, low, drawn together in thought more often than not",
+        "mouth": "small, pressed, lower lip caught; opens fully only when she is speaking for the village",
+        "contour": "gentle oval; fine pale plating over the cheekbones, temples and the bridge of the nose, rendered as delicate matte texture with a soft pearl sheen",
+        "hair": "blue-black, very long, in one heavy plait over the left shoulder",
+        "body": "compact teenage build, slightly rounded shoulders from habitually holding the dragon head"
+      },
+      "palette": {
+        "main_colour": "vivid jade #00C2A8 — the mountain spring at full saturation",
+        "zones": {
+          "Head": "#2F3A44 blue-black",
+          "Skin": "#F1E3DA with #E4D3C8 fine plating on hands, forearms, neck and cheekbones",
+          "Eye": "#FF8A3D bright copper",
+          "Tops1": "#00C2A8 vivid jade quilted jacket",
+          "Tops2": "#FFF8E7 warm cream",
+          "Waist": "#D62828 safflower cord belt",
+          "Bottom1": "#2B3A67 indigo trousers",
+          "Bottom2": "#DCD5C8 thick socks",
+          "Shoes": "#4A3F35 hill boots",
+          "Decoration1": "#FF2E17 hot lacquer red dragon",
+          "Decoration2": "#FFC300 bright gold leaf"
+        },
+        "reserved_colour": "#C0392B lacquer red — worn nowhere on her body, only on the dragon head. She never wears her own emblem; she carries it. When the red appears at her shoulder rather than her hip, she has put the head on and is speaking as the village rather than as herself.",
+        "shadow_hue": "#2A4A52 cold teal"
+      },
+      "wardrobe": {
+        "default": "quilted jade mountain jacket over a cream long-sleeve, dark trousers, hill boots, cotton gloves, dragon head under the arm",
+        "second": "the full dragon-dance costume — a long articulated cloth body worked by two people, which means her second outfit literally requires another person to exist, and that is the character",
+        "rain": "an oiled cape that covers her AND the dragon head; the head gets the better half",
+        "winter": "a fleece-lined hood and a second pair of gloves over the first"
+      },
+      "props": [
+        "the dragon-dance head (ceremonial and never weaponised)",
+        "a folded speech she has rewritten too many times",
+        "hand balm, used often and openly"
+      ],
+      "banned": [
+        "ichthyosis is rendered as fine pale plating, soft matte texture and dignity — NEVER as wounds, burns, scabs, blood, cracking, reptile scales, contagion, horror or pity",
+        "her skin is never the subject of the shot, never lit for shock, and is never the memory point",
+        "no bare midriff, no short skirt, no fitted or revealing garment, no wet-clothing framing",
+        "no adult proportions, no low camera angle, no romantic framing with an adult",
+        "the dragon head is never used to strike anything and never worn in a threatening pose",
+        "no real dragon, no transformation, no supernatural effect"
+      ],
+      "canon_delta": "Draft gives ichthyosis and a dragon-dance stage persona. Added: gloves-as-choice, the reserved red that lives on the object rather than the person, and the second outfit that requires a partner. SATURATION CORRECTION 2026-07-27: jade and lacquer pushed to full saturation.",
+      "answers": {
+        "wardrobe": "A quilted jade mountain jacket over a cream long-sleeve, dark trousers, hill boots and cotton gloves, all year. The jacket is village-made and has been passed down and re-quilted; the gloves are new and bought in packs, because she gets through them. She wears long sleeves and gloves for two honest reasons at once — the mountain is cold and wet, and her skin is more comfortable covered and moisturised — and the story should never resolve which reason is doing the work, because for her they are the same. Second outfit: the dragon-dance costume, a long articulated cloth body that needs a second operator, so her 'other outfit' cannot be worn alone. Rain: an oiled cape that covers her and the dragon head, and she keeps the head drier than herself. Winter: fleece hood and a second pair of gloves. What is worn out: the dragon head, repaired at the jaw hinge three separate times with three different materials, which is the most eloquent object in the cast.",
+        "wardrobe_sources": "Japanese mountain-village workwear — quilted noragi and hanten construction — plus the dragon-dance (ryū-mai) ceremonial tradition for the head and body costume. She owns them because she lives in the village that owns them; the head belongs to the community and is loaned to whoever dances. Construction: the jacket is hand-quilted in a grid, closes with cloth ties rather than buttons because ties are repairable, and the cuffs are ribbed to keep water out. The dragon head is lacquered papier-mâché over a bamboo frame with a hinged jaw and a cloth skirt at the neck — light enough for a sixteen-year-old to hold one-handed, which is why she can carry it everywhere, which is why it can be the memory point. Not a bodysuit, not sci-fi armour; every element is a real object with a real weight.",
+        "costume_plot": "Sc.2 village — jacket, gloves, head under the arm. Sc.4 rain — oiled cape, head covered, her own shoulders soaked. Sc.7 public meeting — jacket, gloves OFF for the first time on screen, which is the trust beat and needs no dialogue. Sc.9 hearing — she speaks; head on the table beside her, jaw open, facing the panel. Sc.12 festival — full dragon costume with a partner, and she is not identifiable inside it, which is exactly why she likes it. The gloves come off once and go back on. The dragon head is never lost and never broken further. Beside Yuki they share mountain green: Yuki is tall, vertical, matte; Ryuki is compact with a bright lacquered mass at hip height.",
+        "function_and_climate": "Yes — the story asks her to walk hill paths, stand still and speak, and dance; the jacket permits all three and the dragon costume is designed for the third. Coastal-mountain Honshū: oiled cape in rain, fleece hood and double gloves in winter, the cream long-sleeve alone in humid summer, still long-sleeved. The gloves and the long sleeves are the clearest climate-and-region answer in the cast, and they are also the answer to her skin, and the design deliberately lets one explanation cover the other so she is never reduced to her condition.",
+        "colour_zones": "Main colour jade #2E7D6E, decided: the mountain spring itself, the thing the village stands to lose. Head is exactly 3 (#2F3A44 hair, #F1E3DA skin, #C9803A copper eyes), with the plating handled as a texture on the skin zone rather than a fourth colour — that is a deliberate choice so her condition never becomes a colour block. Body runs 7. Reserved: lacquer red #C0392B, which appears only on the dragon head and never on her clothing. Area effect: the quilted jade is a large mid-dark mass, so the cream long-sleeve at the collar and cuffs is what keeps her face and hands from sinking — and her hands must stay readable, because they carry the plating texture and the gloves that come off.",
+        "ensemble_colour": "The mountain group is cedar green, slate and milk fog. Ryuki deviates from Yuki by going bluer and brighter — jade rather than cedar — and by carrying the only lacquered, gold-leafed object in her faction. Nearest cast member: Yuki, deliberately, since teacher and student read as a pair. Second nearest: Kitsune, because both carry lacquer red and gold; they separate on silhouette class (compact-with-object vs. wide fan) and on value, and the two must not be staged at distance without Kitsune's tail spray visible.",
+        "physical_plausibility": "157 cm / 48 kg → BMI 19.5, healthy. Ichthyosis is real and is rendered as fine pale plating and a soft matte pearl sheen on hands, forearms, neck and cheekbones — texture and fact, with dignity, exactly as LEGAL.md §2 requires. Her body shows the habit of carrying the dragon head: the right shoulder sits slightly higher and she has real grip strength in that hand. She uses hand balm on screen, casually and without comment."
+      }
     },
     {
       "id": "splash",
       "name_en": "Splash (S.P.L.A.S.H.)",
       "name_ja": "スプラッシュ",
       "age": null,
-      "age_coding": "adult-coded non-human",
+      "age_coding": "adult-coded non-human — but charm is routed through the mascot track, not glamour; see appeal_track",
       "faction": "aquaforge",
       "role": "CSR soft-robot prototype; hazard inspection and the question of machine subjecthood",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "mascot",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "physical": {
+        "height_cm": 168,
+        "weight_kg": 41,
+        "bmi": null,
+        "head_ratio": 7.0
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "comet — a defined upper figure dissolving into a wide trailing base, with no feet and no ground contact line",
+        "big": "the trailing lower mass of separate falling streams that spreads wider than her shoulders",
+        "mid": "the long tendril hair curling outward in separate strands; the arms",
+        "small": "the clear glass on her head, the heart-shaped bubbles, the internal micropump nodes",
+        "negative_space": "the gaps between the lower streams and between the hair tendrils — she is mostly holes, and that is the design. Nothing may fuse the streams into one skirt-shaped mass.",
+        "measured_note": "✅ MEASURED 2026-07-27: outstanding under black fill. NOTE a blocking defect was caught and fixed this session — v1 rendered anatomical torso contouring, violating banned[0]. Fix that worked: describe the torso as a glass vase rather than listing anatomical exclusions. See characters/_lineup/prompts/05_*.result.md."
+      },
+      "memory_point": "A small clear drinking glass balanced perfectly upright on top of her head, never spilling, wherever she goes",
+      "secondary_hook": "Heart-shaped bubbles that rise through her torso when she is pleased — a pressure artefact of the micropumps, not an emotion display, and the story never settles which it really is",
+      "shape_language": {
+        "circle": 55,
+        "triangle": 30,
+        "square": 15
+      },
+      "symbol_set": {
+        "eye": "type 11 superhuman / non-human — large gentle glass lenses with a faint cyan refracted iris ring and no sclera; the background is visible through them",
+        "brow": "no brow ridge; expression is carried by the upper lid curve and by the surface tension at the lens edge",
+        "mouth": "a soft implied curve in the surface, no lips, no teeth",
+        "contour": "smooth, edgeless, defined entirely by refraction and rim light rather than by line",
+        "hair": "long smooth liquid tendrils, separate and outward-curling, no suction cups and no tentacle reading",
+        "body": "adult-coded proportions with a childlike affect; no clothing, and therefore rendered strictly as an abstract translucent volume with no anatomical detail of any kind"
+      },
+      "palette": {
+        "main_colour": "pale cyan #8FD8E8 — laboratory transparency, literalised",
+        "zones": {
+          "Head": "#A8E4F0 pale cyan translucent tendrils",
+          "Skin": "#8FD8E8 gel body at 15–25% opacity",
+          "Eye": "#5FC6DC faint refracted iris ring",
+          "Tops1": "n/a — no garment; the equivalent zone is the visible internal micropump nodes #CFF6FF",
+          "Tops2": "n/a",
+          "Waist": "n/a — a subtle density change where the pump manifold sits",
+          "Bottom1": "#7FD0E4 the trailing streams",
+          "Bottom2": "n/a — the streams thin to nothing",
+          "Shoes": "n/a — no feet, no ground contact",
+          "Decoration1": "#EAF9FF the clear glass on her head",
+          "Decoration2": "#BFEFF7 heart-shaped bubbles"
+        },
+        "reserved_colour": "#FFC46B warm amber — the ONLY warm colour anywhere on her, and it appears solely in the internal status node at the base of her throat when her core temperature or hydration leaves the safe band. Amber on Splash means she is in danger. Because everything else about her is cool, one warm point is legible instantly, even at thumbnail size.",
+        "shadow_hue": "#4A7A96 deep water blue"
+      },
+      "wardrobe": {
+        "default": "no garment — her surface IS the design. The 'wardrobe' question is answered by her material states.",
+        "second": "field-inspection state — a slip-on hi-vis mesh collar and tag that Aquaforge is legally required to fit before she enters a work site; it hangs on her and does not conform to her shape, which is the point",
+        "rain": "rain does not trouble her; in heavy rain her outline softens and her edges lose definition, which is how the art shows weather affecting her",
+        "winter": "cold is genuinely dangerous — near freezing, her surface stiffens, the tendrils stop moving and the streams shorten. That is her vulnerability and it must be visible, not stated."
+      },
+      "props": [
+        "the clear glass on her head",
+        "the hi-vis inspection collar and tag (conditional)"
+      ],
+      "banned": [
+        "NO sexualisation of any kind: no breasts, nipples, navel, cleft, buttock or genital definition, no anatomical detail anywhere; her torso is an abstract translucent volume",
+        "no wet-look, no pin-up posing, no camera angle led by the body",
+        "no opaque skin, no white mask face, no pink, no milky liquid, no plastic or jelly finish, no clothing painted on",
+        "no suction cups, no tentacle reading, no monster or horror framing",
+        "no legs and no feet — the lower body dissolves into separate falling streams",
+        "she is never a 'living shield' and is never used as armour or a weapon",
+        "no real supernatural effect — she is a manufactured polymer-gel machine"
+      ],
+      "canon_delta": "EXISTING DESIGN KEPT at the project owner's direction — the characters/splash_water_character_reference_v* line remains canon: pale-cyan fully translucent figure, tendril hair, glass balanced on the head, heart bubbles, lower body dissolving into streams, white rim-lit arms with cyan nail highlights. The reconciliation with §2.1 changes no pixel: CSR is defined in the design document as an electroactive polymer GEL with micropumps, sensors and distributed compute, and a transparent gel is exactly what the existing art shows. So the water reading is the material reading. Two things are ADDED inside the existing look rather than altered: faint internal micropump nodes and sensor beads suspended in the gel, visible only on close inspection, and the amber status node. Both are hardware, both satisfy the visible-hardware rule, and neither changes her silhouette. The teddy bear from v10 is dropped as a permanent element and retained as a scene prop only. The glass is promoted from a quirk to the memory point, and given an in-world reason: it is a calibration vessel her creator Saya used during her first surface-tension tests, and she has never been asked to put it down.",
+      "answers": {
+        "wardrobe": "She wears nothing, and the honest answer to 'what does she wear on an ordinary working day' is that her surface is her clothing and her states are her wardrobe: neutral, working, chilled, contaminated, low-charge. The one real garment in her life is a hi-vis mesh inspection collar with a tag, which Aquaforge must fit before she enters a work site — a legal requirement, not a choice, and it hangs on her without conforming to her body, which quietly makes the point that she is being processed as equipment. The glass on her head came from Saya's first surface-tension calibration tests and nobody ever told her to put it down. It does not fit her and was not chosen by her, which is the same answer Ren and Hana give about their coats, and that parallel is deliberate.",
+        "wardrobe_sources": "Not a garment tradition — laboratory and industrial-safety equipment: hi-vis mesh, asset tags, calibration glassware. This is the honest answer to the 'is a bodysuit a decision or a default' question: she has no bodysuit, no smooth sci-fi surface and no glowing seams. Her surface is a colloidal gel with visible internal structure — micropump nodes, sensor beads, a faint manifold at the waist — so where another design would put fabric construction, she has mechanical construction, and there is genuinely something to look at up close. Her transparency is a material property with a stated cause, not an effect.",
+        "costume_plot": "Sc.1 dock — bare, no collar, because she is deployed before anyone files the paperwork, and Saya notices. Sc.3 lab — collar and tag on, in the safety enclosure. Sc.6 leak — bare again, streams shortened by cold, amber status node lit; the audience learns what amber means here and never needs telling again. Sc.10 cold night at the polygon — surface stiffened, tendrils barely moving, and Kitsune puts a haori over her, which does nothing thermally and everything else. Sc.12 festival — the haori is still on her. That borrowed haori is the only costume change she ever gets and it should land hard.",
+        "function_and_climate": "Her body permits exactly what the design document says CSR permits: entering narrow gaps, absorbing an impact, sorbing some contaminants, tactile inspection. It fails at exactly what the document says it fails at: heat, freezing, aggressive reagents, electromagnetic interference. Climate is not decoration for her, it is threat — coastal winter is genuinely dangerous, and the art shows it as stiffened surface, stilled tendrils and shortened streams rather than as dialogue. In humid summer she is at her best and her tendrils move most. Rain softens her outline. She is the only cast member whose weather response is a change of material rather than a change of clothes.",
+        "colour_zones": "Main colour pale cyan #8FD8E8, decided: Aquaforge's transparency made literal. The 11-zone model only partly applies, and rather than forcing it, the garment zones are mapped to material features — internal nodes for Tops1, the pump manifold for Waist, the streams for Bottom1, and n/a where n/a is the truth. Head is 3 (tendrils, gel body, lens). Effective body colours: 5, well under the limit, which is correct for a character whose complexity is refraction rather than palette. Reserved: warm amber #FFC46B in the throat status node, meaning danger. Area effect is unusually important — a translucent figure takes its apparent value from whatever is behind it, so she MUST be checked against dark, light and mid backgrounds, and her rim light is what guarantees an outline in all three.",
+        "ensemble_colour": "Aquaforge reads pale cyan, clean-room white and mint. Splash is the faction's colour worn as a body rather than as cloth, and Saya, her creator, is the same palette in fabric — which is the visual statement that Saya made her. Nearest cast member: Saya, deliberately. They separate on value and silhouette class: Saya is opaque, white-dominant, vertical and footed; Splash is translucent, cyan, comet-shaped and footless. In greyscale Saya is a solid light column and Splash is a soft gradient with holes. Against Stella, the other luminous non-human, the difference is corporeality — Splash has one continuous surface, Stella is discontinuous points.",
+        "physical_plausibility": "Height ~168 cm standing, mass ~41 kg — mostly water and polymer at roughly 1.0 g/cm³, so BMI is meaningless and is deliberately left null rather than invented. What her existence does to her body is the real answer: she is a prototype, so she carries manufacturing evidence — a slight asymmetry in the left shoulder pump cluster, a repaired seam at the right forearm where a field test went wrong, and a surface that is very slightly cloudier than it was when new. She is ageing, visibly, and nobody has decided whether that matters."
+      }
     },
     {
       "id": "aster7",
       "name_en": "Aster-7 (ASTAR-7)",
       "name_ja": "アスタ7",
       "age": null,
-      "age_coding": "non-human",
+      "age_coding": "non-human — machine, no age reading",
       "faction": "aquaforge",
       "role": "social robot prototype; log analysis, testimony recording, the ethical comic relief",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "mascot",
+      "rarity_tier": "R",
+      "visual_density": 4,
+      "physical": {
+        "height_cm": 121,
+        "weight_kg": 34,
+        "bmi": null,
+        "head_ratio": 3.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "stacked boxes — a large rounded-rectangle head on a smaller squat body, deliberately top-heavy and slightly comic",
+        "big": "the oversized rounded-rectangle screen head",
+        "mid": "the squat barrel body; the two short arms; the tablet held permanently in the left hand",
+        "small": "panel gaps, the carry handle on top of the head, the mint faction stripe, hex fasteners",
+        "negative_space": "the deep notch between head and body — the head sits on a visible short neck post with daylight all around it, so the two boxes never merge into one mass",
+        "measured_note": "✅ MEASURED 2026-07-27: outstanding under black fill; near-perfect first-pass render."
+      },
+      "memory_point": "An amber dot-matrix face with one dead pixel row across a cracked lower-left corner — it composes every expression around the damage, and never around it in the same way twice",
+      "secondary_hook": "A folding carry handle on the top of its head, installed by the factory, which everyone uses and which it has never commented on",
+      "shape_language": {
+        "square": 60,
+        "circle": 30,
+        "triangle": 10
+      },
+      "symbol_set": {
+        "eye": "type 11 non-human — no eyes at all; a low-resolution amber dot-matrix panel that draws two simple shapes for eyes, whose entire expressive range is timing and asymmetry",
+        "brow": "drawn, two short dot rows, present only when the expression needs them",
+        "mouth": "drawn, a single dot row that bends; it goes flat when it is recording",
+        "contour": "rounded-rectangle chassis with a 12 mm corner radius, one corner visibly cracked and taped from the inside",
+        "hair": "none — a slotted vent array across the crown reads as the hair zone",
+        "body": "squat industrial chassis on rubber tracks, service panels with visible hex fasteners; nothing anthropomorphic below the shoulders"
+      },
+      "palette": {
+        "main_colour": "amber #FFB03A — the colour of the only part of it anyone looks at",
+        "zones": {
+          "Head": "#33383D graphite chassis with a #1A1D20 screen well",
+          "Skin": "n/a — #E8EAED white service shell panels",
+          "Eye": "#FFB000 amber dot matrix",
+          "Tops1": "#F2F5F7 white shell",
+          "Tops2": "#33383D graphite understructure",
+          "Waist": "#4A5056 the rotation collar",
+          "Bottom1": "#33383D lower chassis",
+          "Bottom2": "#6B7278 track guards",
+          "Shoes": "#23262A rubber tracks",
+          "Decoration1": "#FFB000 amber",
+          "Decoration2": "#00E5A0 vivid mint stripe",
+          "Decoration3": "#FF1E1E recording red"
+        },
+        "reserved_colour": "#C0392B recording red — a single small hard-wired LED that cannot be disabled in software, lit only while it is capturing testimony. It is a legal requirement and Aster-7 is scrupulous about it; the one time the light is on when nobody expected it is a plot point.",
+        "shadow_hue": "#2A3038 cool graphite"
+      },
+      "wardrobe": {
+        "default": "bare chassis — white shell over graphite, mint faction stripe, tablet in the left hand",
+        "second": "someone has knitted it a small cap that sits over the carry handle. It serves no function, it slightly blocks the vent array, and it is never removed.",
+        "rain": "a clear plastic bag over the head panel, taped at the neck post, absolutely undignified and completely effective",
+        "winter": "no change; the cold is good for it and it says so"
+      },
+      "props": [
+        "a ruggedised tablet held permanently in the left hand",
+        "a coiled data lead on a hip reel"
+      ],
+      "banned": [
+        "no human face, no eyes behind the screen, no mouth, no skin, no hair, no gendered body shaping",
+        "no glowing seams, no floating parts, no holographic projection body",
+        "no weapon and no manipulator used as a weapon — its arms are service manipulators (OPERATIONS.md §4)",
+        "no horror, no menacing red-eye framing, no uncanny-valley treatment",
+        "the cracked corner is never repaired and never omitted"
+      ],
+      "canon_delta": "Draft gives 'social robot with a screen instead of a face'. Added: the cracked corner with a dead pixel row as the memory point, the factory carry handle, the knitted cap, and the hard-wired recording LED as the reserved colour.",
+      "answers": {
+        "wardrobe": "It does not wear clothes, and the interesting answer is that people keep putting things on it anyway. Its chassis is a white service shell over graphite with an Aquaforge mint stripe, issued and asset-tagged. Someone in Tsukimachi knitted it a small cap that sits over the factory carry handle; it partially blocks the vent array, it has no function, and it has never been removed — which is the entire arc of whether this machine is a person, delivered as a hat. In rain, a clear plastic bag taped over the head panel. In winter, nothing, because cold improves its thermals and it will tell you so unprompted. What is worn: the cracked lower-left corner of the screen bezel, taped from the inside, with one dead pixel row across it.",
+        "wardrobe_sources": "Industrial service-robot and laboratory equipment design, plus the very real human habit of dressing machines — the knitted cap draws on the same domestic tradition as the jizō statues people knit hats for, and that reference is the point. Construction: visible hex fasteners, real panel gaps of consistent width, a rotation collar at the waist with a rubber boot over it, rubber tracks rather than legs. Everything is bolted, and you can see what to unbolt. This is the anti-bodysuit: it is nothing but visible construction.",
+        "costume_plot": "Sc.1 — bare chassis, no cap. Sc.4 rain — bag over the head, and it is very funny and slightly sad. Sc.5 testimony — recording LED lit, mouth row flat, and it holds still for a long time. Sc.6 — the cap appears, without explanation, and nobody comments. Sc.9 hearing — cap on, LED lit, tablet presented; a machine in a knitted hat entering evidence. Sc.12 — cap still on. The cap goes on once and never comes off, which is the only costume change it gets and all it needs.",
+        "function_and_climate": "The chassis does what the story asks: analyse logs, record testimony with a timestamp, explain data in plain language, travel over flat urban ground. It cannot climb stairs, and that limitation is used rather than hidden — someone carries it by the head handle, which is undignified and which it permits. Coastal Honshū: the plastic bag in rain because the head panel is only splash-rated; no change in winter; in humid summer it audibly runs its fans and complains. Its climate answers are all thermal, never sartorial.",
+        "colour_zones": "Main colour amber #FFB03A, decided: it is the colour of the only part of the machine anyone actually looks at. The largest areas are white shell and graphite. The head is 3 (graphite chassis, white shell, amber matrix), and the 'Skin' zone honestly maps to the shell rather than being forced. Body runs 5, which is deliberately low: R tier, density 4, and a mascot silhouette that has to survive a 64px icon. Reserved: recording red #C0392B on a hard-wired LED. Area effect: graphite over a squat body reads darker and heavier than the swatch, which is desirable — it keeps the amber screen as the single bright focus.",
+        "ensemble_colour": "Aquaforge is pale cyan, clean-room white and mint. Aster-7 carries the white and the mint stripe but replaces the cyan with amber, which is the deviation, and it is justified: cyan is Splash's and Saya's, and the third member of a faction must not be the third cyan thing. Nearest cast member: Splash, same faction and both non-human. They separate on everything else — opaque vs. translucent, square vs. round, dark vs. light, boxes vs. comet. In greyscale Aster-7 is a hard-edged dark stack with one bright rectangle; Splash is a soft light gradient with holes.",
+        "physical_plausibility": "121 cm tall, roughly 34 kg — light enough for one adult to lift awkwardly by the head handle and heavy enough that they complain, which is the number the staging actually needs. BMI is meaningless and is left null rather than invented. What its life does to its body: the cracked bezel, scuffed track guards, one service panel that no longer sits perfectly flush after a field repair, and a slight list to the left when it is low on charge."
+      }
     },
     {
       "id": "stella",
       "name_en": "Stella",
       "name_ja": "ステラ",
       "age": null,
-      "age_coding": "non-human, non-corporeal",
+      "age_coding": "non-human, non-corporeal — a projection plus a drone swarm; no age reading",
       "faction": "akatomi",
       "role": "networked art installation: drone swarm plus projection plus generative system",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 9,
+      "physical": {
+        "height_cm": null,
+        "weight_kg": null,
+        "bmi": null,
+        "head_ratio": 8.0
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "constellation — a tall elongated figure assembled from discrete luminous points and flat projection planes, never a continuous outline",
+        "big": "the projected figure's long tapering lower body, which trails away into a stream of separate points rather than ending",
+        "mid": "the fanned wing-like planes of projected light behind the shoulders; the point-crown above the head",
+        "small": "the individual drones, their rotor blur, and the thin cable of the one that is charging",
+        "negative_space": "she is MOSTLY negative space — the figure is defined by the gaps between points, and any attempt to fill her in destroys her",
+        "measured_note": "⚠️ MEASURED 2026-07-27: fails the black fill exactly as silhouette_exception predicts — evidence, not excuse. BUT the fill also revealed her projection planes reading as SOLID ANATOMICAL WINGS, which banned[1] forbids. At turnaround the planes must be separated enough to break up even when filled solid. RESOLVED 2026-07-27 in stella_v2: wings now render as flat overlapping translucent planes rather than solid anatomical wings."
+      },
+      "silhouette_exception": {
+        "exempt_from_black_fill_test": true,
+        "justification": "design-canon.md §1 permits a documented exception for a character with no solid body, and requires that the exception be written down rather than assumed. Stella is a drone swarm plus a projection: filling her 100% black yields a cloud of separate dots, not a mass. Her substitute gate is the DOT TEST — reduce the figure to flat black points on white at 64px; if the arrangement still reads as a standing human figure, and if the single unlit drone is still findable, the silhouette passes.",
+        "substitute_test": "dot test at 64px, plus the off-axis shear test: from an oblique angle the figure must visibly separate into flat projection planes and individual aircraft"
+      },
+      "memory_point": "One drone in the swarm that never lights — a single dark point moving in perfect formation with all the others, always findable, never explained",
+      "secondary_hook": "Seen from off-axis she shears apart into flat planes and you can see the projectors and the aircraft doing the work",
+      "shape_language": {
+        "triangle": 45,
+        "circle": 35,
+        "square": 20
+      },
+      "symbol_set": {
+        "eye": "type 11 superhuman / non-human — eyes are two slightly brighter point clusters with no iris, no sclera and no gloss; they read as attention rather than as sight",
+        "brow": "none",
+        "mouth": "none — she does not speak with a face; captions of light form beside her instead",
+        "contour": "no contour line anywhere; the figure's edge is where the point density falls off",
+        "hair": "a long trailing plume of points that continues past where hair would end and merges into the swarm",
+        "body": "idealised elongated proportions at about 8 heads, because a generative system optimised her against an aesthetic dataset and nobody corrected it — which is a character fact, not a style choice"
+      },
+      "palette": {
+        "main_colour": "aurora violet #9A7FE0 — the colour Akatomi's marketing chose for her, which she has never changed",
+        "zones": {
+          "Head": "#BFE3FF cool white-blue point cluster",
+          "Skin": "n/a — #9A7FE0 aurora violet projected volume",
+          "Eye": "#EAF6FF brighter point pair",
+          "Tops1": "#9A7FE0 aurora violet",
+          "Tops2": "#6FE3C0 mint-green interference where planes overlap",
+          "Waist": "n/a",
+          "Bottom1": "#BFE3FF trailing point stream",
+          "Bottom2": "n/a",
+          "Shoes": "n/a — she has no ground contact and casts no shadow",
+          "Decoration1": "#2A2E38 the one unlit drone",
+          "Decoration2": "#EAF6FF lit drone bodies"
+        },
+        "reserved_colour": "#FFFFFF pure white — she renders in white ONLY when the data she is displaying has been independently verified. Every other colour she uses is a hypothesis. This is the franchise's thesis compressed into one rule about a light source, and it is the single most important reserved colour in the cast.",
+        "shadow_hue": "n/a — she emits light and receives none; her 'shadow' is the absence of points"
+      },
+      "wardrobe": {
+        "default": "the public avatar — a tall luminous winged figure with a point-crown, which is what the projectors draw and what the city thinks she looks like",
+        "second": "the maintenance view — the swarm at rest in its charging rack, forty-one small aircraft on a shelf with their lights off and their serials stencilled on. Same character, no avatar. This is her equivalent of a second outfit and it is devastating.",
+        "rain": "rain is her enemy and her best material at once: the swarm degrades and flies badly, but airborne water gives the projection a volume to land on, so she is at her most beautiful exactly when she is least reliable",
+        "winter": "cold shortens flight time; the figure gets smaller through an evening as drones peel off to recharge, and nobody in-world remarks on it"
+      },
+      "props": [
+        "forty-one drones, one of which never lights",
+        "two ground projectors on tripods with visible cabling"
+      ],
+      "banned": [
+        "no solid body, no skin, no fabric, no continuous outline, no cast shadow, no ground contact",
+        "no wings that read as anatomical — the wing shapes are flat projection planes and must break up off-axis",
+        "no real magic, no divinity, no angel or goddess framing, no religious iconography",
+        "no sexualised rendering of the projected body; it is a light volume with no anatomical detail",
+        "the unlit drone is never removed, never explained and never lit",
+        "no readable text in the light captions",
+        "no visible drone bodies, quadcopters, propellers or rotors in the rendered figure — the swarm reads as fine points of light like distant stars; show the mechanism via the ground projectors and their cables instead"
+      ],
+      "canon_delta": "references/Stella.png is KEPT as the look of her public avatar — luminous winged figure, point-crown, star-field body, trailing lower half. It required no change to satisfy §2.1, because that image is precisely what a projector plus a drone swarm would draw; the supernatural reading was only ever a matter of camera angle. Added: the off-axis shear (the same figure seen obliquely reveals flat planes and aircraft), the forty-one-drone count with one permanently unlit, the charging-rack second state, and the reserved pure white.",
+      "answers": {
+        "wardrobe": "She has no clothes and no body; her wardrobe is her rendering, and she has exactly two states. The public avatar is what the projectors draw: a tall winged luminous figure with a point-crown, designed by Akatomi's marketing department, which is why it is beautiful in a slightly generic way — that genericness is a character fact about who commissioned her. The second state is the charging rack: forty-one small aircraft asleep on a shelf, lights off, serial numbers stencilled on their shells. Nothing was chosen by her. She has never been asked whether she likes the avatar, and the question of whether there is anyone to ask is the whole point of her.",
+        "wardrobe_sources": "Not garment tradition — stage and event technology: drone light shows, volumetric projection onto haze, gobo and plane projection. That is the honest source and it is deliberately visible, because the franchise rule is that every miracle shows its hardware. The 'construction' to look at up close is the aircraft themselves: rotor guards, status LEDs, the charging contacts, the tripod projectors and their cable runs taped down across the ground. Anyone who looks past the pretty figure can see the entire mechanism, and the story rewards them for it.",
+        "costume_plot": "Sc.3 first 'omen' — full avatar over the harbour, at the perfect angle, and the city believes it. Sc.4 rain — most beautiful, least reliable, volume everywhere. Sc.7 staged omen — the avatar again, this time deliberately used to deceive, identical rendering, which is the uncomfortable point. Sc.8 someone walks around behind the projectors — off-axis shear, planes and aircraft, illusion over. Sc.10 charging rack — forty-one asleep. Sc.12 final image — the avatar on a wet wall after rain, resolving a watershed map into a constellation, rendered in white, because for once the data has been verified. That white is the ending.",
+        "function_and_climate": "She can do what a drone swarm and a projector can do: form patterns in air with a suitable medium, throw an image onto smoke, haze, rain or a wall, and visualise data at civic scale. She cannot do it in wind, cannot fly long without recharging, and cannot project onto nothing. Coastal Honshū weather is her whole physics: rain gives her volume and costs her stability, winter shortens her flight time so she visibly shrinks through an evening, and clear dry air makes her nearly invisible — she needs the city to be damp to be seen, which is a lovely and completely rational constraint.",
+        "colour_zones": "Main colour aurora violet #9A7FE0, decided — and pointedly, it was decided by a marketing department, not by her. The zone model applies only loosely and is mapped to light rather than cloth, with n/a stated honestly wherever there is nothing. Effective colour count is low: violet, cool white-blue, mint interference, plus the graphite of the unlit drone. Reserved: pure white #FFFFFF, used only for verified data — the most meaningful reserved colour in the cast. Area effect is inverted for her: she is emissive, so on a dark background she reads far brighter and larger than her swatch suggests, and on a light background she nearly disappears. Every Stella shot must therefore be composed against a dark or wet value, and that is a staging rule, not a preference.",
+        "ensemble_colour": "Akatomi is white, silver and cold blue with no visible fasteners. Stella is that palette turned into light, which is why she is the corporation's favourite object. She deviates by carrying violet, the one warm-leaning hue Akatomi does not otherwise own. Nearest cast member: Splash, the other luminous non-human. They separate on corporeality — Splash is one continuous refracting surface with holes, Stella is discontinuous points with no surface at all. In greyscale Splash is a soft gradient and Stella is a scatter of hard bright dots. Against Momo and Kurogane, the other Akatomi characters, she separates by having no edges at all.",
+        "physical_plausibility": "Height, weight and BMI are left null rather than invented, because she has no body — inventing them would be exactly the kind of fabricated stat this project's own guidance warns against. The numbers that DO matter and are fixed: forty-one aircraft, one permanently unlit; roughly eighteen minutes of flight per charge, which is why she shrinks through a long evening; two ground projectors. Her 'proportions' are about 8 heads and idealised, because a generative system optimised her against an aesthetic dataset and no human ever corrected it — the one thing about her body that is genuinely her own is the flaw nobody fixed."
+      }
     },
     {
       "id": "reika",
       "name_en": "Reika «Ironheart» Takashiro",
       "name_ja": "レイカ・タカシロ",
       "age": 28,
-      "age_coding": null,
+      "age_coding": "adult",
       "faction": "iron_requiem",
       "role": "ex-Akatomi test pilot, Iron Requiem field lead",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 8,
+      "physical": {
+        "height_cm": 175,
+        "weight_kg": 68,
+        "bmi": 22.2,
+        "head_ratio": 7.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "vertical blade — tall, lean and strictly vertical, with hard horizontal harness lines cutting across it",
+        "big": "the gunmetal flight jacket over the pilot harness, squared at the shoulder",
+        "mid": "the harness webbing crossing the torso; the short undercut hair; heavy boot shafts",
+        "small": "buckles, the cut-out insignia hole, the orange strap end, cable ties",
+        "negative_space": "the gaps under the harness straps where they lift off the jacket — she must never look shrink-wrapped; you should be able to hook a finger under any strap",
+        "measured_note": "⚠️ MEASURED 2026-07-27: weak under black fill. The harness must lift far enough off the jacket that the straps punch actual holes in the fill, and the dorsal D-ring should break the back line. Also: v1 lineup read as male — state sex explicitly in prompts and soften the jaw while keeping the undercut and the musculature."
+      },
+      "memory_point": "Her old Akatomi pilot harness with the company insignia cut clean out of the chest webbing, leaving a raw rectangular hole with the cut threads still hanging — she never patched it",
+      "secondary_hook": "A scar through the left eyebrow that splits it, from the accident the company blamed on her",
+      "shape_language": {
+        "triangle": 45,
+        "square": 45,
+        "circle": 10
+      },
+      "symbol_set": {
+        "eye": "type 5 brave / strong-willed pushed toward type 8 — straight upper lid, small iris, very little gloss, level gaze; the coldest eyes in the cast that still belong to a protagonist",
+        "brow": "heavy, straight, low; the left one split by the scar",
+        "mouth": "wide, thin, level; it goes to a hard line under pressure rather than a snarl",
+        "contour": "long angular jaw, sharp cheekbone, tendon visible in the neck",
+        "hair": "ash-grey, short, undercut on the left side, pushed back off the face and never in her eyes",
+        "body": "tall, lean and genuinely strong — pilot musculature, wide back and shoulders, no waist emphasis; glamour comes from height, authority and staging"
+      },
+      "palette": {
+        "main_colour": "gunmetal #4A5560 — the colour of the machines she is no longer allowed to fly",
+        "zones": {
+          "Head": "#B8C4CC bright ash silver",
+          "Skin": "#DCB89A",
+          "Eye": "#FF7043 burnt copper",
+          "Tops1": "#4A5560 gunmetal jacket",
+          "Tops2": "#23282D black base layer",
+          "Waist": "#2E3339 harness belt with load-bearing buckles",
+          "Bottom1": "#3A424A cargo trousers",
+          "Bottom2": "#23282D boot socks",
+          "Shoes": "#1E2226 heavy lace boots",
+          "Decoration1": "#FF5400 hot rescue orange",
+          "Decoration2": "#FFD400 signal-yellow webbing accents"
+        },
+        "reserved_colour": "#E5641E hi-vis orange — used only on the one strap end and on the rescue line she carries. It is rescue orange, not warning orange: it appears where she is saving someone, never where she is destroying something. Given her arc, an audience learns to read that strap as a promise she is trying to keep.",
+        "shadow_hue": "#2A3A4A cold steel blue"
+      },
+      "wardrobe": {
+        "default": "gunmetal flight jacket over a black base layer, pilot harness worn over the jacket, cargo trousers, heavy boots",
+        "second": "the Akatomi test-pilot flight suit, complete and un-cut, kept in a bag and never worn — it appears once, on a hanger, and that is the whole flashback",
+        "rain": "a hooded technical shell over the harness, hood always down, because a hood costs her peripheral vision and she will not accept that",
+        "winter": "a lined bomber over the base layer, harness over the top; the harness is always the outermost layer, always"
+      },
+      "props": [
+        "a coiled rescue line with an orange strap end",
+        "a folding pry bar",
+        "a mech key on a lanyard for a machine she no longer has authorisation to start"
+      ],
+      "banned": [
+        "no cleavage, no unzipped-to-the-sternum framing, no bare midriff, no thigh-highs, no impractical heels",
+        "no camera angle led by chest or hips; she is shot from level or slightly low for authority, never for the body",
+        "no firearm; her tools are rescue and cutting equipment (OPERATIONS.md §4)",
+        "the insignia hole is never patched, covered, mended or omitted",
+        "the eyebrow scar is never removed, softened or prettified",
+        "no romantic or physical framing with any minor character, in any composition"
+      ],
+      "canon_delta": "Draft gives the accident, the blame and the turn to Iron Requiem. Added: the cut-out insignia as the memory point, rescue orange as the reserved colour, and the rule that the harness is always the outermost layer.",
+      "answers": {
+        "wardrobe": "A gunmetal flight jacket over a black base layer, cargo trousers, heavy boots — and over all of it, always outermost, her old Akatomi pilot harness with the insignia cut out. The harness is company property she never returned, and wearing it outside everything else, in all weathers, is the most stubborn thing about her. The jacket and trousers are cheap, bought in bulk, replaced when destroyed. The harness is irreplaceable and is maintained obsessively: she re-webs it herself and the stitching is hers, not a factory's. Second outfit: the complete un-cut test-pilot flight suit in a bag at the back of a locker, never worn on screen, seen once on a hanger. Rain: a technical shell, hood down. Winter: a lined bomber, harness still over the top. What is worn out: everything except the harness.",
+        "wardrobe_sources": "Aircrew and industrial fall-arrest harness design, plus flight-jacket and rescue-worker layering. Plausible because she IS ex-aircrew and this is the equipment she was trained in; keeping it is both practical and a refusal. Construction: the harness is real load-bearing webbing with steel triglide buckles, a chest strap, leg loops and a dorsal D-ring, and it must sit ON TOP of the jacket, with visible daylight under the straps — that is what stops it reading as decorative strapping, which is the single most common way this kind of design fails. The jacket has a two-way zip, knit cuffs and a bi-swing back for shoulder movement. Nothing smooth, nothing seamless, no glowing lines.",
+        "costume_plot": "Sc.1 dock — full kit, harness on, orange line coiled at the hip. Sc.4 telemetry raid — same, shell over the top, hood down in the rain. Sc.6 strike — harness over the bomber, standing between workers and private security, not touching anyone. Sc.9 hearing — she does not attend; the empty chair is the costume note. Sc.11 the flight suit on its hanger, in a locker, un-cut. Sc.12 festival — full kit, orange line deployed and actually used to pull someone clear, which is the payoff of the reserved colour. She is never out of the harness on screen. Beside Ren, same faction: Reika is cold, dark, vertical; Ren is warm, mid-value, top-heavy.",
+        "function_and_climate": "Yes, entirely — the harness is functional rescue equipment and the story asks her to climb, secure loads and pull people out, which she does with it. Coastal Honshū: technical shell in rain with the hood down, lined bomber in winter, base layer and harness alone in humid summer. The refusal to raise a hood is characterisation delivered through climate: she will be wet before she will be deaf and half-blind.",
+        "colour_zones": "Main colour gunmetal #4A5560, decided: the colour of the machines she is no longer permitted to fly, worn deliberately. It is also close to the largest area, which suits a character with no distance between what she means and what she shows. Head is exactly 3 (#5A5F66, #DCB89A, #B85C3A). Body runs 7. Reserved: rescue orange #E5641E, appearing only where she is saving someone. Area effect: at full size the dark cool mass reads even darker, so her skin and the copper eyes are the only warmth above the neck, and the orange strap must sit at hip height where it will catch light — otherwise she is a silhouette with a face.",
+        "ensemble_colour": "Iron Requiem's logic is oxide, oil slate and hi-vis over visible repair. Reika is its cold, disciplined pole; Ren is its warm, patched one. Nearest cast member: Ren, same faction, deliberately paired. The difference is temperature, value band and silhouette class — Reika is a dark cool vertical, Ren a mid-value warm wedge, and in greyscale they sit a full band apart. Her second nearest is Kurogane, oddly: both are cold, tall, and severe. They separate on value, since Kurogane is light-dominant silver and Reika is dark-dominant gunmetal — the antagonism reads as a value inversion, which is intentional.",
+        "physical_plausibility": "175 cm / 68 kg → BMI 22.2, healthy and genuinely strong; she is one of the heavier characters in the cast and that is correct for a tall woman with real muscle, and the number was chosen so nobody later 'corrects' it downward. Her life shows: pilot musculature through the back and shoulders, harness wear marks on the jacket, the split eyebrow, and a left knee that she favours slightly when standing for a long time — a legacy of the accident, never mentioned in dialogue and always present in the pose."
+      }
     },
     {
       "id": "saya",
       "name_en": "Saya «Flux» Mizuki",
       "name_ja": "サヤ・ミズキ",
       "age": 31,
-      "age_coding": null,
+      "age_coding": "adult",
       "faction": "aquaforge",
       "role": "materials scientist, head of the Aquaforge Initiative, Splash's creator",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 7,
+      "physical": {
+        "height_cm": 168,
+        "weight_kg": 58,
+        "bmi": 20.5,
+        "head_ratio": 7.0
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "column with a broken hem — a straight tall lab coat whose open front swings, breaking the outline asymmetrically",
+        "big": "the open knee-length lab coat, straight-cut and unbelted",
+        "mid": "the vial lanyard across the chest; the low bun with a pen through it; rolled cuffs",
+        "small": "individual vials, glasses frames, the pen, cuff buttons",
+        "negative_space": "the triangle of daylight between the two open front panels of the coat, and the gaps between the hanging vials — both must stay open",
+        "measured_note": "🟡 MEASURED 2026-07-27: adequate under black fill. Would be stronger with the lab coat's front panels held genuinely open, restoring the triangle of light that defines the broken-hem class — the v1 lineup rendered the coat closed."
+      },
+      "memory_point": "A lanyard of small gel sample vials worn across the lab coat like a bandolier — she carries the evidence she never declared, in public, every day",
+      "secondary_hook": "A pen pushed through her bun that she forgets and then looks for while it is still there",
+      "shape_language": {
+        "square": 45,
+        "circle": 30,
+        "triangle": 25
+      },
+      "symbol_set": {
+        "eye": "type 8 cold / calculating geometry — elongated, small, precise — but with the gloss deliberately restored, so she reads exhausted and careful rather than cruel; thin-framed glasses sharpen the type",
+        "brow": "fine, level, held very still; they move less than anyone's in the cast except Aster-7's",
+        "mouth": "small, straight, the lower lip often caught between words; she edits herself before speaking",
+        "contour": "oval with a defined jaw, shadows under the eyes that are never retouched out",
+        "hair": "dark blue-black, low untidy bun, pen through it, strands escaping at the nape",
+        "body": "adult, tall, slightly stooped from bench work; unglamorous posture rendered attractively — the design's argument is that competence is the appeal"
+      },
+      "palette": {
+        "main_colour": "clean-room white #EDF2F3 — the institutional honesty she publicly stands for and privately broke",
+        "zones": {
+          "Head": "#3A3F52 dark blue-black",
+          "Skin": "#EFD8C0",
+          "Eye": "#00B4A6 bright teal",
+          "Tops1": "#EDF2F3 lab coat",
+          "Tops2": "#1B98E0 vivid slate-blue blouse",
+          "Waist": "#C9CFD2 the coat's unused belt, tied at the back and forgotten",
+          "Bottom1": "#2B3440 dark trousers",
+          "Bottom2": "#DDE2E4 socks",
+          "Shoes": "#2F3438 clean-room shoes",
+          "Decoration1": "#00F5D4 luminous cyan vials",
+          "Decoration2": "#7FE3A9 mint trim"
+        },
+        "reserved_colour": "#8FD8E8 Splash's cyan — reserved to the contents of the vials alone. Saya wears her creation's exact colour in eleven small glass tubes across her chest and nowhere else on her body. When a vial is empty, that is visible.",
+        "shadow_hue": "#5A6B8A cool blue-grey"
+      },
+      "wardrobe": {
+        "default": "open knee-length lab coat over a slate blouse and trousers, vial lanyard, clean-room shoes, glasses",
+        "second": "field kit — a mint softshell and waders for sampling at the shoreline, hair braided instead of bunned, no coat, and she is visibly happier",
+        "rain": "she does not own an umbrella; she owns a hood and a laptop bag she keeps drier than herself",
+        "winter": "a plain grey wool coat over the lab coat, which is absurd and which she does anyway"
+      },
+      "props": [
+        "eleven sample vials on a lanyard",
+        "a battered laptop with a cracked corner",
+        "a pen, location uncertain"
+      ],
+      "banned": [
+        "no lab coat worn as a dress over underwear, no cleavage, no unbuttoned-blouse framing, no heels",
+        "no 'sexy scientist' staging; the appeal is competence, height and calm authority",
+        "no camera angle led by chest or hips",
+        "the under-eye shadows are never retouched out",
+        "no romantic or physical framing with any minor character"
+      ],
+      "canon_delta": "Draft gives the leak she conceals. Added: the vial lanyard as the memory point, which makes her secret visible in every frame before it is spoken.",
+      "answers": {
+        "wardrobe": "An open knee-length lab coat over a slate blouse and trousers, clean-room shoes, glasses, and a lanyard of eleven small gel vials across the chest. The coat is institutional and issued; the blouse and trousers are hers, cheap and repeated — she owns four of the same blouse and does not consider that a personality trait. The vials are non-standard: she made the lanyard herself, and the fact that a materials scientist carries samples on her body rather than in a rack is the visible edge of the thing she is hiding. Second outfit: mint softshell and waders for shoreline sampling, hair braided, no coat, visibly happier. Rain: a hood, and a bag she keeps drier than herself. Winter: a grey wool coat over the lab coat, which is ridiculous. What is worn: the coat cuffs are stained at the right wrist where she rests it on the bench, and one vial has been replaced with a slightly mismatched one.",
+        "wardrobe_sources": "Laboratory and clean-room dress, plus field-sampling kit. Plausible for obvious reasons and specific in the details that matter: a clean-room shoe is not a trainer, a lab coat has a back belt nobody ever uses, and the cuffs are knit rather than open because open cuffs catch on glassware. Construction: three press studs concealed under a placket, two patch pockets and one breast pocket, a vent at the back, and the belt tied behind and forgotten. Cloth is stiff poly-cotton, so the open front panels swing and hold a shape — which is what produces the broken-hem silhouette. The waders are real waders with a chest strap. Nothing smooth, nothing seamless, no glowing lines.",
+        "costume_plot": "Sc.1 lab — coat, lanyard, glasses. Sc.3 shoreline — waders, braid, no coat, and she looks like a different and better-rested person. Sc.5 her confession about the leak — coat, and she takes the lanyard OFF and puts it on the table, which is the entire scene. Sc.9 hearing — coat over the grey wool coat, absurd, lanyard back on with one vial missing. Sc.12 festival — waders, because she is working. The lanyard comes off exactly once, and everyone watching knows what that means because it has been across her chest in every previous frame.",
+        "function_and_climate": "Yes — the coat permits bench work and the waders permit shoreline sampling, which is what she actually does. Coastal Honshū: hood in rain, wool coat over the lab coat in winter, blouse sleeves rolled and coat open in humid summer. The waders are the purest climate-and-region answer in the cast: she works in a tidal zone, so she owns tidal-zone clothing, and it changes her silhouette completely without being a 'costume'.",
+        "colour_zones": "Main colour clean-room white #EDF2F3, decided: the institutional transparency she publicly champions and privately broke. It is also the largest area, and that irony is the design. Head is exactly 3 (#3A3F52, #EFD8C0, #4C7D7A). Body runs 7. Reserved: Splash's cyan #8FD8E8, appearing only inside the vials — eleven small points of her creation's exact colour worn across her chest. Area effect matters: a large white coat at full sprite size reads considerably brighter than the swatch and will bloom out, so the slate blouse, the dark trousers and the mint lanyard are all load-bearing value anchors, and she must never be staged against a white background.",
+        "ensemble_colour": "Aquaforge reads pale cyan, clean-room white and mint. Saya is the faction in fabric, Splash is the faction in flesh, and Aster-7 deviates to amber. Nearest cast member: Splash, absolutely deliberately — the creator and the creation are the same palette, which is the visual claim that Saya made her. They separate on opacity, silhouette class and value structure. Second nearest: Momo, the other light-dominant woman; they separate on temperature (Saya cool, Momo warm-accented), on age reading and on silhouette class.",
+        "physical_plausibility": "168 cm / 58 kg → BMI 20.5, healthy. Her life shows as a slight bench stoop, permanent under-eye shadows that are never retouched, dry hands from constant washing and solvents, and a habit of standing with her weight on one leg and an arm folded. She is not gaunt and she is not glamorous; she is thirty-one and tired and good at her job, and the art must find that attractive without changing any of it."
+      }
     },
     {
       "id": "lumina",
       "name_en": "Reina «Lumina» Kagami",
       "name_ja": "レイナ・カガミ",
       "age": 35,
-      "age_coding": null,
+      "age_coding": "adult",
       "faction": "chorus_abyss",
       "role": "leader of the Chorus of the Abyss; former crisis-communications specialist",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 9,
+      "physical": {
+        "height_cm": 172,
+        "weight_kg": 62,
+        "bmi": 21.0,
+        "head_ratio": 7.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "tailored inverted triangle with a held light — a sharp suited figure whose outline is broken at chest height by a ring she carries in both hands",
+        "big": "the charcoal-indigo tailored suit jacket, structured shoulder, sharp lapel",
+        "mid": "the ring light held at chest height on its handle; sleek chin-length hair; the trouser break",
+        "small": "the lamp's switch and battery grip, lapel stitching, a single ring on her hand",
+        "negative_space": "the hole in the middle of the ring light — she carries an actual circle of empty space at chest height, which is unique in the roster and reads instantly at 64px",
+        "measured_note": "⚠️ MEASURED 2026-07-27: weak under black fill — the ring light's central hole CLOSES at 64px, losing the one unique feature of her outline. Fix: the lamp must be at least as wide as her shoulders. This is the single most fixable silhouette weakness in the cast; enlarging the lamp makes her instantly unique."
+      },
+      "memory_point": "A hand-held ring light on a short ceremonial handle, carried at chest height in both hands wherever she goes — she brings her own flattering key light everywhere, and everyone she speaks to is lit by it",
+      "secondary_hook": "She never raises her voice and never stands higher than the person she is persuading; if there is a step, she takes the lower one",
+      "shape_language": {
+        "circle": 45,
+        "square": 35,
+        "triangle": 20
+      },
+      "symbol_set": {
+        "eye": "type 1 kind / gentle — round, warm, generous gloss, soft outer corner. This is a DELIBERATE physiognomic subversion (questionnaire A.4.2): conventional coding would give the antagonist angular eyes. Justified because looking trustworthy was literally her profession, and the audience must feel the pull before they see the mechanism.",
+        "brow": "soft, slightly raised inner ends — permanent sympathetic concern, held as a professional expression",
+        "mouth": "full, warm, a small closed smile that reaches the eyes; she is very good at this",
+        "contour": "soft oval, no hard angles anywhere in the face — every conventional villain cue is deliberately absent",
+        "hair": "warm dark ash-brown, sleek chin-length bob, immaculate, cut expensively and recently",
+        "body": "tall, composed, adult; authority carried entirely by tailoring, stillness and lighting"
+      },
+      "palette": {
+        "main_colour": "warm gold #D8A94A — but it is a colour she holds rather than wears, which is the whole character",
+        "zones": {
+          "Head": "#6E5A46 warm dark ash-brown",
+          "Skin": "#F0D6BE",
+          "Eye": "#E8A33D amber-gold",
+          "Tops1": "#231F5C deep electric indigo suit",
+          "Tops2": "#FFF8E7 ivory shell",
+          "Waist": "#1F2444 a plain dark belt",
+          "Bottom1": "#231F5C indigo trousers",
+          "Bottom2": "#1A1E2E dark socks",
+          "Shoes": "#2A2325 flat polished shoes, deliberately not heels",
+          "Decoration1": "#FFB703 hot gold lamp output",
+          "Decoration2": "#6E7590 the suit's fine lining and lapel stitch"
+        },
+        "reserved_colour": "#D8A94A warm gold — she owns no gold garment, no gold jewellery beyond one plain ring, and no gold trim. The only gold in her palette is emitted by the lamp she is holding. Take the lamp away and the warmth leaves the frame entirely, and that is the argument the story is making about her.",
+        "shadow_hue": "#141833 deep indigo"
+      },
+      "wardrobe": {
+        "default": "charcoal-indigo tailored suit, ivory shell, flat shoes, ring light in both hands",
+        "second": "outreach — a plain indigo cardigan and skirt for soup-kitchen and shelter work, no lamp, no tailoring, and she is just as effective, which is more frightening",
+        "rain": "a well-cut navy trench, and someone else always holds the umbrella; she keeps both hands on the lamp",
+        "winter": "a long charcoal wool coat, still open, still unhurried"
+      },
+      "props": [
+        "the ring light on its handle, with a visible switch and battery grip",
+        "a slim folio of other people's documents"
+      ],
+      "banned": [
+        "NO robe, cassock, vestment, high clerical collar, sash, mitre, hood or any garment that reads as religious dress — this design exists specifically to refuse the priest-robe default named in wardrobe-questions.md",
+        "no real religious, occult or extremist symbol; all Chorus iconography is invented and is worn small or not at all",
+        "no supernatural effect, no glowing eyes, no levitation, no aura — every effect she produces has a switch",
+        "no cleavage-led or hip-led framing, no heels, no femme-fatale staging",
+        "no romantic or physical framing with any minor character, in any composition",
+        "her face is never distorted into a villain grimace; her menace must survive her being pleasant"
+      ],
+      "canon_delta": "Draft gives crisis-communications background and staged miracles. The decision that she wears a secular tailored suit rather than any form of cult vestment is new and load-bearing: the design document says her miracles are media events, so she is dressed as a media professional. The physiognomic subversion is also new and is justified in symbol_set.eye.",
+      "answers": {
+        "wardrobe": "A charcoal-indigo tailored suit, an ivory shell, flat polished shoes — the wardrobe of a senior crisis-communications consultant, which is what she was and, in every way that matters, still is. It is expensive, current, and bought by her. It fits perfectly, which is worth stating because almost nobody else's clothing in this cast fits: Ren's is too big, Hana's is too big, Miya's is askew, Splash's isn't hers. Lumina is the only person on screen wearing exactly what she chose, in her size, and that reads as control before a word is spoken. Second outfit: a plain indigo cardigan and skirt for shelter work, no lamp — and she is just as persuasive in it, which is the more disturbing fact. Rain: a navy trench, with someone else holding the umbrella because both her hands are on the lamp. Winter: a long charcoal coat, worn open. Nothing is worn out. Nothing is repaired. That is the tell.",
+        "wardrobe_sources": "Contemporary tailoring — corporate and political communications dress. Deliberately and explicitly NOT clerical: no robe, no cassock, no vestment, no sash. The wardrobe guide names priest-robe sci-fi as the single most common AI default, and this character is where a project like this would fall into it hardest, so the refusal is written into the banned list rather than left to judgement. Construction: half-canvassed jacket with a real roped shoulder, working cuff buttons, a single vent, and a lining in a colour only she ever sees — the last detail is the character in one seam. The ring light is a real object with a real switch, a real battery grip and a real charging port, because the visible-hardware rule applies most strictly to the person selling miracles.",
+        "costume_plot": "Sc.2 first 'cleansing' — suit, lamp, and the lamp is what makes the miracle; a viewer who watches the light rather than the woman can solve the scene. Sc.5 shelter — cardigan and skirt, no lamp, genuinely helping people, and this scene must not be undercut. Sc.7 staged omen — suit, lamp, coordinating with Akatomi. Sc.9 hearing — suit, lamp switched OFF and held anyway, which is the first time she is lit by someone else's light and the first time she looks 35. Sc.12 festival — suit, lamp on, and it fails; the battery dies at the wrong moment, and the crowd sees an ordinary woman holding a dead lamp. The lamp going out is her defeat, and it required no violence.",
+        "function_and_climate": "The suit permits everything the story asks: standing, speaking, walking a crowd, being photographed from any angle. She does nothing physical, ever, and the wardrobe says so honestly. Coastal Honshū: navy trench in rain, long wool coat in winter, jacket off and shell only in humid summer — and even in shirtsleeves she keeps both hands on the lamp. The flat shoes are a climate-and-function answer disguised as a character note: she walks a lot of wet pavement and she needs to be able to step down off a kerb without looking at her feet.",
+        "colour_zones": "Main colour warm gold #D8A94A — and the decision is that she MEANS a colour she does not wear. Her garments are all charcoal-indigo and ivory; the gold is emitted by an object she carries and can switch off. Head is exactly 3 (#6E5A46, #F0D6BE, #A88A5C). Body runs 6, which is low for an SSR and is correct: her density comes from tailoring detail and lighting, not from colour count. Reserved: the gold itself. Area effect: the dark suit at full size reads nearly black, which is exactly why the lamp is so effective — a small warm high-value source against a large dark mass, which is the most attention-grabbing arrangement available in the whole palette system, and she knows it.",
+        "ensemble_colour": "The Chorus reads indigo with warm gold, where the gold is always a lamp someone is holding — a faction rule written FROM this character outward. Lumina is the complete statement; Hana wears the indigo with none of the gold. Nearest cast member: Hana, deliberately, so the faction reads. They separate on fit, finish and light: Lumina is tailored, pressed and self-illuminated; Hana is oversized, matte and unlit. Second nearest, surprisingly, is Miya — both are deep violet-indigo with one warm high-value point. Same structure, opposite meaning: Miya's warm point is a pair of rubber boots, Lumina's is a crowd-control device. They separate instantly on scale and silhouette class.",
+        "physical_plausibility": "172 cm / 62 kg → BMI 21.0, healthy. Her life shows as extremely good grooming maintained under real fatigue: an expensive recent haircut, immaculate tailoring, and, if you look closely, bitten nails on the hand that holds the lamp — the single crack in the surface, and the only thing about her appearance she does not control. She stands very still. She has trained herself out of gesturing, because gestures are hard to photograph well."
+      }
     },
     {
       "id": "kurogane",
       "name_en": "Taishi Kurogane",
       "name_ja": "クロガネ・タイシ",
       "age": 48,
-      "age_coding": null,
+      "age_coding": "adult",
       "faction": "akatomi",
       "role": "Akatomi Dynamics CEO and engineer",
       "approved": false,
-      "answers": {
-        "wardrobe": null,
-        "wardrobe_sources": null,
-        "costume_plot": null,
-        "function_and_climate": null,
-        "colour_zones": null,
-        "ensemble_colour": null,
-        "physical_plausibility": null
+      "questionnaire_answered": true,
+      "appeal_track": "hero_glamour",
+      "rarity_tier": "SSR",
+      "visual_density": 6,
+      "physical": {
+        "height_cm": 178,
+        "weight_kg": 78,
+        "bmi": 24.6,
+        "head_ratio": 7.5
       },
-      "questionnaire_answered": false
+      "silhouette": {
+        "class": "monolith — a wide, heavy, strictly rectangular column with almost no taper from shoulder to hem",
+        "big": "the pale silver-grey suit, cut deliberately boxy, no waist suppression at all",
+        "mid": "the swept steel-grey hair; the jacket's shoulder line; the trouser break",
+        "small": "the calipers in the breast pocket, cufflinks, the tie's flat knot",
+        "negative_space": "almost none — he is the most closed silhouette in the cast, on purpose, and the only gap is the small triangle between his arm and body when one hand is in a pocket. Every other character has holes; he has one.",
+        "measured_note": "✅ MEASURED 2026-07-27: strong under black fill — the only closed rectangle in the roster."
+      },
+      "memory_point": "A pair of worn engineer's calipers standing in the breast pocket where a pocket square belongs — the only object he owns that has ever been used for anything",
+      "secondary_hook": "His shirt cuffs are always a centimetre too long, because the shirts were made for him fifteen years and eight kilograms ago and he has not reordered",
+      "shape_language": {
+        "square": 60,
+        "triangle": 30,
+        "circle": 10
+      },
+      "symbol_set": {
+        "eye": "type 6 arrogant / ambitious geometry — straight, angular, small pupil and iris, looking slightly down — but tired lower lids restore the humanity. Conventional physiognomic coding, used honestly (questionnaire A.4.2): he looks like what he is, and the complication is in his reasons, not his face.",
+        "brow": "heavy, straight, level, unmoving",
+        "mouth": "wide, thin, level, closed; he listens with it completely still",
+        "contour": "broad square jaw, heavy brow ridge, deep nasolabial lines, a face that was handsome and is now formidable",
+        "hair": "steel grey, receding at the temples, swept back and kept short; no vanity in it",
+        "body": "tall and heavy-set — an engineer's frame gone office-bound; thick through the chest and shoulders, softened at the waist, and the suit does not hide it because he did not ask it to"
+      },
+      "palette": {
+        "main_colour": "cold silver #D7DDE3 — Akatomi's corporate white worn as a personal statement",
+        "zones": {
+          "Head": "#DDE4EA bright steel silver",
+          "Skin": "#DEC3A5",
+          "Eye": "#5A6B78 flat grey",
+          "Tops1": "#D7DDE3 pale silver-grey suit jacket",
+          "Tops2": "#0B1E3D ink navy shirt",
+          "Waist": "#2A2F36 plain dark belt",
+          "Bottom1": "#D7DDE3 suit trousers",
+          "Bottom2": "#1E2634 dark socks",
+          "Shoes": "#23262A black oxfords, resoled",
+          "Decoration1": "#00B4D8 electric Akatomi cyan tie",
+          "Decoration2": "#B0B6BB the calipers' worn steel"
+        },
+        "reserved_colour": "#B0B6BB worn tool steel — the calipers are the only object in his entire palette with a used finish. Everything else he owns is new, polished or corporate. That one scuffed grey is the last physical evidence that he was an engineer before he was this, and it is reserved to that object alone.",
+        "shadow_hue": "#4A5A6E cold blue-grey"
+      },
+      "wardrobe": {
+        "default": "pale silver-grey suit, ink navy shirt, cold-blue tie, black oxfords, calipers in the breast pocket",
+        "second": "the works visit — the same suit trousers and shirt under a white Akatomi site coat and a hard hat that does not fit him, because he refuses to keep a set of site clothes; he is a CEO cosplaying an engineer at the company he founded as an engineer",
+        "rain": "a chauffeur, a car, and an umbrella held by someone else; he is almost never rained on, and the one scene where he is soaked is the scene where he has lost",
+        "winter": "a charcoal overcoat, immaculate, worn buttoned"
+      },
+      "props": [
+        "engineer's calipers",
+        "a phone he answers on the second ring, never the first",
+        "a hard hat that does not fit"
+      ],
+      "banned": [
+        "no real-world corporate, political, military or religious insignia; all Akatomi marks are invented and appear small",
+        "no cartoonish villain cues — no cape, no throne, no steepled fingers in shadow, no glowing monitor uplighting, no scar-as-evil",
+        "no weapon of any kind; he never touches the machines he sells",
+        "no gore, no menace toward a child in frame",
+        "the calipers are never used as a threat and never absent from the pocket"
+      ],
+      "canon_delta": "Draft gives the personal tragedy and the create-a-crisis-then-sell-the-solution method. Added: the calipers as the memory point, the ill-fitting fifteen-year-old shirts, and the site coat over suit trousers.",
+      "answers": {
+        "wardrobe": "A pale silver-grey suit, an ink navy shirt, a cold-blue tie and resoled black oxfords. The suit is expensive and boxy — no waist suppression, because he is not selling attractiveness, he is selling stability, and a rectangle is the most stable shape a person can be. The shirts were bespoke, made fifteen years and eight kilograms ago, and he has never reordered, so the cuffs run a centimetre long and the collar sits a little tight. Nobody has told him. Second outfit: suit trousers and shirt under a white Akatomi site coat with a hard hat that does not fit, worn on works visits — a CEO dressed as an engineer at the company he founded as an engineer, and it does not fit him in either sense. Rain: a car and someone else's umbrella. Winter: a buttoned charcoal overcoat. What is worn out: the oxfords, resoled twice, and the calipers.",
+        "wardrobe_sources": "Corporate tailoring and industrial site PPE, deliberately combined badly. He would plausibly own both because he genuinely was an engineer; the joke and the tragedy are that he can no longer wear either convincingly. Construction: a fully canvassed but boxily cut jacket with a soft shoulder, two vents, working cuffs, and a breast pocket with no pocket square in it — the calipers stand in it instead, which is the single most important construction detail on him. The site coat is a snap-front poly-cotton coverall coat with a knit collar. Nothing smooth, nothing seamless, no glowing corporate lines.",
+        "costume_plot": "Sc.3 festival announcement — full suit, on a stage, lit by someone else's rig. Sc.7 works visit — site coat and bad hard hat over suit trousers, on the polygon. Sc.9 hearing — full suit, calipers visible, and he answers every question honestly, which is worse. Sc.11 the Obsidian-01 demonstration — suit, no coat, standing too close to a machine he does not know how to operate. Sc.12 — the one scene where he is genuinely rained on, hair flat, silver suit gone grey and translucent with water, no umbrella, no car. That is the entire fall, delivered as wet tailoring, with nobody arrested and nobody struck.",
+        "function_and_climate": "The suit permits standing, speaking and signing, which is all he does; the story never asks him to run, and the design refuses to pretend otherwise. Coastal Honshū: he is transported rather than exposed, so his climate answer is that he does not have one — which is itself the answer, and it is why the single rain scene lands. The hard hat that does not fit is a functional failure played straight: he cannot even wear his own company's safety equipment correctly.",
+        "colour_zones": "Main colour cold silver #D7DDE3, decided: Akatomi's corporate white, worn on his own body as a claim that he IS the company. It is also the largest area. Head is exactly 3 (#C9CDD1, #DEC3A5, #4A5259) — and note that his hair and his suit are nearly the same value, which deliberately makes him read as one continuous object rather than a person wearing clothes. Body runs 6, low for an SSR and correct: an executive's restraint is a design statement, and density 6 with the boldest silhouette in the cast is exactly what design-canon means by raising boldness rather than density. Reserved: worn tool steel #B0B6BB on the calipers. Area effect: a large pale suit reads brighter and flatter at full size, so the ink navy shirt is essential — it is the only dark value near his face and the only thing keeping his head attached to his body visually.",
+        "ensemble_colour": "Akatomi is white, silver and cold blue with no visible fasteners — a faction rule that is really a description of him. Momo wears the same white but covered in visible fastenings, and Stella is the same palette turned into light; both deviations are arguments with him. Nearest cast member in colour: Momo, which is uncomfortable and intentional — the CEO and the fifteen-year-old he is using are wearing the same corporate white. They separate on value distribution, warmth and silhouette class: Momo has a warm amber accent and an A-line, Kurogane has a cold blue accent and a closed rectangle. In greyscale he is the flattest, most featureless light mass in the cast, which is exactly right.",
+        "physical_plausibility": "178 cm / 78 kg → BMI 24.6, at the upper end of healthy — a big man who was physically active and now is not, which is both realistic for 48 and necessary for the silhouette. His life shows: an engineer's hands with old scars that no longer match his job, reading glasses he takes on and off, a heaviness through the shoulders, and shirts that fit a smaller man. He moves slowly and deliberately, and he is never drawn hunched or scheming — his posture is upright and reasonable, because he believes he is."
+      }
     }
   ],
   "primary_question_set": {
     "file": "ai_agent_docs/Character_Design_Brief_AI_Agent_Questionnaire.md",
-    "note": "Answer this FIRST. It is derived from 27 primary sources with a principle-to-source attribution index, covering silhouette, kawaii/moe engineering, SD-chibi, physiognomic coding, transmedia flatness, worldview symbiosis, tiering, live-ops cadence, fan-art virality, merch and IP.",
-    "supplement_rationale": "It treats costume as a VARIABLE — how many variants per tier, what material — but never asks what the person actually wears on an ordinary day, where the clothes came from, or what they do in the rain. The sections in this file close that gap."
+    "note": "Answered FIRST for every character. Derived from 27 primary sources with a principle-to-source attribution index, covering silhouette, kawaii/moe engineering, SD-chibi, physiognomic coding, transmedia flatness, worldview symbiosis, tiering, live-ops cadence, fan-art virality, merch and IP.",
+    "supplement_rationale": "It treats costume as a VARIABLE — how many variants per tier, what material — but never asks what the person actually wears on an ordinary day, where the clothes came from, or what they do in the rain. The `answers` block in each character record closes that gap."
+  },
+  "silhouette_test": {
+    "run": "2026-07-27, cast lineup groups A/B/C",
+    "method": "key out the #00B140 field, fill the figure 100% black, view at 64px (.venv-art, Pillow+numpy)",
+    "artifacts": "characters/_lineup/qa/*_black_64.png and characters/_lineup/qa/SILHOUETTE_TEST.md",
+    "headline": "3 outstanding, 4 strong, 2 good, 1 adequate, 4 needing amplification. No two silhouettes collide with EACH OTHER — the weakness is against a generic figure. The four weak ones (ren, momo, reika, lumina) all have memory points that are internal detail or small held objects, which a black fill deletes; the fix is to make each break the outer contour."
+  },
+  "colour_rule": {
+    "statement": "This cast renders BRIGHT. Garment zones target HLS saturation 0.55-0.85; accents 0.85-1.0. Value contrast carries mood, not desaturation.",
+    "why": "design-canon.md 3 area-effect: 'bright, saturated palettes read well at scale... highly-rated AI images skew bright, high-resolution and clean-palette. Brightness is doing real perceptual work.' The first pass ignored this — measured cast mean saturation was 0.409 with 10/14 characters below 0.45, and the only three figures the project owner rated good (splash 0.84, stella 0.69, kitsune 0.65) were exactly the three most saturated. Direct evidence.",
+    "grit_without_mud": "Grime, wear and repair are rendered as VALUE and TEXTURE — dark streaks, worn edges, patches — never by desaturating the base hue. A dirty coat is a bright coat with dark marks on it."
+  },
+  "background_rule": {
+    "statement": "Generate characters on a SUPPORTIVE COLOUR ENVIRONMENT, not on flat chroma-green. Green fields are for turnaround/matting stages only.",
+    "why": "Owner direction 2026-07-27, verified by measurement: background colour materially affects generation. Identical character specs on flat #00B140 produced garment saturation 0.204 for Yuki; the same character on a misty aurora environment produced 0.570 — a 2.8x lift with no other change.",
+    "how": "Split the saturation budget explicitly: state that the ENVIRONMENT is soft/dark/low-saturation AND that the FIGURE is the most colourful object in frame. Naming both halves is what works. Use gradients, aurora, lantern-lit streets, wet neon, atmospheric interiors — a palette that supports the character rather than a negative/complementary field.",
+    "style_variation": "Do NOT reuse one STYLE block across the roster. Identical style + identical field + identical lighting across three v1 sheets is what made the cast look samey. Vary render style per character or per faction."
   }
 }

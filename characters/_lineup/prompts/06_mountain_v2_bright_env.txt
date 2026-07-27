@@ -1,0 +1,8 @@
+[v2 of the mountain faction. FOUR changes vs v1, all owner-directed:
+ 1. saturation pushed to the design-canon bright band (cast mean 0.409 -> 0.578)
+ 2. chroma-green field REPLACED with a supportive colour environment
+ 3. faction palette corrected: v1 applied the design doc's ENVIRONMENT colours
+    (cedar/slate/fog) to the PEOPLE, making them camouflage. Landscape stays
+    desaturated; the villagers are now the brightest thing in frame.
+ 4. style shifted to a painterly festival-poster look, away from the flat
+    VN-lineup style used for all three v1 sheets.]

@@ -1,0 +1,61 @@
+[Corrective regeneration of the Splash figure from 03_lineup_groupC.
+BLOCKING defect: v1 rendered anatomical torso contouring, violating splash
+banned[0] in cast.json and failing the qa-checklist.md safety pass.
+ONE change class: every anatomical noun replaced with explicit
+non-anatomical geometry (vase / column / smooth featureless volume), and the
+lower body described positively as separate falling streams rather than as
+"no legs". Pose, glass, tendril hair and amber throat node preserved.]
+
+---
+
+Single full-body character reference on a flat chroma-green field (#00B140), even
+neutral studio light, clean anime visual-novel key art, flat 2D cel shading,
+confident ink line. No text, no watermark, no logo, no UI, no border.
+
+SPLASH — a non-human soft-robot prototype made of transparent polymer gel.
+
+MATERIAL, the most important quality: she is made of HIGHLY TRANSPARENT pale cyan
+(#8FD8E8) gel, like clear water in a glass or clean blown glass. The flat green
+background is CLEARLY VISIBLE THROUGH her head, through her face, through her torso
+and through her arms — you can read the green colour through every part of her. She
+is about 20% opacity: a faint tinted transparent form, not a solid figure. Strong
+refraction, bright caustic highlights, and a narrow crisp white rim light tracing
+her outer edge so her silhouette stays readable against the green.
+
+BODY GEOMETRY, follow exactly: her torso is a SMOOTH FEATURELESS TAPERED COLUMN of
+clear gel, shaped like an elegant glass vase or a smooth decanter — a plain unbroken
+glassy surface with no contours, no modelling, no indentations and no detail of any
+kind on its front surface. Completely smooth and abstract, like polished glass. Her
+shoulders are gentle rounded slopes and her arms are slim smooth transparent tubes
+ending in slender hands with five fingers each.
+
+LOWER BODY: below the waist the smooth column narrows and then BREAKS APART into
+five or six SEPARATE INDIVIDUAL RIBBONS of falling water, each ribbon a distinct
+curving stream that flows downward and outward and TAPERS AWAY TO NOTHING in
+mid-air, with clear open gaps of green background visible between the separate
+ribbons. The ribbons never touch the ground — she floats with empty green space
+beneath her, and the lowest tips of the ribbons dissolve into a few loose droplets.
+
+HEAD: a gentle rounded face of clear gel. Huge kind glass-lens eyes with a faint
+cyan refracted ring and no white sclera; the green background shows through the
+lenses. A soft implied curve for a mouth, no lips. Long hair made of smooth separate
+liquid tendrils that curl outward in individual strands with green space between
+them. Balanced perfectly upright and level on the very top of her head sits a SMALL
+CLEAR EMPTY DRINKING GLASS.
+
+INTERNAL HARDWARE, visible through the transparent gel: small pale rounded micropump
+nodes and tiny sensor beads suspended INSIDE her torso and upper arms like objects
+sealed in clear resin, connected by fine pale filament lines. At the base of her
+throat, one small WARM AMBER (#FFC46B) glowing status node — the only warm colour
+anywhere on her. A few small heart-shaped clear bubbles drifting up inside the gel.
+
+POSE: standing upright and calm, facing forward, arms relaxed and slightly away from
+the body, a gentle curious expression.
+
+STRICT EXCLUSIONS: her torso surface is entirely smooth and abstract with absolutely
+no anatomical features, no anatomical contouring, no chest definition, no navel, no
+body-part modelling of any kind — treat the torso as a plain glass vase. No clothing,
+no swimsuit, no painted-on garment. No opaque or milky areas, no solid jelly look, no
+plastic. No pink, no skin tones. No legs, no knees, no feet, no shoes, no ground
+contact, no cast shadow. No suction cups, no tentacles, no monster features. Not
+sexualised in any way; no pin-up pose, no low camera angle. No text or watermark.
