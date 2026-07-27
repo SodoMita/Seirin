@@ -17,11 +17,21 @@
     "applies_to": "every character, every asset, including CGs and hero shots"
   },
   "style_bible": {
-    "render": "Modern anime / visual-novel key-art rendering: clean cel shading with one soft secondary shadow tone, restrained gradient in the shadow core, no painterly noise, no heavy texture overlay",
-    "line": "Confident tapered ink line, slightly heavier on the outer contour than on interior detail, thinner inside the face",
-    "eye_render": "Layered anime iris — dark upper lid shadow, iris ring, pupil, one primary specular highlight upper-left plus one small secondary lower-right, unless the character's symbol_set says otherwise",
-    "flatness": "2D flat-design language retained for transmedia portability (questionnaire A.5). No 3D-realist rendering of characters; environments may be more rendered than figures.",
-    "light_default": "Key from upper front-left, cool fill from the right, rim light separating the figure from the background"
+    "render": "FLAT STYLIZED CEL. Exactly TWO tones per colour — one base, one shadow — plus an optional third only on the face. Every shadow is a HARD-EDGED SHAPE with a crisp drawn boundary. No gradient, no airbrush, no soft falloff, no blending.",
+    "line": "Visible ink outline of near-even weight around the figure and all interior detail; slightly heavier on the outer contour. The line is part of the style and must never be lost.",
+    "eye_render": "Flat graphic iris: solid iris colour, solid pupil, ONE hard-edged highlight shape. No layered gradient, no glassy rendering.",
+    "flatness": "Genuinely flat 2D. This is a stylization target, not just an anti-photorealism note (questionnaire A.5).",
+    "light_default": "Implied key from upper front-left expressed ONLY as the placement of the hard shadow shape. No rim light, no ambient occlusion, no specular sheen, no depth of field, no glow on the figure.",
+    "banned_render_cues": [
+      "gradient / airbrushed shading",
+      "rim light or edge light on the figure",
+      "specular highlights, gloss, wet sheen",
+      "ambient occlusion / contact softening",
+      "depth of field or blur on the figure",
+      "painterly brush texture",
+      "3D or 2.5D rendering, subsurface scattering"
+    ],
+    "correction_note": "REWRITTEN 2026-07-27 after owner review: '2.5d appeared not what needed, prefer more stylized.' The previous version was self-contradictory — it asked for '2D flat-design language' while specifying 'restrained gradient in the shadow core' and a 'rim light separating the figure', and the hero template added 'cinematic lighting and depth of field'. Gradient + rim light + cinematic = 2.5D. The words said flat; the parameters said rendered, and the generator obeyed the parameters. Measured on identical specs: the old render produced 1076 colours / 33.9% soft-gradient area / 1.7% hard edges; the flat cel test produced 584 / 11.5% / 7.6%. Removing volume CUES is what works — asking for 'flat' while leaving gradient and rim light in place does not."
   },
   "forbidden_global": [
     "no text, letters, numerals, captions, watermarks, signatures, logos, brand marks, UI, borders or colour charts",
@@ -1432,5 +1442,14 @@
     "how": "Use a ground that AGREES with the character: aurora/gradient in their main colour and its neighbours, or a real environment from their district (design doc §10.1). Keep the figure value-separated from the ground so the silhouette still reads.",
     "matting_note": "This does NOT change the matting pipeline. Alpha is still recovered from white+black plates at the END of the process (sprite-spec.md). Colourful grounds are for identity/turnaround/hero generation, where the goal is the best possible character — not for the final matte plates.",
     "supersedes": "The flat-green sheet instruction in SKILL.md workflow step 2.1 and prompt-grammar.md turnaround template, for the identity stages."
+  },
+  "style_by_asset": {
+    "$comment": "Per-asset styles. Deliberately NOT one style for everything — reusing a single STYLE block across the v1 roster is what made the cast look samey.",
+    "sprite": "A — hard cel. Two tones, hard shadow shapes, even ink line. The runtime workhorse; also the easiest to matte because edges are crisp.",
+    "expressions": "A — hard cel, identical to the sprite.",
+    "chibi_ui_merch": "B — flat vector. Solid fills, bold uniform outline, near-zero shading. Flattest measured (439 colours, 5.7% soft) and survives a 64px icon best.",
+    "hero_keyvisual": "C — woodblock flat. Flat colour plus paper grain and brush-ink line; decorative, and the most distinctive on a store page. Still no rim light or gradient on the figure.",
+    "cg_optional": "D — gouache flat. Warmer, softer, storybook. Reserve for quiet domestic beats.",
+    "environments": "Backgrounds MAY carry more rendering and atmosphere than characters — that contrast is the style. Figures stay flat."
   }
 }
