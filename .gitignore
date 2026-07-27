@@ -63,3 +63,5 @@ test-results/
 # throwaway archives elsewhere, ignore those paths individually instead.
 last-frequency/assets/characters/_green/
 last-frequency/assets/characters/_check_composite.jpg
+last-frequency/package.json
+last-frequency/package-lock.json

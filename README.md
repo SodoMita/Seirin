@@ -3,6 +3,7 @@
 Visual-novel project assets and design documents for **Seirin: Night Shift — Resonance 2030**.
 
 ## Directories
+- `last-frequency/` — **original** fully-offline visual novel *The Last Frequency* (~12,500 words, three endings). Story, UI and characters are original; only the Monogatari engine code is borrowed from `cyber-nexus/`. See its `README.md` for the skepticism log (it deliberately ignores this repo's adversarial `LEGAL.md` and joke `license.txt`). Runs by double-clicking `index.html`.
 - `cyber-nexus/` — runnable Monogatari example VN ("Cyber-Nexus: The Static Singularity"). **Runs with no server, no CDN and no runtime fetch**: double-click `index.html`. Game code lives in `vendor/game.js` (story script, HUD, codex, mini-game); guarded by `vendor/failsafe.js` (schema validation, rollback-safe mutations, state machine, lint, no-fetch guard) and `vendor/icons-offline.*` (local icon glyphs — no font CDN).
 - `backgrounds/` — generated scene backgrounds
 - `characters/` — character references and iterations

@@ -85,3 +85,19 @@ Never chain expressions from expressions. Record result notes below.
 
 ### Result notes
 - (filled as generations complete)
+
+### Result notes (2026-07-27)
+- All 10 sprites generated on flat #00B140; identity held across expression
+  edits (each expression was an image-edit of its approved base, never chained).
+- Chroma-matted with tools/mat_chroma.py (two-criterion key: green-excess +
+  distance-to-target-green, plus edge despill). Composite check over watch_room
+  shows clean edges, no green halo, background showing through (see
+  characters/_check_composite.jpg, gitignored).
+- Elara is staged as a *voice from the dial* (no on-screen show-character),
+  which is the deliberate "signal made visible" choice; her art is used as the
+  luminous show-image vision in Ending C's epilogue and as codex portraits, so
+  every generated asset appears in the game.
+- Backgrounds (16:9): title_exterior, watch_room, archive, rooftop, breakroom,
+  cliff_dawn — all match the rooms described in STORY_BIBLE.md §3. The watch
+  room includes the amber tube receiver under glass, crew photo, rain window,
+  and open logbook as specified.
