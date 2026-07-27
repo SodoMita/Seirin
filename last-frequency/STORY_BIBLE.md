@@ -123,6 +123,13 @@ scene only — no sprite, one line).
    has been inside the fold's pocket the whole time; being *answered* is what
    lets her perceive a way out. Answering is the whole game's thesis: signals
    only save people if someone is listening, and listening is a decision.
+8. **The navigation facts (locked):** The Cordelia ran heading 215 toward the
+   Shiogara harbor light. Inside the fold she also sees the OLD cape light —
+   decommissioned 1978, demolished 1981 — a lighthouse that exists in no year
+   and stands directly over the Needle, the rock shelf that killed her. The
+   safe bearing, per the 1986 inquiry's reconstruction, is **241**: it clears
+   the Needle to starboard and finds the true harbor channel. Ending A
+   broadcasts 241.
 
 ## 6. Stats, flags, gates
 
@@ -190,6 +197,7 @@ scene only — no sprite, one line).
 | Mira × Chiyo | Start (letters), Act1 | Act2_BreakRoom confession | All endings (phone call in A; names in B; the saved in C) |
 | Harlan's six words | Act2_Archive | Act3 confrontation | Act3 choice; his stance in the broadcast |
 | Jun's noodles / town memory | Start | Act2_BreakRoom | B's final line; C's epilogue |
+| Jun's father (T. Okita) | Act2_Archive log | — | B/C: the operator of record in 1986 was Jun's father; Jun never knew the log existed |
 | The decommission clock | Start (06:00) | HUD clock; 05:30 power-down | Every ending resolves it (reprieve / memorial / ashes) |
 | The lighthouse that isn't | Act2_Rooftop | — | Fold geometry; the bearing in A |
 
