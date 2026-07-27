@@ -48,6 +48,7 @@ __pycache__/
 *.py[cod]
 .venv/
 .venv-art/
+.venv_art/
 venv/
 .pytest_cache/
 playwright-report/
