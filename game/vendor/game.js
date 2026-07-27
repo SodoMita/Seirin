@@ -125,7 +125,10 @@ if (typeof window !== 'undefined' && window.Monogatari) {
             'kurogane': { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.png' } },
             'yuki':     { name: 'Юки Тэнро', color: '#38bdf8', directory: '', sprites: { normal: 'yuki_normal.png' } },
             'momo':     { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.png' } },
-            'kitsune':  { name: 'Кицунэ Юбикири', color: '#fb923c', directory: '', sprites: { normal: 'kitsune_normal.jpg' } },
+            'kitsune':  { name: 'Кицунэ Юбикири', color: '#fb923c', directory: '', sprites: { normal: 'kitsune_normal.png' } },
+            'kaito':    { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.png' } },
+            'aria':     { name: 'Ария Вейн', color: '#e879f9', directory: '', sprites: { normal: 'aria_normal.png' } },
+            'nao':      { name: 'Нао Синономэ', color: '#34d399', directory: '', sprites: { normal: 'nao_normal.png' } },
             'sys':      { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             'p':        { name: '{{player.name}}', color: '#facc15' }
         });
