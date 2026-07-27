@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
+    <title>Сэйрин: Ночная смена — Резонанс 2030 | Visual Novel</title>
+    <meta name="description" content="Visual Novel: Seirin: Night Shift — Resonance 2030. Runs 100% offline." />
+
+    <link rel="stylesheet" href="assets/fonts/fonts.css" />
+    <link rel="stylesheet" href="vendor/monogatari.css" />
+    <link rel="stylesheet" href="vendor/icons-offline.css" />
+    <link rel="stylesheet" href="vendor/custom-ui.css" />
+</head>
+<body>
+
+    <!-- TOP HUD -->
+    <header class="cyber-top-hud">
+        <div class="hud-group">
+            <span class="hud-brand"><i class="fas fa-microchip"></i> СЭЙРИН РЕЗОНАНС 2030</span>
+            <span id="hud-location" class="hud-badge"><i class="fas fa-map-marker-alt"></i><span>Тэцуба: Улица</span></span>
+        </div>
+
+        <div class="hud-group">
+            <span id="hud-player-name" class="hud-badge amber"><i class="fas fa-user-secret"></i><span>Рэн</span></span>
+            <span id="hud-route" class="hud-badge pink"><i class="fas fa-terminal"></i><span>Начало</span></span>
+            <span id="hud-alert-level" class="hud-badge red"><i class="fas fa-shield-alt"></i><span>0%</span></span>
+        </div>
+
+        <div class="hud-group">
+            <button type="button" class="hud-btn" id="btn-archives">
+                <i class="fas fa-book"></i><span>АРХИВ</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MONOGATARI CONTAINER -->
+    <div id="vn-root"></div>
+
+    <script src="vendor/failsafe.js"></script>
+    <script src="vendor/monogatari.js"></script>
+    <script src="vendor/icons-offline.js"></script>
+    <script src="vendor/game.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+/* ============================================================================
+ * Seirin: Night Shift — Resonance 2030 Custom Visual Novel UI Theme
+ * ----------------------------------------------------------------------------
+ * Clean, glassmorphic visual novel UI with glowing badges, response cards,
+ * top header status HUD, and custom responsive anime styling.
+ * ========================================================================== */
+
+@import url('./monogatari.css');
+@import url('./icons-offline.css');
+
+:root {
+  --sn-bg-dark: rgba(11, 15, 25, 0.88);
+  --sn-glass-border: rgba(56, 189, 248, 0.25);
+  --sn-text-main: #f1f5f9;
+  --sn-cyan-glow: #38bdf8;
+  --sn-pink-glow: #f472b6;
+  --sn-amber-glow: #fbbf24;
+  --sn-purple-glow: #a855f7;
+  --sn-emerald-glow: #34d399;
+  --sn-red-glow: #f87171;
+  --sn-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+#vn-root {
+  font-family: var(--sn-font-family);
+  background-color: #080a12;
+  color: var(--sn-text-main);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Custom Dialogue Screen Layout */
+[data-screen="game"] [data-ui="text-box"] {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 64px);
+  max-width: 1100px;
+  min-height: 180px;
+  padding: 24px 32px;
+  background: var(--sn-bg-dark);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--sn-glass-border);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 50;
+}
+
+/* Speaker Label Badge */
+[data-screen="game"] [data-ui="who"] {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  padding: 6px 18px;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--sn-cyan-glow);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  color: var(--sn-cyan-glow);
+  text-transform: uppercase;
+}
+
+/* Dialogue Text Body */
+[data-screen="game"] [data-ui="say"] {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #e2e8f0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Choice Menu */
+[data-screen="game"] [data-ui="choices"] {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 100;
+}
+
+[data-screen="game"] [data-ui="choices"] button {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 12px;
+  color: #f8fafc;
+  padding: 16px 24px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-screen="game"] [data-ui="choices"] button:hover {
+  background: rgba(30, 58, 138, 0.95);
+  border-color: var(--sn-cyan-glow);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.5), inset 0 0 12px rgba(56, 189, 248, 0.2);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Custom Top HUD */
+.cyber-top-hud {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  z-index: 80;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hud-brand {
+  font-weight: 700;
+  color: var(--sn-cyan-glow);
+  letter-spacing: 0.08em;
+}
+
+.hud-badge {
+  background: rgba(30, 41, 59, 0.8);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.hud-badge.amber { color: var(--sn-amber-glow); border-color: rgba(251, 191, 36, 0.3); }
+.hud-badge.pink { color: var(--sn-pink-glow); border-color: rgba(244, 114, 182, 0.3); }
+.hud-badge.red { color: var(--sn-red-glow); border-color: rgba(248, 113, 113, 0.3); }
+
+.hud-btn {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #cbd5e1;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hud-btn:hover {
+  background: var(--sn-cyan-glow);
+  color: #0f172a;
+}
