@@ -1,0 +1,60 @@
+[v2 of Stella. Project-owner note: "quadrocopters look bad on stella" — in v1
+they rendered as opaque black clip-art quadcopter toys scattered ON TOP of the
+figure, reading as bugs stuck to her. Root cause: they were described as
+literal aircraft, so the model pasted stock drones over the light figure
+instead of BUILDING the figure out of them.
+
+ONE change: the drones are no longer objects placed on her — they are the
+LUMINOUS POINTS THEMSELVES. Each is a tiny glowing lens with a faint rotor
+shimmer, seen mostly as light, with only a few near ones resolving into small
+dark bodies. Also fixes the black-fill finding that her wings read as solid
+anatomical wings (banned[1]) — the planes are now explicitly broken and gapped.]
+
+Key art of STELLA, a non-corporeal drone-swarm-and-projection art installation,
+full figure, tall and elongated at about 8 heads.
+
+BACKGROUND: a deep night-violet to indigo gradient sky over a rain-wet harbour,
+with soft airborne haze and mist catching light, and blurred warm city lights
+far below in bokeh. Rich, saturated, luminous. She is a light source, so the
+ground must stay DARK for her to read — bright figure against deep violet.
+
+SHE IS NOT SOLID. She is assembled ENTIRELY from THOUSANDS OF INDIVIDUAL POINTS
+OF LIGHT hanging in the air — each point is one tiny hovering drone seen as a
+brilliant glowing lens, like a swarm of luminous fireflies holding the shape of
+a standing woman. Brilliant aurora violet (#A65FFF), luminous cyan (#4FE3FF)
+and bright mint (#5FFFC0) where the light overlaps. Her surface is made of the
+GAPS between these points — she is mostly empty space, and the violet sky is
+clearly visible THROUGH her body everywhere.
+
+HOW TO DRAW THE DRONES — most important: the drones ARE the points of light.
+Draw them overwhelmingly as small brilliant glowing dots with a faint circular
+rotor-blur halo around each, so the swarm reads as shimmering light. Only about
+five or six of the NEAREST drones resolve enough to show a small delicate dark
+quadcopter body inside its own glow, and those are drawn small, elegant and
+crisply in perspective. Do NOT scatter opaque black toy quadcopters across her
+body. Do NOT paste stock drone shapes on top of the figure. The aircraft are
+revealed BY the light, not stuck onto it.
+
+WINGS: behind her shoulders, wide fanned shapes made of FLAT OVERLAPPING PLANES
+of projected light, like separate sheets of stage lighting cutting through haze.
+They must be clearly BROKEN INTO SEPARATE GAPPED PANELS with dark sky visible
+between every panel — never a solid continuous wing, never feathered, never
+anatomical. Above her head a floating crown of separate unconnected points.
+
+Her lower body does not end in legs: below the hips the points thin out and
+TRAIL AWAY DOWNWARD into a long falling stream of separate sparks that
+scatters into nothing above the ground. No feet, no ground contact, no cast
+shadow.
+
+Her face is barely there — two slightly brighter clusters of points where eyes
+would be, no iris, no mouth. Serene and impersonal.
+
+ONE SINGLE DRONE IS COMPLETELY DARK AND UNLIT — a small matte charcoal
+quadcopter with no glow at all, clearly visible in perfect formation among the
+shining ones, near her chest. It must be findable.
+
+EXCLUDE: no text, letters, numerals, watermarks, signatures, logos, UI, borders.
+No skin, no fabric, no clothing, no continuous outline, no solid body. No
+anatomical detail and no sexualised rendering — she is a volume of light. No
+angel, goddess, fairy or religious framing, no halo, no feathers. No real magic
+— every glow is a manufactured light source. No dull or desaturated colour.

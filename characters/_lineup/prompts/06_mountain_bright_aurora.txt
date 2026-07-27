@@ -1,0 +1,61 @@
+[v3. FOUR corrections from project-owner review of the v1/v2 lineup:
+ 1. Mountain faction was a miss — rebuilt from cedar/slate camouflage to
+    brilliant turquoise + jade + saffron. In-world logic: people in milk fog
+    dress to be FOUND, not to blend in (rescue / hill / festival dress).
+ 2. All colours were dull — measured cast mean saturation 0.32, contradicting
+    design-canon.md §3 "bright, saturated palettes read well at scale".
+    Re-specified to mean 0.48.
+ 3. Flat chroma-green background was a mistake — it conditions the model toward
+    desaturation. Replaced with a colourful ground in the characters' OWN
+    palette family (aurora/gradient), which is what this prompt tests.
+ 4. (Stella's quadcopters handled separately in prompt 07.)]
+
+Two-character key art, YUKI and RYUKI of the mountain community, standing
+full-figure side by side on a shared ground line.
+
+BACKGROUND — this is important, do not use a flat colour: a luminous
+turquoise-and-jade AURORA GRADIENT. Deep teal at the bottom rising through
+brilliant turquoise to a pale mint-white glow at the top, with soft banded
+aurora light and a few drifting motes. Milk-white mountain fog pooling low
+around their feet, catching the turquoise light. The background is bright,
+saturated and harmonises with the characters, and both figures are clearly
+value-separated from it so their silhouettes read.
+
+Vivid saturated anime key-art colour, clean cel shading with one soft shadow
+tone, crisp tapered ink line, bright high-key lighting, glowing rim light.
+Flat 2D anime illustration. NOT muted, NOT desaturated, NOT washed out.
+
+LEFT — YUKI TENRO, 19, 170cm, tall, upright, calm, a strict vertical column.
+A BRILLIANT TURQUOISE (#12B5A5) field haori, short and open, over a pure WHITE
+wrap-front keikogi, and BRIGHT CERULEAN BLUE (#1B7BB5) hakama — wide pleated
+divided trousers with crisp sharp vertical pleats and visible ties knotted at
+the front. White tabi, brown leather field boots. Slung diagonally across her
+back on a strap, exactly where a sword would sit and angled up over her right
+shoulder, a slim lacquered document tube with a bright SAFFRON ORANGE (#FFA62B)
+end-cap, held a hand's width off her back so a clear gap of light shows between
+the tube and her spine. Black hair in a low tight ponytail. Bright turquoise
+eyes, level gaze, calm and composed. White athletic tape around the base of
+each thumb.
+
+RIGHT — RYUKI, 16, 157cm, compact teenager, shy, gaze slightly down. A
+BRILLIANT JADE-GREEN (#12B58F) quilted mountain jacket, hand-quilted in a
+visible diamond grid, closed with cloth ties, mid-thigh length, over a cream
+long-sleeve. BRIGHT TEAL-BLUE (#1B6B9E) trousers, hill boots, cream cotton
+gloves on both hands. Under her RIGHT ARM she carries a BRILLIANT VERMILION-RED
+(#FF3B2E) and GOLD-LEAF (#FFC63A) lacquered DRAGON-DANCE HEAD, papier-mache
+over bamboo, glossy and richly coloured, its hinged jaw OPEN making a clear
+hole in her silhouette at hip height. The dragon head has been REPAIRED THREE
+TIMES at the jaw hinge with three visibly different materials — a brass plate,
+a wrapping of cord, and a mismatched patch of newer lacquer. Blue-black hair in
+one heavy plait over her left shoulder. Bright copper eyes.
+Her skin carries very fine pale plating with a soft matte pearl sheen across
+the cheekbones and the backs of her hands — a delicate healthy texture with
+dignity, absolutely NOT wounds, scabs, cracks, burns, sores or reptile scales.
+
+EXCLUDE: no text, letters, numerals, watermarks, signatures, logos, UI, borders.
+No sexualisation of either figure — both are minors or young; full-coverage
+clothing, age-accurate proportions, no low or upward camera angle, no cleavage,
+no bare midriff, no clinging fabric. No drawn blade, no katana, no weapon of any
+kind — the tube holds documents and the dragon head is ceremonial. No magic, no
+aura, no supernatural effect. No fused or extra fingers. No dull, muted, grey or
+desaturated colour anywhere.

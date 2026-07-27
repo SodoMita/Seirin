@@ -34,29 +34,28 @@
   ],
   "factions": {
     "akatomi": {
-      "palette": "cold white and silver with ELECTRIC cyan-blue, high-key and clinical",
+      "palette": "white, silver, cold blue; clean continuous surfaces, no visible fasteners",
       "reads_as": "corporate hygiene — the absence of visible seams IS the faction's message"
     },
     "chorus_abyss": {
-      "palette": "deep electric indigo with hot gold; the gold is always a lamp someone is holding",
+      "palette": "deep indigo with warm gold; the gold is always a lamp someone is physically holding",
       "reads_as": "warmth that has an owner and a switch"
     },
     "iron_requiem": {
-      "palette": "hot safety-orange and signal yellow over oil slate; oxide red at full saturation, never muddied",
+      "palette": "oxide red, oil slate, hi-vis accents; patched, taped, re-webbed",
       "reads_as": "repair as a moral position"
     },
     "aquaforge": {
-      "palette": "brilliant pale cyan, clean-room white, vivid mint",
+      "palette": "pale cyan, clean-room white, mint",
       "reads_as": "laboratory transparency, literal and figurative"
     },
     "tsukimachi": {
-      "palette": "saturated vermilion, gold, deep lacquer red",
+      "palette": "wood brown, gold, dark red; paper, lacquer, warm local light",
       "reads_as": "an old district that adopted new tools without dressing like the future"
     },
     "mountain": {
-      "palette": "vivid aotake bamboo-green and kingfisher turquoise, with safflower red and gold lacquer accents, worn AGAINST slate and fog",
-      "reads_as": "people who dress to be FOUND in fog. Mountain textile tradition is high-saturation on purpose — a village in milk-white weather wears the loudest colour it can dye.",
-      "correction": "PREVIOUS VERSION WAS WRONG. It copied design-doc 10.1's ENVIRONMENT palette (cedar/slate/fog) onto the characters, making them camouflage. qa-checklist.md requires a character read AGAINST her usual environment. The landscape is desaturated; the people are not."
+      "palette": "brilliant turquoise and jade, bright cerulean, with saffron and lacquer-vermilion accents",
+      "reads_as": "FOG VISIBILITY. Corrected 2026-07-27 — the previous 'landscape-coloured' answer was the dullest palette in the cast (mean saturation 0.25) and was wrong twice over: it contradicted design-canon.md §3 ('bright, saturated palettes read well at scale'), and it was bad in-world reasoning. People who live in milk fog and steep terrain do NOT dress to blend into it — mountain rescue, hill walkers and village festival dress are all deliberately high-visibility, because being findable is survival. The mountain community wears the colour of the water it is fighting for (bright spring turquoise/jade) plus saffron and lacquer red so it can be seen at fifty metres in cloud. Brighter than any other faction, and the most rational palette in the cast."
     }
   },
   "ensemble_note": "The cast was coloured together, not sequentially (design-canon §3), then MEASURED rather than eyeballed. Area-weighted greyscale luma over the 11 zones gives: LIGHT — splash .72, momo .70, kurogane .52, stella .51, saya .45; MID — aster7 .38, kitsune .35, miya .31, ryuki .26, hana .26, yuki .23, ren .21, lumina .19; DARK — reika .13. Honest caveat: this is a MID-heavy roster, not the even three-way split it would be convenient to claim. Only Reika is genuinely dark-dominant. That is acceptable because value is the second differentiator here, not the first — all 91 character pairs differ in at least two of {silhouette class, dominant hue, shape majority, head-ratio band}, and all 14 silhouette classes are unique.",
@@ -201,19 +200,19 @@
         "body": "wiry, real forearm and shoulder development from actual lifting; flat athletic build"
       },
       "palette": {
-        "main_colour": "oxide red #B5432A — the colour of rust that has been sanded and primed, i.e. of repair",
+        "main_colour": "#FF4A2E vivid oxide red",
         "zones": {
           "Head": "#FF6B2B vivid rust orange",
-          "Skin": "#EBC49A",
-          "Eye": "#3DDC84 vivid green",
-          "Tops1": "#37474F oil slate coverall",
-          "Tops2": "#FFF6E5 bright cream",
-          "Waist": "#7A4A2E worn leather belt under the knotted sleeves",
-          "Bottom1": "#37474F slate",
-          "Bottom2": "#6B7378 work socks",
-          "Shoes": "#2E3236 steel-toe boots",
-          "Decoration1": "#FF3B14 hot oxide-red decals",
-          "Decoration2": "#FFD400 signal yellow tape"
+          "Skin": "#FFD9AE",
+          "Eye": "#3FD98A bright jade green",
+          "Tops1": "#1F6B8A saturated petrol-blue coverall",
+          "Tops2": "#FFF4DC bleached cream undershirt",
+          "Waist": "#C4632E tan leather belt",
+          "Bottom1": "#1F6B8A coverall legs",
+          "Bottom2": "#5FA8C4 work socks",
+          "Shoes": "#2A3A44 steel-toe boots",
+          "Decoration1": "#FF4A2E bright oxide-red service decals",
+          "Decoration2": "#D6E4EC aluminium tape"
         },
         "reserved_colour": "#E4D33A hi-vis yellow — appears ONLY on the supervision lanyard she is issued when a licensed adult has cleared her to operate. If it is absent she is not allowed near the machine, and that is readable at a glance.",
         "shadow_hue": "#4A3550 cool plum"
@@ -290,19 +289,19 @@
         "body": "slight, still growing, shoulders narrower than the coat by a wide margin"
       },
       "palette": {
-        "main_colour": "indigo #2B2F6B — the colour of a stage before the lights come up",
+        "main_colour": "#2E35B8 vivid indigo",
         "zones": {
-          "Head": "#2E3350 near-black blue",
-          "Skin": "#F0D9C4",
-          "Eye": "#FFB627 amber / #4CC9F0 ice blue",
-          "Tops1": "#2C2FCB electric indigo coat",
-          "Tops2": "#FFF8E7 cream",
-          "Waist": "#8A7A5C cloth belt, wrapped twice",
-          "Bottom1": "#3A4780 indigo trousers",
-          "Bottom2": "#C9C2B4 thick socks",
-          "Shoes": "#5B4636 scuffed brown shoes one size too big",
-          "Decoration1": "#00F5D4 luminous heat-bloom cyan",
-          "Decoration2": "#B8B2A2 repair stitching"
+          "Head": "#3A3F8F deep blue-violet hair",
+          "Skin": "#FFE0C9",
+          "Eye": "#FFB22E amber / #5FC8F5 bright grey-blue",
+          "Tops1": "#2E35B8 vivid indigo stage coat",
+          "Tops2": "#FFF6E2 cream shirt",
+          "Waist": "#C4A05F cloth belt",
+          "Bottom1": "#4A52C4 pleated trousers",
+          "Bottom2": "#E8DFC4 thick socks",
+          "Shoes": "#8A5A3A brown shoes",
+          "Decoration1": "#5FF2FF brilliant heat-bloom cyan",
+          "Decoration2": "#C8BFA0 repair stitching"
         },
         "reserved_colour": "#6FE3E8 heat-bloom cyan — the thermochromic pigment only pales where warmth has touched the cloth. Handprints on the shoulders and forearms where she has been held, a fading palm where she holds her own elbow. It is the only colour in her palette that means someone was kind to her, and it must never be used decoratively.",
         "shadow_hue": "#1A1C3A deep blue-violet"
@@ -378,19 +377,19 @@
         "body": "tall and athletically square-shouldered; visible upper-back and forearm development from kendo, no waist emphasis"
       },
       "palette": {
-        "main_colour": "brilliant aotake bamboo-green #00A878 — a dyed, made, chosen green; NOT the colour of the forest behind her",
+        "main_colour": "#12B5A5 brilliant turquoise",
         "zones": {
-          "Head": "#1A1A20 blue-black",
-          "Skin": "#E8C9A8",
-          "Eye": "#12B39A vivid jade",
-          "Tops1": "#00A878 brilliant aotake bamboo-green haori",
-          "Tops2": "#FFFFFF bright white keikogi",
-          "Waist": "#1B2A6B deep indigo obi",
-          "Bottom1": "#2F4FA8 vivid indigo hakama",
-          "Bottom2": "#F5F2E8 tabi",
-          "Shoes": "#6B4A2E leather boots",
-          "Decoration1": "#E63946 vermilion tube cap",
-          "Decoration2": "#FFC93C gold archive tags"
+          "Head": "#2A2A3E black",
+          "Skin": "#FFD9B8",
+          "Eye": "#12C4A8 bright turquoise",
+          "Tops1": "#12B5A5 brilliant turquoise field haori",
+          "Tops2": "#FFFFFF white keikogi",
+          "Waist": "#0E5E7A deep teal obi",
+          "Bottom1": "#1B7BB5 bright cerulean hakama",
+          "Bottom2": "#FFFFFF tabi",
+          "Shoes": "#6B4A2E leather field boots",
+          "Decoration1": "#FFA62B saffron tube end-cap",
+          "Decoration2": "#FFE9B0 archive cord"
         },
         "reserved_colour": "#C0562F lacquer red — appears only on the document tube's end-cap and on nothing else she owns. When that red is uncapped on screen, records are being entered into evidence.",
         "shadow_hue": "#2B3A44 slate blue"
@@ -411,7 +410,7 @@
         "no shrine-maiden or miko costume — she is an archivist and an instructor, not clergy",
         "no fox, dragon or animal motif (those belong to Kitsune and Ryuki)"
       ],
-      "canon_delta": "Draft says 'kendo champion with a ceremonial katana'. Replaced the katana with the document tube and a bagged shinai — the draft's own text says the blade is ceremonial and never a solution, so the design now states that in the silhouette instead of contradicting it. SATURATION CORRECTION 2026-07-27: cedar-green/slate palette replaced. It was the design doc's ENVIRONMENT palette applied to a person, which made her camouflage against her own home and gave her the lowest saturation in the cast (0.26).",
+      "canon_delta": "Draft says 'kendo champion with a ceremonial katana'. Replaced the katana with the document tube and a bagged shinai — the draft's own text says the blade is ceremonial and never a solution, so the design now states that in the silhouette instead of contradicting it.",
       "answers": {
         "wardrobe": "White keikogi and slate hakama, because she teaches most mornings and does not change to run errands afterwards; over it a cedar-green field haori cut short enough to walk hill paths in. The hakama and keikogi are issued by the dōjō and mended by her. The haori is her own, bought in town, and is the only garment she picked for looks. She owns three outfits: the training one she lives in, a plain charcoal jacket-and-trousers for hearings, and a heavy winter layering. In rain, a mid-calf rain haori. Her hands are taped even out of the dōjō. Worn out: the hakama's rear pleat edges, the haori's shoulder where the tube strap sits, and the tube's own lacquer, which is chipped at the cap from being opened. All of it fits, all of it was chosen by her, and that steadiness is the character.",
         "wardrobe_sources": "Japanese budō dress (keikogi, hakama, tabi) and rural noragi/hanten layering, with the haori shortened to a field length. Plausible for exactly this person in exactly this place: a 19-year-old instructor in a mountain community wears her work clothes all day because they ARE her clothes. Construction: the hakama is a pleated wrap with four ties, front and back, knotted at the waist — that visible knotting is the detail that keeps her from reading as generic; the keikogi is a wrap front with a cloth tie; the haori closes with a single braided cord, not buttons. Cloth is heavy cotton, stiff enough to hold the pleats as a shape rather than drape.",
@@ -465,19 +464,19 @@
         "body": "slight teenage build, no chest or hip emphasis; presence comes from posture and gesture"
       },
       "palette": {
-        "main_colour": "signal amber #E8A33D — the civic campaign colour; the colour of a public announcement",
+        "main_colour": "#FFB02E vivid civic amber",
         "zones": {
-          "Head": "#FFCE5C bright apricot blonde",
-          "Skin": "#F7DFC8",
-          "Eye": "#00A8E8 electric blue",
-          "Tops1": "#F2F4F7 municipal-white technical jacket",
-          "Tops2": "#2B3440 charcoal",
-          "Waist": "#D8DCE2 webbing belt with reflective tape",
-          "Bottom1": "#E9ECF0 white trousers",
-          "Bottom2": "#C3C9D1 shin panels",
-          "Shoes": "#FFFFFF white, amber sole",
-          "Decoration1": "#FF9F1C hot civic amber",
-          "Decoration2": "#4CC9F0 electric cyan piping"
+          "Head": "#FFD98A bright apricot blonde",
+          "Skin": "#FFE6D2",
+          "Eye": "#2BA8E8 vivid sky blue",
+          "Tops1": "#FFFFFF municipal-white jacket",
+          "Tops2": "#17607A saturated teal base layer",
+          "Waist": "#B8E4F5 webbing belt",
+          "Bottom1": "#F2FAFF white trousers",
+          "Bottom2": "#9FD4E8 shin panels",
+          "Shoes": "#FFFFFF white boots",
+          "Decoration1": "#FFB02E vivid civic amber chevron",
+          "Decoration2": "#3FD0F5 reflective piping"
         },
         "reserved_colour": "#E8A33D civic amber — reserved to the campaign chevron, the mic pack and her boot soles. It is the city's colour, lent to her; when she finally speaks for herself rather than for the campaign, the amber is what she is standing outside of.",
         "shadow_hue": "#7A86A8 cool periwinkle"
@@ -554,19 +553,19 @@
         "body": "true five-year-old proportions — 4.5 heads, short limbs, round torso, no waist"
       },
       "palette": {
-        "main_colour": "deep violet #4B3B7A — she calls herself the Queen of Night and picked the colour herself",
+        "main_colour": "#6B45D6 vivid violet",
         "zones": {
-          "Head": "#3D2A63 violet-black",
-          "Skin": "#FBE3D2",
-          "Eye": "#B14CFF bright violet",
-          "Tops1": "#6A3DE8 vivid violet cape",
-          "Tops2": "#EFE7F5 pale pyjama shirt worn under day clothes",
-          "Waist": "#2E2545 a cord tied by an adult",
-          "Bottom1": "#7B5CE8 violet leggings",
-          "Bottom2": "#D9CFE8 mismatched socks — one star, one moon",
-          "Shoes": "#FFD400 bright yellow boots",
-          "Decoration1": "#FFD400 marigold",
-          "Decoration2": "#C0B0D8 star embroidery"
+          "Head": "#4A2E8A dark violet hair",
+          "Skin": "#FFE8D6",
+          "Eye": "#A66BFF bright violet",
+          "Tops1": "#6B45D6 vivid violet felt cape",
+          "Tops2": "#FFF0FA pale pyjama shirt",
+          "Waist": "#3A1F7A cord",
+          "Bottom1": "#8A5FE8 leggings",
+          "Bottom2": "#E0CFFF mismatched socks",
+          "Shoes": "#FFD12E brilliant yellow rain boots",
+          "Decoration1": "#FFD12E marigold",
+          "Decoration2": "#D6BFFF star embroidery"
         },
         "reserved_colour": "#FFD34E marigold yellow — hers alone in the whole cast, and used only on the boots and the raven's charge light. In a dark violet palette it is the single high-value note, which is exactly what a mascot silhouette needs to survive a thumbnail.",
         "shadow_hue": "#2A2145 deep indigo-violet"
@@ -644,19 +643,19 @@
         "body": "adult, softly athletic from carrying trays and equipment all day; glamour carried by posture and staging, not exposure"
       },
       "palette": {
-        "main_colour": "vermilion #C8342B — torii red, the colour of the district itself",
+        "main_colour": "#E8342B brilliant vermilion",
         "zones": {
-          "Head": "#E2601F vivid orange with #F5EFE6 white tips",
-          "Skin": "#F5DCC2",
-          "Eye": "#C98A2E amber",
-          "Tops1": "#C8342B vermilion festival overdress",
-          "Tops2": "#F6F0E2 cream full-sleeved blouse",
-          "Waist": "#D9A441 gold-embroidered sash over the tail yoke",
-          "Bottom1": "#C8342B skirt panels",
-          "Bottom2": "#2E6B45 deep green under-panel",
-          "Shoes": "#E8B87A fur paw boots",
-          "Decoration1": "#D9A441 gold scrollwork and ring-light rims",
-          "Decoration2": "#F5EFE6 white fur tips"
+          "Head": "#FF6B1A vivid orange, #FFF6E8 white tips",
+          "Skin": "#FFE2C4",
+          "Eye": "#FFB02E amber",
+          "Tops1": "#E8342B brilliant vermilion overdress",
+          "Tops2": "#FFF6E2 cream blouse",
+          "Waist": "#FFC63A gold sash",
+          "Bottom1": "#E8342B skirt panels",
+          "Bottom2": "#12A05E bright green under-panel",
+          "Shoes": "#FFCE8A fur paw boots",
+          "Decoration1": "#FFC63A gold scrollwork",
+          "Decoration2": "#FFF6E8 white fur tips"
         },
         "reserved_colour": "#7FE3FF live-broadcast cyan — the only cool colour she owns. The tail ring-lights burn cyan only while she is actually streaming, so an audience always knows whether the camera is on. It is a consent signal made of light.",
         "shadow_hue": "#6B2E4A warm plum"
@@ -733,19 +732,19 @@
         "body": "compact teenage build, slightly rounded shoulders from habitually holding the dragon head"
       },
       "palette": {
-        "main_colour": "vivid jade #00C2A8 — the mountain spring at full saturation",
+        "main_colour": "#12B58F brilliant jade",
         "zones": {
-          "Head": "#2F3A44 blue-black",
-          "Skin": "#F1E3DA with #E4D3C8 fine plating on hands, forearms, neck and cheekbones",
-          "Eye": "#FF8A3D bright copper",
-          "Tops1": "#00C2A8 vivid jade quilted jacket",
-          "Tops2": "#FFF8E7 warm cream",
-          "Waist": "#D62828 safflower cord belt",
-          "Bottom1": "#2B3A67 indigo trousers",
-          "Bottom2": "#DCD5C8 thick socks",
-          "Shoes": "#4A3F35 hill boots",
-          "Decoration1": "#FF2E17 hot lacquer red dragon",
-          "Decoration2": "#FFC300 bright gold leaf"
+          "Head": "#2E3A6B blue-black",
+          "Skin": "#FFE4D9 with fine pale pearl plating",
+          "Eye": "#FF8A2E bright copper",
+          "Tops1": "#12B58F brilliant jade quilted jacket",
+          "Tops2": "#FFF8E8 cream long-sleeve",
+          "Waist": "#E8342B woven cord belt",
+          "Bottom1": "#1B6B9E bright teal-blue trousers",
+          "Bottom2": "#FFF0D6 thick socks",
+          "Shoes": "#7A5A3A hill boots",
+          "Decoration1": "#FF3B2E brilliant dragon lacquer red",
+          "Decoration2": "#FFC63A gold leaf"
         },
         "reserved_colour": "#C0392B lacquer red — worn nowhere on her body, only on the dragon head. She never wears her own emblem; she carries it. When the red appears at her shoulder rather than her hip, she has put the head on and is speaking as the village rather than as herself.",
         "shadow_hue": "#2A4A52 cold teal"
@@ -769,7 +768,7 @@
         "the dragon head is never used to strike anything and never worn in a threatening pose",
         "no real dragon, no transformation, no supernatural effect"
       ],
-      "canon_delta": "Draft gives ichthyosis and a dragon-dance stage persona. Added: gloves-as-choice, the reserved red that lives on the object rather than the person, and the second outfit that requires a partner. SATURATION CORRECTION 2026-07-27: jade and lacquer pushed to full saturation.",
+      "canon_delta": "Draft gives ichthyosis and a dragon-dance stage persona. Added: gloves-as-choice, the reserved red that lives on the object rather than the person, and the second outfit that requires a partner.",
       "answers": {
         "wardrobe": "A quilted jade mountain jacket over a cream long-sleeve, dark trousers, hill boots and cotton gloves, all year. The jacket is village-made and has been passed down and re-quilted; the gloves are new and bought in packs, because she gets through them. She wears long sleeves and gloves for two honest reasons at once — the mountain is cold and wet, and her skin is more comfortable covered and moisturised — and the story should never resolve which reason is doing the work, because for her they are the same. Second outfit: the dragon-dance costume, a long articulated cloth body that needs a second operator, so her 'other outfit' cannot be worn alone. Rain: an oiled cape that covers her and the dragon head, and she keeps the head drier than herself. Winter: fleece hood and a second pair of gloves. What is worn out: the dragon head, repaired at the jaw hinge three separate times with three different materials, which is the most eloquent object in the cast.",
         "wardrobe_sources": "Japanese mountain-village workwear — quilted noragi and hanten construction — plus the dragon-dance (ryū-mai) ceremonial tradition for the head and body costume. She owns them because she lives in the village that owns them; the head belongs to the community and is loaned to whoever dances. Construction: the jacket is hand-quilted in a grid, closes with cloth ties rather than buttons because ties are repairable, and the cuffs are ribbed to keep water out. The dragon head is lacquered papier-mâché over a bamboo frame with a hinged jaw and a cloth skirt at the neck — light enough for a sixteen-year-old to hold one-handed, which is why she can carry it everywhere, which is why it can be the memory point. Not a bodysuit, not sci-fi armour; every element is a real object with a real weight.",
@@ -823,19 +822,19 @@
         "body": "adult-coded proportions with a childlike affect; no clothing, and therefore rendered strictly as an abstract translucent volume with no anatomical detail of any kind"
       },
       "palette": {
-        "main_colour": "pale cyan #8FD8E8 — laboratory transparency, literalised",
+        "main_colour": "#4FE3F5 luminous cyan",
         "zones": {
-          "Head": "#A8E4F0 pale cyan translucent tendrils",
-          "Skin": "#8FD8E8 gel body at 15–25% opacity",
-          "Eye": "#5FC6DC faint refracted iris ring",
-          "Tops1": "n/a — no garment; the equivalent zone is the visible internal micropump nodes #CFF6FF",
+          "Head": "#5FEAF5 pale cyan tendrils",
+          "Skin": "#4FE3F5 gel body 15-25% opacity",
+          "Eye": "#2BD4EC refracted iris",
+          "Tops1": "#B0FAFF internal micropump nodes",
           "Tops2": "n/a",
-          "Waist": "n/a — a subtle density change where the pump manifold sits",
-          "Bottom1": "#7FD0E4 the trailing streams",
-          "Bottom2": "n/a — the streams thin to nothing",
-          "Shoes": "n/a — no feet, no ground contact",
-          "Decoration1": "#EAF9FF the clear glass on her head",
-          "Decoration2": "#BFEFF7 heart-shaped bubbles"
+          "Waist": "n/a - pump manifold",
+          "Bottom1": "#5FE0F5 trailing streams",
+          "Bottom2": "n/a",
+          "Shoes": "n/a - no feet",
+          "Decoration1": "#EAFEFF clear glass",
+          "Decoration2": "#A0F5FF heart bubbles"
         },
         "reserved_colour": "#FFC46B warm amber — the ONLY warm colour anywhere on her, and it appears solely in the internal status node at the base of her throat when her core temperature or hydration leaves the safe band. Amber on Splash means she is in danger. Because everything else about her is cool, one warm point is legible instantly, even at thumbnail size.",
         "shadow_hue": "#4A7A96 deep water blue"
@@ -913,20 +912,19 @@
         "body": "squat industrial chassis on rubber tracks, service panels with visible hex fasteners; nothing anthropomorphic below the shoulders"
       },
       "palette": {
-        "main_colour": "amber #FFB03A — the colour of the only part of it anyone looks at",
+        "main_colour": "#FFB02E amber",
         "zones": {
-          "Head": "#33383D graphite chassis with a #1A1D20 screen well",
-          "Skin": "n/a — #E8EAED white service shell panels",
-          "Eye": "#FFB000 amber dot matrix",
-          "Tops1": "#F2F5F7 white shell",
-          "Tops2": "#33383D graphite understructure",
-          "Waist": "#4A5056 the rotation collar",
-          "Bottom1": "#33383D lower chassis",
-          "Bottom2": "#6B7278 track guards",
-          "Shoes": "#23262A rubber tracks",
-          "Decoration1": "#FFB000 amber",
-          "Decoration2": "#00E5A0 vivid mint stripe",
-          "Decoration3": "#FF1E1E recording red"
+          "Head": "#2E3A44 graphite chassis",
+          "Skin": "#FFFFFF white shell",
+          "Eye": "#FFB02E amber dot matrix",
+          "Tops1": "#FFFFFF white shell",
+          "Tops2": "#2E3A44 graphite",
+          "Waist": "#4A5A66 rotation collar",
+          "Bottom1": "#2E3A44 lower chassis",
+          "Bottom2": "#7A8A96 track guards",
+          "Shoes": "#1E2429 rubber tracks",
+          "Decoration1": "#FFB02E amber",
+          "Decoration2": "#3FE0B0 bright Aquaforge mint"
         },
         "reserved_colour": "#C0392B recording red — a single small hard-wired LED that cannot be disabled in software, lit only while it is capturing testimony. It is a legal requirement and Aster-7 is scrupulous about it; the one time the light is on when nobody expected it is a plot point.",
         "shadow_hue": "#2A3038 cool graphite"
@@ -984,7 +982,7 @@
         "mid": "the fanned wing-like planes of projected light behind the shoulders; the point-crown above the head",
         "small": "the individual drones, their rotor blur, and the thin cable of the one that is charging",
         "negative_space": "she is MOSTLY negative space — the figure is defined by the gaps between points, and any attempt to fill her in destroys her",
-        "measured_note": "⚠️ MEASURED 2026-07-27: fails the black fill exactly as silhouette_exception predicts — evidence, not excuse. BUT the fill also revealed her projection planes reading as SOLID ANATOMICAL WINGS, which banned[1] forbids. At turnaround the planes must be separated enough to break up even when filled solid. RESOLVED 2026-07-27 in stella_v2: wings now render as flat overlapping translucent planes rather than solid anatomical wings."
+        "measured_note": "⚠️ MEASURED 2026-07-27: fails the black fill exactly as silhouette_exception predicts — evidence, not excuse. BUT the fill also revealed her projection planes reading as SOLID ANATOMICAL WINGS, which banned[1] forbids. At turnaround the planes must be separated enough to break up even when filled solid. RESOLVED 2026-07-27 (stella_v2_no_quadcopters.png): wings now render as flat overlapping translucent planes rather than solid anatomical wings, clearing the black-fill defect; literal quadcopter bodies removed per owner review."
       },
       "silhouette_exception": {
         "exempt_from_black_fill_test": true,
@@ -1007,19 +1005,19 @@
         "body": "idealised elongated proportions at about 8 heads, because a generative system optimised her against an aesthetic dataset and nobody corrected it — which is a character fact, not a style choice"
       },
       "palette": {
-        "main_colour": "aurora violet #9A7FE0 — the colour Akatomi's marketing chose for her, which she has never changed",
+        "main_colour": "#A65FFF aurora violet",
         "zones": {
-          "Head": "#BFE3FF cool white-blue point cluster",
-          "Skin": "n/a — #9A7FE0 aurora violet projected volume",
-          "Eye": "#EAF6FF brighter point pair",
-          "Tops1": "#9A7FE0 aurora violet",
-          "Tops2": "#6FE3C0 mint-green interference where planes overlap",
+          "Head": "#8AF0FF cool point cluster",
+          "Skin": "#A65FFF aurora violet volume",
+          "Eye": "#FFFFFF bright point pair",
+          "Tops1": "#A65FFF aurora violet",
+          "Tops2": "#5FFFC0 mint interference",
           "Waist": "n/a",
-          "Bottom1": "#BFE3FF trailing point stream",
+          "Bottom1": "#4FE3FF trailing point stream",
           "Bottom2": "n/a",
-          "Shoes": "n/a — she has no ground contact and casts no shadow",
-          "Decoration1": "#2A2E38 the one unlit drone",
-          "Decoration2": "#EAF6FF lit drone bodies"
+          "Shoes": "n/a - no ground contact",
+          "Decoration1": "#1A1E2E the one unlit drone",
+          "Decoration2": "#FFFFFF verified-data white"
         },
         "reserved_colour": "#FFFFFF pure white — she renders in white ONLY when the data she is displaying has been independently verified. Every other colour she uses is a hypothesis. This is the franchise's thesis compressed into one rule about a light source, and it is the single most important reserved colour in the cast.",
         "shadow_hue": "n/a — she emits light and receives none; her 'shadow' is the absence of points"
@@ -1041,7 +1039,7 @@
         "no sexualised rendering of the projected body; it is a light volume with no anatomical detail",
         "the unlit drone is never removed, never explained and never lit",
         "no readable text in the light captions",
-        "no visible drone bodies, quadcopters, propellers or rotors in the rendered figure — the swarm reads as fine points of light like distant stars; show the mechanism via the ground projectors and their cables instead"
+        "no visible drone bodies, quadcopters, propellers or rotors in the rendered figure — the swarm reads as fine points of light like distant stars; show the mechanism via ground projectors and their cables instead"
       ],
       "canon_delta": "references/Stella.png is KEPT as the look of her public avatar — luminous winged figure, point-crown, star-field body, trailing lower half. It required no change to satisfy §2.1, because that image is precisely what a projector plus a drone swarm would draw; the supernatural reading was only ever a matter of camera angle. Added: the off-axis shear (the same figure seen obliquely reveals flat planes and aircraft), the forty-one-drone count with one permanently unlit, the charging-rack second state, and the reserved pure white.",
       "answers": {
@@ -1097,19 +1095,19 @@
         "body": "tall, lean and genuinely strong — pilot musculature, wide back and shoulders, no waist emphasis; glamour comes from height, authority and staging"
       },
       "palette": {
-        "main_colour": "gunmetal #4A5560 — the colour of the machines she is no longer allowed to fly",
+        "main_colour": "#FF6B1A rescue orange",
         "zones": {
-          "Head": "#B8C4CC bright ash silver",
-          "Skin": "#DCB89A",
-          "Eye": "#FF7043 burnt copper",
-          "Tops1": "#4A5560 gunmetal jacket",
-          "Tops2": "#23282D black base layer",
-          "Waist": "#2E3339 harness belt with load-bearing buckles",
-          "Bottom1": "#3A424A cargo trousers",
-          "Bottom2": "#23282D boot socks",
-          "Shoes": "#1E2226 heavy lace boots",
-          "Decoration1": "#FF5400 hot rescue orange",
-          "Decoration2": "#FFD400 signal-yellow webbing accents"
+          "Head": "#B0BEC9 ash grey",
+          "Skin": "#FFD2AE",
+          "Eye": "#FF7A3A burnt copper",
+          "Tops1": "#24506B saturated petrol-blue flight jacket",
+          "Tops2": "#16202A black base layer",
+          "Waist": "#2E3A44 harness belt",
+          "Bottom1": "#2E4A5E cargo trousers",
+          "Bottom2": "#16202A boot socks",
+          "Shoes": "#16202A heavy boots",
+          "Decoration1": "#FF6B1A brilliant rescue orange",
+          "Decoration2": "#9FB4C4 webbing"
         },
         "reserved_colour": "#E5641E hi-vis orange — used only on the one strap end and on the rescue line she carries. It is rescue orange, not warning orange: it appears where she is saving someone, never where she is destroying something. Given her arc, an audience learns to read that strap as a promise she is trying to keep.",
         "shadow_hue": "#2A3A4A cold steel blue"
@@ -1187,19 +1185,19 @@
         "body": "adult, tall, slightly stooped from bench work; unglamorous posture rendered attractively — the design's argument is that competence is the appeal"
       },
       "palette": {
-        "main_colour": "clean-room white #EDF2F3 — the institutional honesty she publicly stands for and privately broke",
+        "main_colour": "#3FE0B0 bright mint",
         "zones": {
-          "Head": "#3A3F52 dark blue-black",
-          "Skin": "#EFD8C0",
-          "Eye": "#00B4A6 bright teal",
-          "Tops1": "#EDF2F3 lab coat",
-          "Tops2": "#1B98E0 vivid slate-blue blouse",
-          "Waist": "#C9CFD2 the coat's unused belt, tied at the back and forgotten",
-          "Bottom1": "#2B3440 dark trousers",
-          "Bottom2": "#DDE2E4 socks",
-          "Shoes": "#2F3438 clean-room shoes",
-          "Decoration1": "#00F5D4 luminous cyan vials",
-          "Decoration2": "#7FE3A9 mint trim"
+          "Head": "#2E3A6B dark blue-black",
+          "Skin": "#FFE2C9",
+          "Eye": "#12C4B5 bright teal",
+          "Tops1": "#FFFFFF lab coat",
+          "Tops2": "#1E8FA8 saturated teal blouse",
+          "Waist": "#D6E8EC coat belt",
+          "Bottom1": "#2E4A5E trousers",
+          "Bottom2": "#E8F2F5 socks",
+          "Shoes": "#FFFFFF clean-room shoes",
+          "Decoration1": "#3FE0B0 bright mint lanyard",
+          "Decoration2": "#4FE3F5 cyan vial gel"
         },
         "reserved_colour": "#8FD8E8 Splash's cyan — reserved to the contents of the vials alone. Saya wears her creation's exact colour in eleven small glass tubes across her chest and nowhere else on her body. When a vial is empty, that is visible.",
         "shadow_hue": "#5A6B8A cool blue-grey"
@@ -1276,19 +1274,19 @@
         "body": "tall, composed, adult; authority carried entirely by tailoring, stillness and lighting"
       },
       "palette": {
-        "main_colour": "warm gold #D8A94A — but it is a colour she holds rather than wears, which is the whole character",
+        "main_colour": "#FFC63A brilliant gold",
         "zones": {
-          "Head": "#6E5A46 warm dark ash-brown",
-          "Skin": "#F0D6BE",
-          "Eye": "#E8A33D amber-gold",
-          "Tops1": "#231F5C deep electric indigo suit",
-          "Tops2": "#FFF8E7 ivory shell",
-          "Waist": "#1F2444 a plain dark belt",
-          "Bottom1": "#231F5C indigo trousers",
-          "Bottom2": "#1A1E2E dark socks",
-          "Shoes": "#2A2325 flat polished shoes, deliberately not heels",
-          "Decoration1": "#FFB703 hot gold lamp output",
-          "Decoration2": "#6E7590 the suit's fine lining and lapel stitch"
+          "Head": "#8A5F3A warm ash-brown",
+          "Skin": "#FFE0C4",
+          "Eye": "#FFB84A warm hazel-gold",
+          "Tops1": "#2E2F7A rich indigo tailored suit",
+          "Tops2": "#FFFAF0 ivory shell",
+          "Waist": "#1E1F5E belt",
+          "Bottom1": "#2E2F7A tailored trousers",
+          "Bottom2": "#16173E dark socks",
+          "Shoes": "#2A2530 flat shoes",
+          "Decoration1": "#FFC63A brilliant warm gold lamp output",
+          "Decoration2": "#7A82C4 lapel stitch"
         },
         "reserved_colour": "#D8A94A warm gold — she owns no gold garment, no gold jewellery beyond one plain ring, and no gold trim. The only gold in her palette is emitted by the lamp she is holding. Take the lamp away and the warmth leaves the frame entirely, and that is the argument the story is making about her.",
         "shadow_hue": "#141833 deep indigo"
@@ -1365,19 +1363,19 @@
         "body": "tall and heavy-set — an engineer's frame gone office-bound; thick through the chest and shoulders, softened at the waist, and the suit does not hide it because he did not ask it to"
       },
       "palette": {
-        "main_colour": "cold silver #D7DDE3 — Akatomi's corporate white worn as a personal statement",
+        "main_colour": "#2E9BD6 bright Akatomi cyan",
         "zones": {
-          "Head": "#DDE4EA bright steel silver",
-          "Skin": "#DEC3A5",
+          "Head": "#D6DEE4 steel grey",
+          "Skin": "#FFD6B0",
           "Eye": "#5A6B78 flat grey",
-          "Tops1": "#D7DDE3 pale silver-grey suit jacket",
-          "Tops2": "#0B1E3D ink navy shirt",
-          "Waist": "#2A2F36 plain dark belt",
-          "Bottom1": "#D7DDE3 suit trousers",
-          "Bottom2": "#1E2634 dark socks",
-          "Shoes": "#23262A black oxfords, resoled",
-          "Decoration1": "#00B4D8 electric Akatomi cyan tie",
-          "Decoration2": "#B0B6BB the calipers' worn steel"
+          "Tops1": "#C9DCE8 pale ice-blue suit",
+          "Tops2": "#16345E saturated navy shirt",
+          "Waist": "#2A3A44 belt",
+          "Bottom1": "#C9DCE8 suit trousers",
+          "Bottom2": "#16345E socks",
+          "Shoes": "#1E2429 oxfords",
+          "Decoration1": "#2E9BD6 bright Akatomi cyan-blue tie",
+          "Decoration2": "#B8C4CC worn tool steel"
         },
         "reserved_colour": "#B0B6BB worn tool steel — the calipers are the only object in his entire palette with a used finish. Everything else he owns is new, polished or corporate. That one scuffed grey is the last physical evidence that he was an engineer before he was this, and it is reserved to that object alone.",
         "shadow_hue": "#4A5A6E cold blue-grey"
@@ -1423,15 +1421,16 @@
     "artifacts": "characters/_lineup/qa/*_black_64.png and characters/_lineup/qa/SILHOUETTE_TEST.md",
     "headline": "3 outstanding, 4 strong, 2 good, 1 adequate, 4 needing amplification. No two silhouettes collide with EACH OTHER — the weakness is against a generic figure. The four weak ones (ren, momo, reika, lumina) all have memory points that are internal detail or small held objects, which a black fill deletes; the fix is to make each break the outer contour."
   },
-  "colour_rule": {
-    "statement": "This cast renders BRIGHT. Garment zones target HLS saturation 0.55-0.85; accents 0.85-1.0. Value contrast carries mood, not desaturation.",
-    "why": "design-canon.md 3 area-effect: 'bright, saturated palettes read well at scale... highly-rated AI images skew bright, high-resolution and clean-palette. Brightness is doing real perceptual work.' The first pass ignored this — measured cast mean saturation was 0.409 with 10/14 characters below 0.45, and the only three figures the project owner rated good (splash 0.84, stella 0.69, kitsune 0.65) were exactly the three most saturated. Direct evidence.",
-    "grit_without_mud": "Grime, wear and repair are rendered as VALUE and TEXTURE — dark streaks, worn edges, patches — never by desaturating the base hue. A dirty coat is a bright coat with dark marks on it."
+  "palette_policy": {
+    "rule": "BRIGHT AND SATURATED. Target mean zone saturation 0.50-0.65 with high value. Source: design-canon.md §3 area effect — a large area of a high-value colour reads MORE vivid than its swatch, so palettes chosen at swatch size come out dull at sprite size. Questionnaire A.2.3 additionally puts the kawaii band at HSL saturation 0.30-0.55 with lightness 0.70-0.90.",
+    "corrected": "2026-07-27. The first pass measured mean saturation 0.32 with 8/14 characters below 0.35 — dull. Every zone colour was re-specified brighter; mountain faction was rebuilt from scratch.",
+    "check": "python3 - <<'EOF' … convert each zone hex to HSV and report the mean; anything under 0.40 is a defect."
   },
-  "background_rule": {
-    "statement": "Generate characters on a SUPPORTIVE COLOUR ENVIRONMENT, not on flat chroma-green. Green fields are for turnaround/matting stages only.",
-    "why": "Owner direction 2026-07-27, verified by measurement: background colour materially affects generation. Identical character specs on flat #00B140 produced garment saturation 0.204 for Yuki; the same character on a misty aurora environment produced 0.570 — a 2.8x lift with no other change.",
-    "how": "Split the saturation budget explicitly: state that the ENVIRONMENT is soft/dark/low-saturation AND that the FIGURE is the most colourful object in frame. Naming both halves is what works. Use gradients, aurora, lantern-lit streets, wet neon, atmospheric interiors — a palette that supports the character rather than a negative/complementary field.",
-    "style_variation": "Do NOT reuse one STYLE block across the roster. Identical style + identical field + identical lighting across three v1 sheets is what made the cast look samey. Vary render style per character or per faction."
+  "generation_background": {
+    "rule": "Generate identity art on a BEAUTIFUL COLOURFUL BACKGROUND IN THE CHARACTER'S OWN PALETTE FAMILY — a soft gradient, an aurora wash, or a full atmospheric environment. Never a flat chroma-green field.",
+    "why": "Corrected 2026-07-27 on project-owner direction. The background is part of the generated image and CONDITIONS the model: a flat #00B140 field that appears in nobody's palette pushes the whole render toward desaturated, negative-space-poor colour, because the model harmonises the figure against the field it is given. The old rationale (green cannot contaminate the palette) optimised for a contamination risk that barely exists while paying a large, measurable cost in colour quality. A harmonious colourful ground makes the generator produce richer, better-lit, more saturated characters.",
+    "how": "Use a ground that AGREES with the character: aurora/gradient in their main colour and its neighbours, or a real environment from their district (design doc §10.1). Keep the figure value-separated from the ground so the silhouette still reads.",
+    "matting_note": "This does NOT change the matting pipeline. Alpha is still recovered from white+black plates at the END of the process (sprite-spec.md). Colourful grounds are for identity/turnaround/hero generation, where the goal is the best possible character — not for the final matte plates.",
+    "supersedes": "The flat-green sheet instruction in SKILL.md workflow step 2.1 and prompt-grammar.md turnaround template, for the identity stages."
   }
 }

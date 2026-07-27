@@ -433,3 +433,68 @@ Kitsune's booms cluster near her head instead of springing from the hip yoke;
 Reika read male in v1; Ryuki's dragon head lacks its three mismatched repairs;
 Lumina's ring light is too small to hold its negative space. All are recorded in
 the `.result.md` files with the specific one-change fix for each.
+
+---
+
+## 10. v2 BRIGHT pass — four owner corrections, 2026-07-27
+
+All four review points were correct. Two were errors in my output; **two were
+errors in the skill itself** and are now fixed at that level.
+
+### 1. Mountain faction — rebuilt
+Measured the dullest palette in the cast (yuki 0.25). "Cedar green, slate, milk
+fog — landscape-coloured" was wrong twice: it contradicted `design-canon.md` §3
+which I had quoted in this very document, and it was bad in-world reasoning.
+**People who live in fog dress to be FOUND, not to blend in** — mountain rescue,
+hill walkers and festival dress are all high-visibility. Rebuilt as brilliant
+turquoise + jade + cerulean with saffron and lacquer-vermilion accents: now the
+brightest faction in the cast (figure saturation 0.673) and the most rational.
+
+### 2. Dull colour — measured and corrected cast-wide
+Mean zone saturation was **0.32, 8/14 below 0.35**. Every zone re-specified:
+**0.32 → 0.48**. New `palette_policy` in `cast.json` sets the target band and a
+numeric check, because this is not eyeball-detectable at swatch size — which is
+precisely what the area-effect rule warns about.
+
+### 3. Flat green background — a skill-level error
+The most valuable correction of the session. The background *conditions the
+model*: it harmonises the figure against the field it is given, so a large flat
+field in a hue nobody wears drags the render toward desaturation. The old
+rationale optimised a contamination risk that barely exists.
+
+Measured on identical characters and hex codes, figure-only pixels:
+
+| Sheet | Background | Figure saturation |
+|---|---|---|
+| group A | flat `#00B140` | 0.342 |
+| group A | sunset gradient | **0.540 (+58%)** |
+| group B | flat `#00B140` | 0.397 |
+| group B | lantern gradient | **0.592 (+49%)** |
+
+Now `generation_background` in `cast.json` and a section in
+`prompt-grammar.md`. **Matting is unaffected** — alpha still comes from
+white+black plates at the end.
+
+### 4. Stella's drones — rebuilt
+They were opaque black clip-art quadcopters pasted over her like bugs, because
+they were described as literal aircraft. Now **the drones ARE the points of
+light**, with the surrounding sky explicitly empty of separate objects. This
+also fixed the black-fill finding that her wings read as solid anatomical wings
+(`banned[1]`).
+
+### Caught in passing
+- 🛑 A **text violation** — the word "OXIDE" rendered across Ren's shirt,
+  breaking `forbidden_global`. Regenerated; violating file quarantined in
+  `_wip/`, not committed.
+- **Splash** lost her head when the "glass vase" instruction over-applied;
+  re-prompted with head/face/hair explicit and the vase scoped to the torso.
+  The result is the strongest version of her yet.
+- **Lumina's ring light** enlarged to shoulder width, fixing the silhouette
+  weakness the black-fill test found.
+- **Kitsune's booms** now fan from the hip yoke rather than haloing her head.
+
+### Still outstanding, honestly
+- **Reika still reads male** after two attempts. Next attempt changes exactly
+  one thing (hair length). If that fails, the design is at fault, not the prompt.
+- Ryuki's three mismatched dragon-head repairs still not rendering.
+- Splash's transparency ~50% against a specified 20%.
