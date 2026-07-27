@@ -17,21 +17,11 @@
     "applies_to": "every character, every asset, including CGs and hero shots"
   },
   "style_bible": {
-    "render": "FLAT STYLIZED CEL. Exactly TWO tones per colour — one base, one shadow — plus an optional third only on the face. Every shadow is a HARD-EDGED SHAPE with a crisp drawn boundary. No gradient, no airbrush, no soft falloff, no blending.",
-    "line": "Visible ink outline of near-even weight around the figure and all interior detail; slightly heavier on the outer contour. The line is part of the style and must never be lost.",
-    "eye_render": "Flat graphic iris: solid iris colour, solid pupil, ONE hard-edged highlight shape. No layered gradient, no glassy rendering.",
-    "flatness": "Genuinely flat 2D. This is a stylization target, not just an anti-photorealism note (questionnaire A.5).",
-    "light_default": "Implied key from upper front-left expressed ONLY as the placement of the hard shadow shape. No rim light, no ambient occlusion, no specular sheen, no depth of field, no glow on the figure.",
-    "banned_render_cues": [
-      "gradient / airbrushed shading",
-      "rim light or edge light on the figure",
-      "specular highlights, gloss, wet sheen",
-      "ambient occlusion / contact softening",
-      "depth of field or blur on the figure",
-      "painterly brush texture",
-      "3D or 2.5D rendering, subsurface scattering"
-    ],
-    "correction_note": "REWRITTEN 2026-07-27 after owner review: '2.5d appeared not what needed, prefer more stylized.' The previous version was self-contradictory — it asked for '2D flat-design language' while specifying 'restrained gradient in the shadow core' and a 'rim light separating the figure', and the hero template added 'cinematic lighting and depth of field'. Gradient + rim light + cinematic = 2.5D. The words said flat; the parameters said rendered, and the generator obeyed the parameters. Measured on identical specs: the old render produced 1076 colours / 33.9% soft-gradient area / 1.7% hard edges; the flat cel test produced 584 / 11.5% / 7.6%. Removing volume CUES is what works — asking for 'flat' while leaving gradient and rim light in place does not."
+    "medium_anchor": "Anime illustration, clean linework and cel colour. — ONE clause, used verbatim. Do not expand it.",
+    "render": "Otherwise let the generator work in its own default idiom. Do NOT specify tone counts, gradient behaviour, rim light, or flatness targets.",
+    "value_range": "Full range, both ends named SEPARATELY. Darks to true black; highlights blown to near-white on a NAMED lit object (a toe cap, a cheekbone, tape in the hair, a metal edge). Adjectives alone produce weak highlights — measured: 'very bright' gave p98=177, naming the lit objects gave p98=246.",
+    "contrast_note": "This is VALUE contrast, distinct from the saturation work. Both apply.",
+    "correction_note": "REWRITTEN 2026-07-27 (owner: 'what it outputs without stylization is better... work with nanobanana default style constraints'). Two failure poles were measured: zero style language defaults to PHOTOREALISM, and long style blocks produced the 2.5D look. One short medium anchor sits between them and preserves the generator's own strengths."
   },
   "forbidden_global": [
     "no text, letters, numerals, captions, watermarks, signatures, logos, brand marks, UI, borders or colour charts",
@@ -1443,13 +1433,26 @@
     "matting_note": "This does NOT change the matting pipeline. Alpha is still recovered from white+black plates at the END of the process (sprite-spec.md). Colourful grounds are for identity/turnaround/hero generation, where the goal is the best possible character — not for the final matte plates.",
     "supersedes": "The flat-green sheet instruction in SKILL.md workflow step 2.1 and prompt-grammar.md turnaround template, for the identity stages."
   },
-  "style_by_asset": {
-    "$comment": "Per-asset styles. Deliberately NOT one style for everything — reusing a single STYLE block across the v1 roster is what made the cast look samey.",
-    "sprite": "A — hard cel. Two tones, hard shadow shapes, even ink line. The runtime workhorse; also the easiest to matte because edges are crisp.",
-    "expressions": "A — hard cel, identical to the sprite.",
-    "chibi_ui_merch": "B — flat vector. Solid fills, bold uniform outline, near-zero shading. Flattest measured (439 colours, 5.7% soft) and survives a 64px icon best.",
-    "hero_keyvisual": "C — woodblock flat. Flat colour plus paper grain and brush-ink line; decorative, and the most distinctive on a store page. Still no rim light or gradient on the figure.",
-    "cg_optional": "D — gouache flat. Warmer, softer, storybook. Reserve for quiet domestic beats.",
-    "environments": "Backgrounds MAY carry more rendering and atmosphere than characters — that contrast is the style. Figures stay flat."
+  "prompt_policy": {
+    "spend_budget_on": [
+      "who the character is and what they do, in 1-2 sentences, FIRST",
+      "why each garment exists and how it is constructed",
+      "footwear as its own dedicated sentence",
+      "body shape, posture, weight distribution, what their work did to them",
+      "both ends of the lighting range, with named lit objects"
+    ],
+    "cut": [
+      "no-text / watermark / logo / UI / border boilerplate",
+      "no-extra-fingers and other generic anatomy warnings",
+      "repeated global forbidden lists",
+      "flatness, canvas and lighting-convention lectures",
+      "anything the model already does correctly by default"
+    ],
+    "keep": [
+      "character-specific safety rules: minors' full coverage, Ryuki's skin dignity, Splash's non-anatomical torso",
+      "canon rules a viewer could misread: Kitsune's ears/tails/paws are costume and equipment",
+      "a short 'no lettering' clause ONLY where the design contains decals, badges, patches, signage or screens"
+    ],
+    "evidence": "Boilerplate removal caused no defects across three generations. The single text artifact ('SERVICE' on Ren's shirt) traced to the phrase 'service decals' in the prompt, not to the missing exclusion — prefer renaming the element ('small red-orange paint marks') over restoring the boilerplate."
   }
 }
