@@ -38,12 +38,35 @@ Null-Point · `solo_3` Соло III — Башня · `solo_4` Соло IV — �
 
 ### Shipped Decision Tree
 
+### First-15-Minutes Hook Ladder (audience 14–20)
+
+The prologue is paced to earn the route fork instead of opening on a menu:
+
+| Beat | Minutes | Content | Mechanic taught |
+|---|---|---|---|
+| 0–2 | atmosphere | Sweeper squares his metre **and nods at Ren** ("he sees his watchers") | World-state text, title banner |
+| 2–5 | chemistry | Miya banter from the window (chalk-keeper, no exposition dumps) | Character voice = hook |
+| ~3 | agency | **Micro-choice M0 "Ты веришь в магию?"** — instant stat pop | Choices have weight (Before the fork!) |
+| 5–8 | anomaly | Looped Momo jingle, too-long anchor smile, `akatomi_alert +3` with HUD pulse | HUD is live, city is not fine |
+| 8–12 | stakes | Timebox: "до рассвета — одна попытка" | Urgency framing |
+| 12–15 | fork | The Seven Ways, now informed | Big choice = commitment |
+
 ```
 ================================================================================
-            CHAPTER 0 (label Start) — THE SEVEN WAYS, 08:00
+   CHAPTER 0 (label Start) — HOOK LADDER → THE SEVEN WAYS, 08:00
 ================================================================================
-                 courtyard scene · sweeper motif · Miya at window
+      courtyard · sweeper's nod · Miya window banter (chalk-keeper gag)
                                        │
+                              [MICRO-NODE M.0]
+                   «Ты веришь в магию?» (no jump — teach stats)
+               ┌──────────────┬──────────────┬──────────────┐
+               ▼ Believe      ▼ Skeptic      ▼ Meta
+          affinity +2      phil_depth +2   phil +2, affin +1
+               └──────────────┴──────┬──────┘
+                                      ▼
+     anomaly beat: looped jingle, long smile, reversible akatomi_alert +3
+     sys: «НОЧНАЯ СМЕНА — до рассвета одна попытка»
+                                      │
    ┌───────┬─────────┬─────────┬───────┼─────────┬────────────┬──────────┐
    ▼ A     ▼ B       ▼ C       ▼ D     ▼ E       ▼ F          ▼ G
  Home      Bar      Freelance Bench  LoneFight  Miya          Docks
@@ -103,10 +126,10 @@ Null-Point · `solo_3` Соло III — Башня · `solo_4` Соло IV — �
 | Stat | Sources (choices/actions) | Sink / effect |
 |---|---|---|
 | `procrastination` | A +5, B +3, Solo 2 +10, S5.1-scout +2 | Flavor stat; displayed in Archives |
-| `philosophical_depth` | D +10 | Flavor (Solo 4 route identity) |
-| `miya_affinity` | F +5, M.1-embrace +5 | Displayed; fuels future Miya content |
+| `philosophical_depth` | M.0 Skeptic +2 / Meta +2, D +10 | Flavor (Solo 4 route identity) |
+| `miya_affinity` | M.0 Believe +2 / Meta +1, F +5, M.1-embrace +5 | Displayed; fuels future Miya content |
 | `ai_empathy` | G +5, AI.1-connect +5 | Displayed; fuels AI transcendence arc |
-| `akatomi_alert` | E +10, Solo 1 +15, S5.1-strike +30, S5.1-scout +5 | **Gates Solo 5 ending** (`vn.branch`, threshold 30); HUD % |
+| `akatomi_alert` | Prologue anomaly +3, E +10, Solo 1 +15, S5.1-strike +30, S5.1-scout +5 | **Gates Solo 5 ending** (`vn.branch`, threshold 30); HUD % pulses on rise |
 
 ### Flag Sources
 

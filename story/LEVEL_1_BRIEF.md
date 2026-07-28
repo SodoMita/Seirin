@@ -18,6 +18,14 @@ branches into vastly different routes. There is **no forced heroism**: if the
 player procrastinates or ignores the city's subtle signals, the world moves on
 without him, leading to distinct solo endings.
 
+**Audience & the 15-minute rule.** Target 14–20. The prologue must earn love
+for the atmosphere and cast inside the first quarter-hour: atmosphere beat
+(the sweeper's nod) → Miya chemistry banter → a low-stakes micro-choice with
+instant stat feedback ("Веришь в магию?") → city anomaly with a visibly
+pulsing HUD alert → night-shift timebox → and only then the seven-way fork.
+Design rules: bond before choice, teaching before commitment, HUD always
+alive, sentences short enough to read at texting speed.
+
 **Thematic pillars (canon):**
 1. **Observation must become action.** A child watching a street sweeper from
    a window is the story's seed: watching is curiosity, not surveillance, and

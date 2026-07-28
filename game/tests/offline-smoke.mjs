@@ -61,7 +61,10 @@ check('engine and game script initialise', !!w.engine && !!w.engine.script(),
 check('runtime makes no network calls', network.length === 0, network.join(', '));
 const lint = w.engine ? w.eval('(() => window.FailSafe.vn(window.engine, { silent: true }).lintScript({ silent: true }))()') : { ok: false, issues: ['engine did not boot'] };
 check('shipped script passes rollback-safety lint', lint.ok, JSON.stringify(lint.issues));
-const miya = w.engine && w.engine.script().Start.find(step => step && step.Choice).Choice.Miya;
+const miyaChoice = w.engine && w.engine.script().Start
+    .map(function (step) { return step && step.Choice; }).filter(Boolean)
+    .find(function (choice) { return !!choice.Miya; });
+const miya = miyaChoice && miyaChoice.Miya;
 if (miya) {
     const before = w.engine.storage('player').miya_affinity;
     miya.onChosen();
@@ -69,13 +72,36 @@ if (miya) {
     miya.onRevert();
     check('real choice callbacks apply and rewind exactly', chosen === before + 5 && w.engine.storage('player').miya_affinity === before);
 }
+const microChoice = w.engine && w.engine.script().Start
+    .map(function (step) { return step && step.Choice; }).filter(Boolean)
+    .find(function (choice) { return !!choice.Believe; });
+if (microChoice) {
+    const before = w.engine.storage('player').miya_affinity;
+    microChoice.Believe.onChosen();
+    const chosen = w.engine.storage('player').miya_affinity;
+    microChoice.Believe.onRevert();
+    check('belief micro-choice applies +2 affinity and rewinds exactly',
+        chosen === before + 2 && w.engine.storage('player').miya_affinity === before);
+}
 const start = w.document.querySelector('main-menu [data-action="start"]');
 if (start) {
     start.click(); await new Promise(resolve => setTimeout(resolve, 1800));
     check('new game reaches Start', w.engine.state('label') === 'Start');
-    for (let i = 0; i < 6; i++) { await w.engine.run('next').catch(() => {}); await new Promise(resolve => setTimeout(resolve, 350)); }
+    const count = () => w.document.querySelectorAll('choice-container button[data-choice]').length;
+    let steps = 0;
+    while (count() === 0 && steps < 30) {
+        await w.engine.run('next').catch(() => {}); await new Promise(resolve => setTimeout(resolve, 250)); steps++;
+    }
+    check('prologue reaches the belief micro-choice', count() === 3, String(count()));
+    if (count() === 3) {
+        w.document.querySelectorAll('choice-container button[data-choice]')[0].click();
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    while (count() === 0 && steps < 45) {
+        await w.engine.run('next').catch(() => {}); await new Promise(resolve => setTimeout(resolve, 250)); steps++;
+    }
     const choices = w.document.querySelectorAll('choice-container button[data-choice]');
-    check('opening reaches the 7-way canon route choice', choices.length === 7, String(choices.length));
+    check('escalation reaches the 7-way canon route choice', choices.length === 7, String(choices.length));
     if (choices.length) {
         const before = w.engine.storage('player').miya_affinity;
         // Choice order: Home, Bar, Freelance, Philosophy, LoneFighter, Miya, AI.

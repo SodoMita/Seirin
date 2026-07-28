@@ -180,6 +180,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             syncSkipButton();
         }
 
+        var lastAlertLevel = null;
         function updateHUD () {
             var p = engine.storage('player') || {};
             var set = function (id, icon, text) {
@@ -190,6 +191,13 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-location', 'fa-map-marker-alt', p.location || 'Тэцуба: Улица');
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
             set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
+            var alertEl = document.getElementById('hud-alert-level');
+            var level = p.akatomi_alert || 0;
+            if (alertEl && lastAlertLevel !== null && level > lastAlertLevel && alertEl.classList) {
+                alertEl.classList.add('alert-pulse');
+                setTimeout(function () { alertEl.classList.remove('alert-pulse'); }, 700);
+            }
+            lastAlertLevel = level;
             syncArchives();
             syncSkipButton();
         }
@@ -241,10 +249,24 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 vn.goTo('Тэцуба: Улица'),
                 'show scene courtyard with fadeIn duration 1s',
                 'sys <span class="t-cyan">[ СЭЙРИН: НОЧНАЯ СМЕНА — РЕЗОНАНС 2030 ]</span>',
-                'p Утро в Сэйрине начинается с шороха берёзовой метлы дворника — он год за годом подметает один и тот же метр асфальта. На третьем этаже, за окном с геранью, пятилетняя Мия рисует мелками и смотрит на улицу. Я стою на развилке трёх улиц: порт, чайный квартал и мой подъезд.',
+                'p Дворник подметает свой метр асфальта у выхода на улочку. Как вчера. Как десять лет назад.',
+                'p Мы никогда не разговаривали. Но он ловит мой взгляд и коротко кивает — как старому знакомому. В этом городе присутствие друг друга ещё не обесценили новости.',
+                'miya Эй! Рэн-и-и! Смотреть вверх разрешено бесплатно!',
                 'show character miya normal at left with fadeIn',
-                'miya Эй! Ты опять идёшь гулять без волшебной палочки?! Поднимись ко мне — покажу новое заклинание! Или иди, куда шёл. День твой.',
-                { Choice: { Dialog: 'Куда направиться дальше?',
+                'miya Ты опять идёшь гулять без волшебной палочки?! Стоять. Я назначаю тебя хранителем обрядового мела.',
+                'p Хранителем мела — у мага с пятилетним стажем спасательных операций? Доверяю.',
+                'miya Рэн, а ты веришь в магию? Отвечай честно — это важно.',
+                { Choice: { Dialog: 'Мия смотрит с третьего этажа очень серьёзно:',
+                    Believe: effectChoice('Верю. Без магии вообще никак.', { miya_affinity: 2 }),
+                    Skeptic: effectChoice('Верю в физику. Но мел пригодится.', { philosophical_depth: 2 }),
+                    Meta: effectChoice('Я верю в статистику выбора.', { philosophical_depth: 2, miya_affinity: 1 })
+                } },
+                'miya Ответ принят и занесён в гримуар. И ещё! Если дворник закончит раньше, чем часы на храме пробьют восемь, — день начнётся заново.',
+                'p В витрине радиолавки ведущая новостей улыбается чуть дольше, чем вообще умеют улыбаться люди. А уличный киоск зациклил одну и ту же строчку песни Момо Хосизоры — третий круг подряд.',
+                vn.reversible({ akatomi_alert: 3 }),
+                'sys <span class="t-red">[ ГОРОДСКАЯ НОТА ]</span> Решётка Резонанса: тест нагрузки 12%. Город ещё не заметил. Ты — заметил.',
+                'sys <span class="t-cyan">[ НОЧНАЯ СМЕНА ]</span> До рассвета — одна попытка. Выбор маршрута её запускает.',
+                { Choice: { Dialog: 'Развилка трёх улиц: порт, чайный квартал, дом. Куда направиться?',
                     Home: routeChoice('Вернуться домой, запереть дверь и прокрастинировать в одиночестве', 'SoloRoute1',
                         { set: { route: 'solo_1' }, procrastination: 5 }),
                     Bar: routeChoice('Пойти в портовый клуб «Null-Point» к разочарованной молодёжи', 'SoloRoute2',

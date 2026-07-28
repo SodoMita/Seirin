@@ -1,6 +1,28 @@
 # Level 2 Hierarchy: Macro Sequence, Pathos Set-Pieces & Route Outcomes (v2)
 ## Project: Seirin: Night Shift — Resonance 2030
 
+### First-15-Minutes Hook Ladder (audience 14–20)
+
+The "**Правило 15 минут**": a teen player either falls in love with the
+atmosphere and cast — or closes the game. The prologue is therefore paced as
+bond-first, fork-later (node graph details: LEVEL_3):
+
+| Beat | Feeling bought |
+|---|---|
+| 0–2 · courtyard, sweeper | "The world keeps breathing; the sweeper nods — I exist here" |
+| 2–5 · Miya banter | "This 5-year-old general is worth staying for" |
+| ~3 · micro-choice "Веришь в магию?" | "My answers already change numbers — I matter" |
+| 5–8 · anomaly + alert pulse | "Something is wrong with the city, and I spotted it" |
+| 8–12 · night-shift timebox | "One attempt until dawn. Now I choose like it matters" |
+
+#### Micro Set-Piece 0: "The Sweeper's Nod" (Chapter 0 opener)
+- Ren sweeps no streets; he just watches the man who has swept the same
+  square metre for a decade. The man catches his eye and nods — recognition
+  without a single line of dialogue.
+- **Why it works for 14–20:** instant intimacy, zero exposition; the city
+  becomes a place where the player is *seen*, not a cut-scene backdrop.
+  It also plants the motif that pays off in Miya's pact (watching → acting).
+
 ### Macro Sequence of Events (matches shipped node graph)
 
 ```

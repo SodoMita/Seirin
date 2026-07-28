@@ -259,6 +259,15 @@
   border-color: var(--sn-cyan-glow);
 }
 
+/* Alert badge pulse — fires whenever akatomi_alert rises (choices feel alive) */
+@keyframes alertPulse {
+  0% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
+  50% { box-shadow: 0 0 18px rgba(248, 113, 113, 0.85); transform: scale(1.06); }
+  100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
+}
+
+.hud-badge.alert-pulse { animation: alertPulse 0.7s ease-out; }
+
 /* Narrow screens: wrap the HUD and keep the engine quick-menu off it.
    Vendored monogatari.css pins quick-menu to top:0 under ~600px, where it
    would sit beneath this z-80 HUD; move it to the bottom at every size. */

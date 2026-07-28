@@ -82,6 +82,17 @@ test('fast-forward is wired: HUD button in markup, Skip > 0 in settings', () => 
     assert.match(source, /engine\.skip\(!engine\.global\('skip'\)\)/);
 });
 
+test('first-15-minutes hook: micro-choice teaches stats BEFORE the 7-way fork', () => {
+    // Miya's magic question (effectChoice, no jump) must precede the canon
+    // route fork, and the city anomaly must bump akatomi_alert visibly.
+    const iBelieve = source.indexOf('Believe: effectChoice');
+    const iFork = source.indexOf('Home: routeChoice');
+    assert.ok(iBelieve > -1, 'magic-question micro-choice missing');
+    assert.ok(iFork > -1, '7-way canon fork missing');
+    assert.ok(iBelieve < iFork, 'micro-choice must come before the route fork');
+    assert.match(source, /reversible\(\{ akatomi_alert: 3 \}\)/);
+});
+
 test('every canon met_* contact has a route step that can set it', () => {
     // met_lumina stays unreachable for now (no Chorus of the Abyss route yet);
     // everything else must be settable or the Archives codex lies.
