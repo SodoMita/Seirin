@@ -93,6 +93,43 @@ test('first-15-minutes hook: micro-choice teaches stats BEFORE the 7-way fork', 
     assert.match(source, /reversible\(\{ akatomi_alert: 3 \}\)/);
 });
 
+test('every route teaches with a micro-choice before its commitment beat', () => {
+    // Each of the 7 routes mirrors the prologue hook ladder in miniature:
+    // arrival -> voice beat -> low-stakes effectChoice (instant stat feedback)
+    // -> escalation into the route's commitment node. Pins order per route.
+    const beats = [
+        ['SoloRoute1: [', 'CouchMarathon: effectChoice', '[ ТИХОЕ ПОРАЖЕНИЕ ]'],
+        ['SoloRoute2: [', 'ToastStatusQuo: effectChoice', 'vn.reversible({ procrastination: 10 })'],
+        ['SoloRoute3: [', 'TaskPerfect: effectChoice', 'show character kurogane'],
+        ['SoloRoute4: [', 'CheckSky: effectChoice', 'за монитором'],
+        ['SoloRoute5: [', 'PrepCharges: effectChoice', 'NightStrike: effectChoice'],
+        ['MiyaRoute: [', 'ArtWire: effectChoice', 'Embrace: routeChoice'],
+        ['AIRoute: [', 'GreetRhythm: effectChoice', 'Connect: routeChoice']
+    ];
+    beats.forEach(([label, micro, commitment]) => {
+        const from = source.indexOf(label);
+        const atMicro = source.indexOf(micro);
+        const atCommit = source.indexOf(commitment);
+        assert.ok(from > -1, `route label missing: ${label}`);
+        assert.ok(atMicro > from, `micro-beat ${micro} must live inside ${label}`);
+        assert.ok(atCommit > atMicro, `micro-beat must precede ${commitment}`);
+    });
+    // Micro-beats are teaching moments, not route forks: they must never jump.
+    assert.equal((source.match(/effectChoice\([\s\S]*?Do:/g) || []).length, 0);
+});
+
+test('Solo 5 balance: the watchful path can never trip Trap #1 by accident', () => {
+    // Gate is akatomi_alert >= 30 after S5.1. Worst-case alert before the gate:
+    // prologue anomaly 3 + fork E 10 + every S5.0/S5.1 bump except the strike.
+    const s5 = source.slice(source.indexOf('SoloRoute5: ['), source.indexOf('Solo5BadEnd: ['));
+    const bumps = (s5.match(/akatomi_alert: (\d+)/g) || [])
+        .map(text => Number(text.replace(/\D+/g, '')));
+    const strike = Math.max.apply(null, bumps);
+    const watchful = 3 + 10 + bumps.filter(n => n !== strike).reduce((a, b) => a + b, 0);
+    assert.ok(strike >= 30 - 13, 'night strike must always trip the 30% gate');
+    assert.ok(watchful < 30, `prep + observe alert ${watchful} must stay below the 30% gate`);
+});
+
 test('every canon met_* contact has a route step that can set it', () => {
     // met_lumina stays unreachable for now (no Chorus of the Abyss route yet);
     // everything else must be settable or the Archives codex lies.

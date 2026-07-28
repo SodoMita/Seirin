@@ -83,6 +83,31 @@ if (microChoice) {
     check('belief micro-choice applies +2 affinity and rewinds exactly',
         chosen === before + 2 && w.engine.storage('player').miya_affinity === before);
 }
+// Route first-minutes beats: every micro-choice must apply and rewind exactly.
+const routeBeats = [
+    ['SoloRoute1', 'CouchMarathon', 'procrastination', 5],
+    ['SoloRoute2', 'ToastStatusQuo', 'procrastination', 3],
+    ['SoloRoute3', 'TaskQuestions', 'philosophical_depth', 2],
+    ['SoloRoute4', 'CheckMemory', 'philosophical_depth', 3],
+    ['SoloRoute5', 'PrepSchedule', 'philosophical_depth', 2],
+    ['MiyaRoute', 'ArtWire', 'miya_affinity', 2],
+    ['AIRoute', 'GreetRhythm', 'ai_empathy', 2]
+];
+routeBeats.forEach(function (beat) {
+    if (!w.engine) { return; }
+    const choice = w.engine.script()[beat[0]]
+        .map(function (step) { return step && step.Choice; }).filter(Boolean)
+        .find(function (c) { return !!c[beat[1]]; });
+    check('route micro-beat exists: ' + beat[0] + ' / ' + beat[1], !!choice);
+    if (choice) {
+        const before = w.engine.storage('player')[beat[2]];
+        choice[beat[1]].onChosen();
+        const chosen = w.engine.storage('player')[beat[2]];
+        choice[beat[1]].onRevert();
+        check('route micro-beat ' + beat[1] + ' applies +' + beat[3] + ' and rewinds',
+            chosen === before + beat[3] && w.engine.storage('player')[beat[2]] === before);
+    }
+});
 const start = w.document.querySelector('main-menu [data-action="start"]');
 if (start) {
     start.click(); await new Promise(resolve => setTimeout(resolve, 1800));

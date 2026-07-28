@@ -5,7 +5,9 @@ This level is the authoritative mirror of the shipped script
 (`game/vendor/game.js`, 14 labels). Engine-side invariants: all state changes
 go through `FailSafe.vn` (`reversible` / `goTo` / `choiceEffect` / `branch`);
 
-every route-fork is tested in `game/tests/game.test.mjs`.
+every route-fork is tested in `game/tests/game.test.mjs`. Each route opens
+with a teaching micro-choice (nodes S1.0–S5.0, M.05, AI.0): `effectChoice`
+only, no jumps — they tutorialize stats before the route's commitment node.
 
 ### Game Storage State & Variable Schema
 
@@ -76,25 +78,64 @@ The prologue is paced to earn the route fork instead of opening on a menu:
            │         │          │     │          ritual_start  met_stella
    ▼       ▼         ▼          ▼     ▼          ▼              ▼
 [SoloRoute1][SoloRoute2][SoloRoute3][SoloRoute4]│          │
- workshop   port      tsukimachi   void         │          │
- alert+15   proc+10   met_kurogane              ▼          ▼
- momo TV    kaito     kurogane             [SoloRoute5]  [AIRoute]
-   ▼       ▼         ▼          ▼           dojo       port→lab
-[END: ТИХОЕ [END:    [END:     [END:           │            │
- ПОРАЖЕНИЕ] ТРАГИЧ.]  ЗОЛОТАЯ   4-я СТЕНА    S5.1         AI.1
-                      КЛЕТКА]                  │            │
-                ┌──────── strike alert+30     │            │ connect empathy+5
-                └──────── scout  alert+5      │            │ isolate (safe)
-                     vn.branch(alert ≥ 30)    │            │
-                     ┌────────┴────────┐      │            │
-                     ▼                 ▼      ▼            ▼
-              [Solo5BadEnd]     [Solo5Standoff]      [MiyaRoute] (M.1 below)
-              ЗАХВАЧЕН_truck    НИЧЬЯ_23min          [AI endings below]
+ workshop   port      tsukimachi   courtyard    ▼          ▼
+ S1.0      S2.0      S3.0        S4.0      [SoloRoute5]  [AIRoute]
+ micro     micro     micro       micro      dojo S5.0    port→lab AI.0
+ alert+15  alert+2   met_kurogane                  │            │
+ momo TV   proc+10   kurogane                    │            │
+   ▼       ▼         ▼          ▼                S5.1         AI.1
+[END: ТИХОЕ [END:    [END:     [END:              │            │
+ ПОРАЖЕНИЕ] ТРАГИЧ.]  ЗОЛОТАЯ   4-я СТЕНА        │            │
+                      КЛЕТКА]                     │            │
+                ┌──────── strike alert+30        │            │ connect empathy+5
+                └──────── scout  alert+5         │            │ isolate (safe)
+                     vn.branch(alert ≥ 30)       │            │
+                     ┌────────┴────────┐         │            │
+                     ▼                 ▼         ▼            ▼
+              [Solo5BadEnd]     [Solo5Standoff]         [MiyaRoute] (M.05, M.1 below)
+              ЗАХВАЧЕН_truck    НИЧЬЯ_23min             [AI endings below]
 
 ================================================================================
- MIYA ROUTE (label MiyaRoute → choice node M.1)
+ ROUTE MICRO-BEATS (teaching choices — effectChoice only, NO jumps)
 ================================================================================
- miya_room · Obryad of Friendship · reversible: met_reika, met_saya
+ S1.0 (SoloRoute1) «Идеальный вечер ничегонеделания начинается с…»
+   ├ Марафон роликов   → proc +5
+   ├ Сон «на пять минут» → proc +3
+   └ Взгляд на «Титана»  → proc +2, phil +1
+ S2.0 (SoloRoute2) «За что пьём, механик?»
+   ├ За status quo     → proc +3
+   ├ За непришедших    → phil +2
+   └ За громкость      → proc +2
+      (then reversible: akatomi_alert +2 — bass synced to Lattice test 27%)
+ S3.0 (SoloRoute3) «Как пройдёт твоя первая неделя в башне?»
+   ├ Блестяще и молча  → alert +3
+   ├ Спросить про инфразвук → phil +2, alert +5
+   └ Тихий журнал команд    → phil +3
+ S4.0 (SoloRoute4) «Проверка реальности начинается с…»
+   ├ Небо (облака по кругу) → phil +2
+   ├ Память (вчера = сегодня) → phil +3
+   └ Мысленный звонок Мие   → phil +1, miya_affinity +1
+ S5.0 (SoloRoute5) «Последняя проверка снаряжения»
+   ├ Тройные ЭМИ-заряды → alert +2
+   ├ Расписание патрулей → phil +2
+   └ Ключ Рейки (талисман) → phil +1
+      BALANCE LOCK: worst watchful path = 3 + 10 + 2 + 5 = 20 < 30 (tested)
+ M.05 (MiyaRoute) «Вклад хранителя мела в Большой Круг»
+   ├ Медная проволока «нити судьбы» → miya_affinity +2
+   ├ Светодиод «светлячок-хранитель» → miya_affinity +1, ai_empathy +1
+   └ Честно: «просто резистор»      → miya_affinity +1, phil +2
+ AI.0 (AIRoute) «Как поздороваться со Сплеш?»
+   ├ Ритм сердца по стеклу → ai_empathy +2
+   ├ «Привет. Я Рэн» вслух → ai_empathy +1, phil +1
+   └ Вопросы про нейросеть → phil +2
+
+================================================================================
+ MIYA ROUTE (label MiyaRoute → micro-node M.05 → choice node M.1)
+================================================================================
+ miya_room · Obryad of Friendship · artifact catalogue beat
+ micro-node M.05 — «Вклад хранителя мела» (deltas above, no jump)
+ stakes beat: Kurogane's surveyor drones measure the park through the window
+ reversible: met_reika, met_saya
  reika (toy chair) + saya (juice as potion) lines
         choice M.1 — "Мия протягивает тебе кусок мела:"
    ┌────────────────────────────┴────────────────────────────┐
@@ -106,9 +147,12 @@ The prologue is paced to earn the route fork instead of opening on a menu:
  [END: ГАРМОНИЯ ФРАКЦИЙ]                              [END: ХРАНИТЕЛЬ БЕЗ МАГИИ]
 
 ================================================================================
- AI ROUTE (label AIRoute → choice node AI.1)
+ AI ROUTE (label AIRoute → micro-node AI.0 → choice node AI.1)
 ================================================================================
  port → lab · reversible: met_saya · Splash heartbeat line
+ docks beat: Stella's light net dimmed "until orders" (transcendence seed)
+ micro-node AI.0 — «Как поздороваться со Сплеш?» (deltas above, no jump)
+ saya dilemma line: empathy appeared a month ago
         choice AI.1 — "Сплеш прижалась гелевой ладонью к стеклу:"
    ┌────────────────────────────┴────────────────────────────┐
    ▼ Connect (ai_empathy +5)                                  ▼ Isolate (safety, no delta)
@@ -125,11 +169,11 @@ The prologue is paced to earn the route fork instead of opening on a menu:
 
 | Stat | Sources (choices/actions) | Sink / effect |
 |---|---|---|
-| `procrastination` | A +5, B +3, Solo 2 +10, S5.1-scout +2 | Flavor stat; displayed in Archives |
-| `philosophical_depth` | M.0 Skeptic +2 / Meta +2, D +10 | Flavor (Solo 4 route identity) |
-| `miya_affinity` | M.0 Believe +2 / Meta +1, F +5, M.1-embrace +5 | Displayed; fuels future Miya content |
-| `ai_empathy` | G +5, AI.1-connect +5 | Displayed; fuels AI transcendence arc |
-| `akatomi_alert` | Prologue anomaly +3, E +10, Solo 1 +15, S5.1-strike +30, S5.1-scout +5 | **Gates Solo 5 ending** (`vn.branch`, threshold 30); HUD % pulses on rise |
+| `procrastination` | A +5, B +3, S1.0 +2..+5, S2.0 +2..+3, Solo 2 +10, S5.1-scout +2 | Flavor stat; displayed in Archives |
+| `philosophical_depth` | M.0 Skeptic +2 / Meta +2, D +10, S1.0 +1, S2.0 +2, S3.0 +2..+3, S4.0 +1..+3, S5.0 +1..+2, M.05 +2, AI.0 +1..+2 | Flavor (Solo 4 route identity) |
+| `miya_affinity` | M.0 Believe +2 / Meta +1, F +5, S4.0 +1, M.05 +1..+2, M.1-embrace +5 | Displayed; fuels future Miya content |
+| `ai_empathy` | G +5, M.05 +1, AI.0 +1..+2, AI.1-connect +5 | Displayed; fuels AI transcendence arc |
+| `akatomi_alert` | Prologue anomaly +3, E +10, Solo 1 +15, S2.0 note +2, S3.0 +3..+5, S5.0 +2, S5.1-strike +30, S5.1-scout +5 | **Gates Solo 5 ending** (`vn.branch`, threshold 30); HUD % pulses on rise |
 
 ### Flag Sources
 
@@ -146,5 +190,9 @@ The prologue is paced to earn the route fork instead of opening on a menu:
 ### Test coverage hooks
 `game/tests/game.test.mjs` pins: the 14-label inventory, all 11 `routeChoice`
 jump targets, absence of quoted `vn.goTo` strings, presence of a fully-armed
-`vn.branch`, and settable `met_*` flags. `offline-smoke.mjs` plays the real
-engine through the 7-way choice into the Miya branch and back.
+`vn.branch`, settable `met_*` flags, the per-route micro-beat ordering
+(micro-choice strictly before each commitment node; micro-choices never
+jump), and the Solo 5 balance lock (worst-case watchful alert < 30 ≤ any
+strike path). `offline-smoke.mjs` plays the real engine through the 7-way
+choice into the Miya branch and back, and applies+reverts one micro-beat per
+route checking exact stat deltas and rewind.

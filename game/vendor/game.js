@@ -4,6 +4,8 @@
  * ES5 Browser & Node Compatible Visual Novel Code in game/
  * Chapter 0 street walk with 7 canon choices (LEVEL_1..3): 5 Solo Routes,
  * Miya Ritual Route (mid-route node M.1) and AI Route (mid-route node AI.1).
+ * Every route opens with its own first-minutes beat: arrival -> voice beat ->
+ * teaching micro-choice (effectChoice, instant stat feedback) -> escalation.
  * Stats are load-bearing: Solo 5 ending is gated by akatomi_alert (vn.branch).
  * Uses HUD icon markup: fa-map-marker-alt, fa-coins, fa-terminal, fa-user-secret, fa-shield-alt
  * ========================================================================== */
@@ -232,7 +234,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.png' } },
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.png' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
-            p: { name: '{{player.name}}', color: '#facc15' }
+            p: { name: 'Рэн', color: '#facc15' }
         });
 
         function routeChoice (text, target, effectSpec) {
@@ -287,7 +289,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 vn.goTo('Квартира: Комната'),
                 'hide character miya with fadeOut',
                 'show scene workshop with fadeIn duration 1s',
-                'p Я запер дверь на два замка и опустил жалюзи. Зачем суетиться? В этой комнате есть тишина, мягкий диван и бесконечная лента видеороликов.',
+                'p Дома. Два оборота замка, щёлк щеколды, жалюзи вниз. Комната гаснет ровно наполовину — как аквариум, где я сам себе рыба.',
+                'p На столе — разобранный накопитель «Титана-04». Рейка велела собрать к понедельнику. Понедельник далеко. Диван близко.',
+                { Choice: { Dialog: 'Идеальный вечер ничегонеделания начинается с…',
+                    CouchMarathon: effectChoice('Марафона смешных роликов до утра', { procrastination: 5 }),
+                    CouchNap: effectChoice('Маленького сна «буквально на пять минут»', { procrastination: 3 }),
+                    CouchBench: effectChoice('Взгляда на детали «Титана». Соберу… завтра', { procrastination: 2, philosophical_depth: 1 })
+                } },
+                'p Часы стираются. Лента сама подсовывает следующее видео, ещё одно, ещё. Кто решает, что мне показать?.. Ладно. Какая разница.',
+                'p Телефон пискнул и умер. Значок сети сменился фиолетовым кругом с волной. За стеной соседи смотрят то же самое: сквозь стены улыбаются дикторы.',
                 vn.reversible({ akatomi_alert: 15 }),
                 'show character momo normal at center with fadeIn',
                 'momo «…и пусть наша песня согласия звучит из каждого окна!» — голос Момо Хосизоры льётся из каждого динамика города.',
@@ -299,9 +309,18 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 vn.goTo('Тэцуба: клуб «Null-Point»'),
                 'hide character miya with fadeOut',
                 'show scene port with fadeIn duration 1s',
-                'p В «Нулл-Пойнте» под ржавыми сводами порта никогда не бывает солнца. Здесь собираются те, кто давно махнул рукой на учёбу, работу и будущее.',
+                'p В «Нулл-Пойнте» под ржавыми сводами порта никогда не бывает солнца. Бас продавливается сквозь подошвы, а вместо рассвета здесь неон.',
                 'show character kaito normal at left with fadeIn',
+                'kaito Ого! Механик с сухого дока сам спустился в трюм. Рейка знает, что ты сегодня с нами, а не с железом?',
+                'kaito Садись. Здесь все свои. Вернее — все ничьи. Это даже надёжнее.',
+                { Choice: { Dialog: 'Кайто поднимает мутный стакан: «За что пьём, механик?»',
+                    ToastStatusQuo: effectChoice('«За то, чтобы всё осталось как есть»', { procrastination: 3 }),
+                    ToastFallen: effectChoice('«За тех, кто сегодня не пришёл»', { philosophical_depth: 2 }),
+                    ToastVolume: effectChoice('«За громкость. Только за громкость!»', { procrastination: 2 })
+                } },
                 'kaito Да какая разница, кто нами управляет?! Главное — чтобы стимуляторы были дешёвыми, а музыка громкой!',
+                vn.reversible({ akatomi_alert: 2 }),
+                'sys <span class="t-red">[ ГОРОДСКАЯ НОТА ]</span> Решётка Резонанса: тест нагрузки 27%. Бас в клубе вздрагивает точно в такт. Никто не заметил. Ты — заметил.',
                 vn.reversible({ procrastination: 10 }),
                 'p Месяцы слились в шум, головную боль и звон в ушах. Когда за клубом пришли патрули Акатоми, никто из нас даже не смог встать со скамеек.',
                 'sys <span class="t-red">[ ТРАГИЧЕСКИЙ ФИНАЛ ]</span> Маршрут: клуб → грузовик → Шельф-4.',
@@ -311,6 +330,14 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 vn.goTo('Башня Акатоми: 84 этаж'),
                 'hide character miya with fadeOut',
                 'show scene tsukimachi with fadeIn duration 1s',
+                'p Лифт башни Акатоми несёт меня мимо этажей, куда мой гостьевой бейдж не пропустит никогда. В кабине пахнет озоном и чужими амбициями.',
+                'p Первая задача центрального отдела шифрования — драйвер подачи инфразвука. Восемь тысяч кредитов за неделю. Рот здесь открывают только за обедом.',
+                { Choice: { Dialog: 'Как пройдёт твоя первая неделя в башне?',
+                    TaskPerfect: effectChoice('Оптимизировать драйвер до блеска — премия важнее', { akatomi_alert: 3 }),
+                    TaskQuestions: effectChoice('Спросить наставника, зачем городу инфразвук', { philosophical_depth: 2, akatomi_alert: 5 }),
+                    TaskLogger: effectChoice('Вшить в код тихий журнал всех команд', { philosophical_depth: 3 })
+                } },
+                'p Мой код был безупречен. Подача стала мягче, покрытие — ровнее, улыбки дикторов внизу — длиннее. Квартальный бонус пришёл раньше срока.',
                 vn.reversible({ flags: { met_kurogane: true } }),
                 'show character kurogane normal at center with fadeIn',
                 'kurogane Отличная работа, молодой человек! Посмотрите вниз: все слушают нашу музыку и не задают вопросов. Вы богаты, успешны и защищены.',
@@ -321,7 +348,13 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             SoloRoute4: [
                 vn.goTo('Абстрактная Пустота'),
                 'hide character miya with fadeOut',
-                'p Я сел на старую скамейку и посмотрел на небо. Текстуры слишком точные. Откуда-то из-за пределов слышен стук клавиш.',
+                'p Я сел на старую скамейку на развилке и посмотрел на небо. Текстуры слишком точные. Откуда-то из-за пределов слышен стук клавиш.',
+                { Choice: { Dialog: 'Проверка реальности начинается с…',
+                    CheckSky: effectChoice('Неба: облака повторяются каждые сорок секунд', { philosophical_depth: 2 }),
+                    CheckMemory: effectChoice('Памяти: вчера подозрительно похоже на сегодня', { philosophical_depth: 3 }),
+                    CheckMiya: effectChoice('Мысленного звонка Мие — вдруг магия правда есть', { philosophical_depth: 1, miya_affinity: 1 })
+                } },
+                'p Паттерны сходятся. Мир подогнан идеально — но до целого не хватает ровно одного наблюдателя.',
                 'p Эй, ты — за монитором. Я видел переменные нашего мира: procrastination, akatomi_alert, miya_affinity. Наша боль — это integer в памяти браузера.',
                 'p Я делаю шаг за пределы строки текста. Прощай.',
                 'sys <span class="t-violet">[ ВЫХОД ЗА ПРЕДЕЛЫ СЦЕНАРИЯ ]</span> Слом 4-й стены выполнен.',
@@ -332,6 +365,12 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'hide character miya with fadeOut',
                 'show scene dojo with fadeIn duration 1s',
                 'p Никто не пойдёт со мной — и не надо. Паяльник, самодельный ЭМИ-заряд, схема девятой подстанции. Я справлюсь один.',
+                'p В старом додзё пахнет татами и озоном. Когда-то здесь учили падать. Сегодня я учусь не попадаться.',
+                { Choice: { Dialog: 'Последняя проверка снаряжения. Что важнее?',
+                    PrepCharges: effectChoice('Тройной запас ЭМИ-зарядов', { akatomi_alert: 2 }),
+                    PrepSchedule: effectChoice('Ещё раз сверить расписание патрулей', { philosophical_depth: 2 }),
+                    PrepWrench: effectChoice('Разводной ключ из дока Рейки — талисман', { philosophical_depth: 1 })
+                } },
                 { Choice: { Dialog: 'Как действовать?',
                     NightStrike: effectChoice('Ударить по подстанции 09 уже этой ночью',
                         { akatomi_alert: 30 }),
@@ -363,6 +402,14 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'show scene miya_room with fadeIn duration 1s',
                 'show character miya normal at center with fadeIn',
                 'miya Смотри! Я нарисовала Большой Круг Очищения! Сегодня, когда луна встанет над собором, мы проведём Великий Обряд Дружбы!',
+                'p В комнате Мии резистор — это зуб дракона, оптоволокно — нить судьбы, а старый аккумулятор — спящий голем. Магии в Сэйрине нет. Но каталог у магии здесь свой.',
+                { Choice: { Dialog: 'Мия ждёт вклад хранителя мела в Большой Круг:',
+                    ArtWire: effectChoice('Моток медной проволоки — «нити судьбы»', { miya_affinity: 2 }),
+                    ArtLed: effectChoice('Старый светодиод — «светлячок-хранитель»', { miya_affinity: 1, ai_empathy: 1 }),
+                    ArtHonesty: effectChoice('Честно: это просто резистор. Но зуб тоже', { miya_affinity: 1, philosophical_depth: 2 })
+                } },
+                'miya Принято! Артефакт усилен на плюс сто процентов. Взрослые в нашем городе обязаны слушать магию… но делают вид, что заняты.',
+                'miya И смотри в окно: жёлтые жуки Курогане меряют парк рулетками. Они хотят стереть мою площадку! Поэтому Обряд — сегодня. Точно-точно.',
                 vn.reversible({ flags: { met_reika: true, met_saya: true } }),
                 'show character reika normal at left with fadeIn',
                 'reika Я командую отрядом тяжёлой спасательной техники, а сижу на игрушечном стуле… Но если мои пилоты узнают — засмеют в сухом доке!',
@@ -405,9 +452,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 vn.reversible({ flags: { met_saya: true } }),
                 'show character saya normal at center with fadeIn',
                 'saya Знакомься: жилой модуль доков. А под нами — испытательный бассейн, где живёт наша гордость.',
+                'p По лестнице вниз Сая кивает на пустые крепления в потолке: световая сеть Стеллы. «Репетирует рассветную симфонию. Акатоми велел приглушить — до приказа».',
                 'show scene lab with fadeIn duration 1s',
                 'show character splash normal at left with fadeIn',
                 'splash Привет… Я… чувствую… ритм… твоего… сердца…',
+                { Choice: { Dialog: 'Как поздороваться со Сплеш?',
+                    GreetRhythm: effectChoice('Постучать по стеклу ритмом сердца', { ai_empathy: 2 }),
+                    GreetVoice: effectChoice('Сказать вслух: «Привет. Я Рэн»', { ai_empathy: 1, philosophical_depth: 1 }),
+                    GreetScience: effectChoice('Спросить Саю про архитектуру её нейросети', { philosophical_depth: 2 })
+                } },
                 'saya Месяц назад её нейросеть начала проявлять признаки эмпатии. Что с этим делать — решать тебе.',
                 { Choice: { Dialog: 'Сплеш прижалась гелевой ладонью к стеклу резервуара:',
                     Connect: routeChoice('Подключить нейроядро Сплеш к световой сети Стеллы', 'AIEndingTranscendence',
