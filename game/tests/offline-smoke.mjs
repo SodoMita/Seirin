@@ -121,7 +121,8 @@ const routeBeats = [
     ['SoloRoute4', 'CheckMemory', 'philosophical_depth', 3],
     ['SoloRoute5', 'PrepSchedule', 'philosophical_depth', 2],
     ['MiyaRoute', 'ArtWire', 'miya_affinity', 2],
-    ['AIRoute', 'GreetRhythm', 'ai_empathy', 2]
+    ['AIRoute', 'GreetRhythm', 'ai_empathy', 2],
+    ['MomoRoute', 'SweetLie', 'momo_affinity', 2]
 ];
 routeBeats.forEach(function (beat) {
     if (!w.engine) { return; }
@@ -172,18 +173,36 @@ if (start) {
         await w.engine.run('next').catch(() => {}); await new Promise(resolve => setTimeout(resolve, 250)); steps++;
     }
     const choices = w.document.querySelectorAll('choice-container button[data-choice]');
-    check('escalation reaches the 7-way canon route choice', choices.length === 7, String(choices.length));
+    check('escalation reaches the 8-way canon route choice', choices.length === 8, String(choices.length));
     if (choices.length) {
         const before = w.engine.storage('player').miya_affinity;
-        // Choice order: Home, Bar, Freelance, Philosophy, LoneFighter, Miya, AI.
+        const beforeMomo = w.engine.storage('player').momo_affinity;
+        // Choice order: Home, Bar, Freelance, Philosophy, LoneFighter, Miya, AI, Momo.
+        check('Momo fork option exists with met_momo wired',
+            w.engine.script().Start
+                .map(function (step) { return step && step.Choice; }).filter(Boolean)
+                .some(function (c) { return c.Momo && c.Momo.Do === 'jump MomoRoute'; }));
         choices[5].click(); await new Promise(resolve => setTimeout(resolve, 900));
         check('Miya choice applies its affinity effect', w.engine.storage('player').miya_affinity === before + 5);
         // ROLLBACK REGRESSION: route choices rewind the jump AND the stats.
         await w.engine.revert().catch(() => {});
         await new Promise(resolve => setTimeout(resolve, 900));
-        check('back after a route choice returns to the 7-way fork',
-            w.engine.storage('player').miya_affinity === before && count() === 7,
+        check('back after a route choice returns to the 8-way fork',
+            w.engine.storage('player').miya_affinity === before && count() === 8,
             'affinity=' + w.engine.storage('player').miya_affinity + ', options=' + count());
+        // The 8th option must drive the live game into the romance route.
+        w.document.querySelectorAll('choice-container button[data-choice]')[7].click();
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        check('Momo route choice enters the romance route with its effects',
+            w.engine.state('label') === 'MomoRoute' &&
+                w.engine.storage('player').momo_affinity === beforeMomo + 5 &&
+                w.engine.storage('flags').met_momo === true,
+            'label=' + w.engine.state('label') + ', affinity=' + w.engine.storage('player').momo_affinity);
+        await w.engine.revert().catch(() => {});
+        await new Promise(resolve => setTimeout(resolve, 900));
+        check('back from the Momo route returns to the fork',
+            w.engine.storage('player').momo_affinity === beforeMomo && count() === 8,
+            'affinity=' + w.engine.storage('player').momo_affinity + ', options=' + count());
         w.document.querySelectorAll('choice-container button[data-choice]')[5].click();
         await new Promise(resolve => setTimeout(resolve, 900));
         const action = w.engine.script().MiyaRoute.find(step => step && step.Function && step.Function.Apply);
@@ -219,7 +238,7 @@ if (graphMenuBtn) {
     const overlay = w.document.getElementById('graph-overlay');
     check('debug route atlas opens mid-game too', overlay && overlay.hidden === false);
     const nodes = w.document.querySelectorAll('.graph-node');
-    check('route atlas auto-renders all 14 shipped labels', nodes.length === 14, String(nodes.length));
+    check('route atlas auto-renders all 17 shipped labels', nodes.length === 17, String(nodes.length));
     const branchCard = w.document.getElementById('graph-node-SoloRoute5');
     check('atlas shows the vn.branch forks of Solo 5',
         !!(branchCard && branchCard.querySelector('[data-graph-goto="Solo5BadEnd"]') &&
@@ -240,7 +259,11 @@ if (graphMenuBtn) {
     }
 }
 check('no unmapped icons', Object.keys((w.IconsOffline && w.IconsOffline.missing) || {}).length === 0);
-const relevant = errors.filter(error => !/settings saved|first time|Cannot convert undefined|null to object|localStorage/i.test(error));
+// "Attempted to hide a character that was not being shown" is a true no-op
+// notice the engine logs when a route's leading hide runs after the atlas
+// teleport wiped presentation state (organic play always has the sprite up).
+const relevant = errors.filter(error =>
+    !/settings saved|first time|Cannot convert undefined|null to object|localStorage|Attempted to hide a character/i.test(error));
 check('no unexpected console errors', relevant.length === 0, relevant.join(' | '));
 dom.window.close();
 if (failures.length) { console.error('SMOKE FAILED: ' + failures.join(', ')); process.exit(1); }

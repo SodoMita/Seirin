@@ -2,8 +2,12 @@
  * Seirin: Night Shift — Resonance 2030 (New Game Engine Code)
  * ----------------------------------------------------------------------------
  * ES5 Browser & Node Compatible Visual Novel Code in game/
- * Chapter 0 street walk with 7 canon choices (LEVEL_1..3): 5 Solo Routes,
- * Miya Ritual Route (mid-route node M.1) and AI Route (mid-route node AI.1).
+ * Chapter 0 street walk with 8 canon choices (LEVEL_1..3 v3): 5 Solo Routes,
+ * Miya Ritual Route (mid-route node M.1), AI Route (mid-route node AI.1)
+ * and the Momo PG-13 romance-comedy route (mid-route node MO.1).
+ * Ren is a mechanic apprentice AND a supervised combat-mecha pilot
+ * (Scrap-Titan 04) who rides his own rebuilt motorcycle "Стриж" — the
+ * machines are route furniture everywhere, not a character-sheet sticker.
  * Every route opens with its own first-minutes beat: arrival -> voice beat ->
  * teaching micro-choice (effectChoice, instant stat feedback) -> escalation.
  * Stats are load-bearing: Solo 5 ending is gated by akatomi_alert (vn.branch).
@@ -25,6 +29,7 @@
                 procrastination:     FS.schema.number({ int: true, min: 0 }).default(0),
                 philosophical_depth: FS.schema.number({ int: true, min: 0 }).default(0),
                 miya_affinity:       FS.schema.number({ int: true, min: 0 }).default(0),
+                momo_affinity:       FS.schema.number({ int: true, min: 0 }).default(0),
                 ai_empathy:          FS.schema.number({ int: true, min: 0 }).default(0),
                 akatomi_alert:       FS.schema.number({ int: true, min: 0 }).default(0),
                 location:            FS.schema.string().default('Тэцуба: Улица')
@@ -37,6 +42,7 @@
                 met_saya:              FS.schema.boolean().default(false),
                 met_lumina:            FS.schema.boolean().default(false),
                 met_kurogane:          FS.schema.boolean().default(false),
+                met_momo:              FS.schema.boolean().default(false),
                 ritual_started:        FS.schema.boolean().default(false),
                 magic_rejected:        FS.schema.boolean().default(false),
                 happy_ending_achieved: FS.schema.boolean().default(false)
@@ -59,7 +65,7 @@
  * symptom of a stale cache / blocked localStorage / truncated vendor file. */
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     (function () {
-        var BUILD = '2026-07-28-r9';
+        var BUILD = '2026-07-28-r10';
         var captured = [];
         var bannerShown = false;
         window.addEventListener('error', function (e) {
@@ -147,7 +153,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             solo_4: 'Соло IV — Пустота',
             solo_5: 'Соло V — Одиночная война',
             miya:   'Рут Мии',
-            ai:     'Рут ИИ'
+            ai:     'Рут ИИ',
+            momo:   'Рут Момо — Сбежавшая песня'
         };
 
         /* Display names for the debug route atlas. The atlas STRUCTURE is
@@ -167,7 +174,10 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             MiyaEndingGuardian:    'ФИНАЛ · Хранитель без магии',
             AIRoute:               'Рут ИИ · Доки Aquaforge',
             AIEndingTranscendence: 'ФИНАЛ · Трансцендентность',
-            AIEndingIsolation:     'ФИНАЛ · Тишина в аквариуме'
+            AIEndingIsolation:     'ФИНАЛ · Тишина в аквариуме',
+            MomoRoute:             'Рут Момо · Арена, чёрный вход',
+            MomoEndingSong:        'ФИНАЛ · Голос живого города',
+            MomoEndingEncore:      'ФИНАЛ · Бис по контракту'
         };
 
         var ARCHIVE_CONTACTS = [
@@ -175,6 +185,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             ['met_reika',   'Рейка Такасиро'],
             ['met_saya',    'Сая Мизуки'],
             ['met_kurogane','Таиши Курогане'],
+            ['met_momo',    'Момо Хосизора'],
             ['met_splash',  'S.P.L.A.S.H.'],
             ['met_stella',  'Стелла'],
             ['met_lumina',  'Люмина']
@@ -184,6 +195,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             ['procrastination',     'Прокрастинация'],
             ['philosophical_depth', 'Глубина рефлексии'],
             ['miya_affinity',       'Доверие Мии'],
+            ['momo_affinity',       'Доверие Момо'],
             ['ai_empathy',          'Эмпатия ИИ'],
             ['akatomi_alert',       'Тревога Акатоми']
         ];
@@ -551,7 +563,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
          * nothing visibly broke, but that was luck, not design. */
         engine.settings({
             'Name': 'Сэйрин: Ночная смена — Резонанс 2030',
-            'Version': '1.2.0',
+            'Version': '1.3.0',
             'Target': '#vn-root', 'ServiceWorkers': false, 'Preload': false,
             'AssetsPath': {
                 'root': 'assets', 'characters': 'characters', 'scenes': 'scenes',
@@ -577,10 +589,11 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 } });
         engine.storage({
             player: { name: 'Рэн', route: 'none', procrastination: 0, philosophical_depth: 0,
-                miya_affinity: 0, ai_empathy: 0, akatomi_alert: 0, location: 'Тэцуба: Улица' },
+                miya_affinity: 0, momo_affinity: 0, ai_empathy: 0, akatomi_alert: 0,
+                location: 'Тэцуба: Улица' },
             flags: { met_miya: false, met_splash: false, met_stella: false, met_reika: false,
-                met_saya: false, met_lumina: false, met_kurogane: false, ritual_started: false,
-                magic_rejected: false, happy_ending_achieved: false }
+                met_saya: false, met_lumina: false, met_kurogane: false, met_momo: false,
+                ritual_started: false, magic_rejected: false, happy_ending_achieved: false }
         });
         engine.assets('scenes', { courtyard: 'courtyard.png', miya_room: 'miya_room.png',
             workshop: 'workshop.png', tsukimachi: 'tsukimachi.png', lab: 'lab.png',
@@ -621,9 +634,10 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'sys <span class="t-cyan">[ СЭЙРИН: НОЧНАЯ СМЕНА — РЕЗОНАНС 2030 ]</span>',
                 'p Дворник подметает свой метр асфальта у выхода на улочку. Как вчера. Как десять лет назад.',
                 'p Мы никогда не разговаривали. Но он ловит мой взгляд и коротко кивает — как старому знакомому. В этом городе присутствие друг друга ещё не обесценили новости.',
+                'p «Стриж» остался под аркой — двигатель ещё тёплый, характер уже тяжёлый. Завтра Рейка гоняет меня в учебном куполе «Титана-04» до вечера: восемнадцать метров гидравлики не прощают сонного пилота.',
                 'miya Эй! Рэн-и-и! Смотреть вверх разрешено бесплатно!',
                 'show character miya normal at left with fadeIn',
-                'miya Ты опять идёшь гулять без волшебной палочки?! Стоять. Я назначаю тебя хранителем обрядового мела.',
+                'miya Ты опять тарахтел своим мотоциклом на весь двор! Дворник передал: «Пусть стрижи летают, а не тарахтят». А ещё — ты идёшь гулять без волшебной палочки! Стоять. Назначаю тебя хранителем обрядового мела.',
                 'p Хранителем мела — у мага с пятилетним стажем спасательных операций? Доверяю.',
                 'miya Рэн, а ты веришь в магию? Отвечай честно — это важно.',
                 { Choice: { Dialog: 'Мия смотрит с третьего этажа очень серьёзно:',
@@ -636,7 +650,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 vn.reversible({ akatomi_alert: 3 }),
                 'sys <span class="t-red">[ ГОРОДСКАЯ НОТА ]</span> Решётка Резонанса: тест нагрузки 12%. Город ещё не заметил. Ты — заметил.',
                 'sys <span class="t-cyan">[ НОЧНАЯ СМЕНА ]</span> До рассвета — одна попытка. Выбор маршрута её запускает.',
-                { Choice: { Dialog: 'Развилка трёх улиц: порт, чайный квартал, дом. Куда направиться?',
+                { Choice: { Dialog: 'Развилка трёх улиц: порт, арена, чайный квартал, дом. Куда направиться?',
                     Home: routeChoice('Вернуться домой, запереть дверь и прокрастинировать в одиночестве', 'SoloRoute1',
                         { set: { route: 'solo_1' }, procrastination: 5 }),
                     Bar: routeChoice('Пойти в портовый клуб «Null-Point» к разочарованной молодёжи', 'SoloRoute2',
@@ -650,7 +664,9 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                     Miya: routeChoice('Подняться к Мии и принять участие в её магических ритуалах', 'MiyaRoute',
                         { set: { route: 'miya' }, miya_affinity: 5, flags: { met_miya: true, ritual_started: true } }),
                     AI: routeChoice('Спуститься в доки Aquaforge — к мягкому роботу Сплеш и ИИ Стелле', 'AIRoute',
-                        { set: { route: 'ai' }, ai_empathy: 5, flags: { met_splash: true, met_stella: true } })
+                        { set: { route: 'ai' }, ai_empathy: 5, flags: { met_splash: true, met_stella: true } }),
+                    Momo: routeChoice('Прикатить на «Стриже» к арене — к голосу, который город слышит по контракту', 'MomoRoute',
+                        { set: { route: 'momo' }, momo_affinity: 5, flags: { met_momo: true } })
                 } }
             ],
             SoloRoute1: [
@@ -658,7 +674,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'hide character miya with fadeOut',
                 'show scene workshop with fadeIn duration 1s',
                 'p Дома. Два оборота замка, щёлк щеколды, жалюзи вниз. Комната гаснет ровно наполовину — как аквариум, где я сам себе рыба.',
-                'p На столе — разобранный накопитель «Титана-04». Рейка велела собрать к понедельнику. Понедельник далеко. Диван близко.',
+                'p На столе — разобранный накопитель «Титана-04» и связка ключей от «Стрижа». Рейка велела собрать к понедельнику. Понедельник далеко. Диван близко.',
                 { Choice: { Dialog: 'Идеальный вечер ничегонеделания начинается с…',
                     CouchMarathon: effectChoice('Марафона смешных роликов до утра', { procrastination: 5 }),
                     CouchNap: effectChoice('Маленького сна «буквально на пять минут»', { procrastination: 3 }),
@@ -678,8 +694,9 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'hide character miya with fadeOut',
                 'show scene port with fadeIn duration 1s',
                 'p В «Нулл-Пойнте» под ржавыми сводами порта никогда не бывает солнца. Бас продавливается сквозь подошвы, а вместо рассвета здесь неон.',
+                'p «Стрижа» приткнул между двумя патрульными скутерами. Пусть стражи порядка посторожат его заодно — общественная нагрузка.',
                 'show character kaito normal at left with fadeIn',
-                'kaito Ого! Механик с сухого дока сам спустился в трюм. Рейка знает, что ты сегодня с нами, а не с железом?',
+                'kaito Ого! Пилот «Титана» собственной персоной спустился в трюм. Рейка знает, что её лучший курсант сегодня с нами, а не в куполе?',
                 'kaito Садись. Здесь все свои. Вернее — все ничьи. Это даже надёжнее.',
                 { Choice: { Dialog: 'Кайто поднимает мутный стакан: «За что пьём, механик?»',
                     ToastStatusQuo: effectChoice('«За то, чтобы всё осталось как есть»', { procrastination: 3 }),
@@ -699,7 +716,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'hide character miya with fadeOut',
                 'show scene tsukimachi with fadeIn duration 1s',
                 'p Лифт башни Акатоми несёт меня мимо этажей, куда мой гостьевой бейдж не пропустит никогда. В кабине пахнет озоном и чужими амбициями.',
-                'p Первая задача центрального отдела шифрования — драйвер подачи инфразвука. Восемь тысяч кредитов за неделю. Рот здесь открывают только за обедом.',
+                'p Контракт в конверте — сразу два места: клавиатура драйвера подачи инфразвука… и курсантский купол нового «Опекуна-9» в ангаре минус второго этажа. Восемь тысяч кредитов в неделю. Рот здесь открывают только за обедом.',
                 { Choice: { Dialog: 'Как пройдёт твоя первая неделя в башне?',
                     TaskPerfect: effectChoice('Оптимизировать драйвер до блеска — премия важнее', { akatomi_alert: 3 }),
                     TaskQuestions: effectChoice('Спросить наставника, зачем городу инфразвук', { philosophical_depth: 2, akatomi_alert: 5 }),
@@ -708,8 +725,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'p Мой код был безупречен. Подача стала мягче, покрытие — ровнее, улыбки дикторов внизу — длиннее. Квартальный бонус пришёл раньше срока.',
                 vn.reversible({ flags: { met_kurogane: true } }),
                 'show character kurogane normal at center with fadeIn',
-                'kurogane Отличная работа, молодой человек! Посмотрите вниз: все слушают нашу музыку и не задают вопросов. Вы богаты, успешны и защищены.',
-                'p Миллионы на счетах, панорамный вид на океан… и застывший город внизу, где люди ходят, как марионетки. Я построил свою клетку на кладбище чужих душ.',
+                'kurogane Отличная работа, молодой человек! Посмотрите вниз: все слушают нашу музыку и не задают вопросов. Вы богаты, успешны и защищены. А «Опекун» под вашими руками — самый изящный жест в моём арсенале.',
+                'p Миллионы на счетах, панорамный купол с видом на океан… и застывший город внизу, где люди ходят, как марионетки. Я выиграл право летать — в клетке, которую собрал собственными руками.',
                 'sys <span class="t-red">[ ЗОЛОТАЯ КЛЕТКА ]</span> Личный успех. Глобальный результат — тот же, что и при прокрастинации.',
                 'end'
             ],
@@ -723,7 +740,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                     CheckMiya: effectChoice('Мысленного звонка Мие — вдруг магия правда есть', { philosophical_depth: 1, miya_affinity: 1 })
                 } },
                 'p Паттерны сходятся. Мир подогнан идеально — но до целого не хватает ровно одного наблюдателя.',
-                'p Эй, ты — за монитором. Я видел переменные нашего мира: procrastination, akatomi_alert, miya_affinity. Наша боль — это integer в памяти браузера.',
+                'p Эй, ты — за монитором. Я видел переменные нашего мира: procrastination, akatomi_alert, miya_affinity, momo_affinity. Наша боль — это integer в памяти браузера.',
                 'p Я делаю шаг за пределы строки текста. Прощай.',
                 'sys <span class="t-violet">[ ВЫХОД ЗА ПРЕДЕЛЫ СЦЕНАРИЯ ]</span> Слом 4-й стены выполнен.',
                 'end'
@@ -734,6 +751,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'show scene dojo with fadeIn duration 1s',
                 'p Никто не пойдёт со мной — и не надо. Паяльник, самодельный ЭМИ-заряд, схема девятой подстанции. Я справлюсь один.',
                 'p В старом додзё пахнет татами и озоном. Когда-то здесь учили падать. Сегодня я учусь не попадаться.',
+                'p «Титана» не взять: ангар на тройном замке, а Рейке снится каждый мой вдох в куполе. Сегодня моя броня — рюкзак, паяльник и тормозной парашют от «Стрижа».',
                 { Choice: { Dialog: 'Последняя проверка снаряжения. Что важнее?',
                     PrepCharges: effectChoice('Тройной запас ЭМИ-зарядов', { akatomi_alert: 2 }),
                     PrepSchedule: effectChoice('Ещё раз сверить расписание патрулей', { philosophical_depth: 2 }),
@@ -780,7 +798,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'miya И смотри в окно: жёлтые жуки Курогане меряют парк рулетками. Они хотят стереть мою площадку! Поэтому Обряд — сегодня. Точно-точно.',
                 vn.reversible({ flags: { met_reika: true, met_saya: true } }),
                 'show character reika normal at left with fadeIn',
-                'reika Я командую отрядом тяжёлой спасательной техники, а сижу на игрушечном стуле… Но если мои пилоты узнают — засмеют в сухом доке!',
+                'reika Я командую тяжёлой спасательной рамой «Титан-04», а сижу на игрушечном стуле… Но если мои пилоты узнают — засмеют в сухом доке!',
+                'reika И, Рэн. Завтра, 06:00 — тренировка в куполе. Не появишься — найду тебя даже за четвёртой стеной.',
                 'show character saya normal at right with fadeIn',
                 'saya Не бунтуй, Рейка. Мия одной «магической игрой» соединила наши лаборатории и ваши мастерские крепче любого контракта.',
                 { Choice: { Dialog: 'Мия протягивает тебе кусок мела:',
@@ -854,6 +873,60 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'saya Ты выбрал безопасность. Я… тоже так хотела. Наверное. Повторяй это достаточно долго — и перестанешь слышать, как она поёт.',
                 'splash Я… в… безопасности… Почему… тогда… так… тихо…',
                 'sys <span class="t-violet">[ ФИНАЛ ИИ: ТИШИНА В АКВАРИУМЕ ]</span> Ядро изолировано. Бассейн светится ровно наполовину.',
+                'end'
+            ],
+            MomoRoute: [
+                vn.goTo('Арена Сэйрин: чёрный вход'),
+                'hide character miya with fadeOut',
+                'show scene tsukimachi with fadeIn duration 1s',
+                'p «Стриж» чихнул на последнем подъёме и замер точно у чёрного входа арены. Знаю я этот характер: он не сломался. Он умнее меня — сам выбрал, где остановиться.',
+                'p За дверью репетируют рассветный гимн. Голос Момо Хосизоры тянет гаммы, и каждая нота на долю секунды приседает в такт тесту Решётки. Так не поют. Так настраивают прибор.',
+                'show scene port with fadeIn duration 1s',
+                'show character momo normal at left with fadeIn',
+                'momo Смотришь на девушку три секунды — штраф по контракту. Смотришь четвёртую — уже сюжетный поворот. Решай быстрее, пилот.',
+                'p Солнцезащитные очки размером с пол-лица, капюшон до бровей. Маскировка уровня «меня здесь нет». Коробка с парфе — уровня «меня здесь очень даже есть».',
+                'momo Я инкогнито! По телевизору у меня совсем другое лицо — его по утрам рисуют взрослые с юристами.',
+                { Choice: { Dialog: 'Момо поднимает ложечку парфе, как дирижёрскую палочку: «Ну? Чем заслужил право стоять рядом с голосом города?»',
+                    SweetLie: effectChoice('Слащавость: «Твой голос — единственное, что держит этот город живым»', { momo_affinity: 2 }),
+                    GrandPathos: effectChoice('Пафос: «Я пилот „Титана-04“. Для твоей песни достану громкоговоритель размером с рассвет»', { momo_affinity: 1, akatomi_alert: 1 }),
+                    HonestWrench: effectChoice('Честно: «Не заслужил. Просто слышу, что ты сегодня поёшь грустно»', { momo_affinity: 1, philosophical_depth: 2 })
+                } },
+                'momo Принято. Оценка — четыре целых две десятых улыбки. Надбавку за дерзость… выдам после. Если будет после.',
+                'p Мы ехали вдоль залива на «Стриже». Она держалась за мою куртку ровно так, как написано в регламенте пассажира, — и ни на сантиметр регламентнее. Разумеется.',
+                'p Дроны-измерители скользнули над площадью — и она вжалась за мою спину так отработанно, будто прятаться за пилотами давно входит в её райдер.',
+                'momo Слушай. На рассвете мой голос включат из каждого окна — гимн согласия Решётки. Улыбка — четыре целых две десятых секунды, пункт семь приложения.',
+                'momo Но у меня есть ДРУГАЯ песня. Своя. Про город, который по утрам смеётся. Если её услышат хоть раз — гимн потом не проглотит никто.',
+                'momo Только вывести её могу не я. Мой микрофон — не мой. Нужна передаточная мачта, до которой не дотянутся юристы.',
+                { Choice: { Dialog: 'Момо снимает очки. Три секунды она просто молчит — впервые за весь вечер:',
+                    SingHerSong: routeChoice('Вывести «Титана» к арене до рассвета — город услышит ЕЁ песню', 'MomoEndingSong',
+                        { momo_affinity: 5 }),
+                    SingTheHymn: routeChoice('Взвесить риски «по-взрослому»: контракт — броня, пусть поёт гимн', 'MomoEndingEncore',
+                        { philosophical_depth: 1 })
+                } }
+            ],
+            MomoEndingSong: [
+                vn.goTo('Сэйрин: над ареной'),
+                'show scene cathedral with fadeIn duration 1s',
+                vn.reversible({ flags: { met_reika: true, happy_ending_achieved: true } }),
+                'p В 04:47 «Титан-04» встал над ареной, как чья-то огромная рука над свечой. Рейка молчала на частоте дока двенадцать секунд, а потом сказала только: «Пилот. Не опоздай на утреннюю тренировку». Она всё знала. Она всегда знает.',
+                'show character momo normal at center with fadeIn',
+                'momo Пункт семь приложения — аннулирован. Дальше пою не улыбка по секундомеру. Дальше — я.',
+                'momo Город! Это не гимн! Это — я! Хозяйка собственного голоса!',
+                'p Её песня покатилась с мачты «Титана» над крышами — про улицы, что смеются по утрам, про дворника, который знает каждое окно города, про окно, что знает каждого прохожего.',
+                'p По горизонту вспыхивали огни, и улыбки за окнами были разной длины — своей. Ни одной по расписанию.',
+                'momo …Рэн. Твоё сердце стучит громче «Стрижа». Слышу отсюда. …Это ничего не значит! Наверное.',
+                'momo Четыре целых две десятых секунды — я держала твой шлем двумя руками. По контракту. С собой. Без свидетелей.',
+                'sys <span class="t-cyan">[ СЧАСТЛИВЫЙ ФИНАЛ МОМО — ГОЛОС ЖИВОГО ГОРОДА ]</span> На рассвете город услышал человека.',
+                'end'
+            ],
+            MomoEndingEncore: [
+                vn.goTo('Сэйрин: арена, рассвет'),
+                'hide character momo with fadeOut',
+                'show scene tsukimachi with fadeIn duration 1s',
+                'momo …Ясно. Реалист с разводным ключом. Ладно. Значит, реально пою — я. Из каждого окна, по контракту, четыре целых две десятых.',
+                'p На рассвете гимн полился из каждого окна. Аплодисменты гремели, как дождь по жести. На всех экранах города она улыбалась ровно на четыре целых две десятых секунды дольше, чем умеют люди.',
+                'p Только теперь я знаю, кто эти секунды считает. Свою песню она больше никому не расскажет.',
+                'sys <span class="t-red">[ ФИНАЛ МОМО — БИС, КОТОРОГО НИКТО НЕ ПРОСИЛ ]</span> Своя песня осталась на бумаге.',
                 'end'
             ]
         });

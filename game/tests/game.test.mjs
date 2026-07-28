@@ -34,6 +34,8 @@ test('storage schema supplies complete, safe defaults', () => {
     assert.equal(checked.ok, true);
     assert.equal(checked.value.player.name, 'Рэн');
     assert.equal(checked.value.player.akatomi_alert, 0);
+    assert.equal(checked.value.player.momo_affinity, 0);
+    assert.equal(checked.value.flags.met_momo, false);
     assert.equal(checked.value.flags.happy_ending_achieved, false);
 });
 
@@ -44,12 +46,13 @@ test('all declared story jumps target real labels', () => {
         'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
         'Solo5BadEnd', 'Solo5Standoff',
         'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
-        'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation'
+        'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
+        'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore'
     ].sort());
     // routeChoice constructs its jump dynamically, so inspect every supplied
     // target rather than looking for a literal `jump Label` in the source.
     const jumps = [...source.matchAll(/routeChoice\([\s\S]*?,\s*'([A-Za-z][A-Za-z0-9]*)'/g)].map(m => m[1]);
-    assert.equal(jumps.length, 11);
+    assert.equal(jumps.length, 14);
     jumps.forEach(label => assert.ok(labels.includes(label), `missing target ${label}`));
 });
 
@@ -111,7 +114,8 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
     const titlesBlock = source.slice(start, source.indexOf('};', start));
     ['Start', 'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
         'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
-        'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation']
+        'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
+        'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore']
         .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
 });
 
@@ -215,7 +219,8 @@ test('every route teaches with a micro-choice before its commitment beat', () =>
         ['SoloRoute4: [', 'CheckSky: effectChoice', 'за монитором'],
         ['SoloRoute5: [', 'PrepCharges: effectChoice', 'NightStrike: effectChoice'],
         ['MiyaRoute: [', 'ArtWire: effectChoice', 'Embrace: routeChoice'],
-        ['AIRoute: [', 'GreetRhythm: effectChoice', 'Connect: routeChoice']
+        ['AIRoute: [', 'GreetRhythm: effectChoice', 'Connect: routeChoice'],
+        ['MomoRoute: [', 'SweetLie: effectChoice', 'SingHerSong: routeChoice']
     ];
     beats.forEach(([label, micro, commitment]) => {
         const from = source.indexOf(label);
@@ -244,9 +249,42 @@ test('Solo 5 balance: the watchful path can never trip Trap #1 by accident', () 
 test('every canon met_* contact has a route step that can set it', () => {
     // met_lumina stays unreachable for now (no Chorus of the Abyss route yet);
     // everything else must be settable or the Archives codex lies.
-    ['met_miya', 'met_reika', 'met_saya', 'met_kurogane', 'met_splash', 'met_stella'].forEach(flag => {
+    ['met_miya', 'met_reika', 'met_saya', 'met_kurogane', 'met_splash', 'met_stella', 'met_momo'].forEach(flag => {
         assert.ok(source.includes(flag), `flag ${flag} is never set`);
     });
+});
+
+test('Momo route: retention methods are literal named options, both endings shipped', () => {
+    // The route's teaching micro-choice literalizes the canon retention
+    // toolkit — sugar overload, pomp, honesty — as named choice keys.
+    const momo = source.slice(source.indexOf('MomoRoute: ['), source.indexOf('MomoEndingSong: ['));
+    ['SweetLie: effectChoice', 'GrandPathos: effectChoice', 'HonestWrench: effectChoice'].forEach(key => {
+        assert.ok(momo.includes(key), `Momo micro-choice missing ${key}`);
+    });
+    assert.ok(momo.indexOf('SingHerSong: routeChoice') > momo.indexOf('SweetLie: effectChoice'),
+        'commitment node MO.1 must follow the teaching micro-choice');
+    assert.ok(momo.includes('SingTheHymn: routeChoice'), 'bitter ending choice missing');
+    // The happy arm must actually light the Archives happy-ending flag.
+    const song = source.slice(source.indexOf('MomoEndingSong: ['), source.indexOf('MomoEndingEncore: ['));
+    assert.ok(song.includes('happy_ending_achieved: true'), 'MomoEndingSong must set happy_ending_achieved');
+    // Ren's pilot identity is load-bearing in the route body (mecha + bike).
+    assert.ok(momo.includes('Титан') && momo.includes('Стриж'), 'route must feature both machines');
+    assert.ok(song.includes('Титан'), 'the mecha must deliver the happy ending');
+});
+
+test('Ren pilots a combat mecha and a motorcycle across the whole script', () => {
+    // Owner mandate: the machines are route furniture everywhere — prologue,
+    // solo routes, Miya and Momo — never a single offhand mention. Machine
+    // references land in the first lines of a route, so a fixed window is
+    // enough and stays robust against later reordering.
+    const startBlock = source.slice(source.indexOf('Start: ['), source.indexOf('SoloRoute1: ['));
+    assert.ok(startBlock.includes('Стриж'), 'prologue must establish the motorcycle');
+    assert.ok(startBlock.includes('Титан'), 'prologue must establish the mecha');
+    ['SoloRoute1: [', 'SoloRoute2: [', 'SoloRoute3: [', 'SoloRoute5: [', 'MiyaRoute: [', 'MomoRoute: [']
+        .forEach(label => {
+            const block = source.slice(source.indexOf(label), source.indexOf(label) + 6000);
+            assert.ok(/Стриж|Титан|Опекун/.test(block), `${label} must reference a machine`);
+        });
 });
 
 test('graph teleport wipes presentation + history so Back cannot cross the jump boundary', () => {
