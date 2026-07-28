@@ -58,6 +58,18 @@ check('offline vendors and game code load', !!w.FailSafe && !!w.IconsOffline && 
 check('engine and game script initialise', !!w.engine && !!w.engine.script(),
     'Monogatari=' + typeof w.Monogatari + ', default=' + typeof (w.Monogatari && w.Monogatari.default) +
     ', menu=' + w.document.querySelectorAll('main-menu').length + ', errors=' + errors.join(' | '));
+// White-screen regression: the engine never creates its screen skeleton, so
+// index.html must ship it. An empty #vn-root used to mean no main menu at all.
+const menuEl = w.document.querySelector('main-screen main-menu');
+const gameScreenEl = w.document.querySelector('game-screen text-box');
+check('engine markup skeleton present (main-menu, text-box)', !!menuEl && !!gameScreenEl,
+    'main-menu=' + !!menuEl + ', text-box=' + !!gameScreenEl);
+if (menuEl) {
+    // Components render lazily on connect; if the menu buttons are there the
+    // engine's menu setup survived boot in this environment.
+    const menuButtons = menuEl.querySelectorAll('button');
+    check('main menu renders its buttons', menuButtons.length >= 2, String(menuButtons.length));
+}
 check('runtime makes no network calls', network.length === 0, network.join(', '));
 const lint = w.engine ? w.eval('(() => window.FailSafe.vn(window.engine, { silent: true }).lintScript({ silent: true }))()') : { ok: false, issues: ['engine did not boot'] };
 check('shipped script passes rollback-safety lint', lint.ok, JSON.stringify(lint.issues));

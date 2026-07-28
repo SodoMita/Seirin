@@ -72,6 +72,22 @@ test('stat-gated branching is actually used (vn.branch with both arms)', () => {
     assert.ok(branches.length >= 1, 'at least one vn.branch with True and False arms');
 });
 
+test('index.html ships the engine markup skeleton (white-screen regression)', () => {
+    // The engine renders INTO screen/menu custom elements but never creates
+    // them. An empty <div id="vn-root"> made init abort -> white screen with
+    // no main menu (cyber-nexus/index.html ships the full skeleton).
+    const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
+    const rootMatch = html.match(/<div id="vn-root">([\s\S]*?)<\/div>\s*<!--/);
+    assert.ok(rootMatch, '#vn-root container missing');
+    ['visual-novel', 'loading-screen', 'main-screen', 'main-menu',
+        'game-screen', 'text-box', 'quick-menu', 'dialog-log',
+        'load-screen', 'save-screen', 'settings-screen', 'help-screen']
+        .forEach(tag => {
+            assert.ok(html.includes('<' + tag + '>'), `missing <${tag}> in skeleton`);
+        });
+    assert.ok(rootMatch[1].includes('<main-menu>'), '#vn-root must not be an empty div');
+});
+
 test('fast-forward is wired: HUD button in markup, Skip > 0 in settings', () => {
     const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
     assert.match(html, /id="btn-skip"/);

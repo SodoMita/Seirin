@@ -36,8 +36,34 @@
         </div>
     </header>
 
-    <!-- MONOGATARI CONTAINER -->
-    <div id="vn-root"></div>
+    <!-- MONOGATARI CONTAINER — engine markup skeleton.
+         NOTE 1: the container id is "vn-root", NOT "monogatari" (an element
+         with id="monogatari" creates a global window.monogatari pointing at
+         the DIV, which shadows the engine object).
+         NOTE 2: the engine renders INTO these custom elements but never
+         creates them. game/ used to ship an empty <div id="vn-root">, so
+         engine.init() aborted and the player got a white screen instead of
+         the main menu (cyber-nexus/index.html is the reference). -->
+    <div id="vn-root">
+        <visual-novel>
+            <language-selection-screen></language-selection-screen>
+            <loading-screen></loading-screen>
+            <main-screen>
+                <main-menu></main-menu>
+            </main-screen>
+            <game-screen>
+                <dialog-log></dialog-log>
+                <text-box></text-box>
+                <quick-menu></quick-menu>
+            </game-screen>
+            <gallery-screen></gallery-screen>
+            <credits-screen></credits-screen>
+            <load-screen></load-screen>
+            <save-screen></save-screen>
+            <settings-screen></settings-screen>
+            <help-screen></help-screen>
+        </visual-novel>
+    </div>
 
     <!-- ARCHIVES CODEX MODAL (opened by #btn-archives, wired in vendor/game.js) -->
     <div id="archives-overlay" class="archives-overlay" hidden>
