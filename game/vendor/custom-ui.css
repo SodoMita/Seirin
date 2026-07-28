@@ -5,8 +5,8 @@
  * top header status HUD, and custom responsive anime styling.
  * ========================================================================== */
 
-@import url('./monogatari.css?v=20260728r10');
-@import url('./icons-offline.css?v=20260728r10');
+@import url('./monogatari.css?v=20260728r11');
+@import url('./icons-offline.css?v=20260728r11');
 
 :root {
   --sn-bg-dark: rgba(11, 15, 25, 0.88);
@@ -850,7 +850,7 @@ main-screen {
   background:
     repeating-linear-gradient(45deg, rgba(251, 191, 36, 0.03) 0 2px, transparent 2px 32px),
     linear-gradient(rgba(8, 10, 18, 0.85), rgba(8, 10, 18, 0.95)),
-    url('../assets/scenes/courtyard.png?v=20260728r10') center/cover no-repeat !important;
+    url('../assets/scenes/courtyard.png?v=20260728r11') center/cover no-repeat !important;
   animation: mechAmbient 14s linear infinite;
 }
 

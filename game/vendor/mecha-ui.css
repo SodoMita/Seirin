@@ -1,0 +1,1290 @@
+/* ============================================================================
+ * Seirin: Night Shift — Resonance 2030
+ * MECHA-UI — 2.5D skeuomorphic armour skin
+ * ----------------------------------------------------------------------------
+ * Loads AFTER vendor/custom-ui.css and deliberately overrides its flat
+ * "mecha reskin" pass. Everything here is paint + layers; the GEOMETRY of the
+ * older file (panel positions, sprite world-scale table, responsive breaks) is
+ * left untouched on purpose, because that geometry is a set of regression pins.
+ *
+ * --------------------------------------------------------------------------
+ * THE PLATE MODEL (why there are so many layers)
+ * --------------------------------------------------------------------------
+ * A real armour panel is not one rectangle, it is a stack. Each themed element
+ * carries `data-mech="<kind>"` and hosts up to five empty <i class="mech-l">
+ * children injected by vendor/mecha-ui.js. Painting order, bottom to top:
+ *
+ *   0. the element's own background ....... the RIM (bright machined edge)
+ *   1. .mech-l-face ....................... inset face: 2-light bevel + steel
+ *   2. .mech-l-wear ....................... bruises: scratches, chips, rust,
+ *                                           grease, stencilled serial code
+ *   3. .mech-l-gloss ...................... moving specular (the illumination)
+ *   4. .mech-l-rivets ..................... bolt rows, top and bottom
+ *   5. .mech-l-edge ....................... running edge light / status glow
+ *   6. the element's real text ............ always on top, always readable
+ *
+ * The layers sit at `z-index: -1` inside a stacking context created by the
+ * host (`isolation: isolate`). That is what lets them paint ABOVE the host's
+ * background but BELOW a bare text node — choice buttons have no element to
+ * hang the label on, so a positive z-index would bury the text.
+ *
+ * clip-path kills box-shadow, so depth is built from:
+ *   - a 2px rim revealed by insetting .mech-l-face inside a smaller chamfer,
+ *   - gradients lit from the top-left with a bounce highlight bottom-right,
+ *   - filter: drop-shadow() applied post-clip so the shadow follows the cuts.
+ *
+ * --------------------------------------------------------------------------
+ * 2.5D
+ * --------------------------------------------------------------------------
+ * --mech-mx / --mech-my are pointer coordinates in -1..1, written by
+ * mecha-ui.js. Panels take a small perspective rotation from them and the
+ * specular highlight slides the opposite way, so the metal reads as a tilted
+ * physical surface rather than a picture of one.
+ *
+ * --------------------------------------------------------------------------
+ * TEXTURES
+ * --------------------------------------------------------------------------
+ * --mech-tex-* are PNG data URIs baked at boot by mecha-ui.js on a <canvas>.
+ * Nothing is fetched and nothing is committed as a binary. Every use goes
+ * through var(--mech-tex-x, <css fallback>) so a browser without canvas (or
+ * jsdom in the smoke test) still gets a plausible surface.
+ *
+ * Reduced motion is honoured at the bottom of this file: all decoration
+ * remains, only movement stops.
+ * ========================================================================== */
+
+/* ============================================================================
+ * 1. TOKENS
+ * ========================================================================== */
+:root {
+  /* Gunmetal ramp — sampled from the material study board (design/concepts). */
+  --mech-steel-hi:   #b8c6d8;
+  --mech-steel-lit:  #7d8da5;
+  --mech-steel-mid:  #46536a;
+  --mech-steel-low:  #232c3c;
+  --mech-steel-deep: #131a26;
+  --mech-void:       #070a11;
+
+  --mech-amber: #fbbf24;
+  --mech-cyan:  #38bdf8;
+  --mech-red:   #f87171;
+  --mech-green: #34d399;
+  --mech-violet:#a855f7;
+
+  /* Machining */
+  --mech-chamfer: 16px;
+  --mech-rim: 2px;
+
+  /* Two-light bevel. Key light top-left, cold bounce bottom-right. */
+  --mech-rim-grad: linear-gradient(158deg,
+      #a4b4c9 0%, #6d7d95 16%, #3a4557 46%,
+      #1b2330 72%, #55637a 92%, #8a9bb2 100%);
+
+  /* Two-light face shading. Layer 1 is the bevel: a hard bright lip in the
+     first 3% (the machined top edge catching the key light), a long body
+     falloff, then a cold bounce in the last 4% where the bottom chamfer picks
+     up fill light. The hard stops matter — a smooth gradient reads as a
+     painted card, an abrupt lip reads as an edge with thickness. */
+  --mech-face-grad:
+      linear-gradient(176deg,
+        rgba(226, 240, 255, 0.30) 0%,
+        rgba(198, 220, 245, 0.10) 2.5%,
+        rgba(255, 255, 255, 0.025) 12%,
+        rgba(0, 0, 0, 0.14) 52%,
+        rgba(0, 0, 0, 0.42) 92%,
+        rgba(170, 202, 240, 0.16) 96%,
+        rgba(120, 150, 190, 0.10) 100%),
+      linear-gradient(150deg, #303c50 0%, #1c2433 46%, #0d131d 100%);
+
+  /* Hazard stencil (material study #5).
+     Two alphas on purpose: --mech-hazard is the full-strength stencil for
+     small decorative caps (the strip's chevron block), while
+     --mech-hazard-soft is the only one allowed BEHIND TEXT. At 0.85 the
+     stripes turned hovered choice plates into unreadable barber poles — the
+     label has to stay the loudest thing on an interactive control. */
+  --mech-hazard: repeating-linear-gradient(-45deg,
+      rgba(251, 191, 36, 0.85) 0 10px,
+      rgba(17, 21, 30, 0.85) 10px 20px);
+  --mech-hazard-soft: repeating-linear-gradient(-45deg,
+      rgba(251, 191, 36, 0.13) 0 10px,
+      rgba(17, 21, 30, 0.10) 10px 20px);
+
+  /* Pointer parallax, written by mecha-ui.js. */
+  --mech-mx: 0;
+  --mech-my: 0;
+  --mech-tilt: 1;      /* global multiplier; JS zeroes it for reduced motion */
+
+  /* Live alert level 0..1, written by mecha-ui.js from player.akatomi_alert. */
+  --mech-alert: 0;
+}
+
+/* ============================================================================
+ * 2. KEYFRAMES — indicators, strips, illumination
+ * ========================================================================== */
+
+/* Specular bar travelling across a plate. Phase is offset per element so the
+   light crosses the whole screen as one front instead of blinking together. */
+@keyframes mechSpecular {
+  0%   { background-position: 190% 0; }
+  100% { background-position: -90% 0; }
+}
+
+/* Running light chasing along the lit edge of a panel. */
+@keyframes mechEdgeRun {
+  0%   { background-position: -60% 0; opacity: 0.25; }
+  35%  { opacity: 0.95; }
+  100% { background-position: 160% 0; opacity: 0.25; }
+}
+
+/* Status LED heartbeat. */
+@keyframes mechPulse {
+  0%, 100% { opacity: 1;    box-shadow: 0 0 7px currentColor, 0 0 2px #fff inset; }
+  50%      { opacity: 0.32; box-shadow: 0 0 2px currentColor; }
+}
+
+/* Fast strobe used when the city alert crosses the danger threshold. */
+@keyframes mechStrobe {
+  0%, 44%, 100% { opacity: 1; box-shadow: 0 0 12px currentColor; }
+  50%, 94%      { opacity: 0.18; box-shadow: none; }
+}
+
+/* Segmented gauge shimmer — the top segment breathes while data is live. */
+@keyframes mechGaugeLive {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.45); }
+}
+
+/* Radar disc sweep. */
+@keyframes mechRadar {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Hazard chevron drift. */
+@keyframes mechChevron {
+  from { background-position: 0 0; }
+  to   { background-position: 40px 0; }
+}
+
+/* Data strip marquee. */
+@keyframes mechTicker {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Power-on: a plate energises from its lit edge outward. */
+@keyframes mechPowerUp {
+  0%   { opacity: 0; transform: scaleX(0.82); filter: brightness(2.4); }
+  55%  { opacity: 1; filter: brightness(1.6); }
+  100% { opacity: 1; transform: scaleX(1); filter: brightness(1); }
+}
+
+/* Whole-UI moving hangar light (the "hard" illumination pass). */
+@keyframes mechAmbientLight {
+  0%   { transform: translate3d(-38%, -14%, 0) rotate(-8deg); }
+  50%  { transform: translate3d(34%, 10%, 0) rotate(6deg); }
+  100% { transform: translate3d(-38%, -14%, 0) rotate(-8deg); }
+}
+
+/* Emergency beacon: a rotating red cone washing the cockpit. */
+@keyframes mechBeacon {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes mechAlarmWash {
+  0%, 100% { opacity: 0.16; }
+  50%      { opacity: 0.42; }
+}
+
+/* Telemetry readout digit flicker on change. */
+@keyframes mechDigitSet {
+  0%   { color: #fff; text-shadow: 0 0 10px currentColor; }
+  100% { color: inherit; text-shadow: none; }
+}
+
+/* Boot diagnostic wipe. */
+@keyframes mechBootWipe {
+  0%   { opacity: 0;   transform: translateY(-100%); }
+  12%  { opacity: 0.9; }
+  100% { opacity: 0;   transform: translateY(220%); }
+}
+
+/* ============================================================================
+ * 3. LAYER PRIMITIVES
+ * ========================================================================== */
+/* CONTAINING-BLOCK NOTE — do not "fix" this with padding maths.
+ * The containing block of an absolutely positioned child is its positioned
+ * ancestor's PADDING box: the area inside the BORDER, padding included. Every
+ * plate here draws its rim as a background and sets border:none, so the
+ * padding box IS the border box and a plain `inset: 0` already covers the
+ * whole plate. An earlier revision subtracted the host's padding here and blew
+ * every layer out past its plate (a 564px button carried a 640px face).
+ * Measured: face == button rect, exactly. Keep it that way. */
+/* POSITIONING NOTE — this rule deliberately does NOT set `position`.
+ * The layers need a positioned host, but declaring `position: relative` here
+ * silently broke real layout: `[data-mech]` and `.cyber-top-hud` have equal
+ * specificity (0,1,0) and this file loads later, so the dashboard lost its
+ * `position: absolute` and fell into normal flow, dropping its 24px inset.
+ * mecha-ui.js instead sets `position: relative` inline ONLY on hosts computing
+ * to `static`, which cannot disturb an element that already positions itself. */
+[data-mech] {
+  isolation: isolate;                 /* contain the -1 layers and blending */
+}
+
+[data-mech] > .mech-l {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Layers that sit one rim-width inside the plate edge, so the machined rim
+   stays visible all the way around the face. */
+[data-mech] > .mech-l-face,
+[data-mech] > .mech-l-wear,
+[data-mech] > .mech-l-gloss,
+[data-mech] > .mech-l-edge { inset: var(--mech-rim); }
+
+/* --- face: the inset armour surface ------------------------------------- */
+[data-mech] > .mech-l-face {
+  background-color: #161d2a;
+  background-image:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, repeating-linear-gradient(92deg,
+        rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 3px));
+  background-size: auto, auto, 128px 128px;
+  background-blend-mode: normal, normal, overlay;
+}
+
+/* Grain sits on the face so the steel is never a clean gradient. */
+[data-mech] > .mech-l-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--mech-tex-grain, none);
+  background-size: 128px 128px;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+}
+
+/* --- wear: the decorative bruises ---------------------------------------
+   Scratches, impact dents, chipped paint, rust bloom and grease, baked by
+   mecha-ui.js. data-wear picks one of three variants so no two plates on
+   screen carry the same damage. */
+[data-mech] > .mech-l-wear {
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  /* Wear is texture, not decoration: it should be felt, not counted. */
+  opacity: 0.62;
+}
+[data-mech] > .mech-l-wear[data-wear="a"] { background-image: var(--mech-tex-wear-a, none); background-position: 0 0; }
+[data-mech] > .mech-l-wear[data-wear="b"] { background-image: var(--mech-tex-wear-b, none); background-position: -70px -30px; }
+[data-mech] > .mech-l-wear[data-wear="c"] { background-image: var(--mech-tex-wear-c, none); background-position: -145px -95px; }
+
+/* Stencilled unit code, straight off the material study sheet. */
+[data-mech] > .mech-l-wear::after {
+  content: attr(data-serial);
+  position: absolute;
+  right: 9px;
+  bottom: 3px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  color: rgba(203, 213, 225, 0.34);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+
+/* --- gloss: the moving light -------------------------------------------- */
+[data-mech] > .mech-l-gloss {
+  /* The pointer highlight below is deliberately oversized (inset: -40%) so it
+     can slide without exposing an edge. Clip it here: kinds without their own
+     clip-path (housing) would otherwise let the glow spill outside the plate,
+     and the overflow also inflates the host's scrollWidth, which makes genuine
+     text-clipping impossible to measure. */
+  overflow: hidden;
+  background-image: linear-gradient(104deg,
+      transparent 34%,
+      rgba(214, 234, 255, 0.05) 44%,
+      rgba(228, 242, 255, 0.20) 50%,
+      rgba(214, 234, 255, 0.05) 56%,
+      transparent 66%);
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  animation: mechSpecular 9s linear infinite;
+  animation-delay: calc(var(--mech-phase, 0) * -9s);
+  mix-blend-mode: screen;
+}
+
+/* Pointer-driven specular: a soft highlight that tracks the cursor, which is
+   what actually sells the tilt as a 3D surface. */
+[data-mech] > .mech-l-gloss::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(closest-side circle,
+      rgba(226, 240, 255, 0.16), transparent 100%);
+  transform: translate3d(calc(var(--mech-mx) * 32%), calc(var(--mech-my) * 32%), 0);
+  opacity: 0.85;
+}
+
+/* --- rivets: bolt rows top and bottom -----------------------------------
+   Each bolt = dark seat + shadow + top highlight, i.e. the "1px dark + 1px
+   light" note from the annotated critique board. */
+[data-mech] > .mech-l-rivets::before,
+[data-mech] > .mech-l-rivets::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 8px;
+  background-image:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.34) 0 0.8px, transparent 1.6px),
+    radial-gradient(circle at 50% 70%, rgba(0, 0, 0, 0.62) 0 1.9px, transparent 2.6px),
+    radial-gradient(circle at 50% 50%, #39445a 0 2.4px, rgba(20, 26, 38, 0) 3px);
+  background-size: 30px 8px;
+  background-repeat: repeat-x;
+  opacity: 0.85;
+}
+[data-mech] > .mech-l-rivets::before { top: 4px; }
+[data-mech] > .mech-l-rivets::after  { bottom: 4px; }
+
+/* --- edge: running status light ----------------------------------------- */
+[data-mech] > .mech-l-edge {
+  overflow: hidden;
+}
+[data-mech] > .mech-l-edge::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background-image: linear-gradient(90deg,
+      transparent 0%,
+      var(--mech-edge-color, rgba(56, 189, 248, 0.9)) 45%,
+      rgba(255, 255, 255, 0.85) 50%,
+      var(--mech-edge-color, rgba(56, 189, 248, 0.9)) 55%,
+      transparent 100%);
+  background-size: 55% 100%;
+  background-repeat: no-repeat;
+  animation: mechEdgeRun 5.5s ease-in-out infinite;
+  animation-delay: calc(var(--mech-phase, 0) * -5.5s);
+}
+
+/* Everything a plate hosts as real content stays above the layers. */
+[data-mech] > *:not(.mech-l) { position: relative; }
+
+/* Boot energisation for freshly mounted plates. */
+[data-mech] > .mech-l-face,
+[data-mech] > .mech-l-edge { animation-name: mechPowerUp; animation-duration: 0.5s; animation-fill-mode: both; }
+[data-mech] > .mech-l-edge {
+  animation-name: mechPowerUp, mechEdgeRun;
+  animation-duration: 0.5s, 5.5s;
+  animation-timing-function: ease-out, ease-in-out;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: both, both;
+}
+
+/* ============================================================================
+ * 4. PLATE KINDS — chamfers and depth per component family
+ * ========================================================================== */
+
+/* --- kind: plate (menu + choice buttons) -------------------------------- */
+[data-mech="plate"] {
+  background: var(--mech-rim-grad) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 14px),
+      calc(100% - 14px) 100%, 0 100%, 0 20px) !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.10))
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.62));
+  transform:
+    perspective(1200px)
+    rotateX(calc(var(--mech-my) * var(--mech-tilt) * -1.1deg))
+    rotateY(calc(var(--mech-mx) * var(--mech-tilt) * 1.5deg));
+  transition: transform 0.18s ease-out, filter 0.22s ease-out;
+}
+[data-mech="plate"] > .mech-l-face,
+[data-mech="plate"] > .mech-l-wear,
+[data-mech="plate"] > .mech-l-gloss,
+[data-mech="plate"] > .mech-l-edge {
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 12px),
+      calc(100% - 12px) 100%, 0 100%, 0 18px);
+}
+
+/* --- kind: console (the dialogue cockpit) -------------------------------- */
+[data-mech="console"] {
+  background: var(--mech-rim-grad) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  clip-path: polygon(34px 0, 100% 0, 100% calc(100% - 18px),
+      calc(100% - 18px) 100%, 0 100%, 0 34px) !important;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
+}
+[data-mech="console"] > .mech-l-face,
+[data-mech="console"] > .mech-l-wear,
+[data-mech="console"] > .mech-l-gloss,
+[data-mech="console"] > .mech-l-edge {
+  clip-path: polygon(32px 0, 100% 0, 100% calc(100% - 16px),
+      calc(100% - 16px) 100%, 0 100%, 0 32px);
+}
+
+/* --- kind: dash (top HUD) ------------------------------------------------ */
+[data-mech="dash"] {
+  background: var(--mech-rim-grad) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 50%,
+      calc(100% - 16px) 100%, 16px 100%, 0 50%) !important;
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 0, 0.6));
+}
+[data-mech="dash"] > .mech-l-face,
+[data-mech="dash"] > .mech-l-wear,
+[data-mech="dash"] > .mech-l-gloss,
+[data-mech="dash"] > .mech-l-edge {
+  clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%,
+      calc(100% - 15px) 100%, 15px 100%, 0 50%);
+}
+[data-mech="dash"] > .mech-l-rivets::before { top: 2px; }
+[data-mech="dash"] > .mech-l-rivets::after  { bottom: 2px; }
+
+/* --- kind: chip (small buttons) ------------------------------------------ */
+[data-mech="chip"] {
+  background: linear-gradient(160deg, #8a9ab1 0%, #3a4557 44%, #1a212e 78%, #6a7a92 100%) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px),
+      calc(100% - 9px) 100%, 0 100%, 0 9px) !important;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+[data-mech="chip"] > .mech-l-face,
+[data-mech="chip"] > .mech-l-gloss,
+[data-mech="chip"] > .mech-l-edge {
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px),
+      calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+[data-mech="chip"] > .mech-l-face { background-size: auto, auto, 96px 96px; }
+
+/* --- kind: housing (modal panels) ---------------------------------------- */
+[data-mech="housing"] {
+  background: var(--mech-rim-grad) !important;
+  border: none !important;
+  border-radius: 3px !important;
+  filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.75));
+}
+[data-mech="housing"] > .mech-l-face,
+[data-mech="housing"] > .mech-l-wear,
+[data-mech="housing"] > .mech-l-gloss { inset: 3px; }
+
+/* ============================================================================
+ * 5. TOP HUD — armoured dashboard with a live instrument rail
+ * ========================================================================== */
+/* The dash is an octagon: its 16px side cuts eat into the content box, so the
+   horizontal padding has to clear the chamfer or the first glyph of the brand
+   and the last button get sliced. flex-wrap is off — a wrapped dashboard
+   breaks the octagon silhouette; the instrument rail drops out at narrow
+   widths instead (see the responsive block). */
+.cyber-top-hud {
+  padding: 11px 34px;
+  color: #9fb0c6;
+  gap: 18px;
+  flex-wrap: nowrap;
+  min-height: 56px;
+}
+/* Read-outs must never be shrunk below their own text. Flex's default
+   `min-width: auto` normally prevents that, but these groups need
+   `min-width: 0` to allow overflow clipping, which re-enables shrinking —
+   and the alert badge lost its digits ("65%" rendered as "6"). Pinning the
+   badge groups to flex: none keeps every value intact; the instrument rail
+   (decorative) is the only element permitted to give up space. */
+.cyber-top-hud > .hud-group { flex: none; min-width: 0; }
+.hud-badge { flex: none; }
+
+/* Brand block reads as an etched nameplate. */
+.hud-brand {
+  font-family: 'Orbitron', 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  color: #cfe2f7;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9), 0 0 12px rgba(56, 189, 248, 0.55);
+  animation: none;
+  /* Etched nameplates do not word-wrap. Without this the brand broke into
+     "СЭЙРИН РЕЗОНАНС / 2030" and pushed the dashboard 40px taller. */
+  white-space: nowrap;
+}
+.hud-brand > .fas { color: var(--mech-cyan); }
+
+/* --- badges: instrument read-outs, pure CSS -----------------------------
+   game.js rewrites badge innerHTML on every state change, so these must not
+   depend on injected children — pseudo-elements survive the rewrite. */
+.hud-badge {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 20px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%) !important;
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.10), rgba(0, 0, 0, 0.30) 60%),
+    linear-gradient(150deg, #2a3446 0%, #161d2a 100%) !important;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  white-space: nowrap;     /* a wrapped read-out is not a read-out */
+}
+/* seated LED on the left cheek of every badge */
+.hud-badge::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: currentColor;
+  color: inherit;
+  box-shadow: 0 0 7px currentColor;
+  animation: mechPulse 2.6s ease-in-out infinite;
+}
+/* hairline top bevel */
+.hud-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+.hud-badge.amber::before { animation-delay: -0.5s; }
+.hud-badge.pink::before  { animation-delay: -1.1s; }
+.hud-badge.red::before   { animation-delay: -1.7s; }
+
+/* The alert badge doubles as a filling gauge: --mech-alert drives the wash. */
+#hud-alert-level {
+  overflow: hidden;
+  background:
+    linear-gradient(90deg,
+      rgba(248, 113, 113, 0.42) 0%,
+      rgba(248, 113, 113, 0.42) calc(var(--mech-alert) * 100%),
+      transparent calc(var(--mech-alert) * 100%)),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.10), rgba(0, 0, 0, 0.30) 60%),
+    linear-gradient(150deg, #2a3446 0%, #161d2a 100%) !important;
+  transition: background 0.5s ease;
+}
+
+/* --- HUD buttons ---------------------------------------------------------- */
+.hud-btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #cfdcec;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
+  padding: 7px 15px;
+}
+.hud-btn:hover {
+  background: linear-gradient(160deg, #b9cae0 0%, #5d7086 40%, #24303f 80%) !important;
+  color: #f4f9ff;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5)) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+  transform: translateY(-1px);
+}
+.hud-btn:hover > .mech-l-face { background-image: var(--mech-face-grad), var(--mech-hazard-soft); background-size: auto, 40px 40px; }
+.hud-btn.active {
+  color: #0b1018;
+  background: linear-gradient(160deg, #ffe6a3 0%, #fbbf24 42%, #a97a06 100%) !important;
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.65));
+}
+.hud-btn.active > .mech-l-face { opacity: 0.22; }
+.hud-btn.active::after { animation: mechStrobe 1.1s steps(1, end) infinite; }
+
+/* --- the live instrument rail (built by mecha-ui.js) --------------------- */
+/* The instrument cluster is decorative telemetry: it must never win space
+   from the badges or the buttons, so it is the first thing allowed to shrink
+   and is clipped rather than allowed to push the dashboard wider. */
+.hud-instruments {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 4px;
+  /* Recessed instrument bay: a darker well inside the dashboard face. */
+  background: linear-gradient(180deg, rgba(3, 6, 11, 0.55), rgba(6, 10, 16, 0.30));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+
+.mech-leds {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mech-led {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  color: rgba(148, 163, 184, 0.75);
+  line-height: 1;
+}
+.mech-led::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor, inset 0 0 2px rgba(255, 255, 255, 0.9);
+  animation: mechPulse 3s ease-in-out infinite;
+}
+.mech-led[data-state="ready"] { color: var(--mech-amber); }
+.mech-led[data-state="active"] { color: var(--mech-cyan); }
+.mech-led[data-state="alert"] { color: var(--mech-red); }
+.mech-led[data-state="alert"]::before { animation-delay: -1.4s; }
+.mech-led[data-state="active"]::before { animation-delay: -0.7s; }
+.mech-led.off { color: rgba(100, 116, 139, 0.5); }
+.mech-led.off::before { box-shadow: none; animation: none; opacity: 0.4; }
+.mech-led.crit::before { animation: mechStrobe 0.55s steps(1, end) infinite; }
+
+/* Segmented gauges: solid fill with 2px dark gaps punched over it. */
+.mech-gauges {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mech-gauge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+  line-height: 1;
+}
+.mech-gauge-k { width: 26px; color: rgba(148, 163, 184, 0.8); }
+.mech-gauge-bar {
+  position: relative;
+  width: 62px;
+  height: 7px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #05080d, #10161f);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+}
+/* unlit segment ghosts */
+.mech-gauge-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg,
+      rgba(148, 163, 184, 0.16) 0 5px, transparent 5px 7px);
+}
+.mech-gauge-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background-color: currentColor;
+  background-image: repeating-linear-gradient(90deg,
+      transparent 0 5px, rgba(0, 0, 0, 0.92) 5px 7px);
+  box-shadow: 0 0 8px currentColor;
+  transition: width 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: mechGaugeLive 2.4s ease-in-out infinite;
+}
+.mech-gauge-v {
+  width: 20px;
+  text-align: right;
+  color: #dbe7f5;
+}
+.mech-gauge-v.set { animation: mechDigitSet 0.5s ease-out; }
+.mech-gauge[data-k="res"]  { color: var(--mech-cyan); }
+.mech-gauge[data-k="pwr"]  { color: var(--mech-green); }
+.mech-gauge[data-k="heat"] { color: var(--mech-amber); }
+.mech-gauge.crit { color: var(--mech-red) !important; }
+
+/* Radar disc. */
+.mech-radar {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.14), rgba(4, 10, 8, 0.95) 78%);
+  box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.35), 0 0 8px rgba(52, 211, 153, 0.2);
+  flex: none;
+}
+.mech-radar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg,
+      rgba(52, 211, 153, 0.55) 0deg,
+      rgba(52, 211, 153, 0.10) 42deg,
+      transparent 78deg);
+  animation: mechRadar 3.1s linear infinite;
+}
+.mech-radar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, transparent 0 7px, rgba(52, 211, 153, 0.28) 7px 7.8px, transparent 8px),
+    linear-gradient(90deg, transparent calc(50% - 0.4px), rgba(52, 211, 153, 0.24) calc(50% - 0.4px) calc(50% + 0.4px), transparent calc(50% + 0.4px)),
+    linear-gradient(0deg,  transparent calc(50% - 0.4px), rgba(52, 211, 153, 0.24) calc(50% - 0.4px) calc(50% + 0.4px), transparent calc(50% + 0.4px));
+}
+
+.mech-serial {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  color: rgba(148, 163, 184, 0.55);
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  max-height: 34px;
+  overflow: hidden;
+}
+
+/* ============================================================================
+ * 6. DATA STRIP — scrolling telemetry rail under the HUD
+ * ========================================================================== */
+/* --mech-strip-top is measured from the live HUD by mecha-ui.js, because the
+   dashboard's height depends on the instrument rail, the font and the current
+   breakpoint. The literal is only the pre-measurement fallback. */
+.mech-strip {
+  position: absolute;
+  top: var(--mech-strip-top, 74px);
+  left: 24px;
+  right: 24px;
+  height: 20px;
+  z-index: 79;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, #161d2a, #0b1018);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55));
+}
+.mech-strip::before {           /* hazard cap, drifting */
+  content: '';
+  width: 46px;
+  flex: none;
+  background: var(--mech-hazard);
+  background-size: 28px 28px;
+  animation: mechChevron 1.4s linear infinite;
+  opacity: 0.85;
+}
+.mech-strip::after {            /* bevel */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+.mech-strip-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: rgba(160, 190, 220, 0.72);
+  animation: mechTicker 38s linear infinite;
+  will-change: transform;
+}
+.mech-strip-track span { padding: 0 22px; }
+.mech-strip-track b { color: var(--mech-cyan); font-weight: 700; }
+.mech-strip-track i { color: var(--mech-amber); font-style: normal; }
+
+/* ============================================================================
+ * 7. TEXT BOX — cockpit console
+ * ========================================================================== */
+[data-screen="game"] text-box {
+  padding: 22px 34px 26px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-top: none;
+  overflow: visible;
+}
+/* Kill custom-ui.css's flat scanline overlay; the layer stack replaces it. */
+[data-screen="game"] text-box::after { display: none; }
+
+/* The console is the largest plate on screen, so it is the one that most
+   easily reads as a flat black slab. Two corrections:
+   (1) the darkening wash behind the type is a VERTICAL ramp that is strong
+       under the text and weak at the top, instead of a uniform 0.72 veil —
+       contrast is preserved (measured 15:1) without killing the material;
+   (2) a wide diagonal sheen keeps the surface curved rather than dead flat. */
+[data-screen="game"] text-box > .mech-l-face {
+  background-image:
+    /* Darkening is aimed at the TEXT BAND only (roughly 15%-72% of the panel,
+       where the speaker line and dialogue sit). Below that it releases so the
+       lower third of the console shows lit metal and a bounce highlight along
+       the bottom chamfer, instead of fading to a black void. */
+    linear-gradient(180deg,
+      rgba(6, 10, 16, 0.10) 0%,
+      rgba(4, 7, 12, 0.64) 22%,
+      rgba(4, 7, 12, 0.64) 68%,
+      rgba(6, 11, 18, 0.34) 88%,
+      rgba(28, 40, 58, 0.16) 100%),
+    linear-gradient(112deg, rgba(150, 190, 240, 0.10) 0%, transparent 34%, transparent 74%, rgba(120, 160, 210, 0.06) 100%),
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, repeating-linear-gradient(92deg,
+        rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 3px));
+  background-size: auto, auto, auto, auto, 128px 128px;
+}
+/* Wear is scaled up and strengthened on the console: at 256px the tile
+   repeated ~4x across an 1100px panel and read as wallpaper. */
+[data-screen="game"] text-box > .mech-l-wear {
+  background-size: 420px 420px;
+  opacity: 0.8;
+}
+[data-screen="game"] text-box > .mech-l-edge { --mech-edge-color: rgba(251, 191, 36, 0.95); }
+
+/* The engine's [data-content="name"] is a flex row, so <span data-ui="who">
+   stretches to the full console width and the speaker badge became a 1032px
+   bar. Pin it to its text and keep the row from distributing free space. */
+[data-screen="game"] [data-content="name"] {
+  align-items: center;
+  justify-content: flex-start;
+}
+[data-screen="game"] [data-content="name"] > [data-ui="who"] {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+}
+/* An empty speaker (narration lines) must not leave a floating chip. */
+[data-screen="game"] [data-ui="who"]:empty { display: none; }
+
+[data-screen="game"] [data-ui="who"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.34) 62%),
+    linear-gradient(150deg, #22405c 0%, #0e1c2b 100%);
+  border: none;
+  border-left: 3px solid var(--mech-cyan);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  padding: 6px 26px 6px 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
+  color: #dff1ff;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.6), 0 1px 0 rgba(0, 0, 0, 0.9);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+[data-screen="game"] [data-ui="who"]:not(:empty)::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: var(--mech-cyan);
+  box-shadow: 0 0 8px var(--mech-cyan);
+  animation: mechPulse 1.6s ease-in-out infinite;
+}
+
+/* Speaker rail: amber data line under the name row. */
+[data-screen="game"] text-box [data-content="text"] {
+  border-top: 1px solid rgba(251, 191, 36, 0.22);
+  margin-top: 6px;
+  padding-top: 4px;
+}
+[data-screen="game"] [data-ui="say"] {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.16rem;
+  line-height: 1.62;
+  color: #eaf2fb;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+/* ============================================================================
+ * 8. CHOICE PLATES
+ * ========================================================================== */
+[data-screen="game"] choice-container button {
+  border-left: none !important;
+  padding: 15px 22px 15px 58px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  color: #e9f2fb;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  overflow: visible;
+}
+[data-screen="game"] choice-container button > .mech-l-edge { --mech-edge-color: rgba(56, 189, 248, 0.95); }
+
+/* Index stencil, kept from custom-ui.css but re-seated on the metal. */
+[data-screen="game"] choice-container button::before {
+  left: 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(148, 197, 240, 0.85);
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.55), 0 1px 0 rgba(0, 0, 0, 0.9);
+}
+/* The old flat sweep is replaced by the gloss layer. */
+[data-screen="game"] choice-container button::after { display: none; }
+
+[data-screen="game"] choice-container button:hover,
+[data-screen="game"] choice-container button:focus-visible {
+  background: linear-gradient(158deg, #cfe0f2 0%, #7f90a8 18%, #47536a 50%, #222a39 78%, #9fb0c6 100%) !important;
+  animation: none;
+  transform:
+    perspective(1200px)
+    rotateX(calc(var(--mech-my) * var(--mech-tilt) * -1.1deg))
+    rotateY(calc(var(--mech-mx) * var(--mech-tilt) * 1.5deg))
+    translateY(-2px);
+  filter:
+    drop-shadow(0 0 16px rgba(56, 189, 248, 0.42))
+    drop-shadow(0 9px 16px rgba(0, 0, 0, 0.66));
+}
+[data-screen="game"] choice-container button:hover > .mech-l-face {
+  background-image:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.18), transparent 55%),
+    var(--mech-face-grad),
+    var(--mech-hazard-soft);
+  background-size: auto, auto, 40px 40px;
+  animation: mechChevron 1.1s linear infinite;
+}
+[data-screen="game"] choice-container button:hover::before { color: var(--mech-amber); }
+
+/* ============================================================================
+ * 9. MAIN MENU / TITLE — hangar bay
+ * ========================================================================== */
+main-screen {
+  background:
+    linear-gradient(0deg, rgba(251, 191, 36, 0.05) 0 2px, transparent 2px 46px),
+    linear-gradient(rgba(8, 10, 18, 0.82), rgba(6, 8, 14, 0.96)),
+    url('../assets/scenes/courtyard.png?v=20260728r11') center/cover no-repeat !important;
+  animation: none;
+}
+/* Hangar floor + warning stripe at the deck line. */
+main-screen::before,
+main-screen::after { z-index: 4; }
+
+main-screen::before {
+  content: 'СЭЙРИН';
+  background: linear-gradient(178deg,
+      #f2f8ff 0%, #b9cbe2 30%, #63748f 48%,
+      #2c3648 55%, #93a6c0 68%, #e6eefa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 0 18px rgba(56, 189, 248, 0.55))
+    drop-shadow(0 4px 6px rgba(0, 0, 0, 0.85));
+  text-shadow: none;
+  animation: none;
+}
+main-screen::after {
+  text-shadow: 0 0 12px rgba(244, 114, 182, 0.75), 0 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+main-menu button {
+  padding-left: 40px !important;
+  color: #e8f0fa !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+  overflow: visible;
+}
+main-menu button > span { position: relative; z-index: 1; }
+main-menu button > .mech-l-edge { --mech-edge-color: rgba(251, 191, 36, 0.95); }
+
+/* Status LED, re-seated against the new bevel. */
+main-menu button::before {
+  left: 16px;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  box-shadow: 0 0 9px var(--mech-amber), inset 0 0 2px rgba(255, 255, 255, 0.9);
+  animation: mechPulse 2.4s ease-in-out infinite;
+  z-index: 1;
+}
+main-menu button::after { display: none; }   /* gloss layer replaces it */
+
+main-menu button:hover,
+main-menu button:focus-visible {
+  background: linear-gradient(158deg, #d8e6f6 0%, #8598b0 18%, #4b5870 50%, #232c3b 78%, #a7b8ce 100%) !important;
+  animation: none;
+  transform:
+    perspective(1200px)
+    rotateX(calc(var(--mech-my) * var(--mech-tilt) * -1.1deg))
+    rotateY(calc(var(--mech-mx) * var(--mech-tilt) * 1.5deg))
+    translateY(-2px);
+  filter:
+    drop-shadow(0 0 18px rgba(251, 191, 36, 0.42))
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.68));
+}
+main-menu button:hover > .mech-l-face {
+  background-image:
+    linear-gradient(180deg, rgba(251, 191, 36, 0.20), transparent 52%),
+    var(--mech-face-grad),
+    var(--mech-hazard-soft);
+  background-size: auto, auto, 40px 40px;
+  animation: mechChevron 1.1s linear infinite;
+}
+main-menu button:hover::before { background: var(--mech-cyan); color: var(--mech-cyan); }
+main-menu button:active { transform: translateY(1px) scale(0.995); }
+
+/* ============================================================================
+ * 10. QUICK MENU + SYSTEM SCREENS
+ * ========================================================================== */
+quick-menu {
+  background: linear-gradient(180deg, rgba(14, 19, 28, 0.94), rgba(8, 11, 17, 0.94));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  align-items: center;
+  padding-right: 8px;
+}
+quick-menu button {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 11px;
+  color: #b9cade !important;
+}
+quick-menu button:hover,
+quick-menu button:focus {
+  border: none !important;
+  color: #eaf4ff !important;
+  filter: drop-shadow(0 0 9px rgba(56, 189, 248, 0.55));
+}
+quick-menu button > .fas { font-size: 1rem !important; }
+
+[data-screen]:not([data-screen="game"]) {
+  background-color: #080b12;
+  background-image:
+    linear-gradient(0deg, rgba(251, 191, 36, 0.035) 0 1px, transparent 1px 40px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 0 1px, transparent 1px 40px);
+}
+[data-screen]:not([data-screen="game"]) [data-action="back"] {
+  background: linear-gradient(160deg, #93a4bb 0%, #3a4557 48%, #161d2a 100%);
+  color: #dff1ff;
+  border: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+[data-screen]:not([data-screen="game"]) [data-action="back"]:hover {
+  filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.6)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+/* ============================================================================
+ * 11. MODALS — machined housings
+ * ========================================================================== */
+.archives-panel,
+.graph-panel {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.archives-panel > .mech-l-edge,
+.graph-panel > .mech-l-edge { --mech-edge-color: rgba(251, 191, 36, 0.9); }
+.archives-head,
+.graph-head {
+  font-family: 'Orbitron', 'Rajdhani', sans-serif;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5), 0 1px 0 rgba(0, 0, 0, 0.9);
+}
+.graph-chip,
+.graph-node,
+.graph-target,
+.graph-jump {
+  border-radius: 0;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.graph-node {
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.28) 60%),
+    linear-gradient(150deg, #202a3a 0%, #10161f 100%);
+  border: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================================
+ * 12. GLOBAL ILLUMINATION — the moving hangar light and the alarm beacon
+ * ========================================================================== */
+.mech-ambient,
+.mech-beacon {
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 900;
+}
+
+/* A slow key light drifting across the interface.
+ *
+ * IMPORTANT — this lights the CHROME, never the scene. Earlier revisions put a
+ * full-viewport soft-light pass here; because soft-light multiplies against
+ * whatever is behind it, the warm sunset courtyard bled a pink cast straight
+ * through the armour plates and the background art went hazy. Masking helped
+ * but never fully removed the tint.
+ *
+ * The fix is to stop blending against the artwork at all: `plus-lighter` only
+ * ADDS a cool white, so the result can tint metal toward the key light but can
+ * never pick up the backdrop's hue. The alpha is deliberately tiny — this is a
+ * sheen crossing the panels, and the per-plate .mech-l-gloss sweep is what
+ * actually carries the illumination animation. */
+.mech-ambient {
+  background: radial-gradient(40% 56% at 30% 22%,
+      rgba(150, 196, 255, 0.085) 0%,
+      rgba(120, 170, 240, 0.035) 46%,
+      transparent 76%);
+  mix-blend-mode: plus-lighter;
+  animation: mechAmbientLight 26s ease-in-out infinite;
+  will-change: transform;
+  /* Keep it off the middle of the stage, where sprites and dialogue live. */
+  -webkit-mask-image: linear-gradient(180deg,
+      #000 0, #000 16%, transparent 30%, transparent 64%, #000 84%, #000 100%);
+  mask-image: linear-gradient(180deg,
+      #000 0, #000 16%, transparent 30%, transparent 64%, #000 84%, #000 100%);
+}
+
+/* Emergency beacon, only visible while the city alert is critical. */
+.mech-beacon {
+  z-index: 901;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: conic-gradient(from 0deg,
+      rgba(248, 60, 60, 0.34) 0deg,
+      transparent 46deg,
+      transparent 180deg,
+      rgba(248, 60, 60, 0.34) 226deg,
+      transparent 272deg);
+  mix-blend-mode: screen;
+}
+html.mech-alarm .mech-beacon {
+  opacity: 1;
+  animation: mechBeacon 3.4s linear infinite, mechAlarmWash 1.7s ease-in-out infinite;
+}
+
+/* Caution / alarm states ripple through the whole dashboard. */
+html.mech-caution .cyber-top-hud { filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.32)) drop-shadow(0 7px 14px rgba(0, 0, 0, 0.6)); }
+html.mech-alarm   .cyber-top-hud { filter: drop-shadow(0 0 16px rgba(248, 113, 113, 0.45)) drop-shadow(0 7px 14px rgba(0, 0, 0, 0.6)); }
+html.mech-alarm   .cyber-top-hud > .mech-l-edge { --mech-edge-color: rgba(248, 113, 113, 0.95); }
+html.mech-alarm   .mech-strip::before { animation-duration: 0.6s; }
+html.mech-alarm   .mech-strip-track { color: rgba(255, 190, 190, 0.85); }
+html.mech-alarm   #hud-alert-level::before { animation: mechStrobe 0.5s steps(1, end) infinite; }
+
+/* Boot diagnostic wipe — one pass over the dashboard at start-up. */
+.mech-bootwipe {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 34vh;
+  z-index: 902;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+      transparent,
+      rgba(120, 220, 255, 0.10) 62%,
+      rgba(190, 240, 255, 0.5) 96%,
+      transparent);
+  animation: mechBootWipe 1.35s ease-in 1 both;
+}
+
+/* ============================================================================
+ * 13. RESPONSIVE
+ * ========================================================================== */
+/* Dashboard degradation ladder. The dashboard is a fixed-height octagon that
+   must not wrap, so as width runs out we DROP decoration in priority order
+   rather than squeezing read-outs. Measured at 1440px the full rail needed
+   ~1945px of content in a 1392px box, which clipped the alert digits — hence
+   the first two steps fire well above phone sizes.
+     1. serial plate      (pure flavour)
+     2. radar disc        (pure flavour)
+     3. gauge value digits, then whole instrument bay
+     4. HUD button labels (icons remain, still tappable) */
+@media screen and (max-width: 100em) {
+  .mech-serial { display: none; }
+}
+@media screen and (max-width: 88em) {
+  .mech-radar { display: none; }
+  .hud-instruments { gap: 10px; }
+}
+@media screen and (max-width: 80em) {
+  .mech-gauge-v { display: none; }
+  .mech-gauge-bar { width: 48px; }
+}
+@media screen and (max-width: 72em) {
+  .hud-instruments { display: none; }        /* dashboard before instruments */
+  /* Past this point the read-outs genuinely do not fit on one line. A single
+     row would overflow the octagon and hide the action buttons entirely, so
+     the dashboard is allowed to become a two-row panel: the silhouette is
+     shallower (see the reduced chamfer) but nothing is lost. */
+  .cyber-top-hud {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    justify-content: flex-start;
+    padding: 10px 22px;
+  }
+  .cyber-top-hud > .hud-group:last-of-type { margin-left: auto; }
+}
+@media screen and (max-width: 62em) {
+  .hud-btn span:not([class]) { display: none; }   /* icon-only actions */
+  .hud-btn { padding: 7px 11px; }
+  .mech-strip { top: auto; bottom: 0; left: 0; right: 0; clip-path: none; }
+}
+@media screen and (max-width: 37.5em) {
+  .cyber-top-hud { padding: 8px 14px; gap: 8px; }
+  /* Phones: a location name like "Тэцуба: Улица" is the one read-out that can
+     be arbitrarily long, so it is the only badge allowed to ellipsise. The
+     numeric read-outs stay whole — a truncated alert level is a lie. */
+  #hud-location { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+  #hud-location > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hud-brand { font-size: 0.7rem; }
+  /* The brand plate plus a location badge alone exceed a 360px viewport, so
+     the groups themselves must be able to break internally down here. */
+  .cyber-top-hud > .hud-group { flex: 0 1 auto; flex-wrap: wrap; row-gap: 6px; }
+  [data-mech="dash"] { clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%) !important; }
+  [data-mech="dash"] > .mech-l-rivets { display: none; }
+  [data-screen="game"] text-box { padding: 16px 20px 20px; }
+  [data-screen="game"] choice-container button { padding: 12px 16px 12px 46px; }
+  .mech-strip { height: 18px; }
+}
+
+/* ============================================================================
+ * 14. REDUCED MOTION — keep the machine, stop the movement
+ * ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  [data-mech] > .mech-l-gloss,
+  [data-mech] > .mech-l-edge::before,
+  [data-mech] > .mech-l-face,
+  [data-mech] > .mech-l-edge,
+  .hud-badge::before,
+  .hud-btn.active::after,
+  .mech-led::before,
+  .mech-gauge-fill,
+  .mech-radar::before,
+  .mech-strip::before,
+  .mech-strip-track,
+  .mech-ambient,
+  .mech-beacon,
+  .mech-bootwipe,
+  main-menu button::before,
+  main-menu button:hover > .mech-l-face,
+  [data-screen="game"] choice-container button:hover > .mech-l-face,
+  [data-screen="game"] [data-ui="who"]:not(:empty)::after {
+    animation: none !important;
+  }
+  [data-mech] > .mech-l-face,
+  [data-mech] > .mech-l-edge { opacity: 1; transform: none; }
+  [data-mech="plate"],
+  main-menu button:hover,
+  [data-screen="game"] choice-container button:hover { transform: none !important; }
+  .mech-bootwipe { display: none; }
+}
