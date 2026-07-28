@@ -1288,3 +1288,557 @@ html.mech-alarm   #hud-alert-level::before { animation: mechStrobe 0.5s steps(1,
   [data-screen="game"] choice-container button:hover { transform: none !important; }
   .mech-bootwipe { display: none; }
 }
+
+/* ============================================================================
+ * 15. SYSTEM SCREENS — settings / save / load / help / credits
+ * ----------------------------------------------------------------------------
+ * These are engine-rendered screens that the theme never reached: the player
+ * saw white Helvetica on near-black with default browser range inputs (bare
+ * blue circles). They are part of the game, so they get the same armour.
+ * ========================================================================== */
+
+/* Recessed instrument bay backdrop, so the screen is not "black on black". */
+[data-screen]:not([data-screen="game"]) {
+  background-color: #0a0e16;
+  background-image:
+    radial-gradient(120% 90% at 50% -10%, rgba(56, 189, 248, 0.10), transparent 60%),
+    linear-gradient(0deg, rgba(251, 191, 36, 0.030) 0 1px, transparent 1px 40px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.026) 0 1px, transparent 1px 40px);
+}
+
+/* Screen titles read as stencilled bulkhead labels. */
+[data-screen]:not([data-screen="game"]) h2 {
+  font-family: 'Orbitron', 'Rajdhani', sans-serif;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #dceaf8;
+  text-shadow: 0 0 18px rgba(56, 189, 248, 0.45), 0 2px 0 rgba(0, 0, 0, 0.9);
+  margin: 1.1rem auto 0.4rem;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+/* Amber rule under the title, with a lit centre — a hangar sign underline. */
+[data-screen]:not([data-screen="game"]) h2::after {
+  content: '';
+  position: absolute;
+  left: 50%; bottom: 0;
+  width: min(420px, 60vw);
+  height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent,
+      rgba(251, 191, 36, 0.85) 30%, rgba(255, 255, 255, 0.9) 50%,
+      rgba(251, 191, 36, 0.85) 70%, transparent);
+}
+
+/* Group headings (Audio / Text Speed / Autoplay Speed). */
+[data-screen]:not([data-screen="game"]) h3 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mech-amber);
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.35), 0 1px 0 rgba(0, 0, 0, 0.9);
+  margin: 0 0 0.2rem;
+}
+
+/* Each settings block becomes a bolted equipment panel instead of open space. */
+settings-screen [data-settings],
+settings-screen [data-content="audio-settings"],
+settings-screen [data-content="auto-play-speed-controller"] {
+  position: relative;
+  isolation: isolate;
+  padding: 18px 22px 22px;
+  margin: 0 auto 18px;
+  max-width: 520px;
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.055), rgba(0, 0, 0, 0.30) 60%),
+    linear-gradient(150deg, #212b3c 0%, #121926 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px),
+      calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+/* Corner bracket, so the panel reads as a bolted plate. */
+settings-screen [data-settings]::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 8px;
+  width: 14px; height: 14px;
+  border-left: 2px solid rgba(251, 191, 36, 0.55);
+  border-top: 2px solid rgba(251, 191, 36, 0.55);
+  pointer-events: none;
+}
+
+/* Control labels. */
+settings-screen span[data-string] {
+  display: block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #b8cadf;
+  margin: 14px 0 4px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+/* --- Range sliders: machined track + knurled knob -----------------------
+   The engine ships bare <input type="range">, which renders as the browser's
+   default blue circle on an invisible track — the exact "knobs are just blue
+   circles" complaint. Styling a range needs vendor pseudo-elements, and they
+   CANNOT be combined into one selector list: an unknown pseudo-element
+   invalidates the whole rule, so -webkit and -moz are written out separately
+   even though the declarations are identical. */
+settings-screen input[type="range"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 22px;
+  margin: 2px 0 6px;
+  background: transparent;   /* the track pseudo-elements paint instead */
+  cursor: pointer;
+}
+settings-screen input[type="range"]:focus { outline: none; }
+settings-screen input[type="range"]:focus-visible {
+  outline: 2px solid var(--mech-cyan);
+  outline-offset: 3px;
+}
+
+/* track */
+settings-screen input[type="range"]::-webkit-slider-runnable-track {
+  height: 10px;
+  background:
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0 6px, transparent 6px 8px),
+    linear-gradient(180deg, #05080d, #131b27);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+}
+settings-screen input[type="range"]::-moz-range-track {
+  height: 10px;
+  background:
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0 6px, transparent 6px 8px),
+    linear-gradient(180deg, #05080d, #131b27);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+}
+/* filled portion (Firefox can do this natively; WebKit cannot) */
+settings-screen input[type="range"]::-moz-range-progress {
+  height: 10px;
+  background: linear-gradient(180deg, #7fd8ff, var(--mech-cyan) 45%, #1c7ea8);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
+}
+
+/* knob: a hex-capped machined slug, not a circle */
+settings-screen input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 22px;
+  margin-top: -6px;                 /* centre against the 10px track */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+    linear-gradient(160deg, #cfe0f2 0%, #7d8da5 38%, #39445a 78%, #9fb0c6 100%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 10px rgba(56, 189, 248, 0.35);
+  clip-path: polygon(50% 0, 100% 22%, 100% 78%, 50% 100%, 0 78%, 0 22%);
+  border: none;
+}
+settings-screen input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
+    linear-gradient(160deg, #cfe0f2 0%, #7d8da5 38%, #39445a 78%, #9fb0c6 100%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 10px rgba(56, 189, 248, 0.35);
+  clip-path: polygon(50% 0, 100% 22%, 100% 78%, 50% 100%, 0 78%, 0 22%);
+  border: none;
+}
+settings-screen input[type="range"]:hover::-webkit-slider-thumb {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 16px rgba(56, 189, 248, 0.75);
+}
+settings-screen input[type="range"]:hover::-moz-range-thumb {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 16px rgba(56, 189, 248, 0.75);
+}
+
+/* Save/load slots and generic system buttons inherit the plate language. */
+save-screen button:not([data-action="back"]),
+load-screen button:not([data-action="back"]),
+help-screen button:not([data-action="back"]),
+credits-screen button:not([data-action="back"]),
+settings-screen button:not([data-action="back"]) {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #e6eff9;
+}
+
+/* ============================================================================
+ * 16. QUICK MENU — the in-game action bar
+ * ----------------------------------------------------------------------------
+ * Was unstyled engine chrome (plain text, English labels, default FA glyphs)
+ * sitting on top of the artwork. It is now a bolted control rail. The Quit
+ * button is given danger styling because it ends the run.
+ * ========================================================================== */
+quick-menu {
+  background:
+    linear-gradient(180deg, rgba(20, 27, 39, 0.97), rgba(9, 13, 20, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    0 -4px 14px rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(56, 189, 248, 0.22);
+  border-bottom: none;
+  padding: 0 14px;
+  gap: 2px;
+  /* Rivet strip along the top edge of the rail. */
+  background-image:
+    radial-gradient(circle at 50% 3px, rgba(255, 255, 255, 0.22) 0 0.7px, transparent 1.4px),
+    linear-gradient(180deg, rgba(20, 27, 39, 0.97), rgba(9, 13, 20, 0.98));
+  background-size: 34px 100%, auto;
+  background-repeat: repeat-x, no-repeat;
+}
+
+quick-menu button {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  margin: 0 1px !important;
+  padding: 5px 11px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.76rem !important;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #a9bcd2 !important;
+  background: transparent !important;
+  border: none !important;
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+  transition: color 0.18s ease, background 0.18s ease, filter 0.18s ease;
+}
+quick-menu button:hover,
+quick-menu button:focus-visible {
+  color: #eaf6ff !important;
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.22), rgba(56, 189, 248, 0.06)) !important;
+  border: none !important;
+  filter: drop-shadow(0 0 9px rgba(56, 189, 248, 0.45));
+}
+/* Lit underline on hover — a switch closing contact. */
+quick-menu button::after {
+  content: '';
+  position: absolute;
+  left: 7px; right: 7px; bottom: 2px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--mech-cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+quick-menu button:hover::after,
+quick-menu button:focus-visible::after { opacity: 1; }
+
+/* Quit is destructive: red rail, and it never blends in with navigation. */
+quick-menu button[data-action="end"] { color: #f3a9a9 !important; }
+quick-menu button[data-action="end"]:hover {
+  color: #fff3f3 !important;
+  background: linear-gradient(180deg, rgba(248, 113, 113, 0.30), rgba(248, 113, 113, 0.08)) !important;
+  filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.55));
+}
+quick-menu button[data-action="end"]::after {
+  background: linear-gradient(90deg, transparent, var(--mech-red), transparent);
+}
+
+/* ============================================================================
+ * 17. CUSTOM ICONS — replace the default Font Awesome glyphs
+ * ----------------------------------------------------------------------------
+ * The engine injects Font Awesome SVGs into every quick-menu button. Rather
+ * than fight the icon font, the SVG is hidden and a themed glyph is drawn from
+ * a CSS mask, so the icons are vector, offline, recolourable, and consistent
+ * with the mecha language. Keyed off [icon] so it survives re-render.
+ * ========================================================================== */
+quick-menu button > svg,
+quick-menu button > .fas,
+quick-menu button > .far { display: none !important; }
+
+quick-menu button::before {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex: none;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center;  mask-position: center;
+  -webkit-mask-size: contain;     mask-size: contain;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* ← back: chevron into a bracket */
+quick-menu button[data-action="back"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2.4" stroke-linecap="square" d="M13 5 6 12l7 7M6 12h13"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2.4" stroke-linecap="square" d="M13 5 6 12l7 7M6 12h13"/></svg>');
+}
+/* hide/show: a targeting reticle rather than an eyeball */
+quick-menu button[data-action="distraction-free"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="square"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="square"/></g></svg>');
+}
+/* log: stacked data lines on a plate */
+quick-menu button[data-action="dialog-log"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M3 4h18v13H8l-5 4z"/><path d="M7 9h10M7 12.5h6" stroke-linecap="square"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M3 4h18v13H8l-5 4z"/><path d="M7 9h10M7 12.5h6" stroke-linecap="square"/></g></svg>');
+}
+/* auto: play triangle inside a rotor ring */
+quick-menu button[data-action="auto-play"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><circle cx="12" cy="12" r="9"/></g><path fill="black" d="M10 8.2 16 12l-6 3.8z"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><circle cx="12" cy="12" r="9"/></g><path fill="black" d="M10 8.2 16 12l-6 3.8z"/></svg>');
+}
+/* skip: double chevron into a bar */
+quick-menu button[data-action="skip"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M3 5l8 7-8 7zM11 5l8 7-8 7z"/><rect fill="black" x="20" y="5" width="2.4" height="14"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M3 5l8 7-8 7zM11 5l8 7-8 7z"/><rect fill="black" x="20" y="5" width="2.4" height="14"/></svg>');
+}
+/* save: a data cartridge */
+quick-menu button[icon~="fa-save"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M3 3h13l5 5v13H3z"/><path d="M7 3v6h8"/><rect x="7" y="13" width="10" height="6"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M3 3h13l5 5v13H3z"/><path d="M7 3v6h8"/><rect x="7" y="13" width="10" height="6"/></g></svg>');
+}
+/* load: cartridge with an insertion arrow */
+quick-menu button[icon~="fa-undo"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2" stroke-linecap="square"><path d="M4 12a8 8 0 1 1 2.5 5.8"/><path d="M3 6v5h5"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2" stroke-linecap="square"><path d="M4 12a8 8 0 1 1 2.5 5.8"/><path d="M3 6v5h5"/></g></svg>');
+}
+/* settings: hex bolt head */
+quick-menu button[icon~="fa-cog"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M12 2.5 20 7v10l-8 4.5L4 17V7z"/><circle cx="12" cy="12" r="3.4"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M12 2.5 20 7v10l-8 4.5L4 17V7z"/><circle cx="12" cy="12" r="3.4"/></g></svg>');
+}
+/* quit: power symbol */
+quick-menu button[data-action="end"]::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2.2" stroke-linecap="square"><path d="M12 2.5v9"/><path d="M6.5 6a8 8 0 1 0 11 0"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2.2" stroke-linecap="square"><path d="M12 2.5v9"/><path d="M6.5 6a8 8 0 1 0 11 0"/></g></svg>');
+}
+
+/* ============================================================================
+ * 18. CHOICE OVERFLOW — "4 of 8 plates visible" fix
+ * ----------------------------------------------------------------------------
+ * The 8-way fork is taller than the scroll window, and nothing indicated that
+ * more options existed below: the list simply looked like it had 4 entries.
+ * vendor/mecha-ui.js adds .has-overflow / .at-bottom to choice-container.
+ * ========================================================================== */
+/* Collision fix: the fork used to run past the dialogue console and under the
+   quick-menu, so the last plates sat behind Back/Save/Quit and "Quit menu can
+   be overlapped by choice". The stack from the bottom is:
+     quick-menu 40px + console ~150px + gap. Reserving 250px and centring the
+   window in what is left guarantees the list can never reach either. */
+[data-screen="game"] choice-container {
+  position: absolute;
+  max-height: min(52vh, calc(100vh - 250px)) !important;
+  top: 42% !important;
+}
+
+
+/* Fade + prompt live on a fixed overlay pinned to the container, NOT on
+   ::after of the scrolling box (which would scroll away with the content). */
+.mech-scroll-hint {
+  /* Positioned by mecha-ui.js into the gap BELOW the choice list, so it can
+     never print over an option label (both a ::after and a sticky footer did
+     exactly that — they pin to the bottom edge of the scrollport, which is
+     where the next plate is mid-clip). transform centres it on the list. */
+  position: absolute;
+  transform: translateX(-50%);
+  padding: 5px 16px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  color: #120d02;
+  background: linear-gradient(180deg, #ffe6a3, var(--mech-amber) 55%, #c98f08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 14px rgba(251, 191, 36, 0.45);
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  pointer-events: none;
+  z-index: 120;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease;
+}
+.mech-scroll-hint::after { content: 'ЕЩЁ ' attr(data-more) '  \25BC'; }
+.mech-scroll-hint.show {
+  opacity: 1;
+  visibility: visible;
+  animation: mechHintBob 1.5s ease-in-out infinite;
+}
+
+/* Feather the bottom of the list so clipped plates fade instead of being
+   guillotined by a hard edge. Painted by the container, not the badge. */
+[data-screen="game"] choice-container.has-overflow {
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 88%, rgba(0,0,0,.25) 100%);
+          mask-image: linear-gradient(180deg, #000 0, #000 88%, rgba(0,0,0,.25) 100%);
+}
+
+@keyframes mechHintBob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(3px); }
+}
+
+/* A machined scrollbar, so the overflow is visible even before scrolling. */
+[data-screen="game"] choice-container { scrollbar-width: thin; scrollbar-color: rgba(56,189,248,.55) rgba(8,12,18,.6); }
+[data-screen="game"] choice-container { padding-right: 12px; }
+[data-screen="game"] choice-container::-webkit-scrollbar { width: 10px; }
+[data-screen="game"] choice-container::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #05080d, #10161f);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.9);
+}
+[data-screen="game"] choice-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7fd8ff, #38bdf8 45%, #1c7ea8);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mech-scroll-hint::before {
+  /* Feather the list edge just above the badge, so plates fade out rather
+     than being cut off by a hard line. */
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 100%;
+  height: 26px;
+  background: linear-gradient(180deg, transparent, rgba(6, 9, 15, 0.55));
+}
+.mech-scroll-hint::after { animation: none !important; }
+}
+
+/* ============================================================================
+ * 19. LIVING SCENE — animated objects in the dialogue field
+ * ----------------------------------------------------------------------------
+ * "You didn't add animatable objects to dialogue field and other parts."
+ * Correct: the previous pass animated the CHROME but left the stage static —
+ * sprites, backdrop and the dialogue itself never moved, so scenes looked
+ * like a slideshow behind a live cockpit.
+ *
+ * CRITICAL: sprite motion uses the individual `translate:` property, NEVER
+ * `transform:`. The engine positions .center/.left/.right sprites with
+ * transform, so animating transform here would fight the engine and snap
+ * sprites out of position. `translate:` composites independently.
+ * ========================================================================== */
+
+@keyframes mechBreathe {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -7px; }
+}
+@keyframes mechBreatheSoft {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -4px; }
+}
+/* Ken Burns: a slow push on the backdrop so the world is never frozen. */
+@keyframes mechKenBurns {
+  0%   { scale: 1.02; }
+  100% { scale: 1.06; }
+}
+/* Speaker plate: a subtle data-pulse while a line is on screen. */
+@keyframes mechSpeakerLive {
+  0%, 100% { box-shadow: 0 0 0 rgba(56, 189, 248, 0); }
+  50%      { box-shadow: -3px 0 14px rgba(56, 189, 248, 0.45); }
+}
+/* Dust/ember motes drifting across the stage. */
+@keyframes mechMoteDrift {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 0.55; }
+  90%  { opacity: 0.4; }
+  100% { transform: translate3d(38px, -62vh, 0); opacity: 0; }
+}
+/* Advance caret: the "click to continue" blip. */
+@keyframes mechCaret {
+  0%, 100% { opacity: 0.25; translate: 0 0; }
+  50%      { opacity: 1;    translate: 0 3px; }
+}
+
+/* --- Sprites breathe and are grounded ----------------------------------- */
+game-screen [data-character] {
+  animation: mechBreathe 5.2s ease-in-out infinite;
+  filter: drop-shadow(0 18px 14px rgba(0, 0, 0, 0.45));
+  will-change: translate;
+}
+/* Desync so a group of characters does not bob in unison. */
+game-screen [data-character][data-position="left"],
+game-screen [data-character].left   { animation-duration: 5.8s; animation-delay: -1.4s; }
+game-screen [data-character][data-position="right"],
+game-screen [data-character].right  { animation-duration: 4.9s; animation-delay: -2.7s; }
+game-screen [data-character][data-character="splash"] {
+  /* Splash is a hovering colloid mass: she floats more, and wider. */
+  animation: mechBreatheSoft 3.4s ease-in-out infinite;
+}
+
+/* --- Backdrop drift ------------------------------------------------------
+   Scoped to the engine's background element ONLY. An earlier selector used
+   `[data-content="visuals"] > img`, but character sprites are also direct
+   img children of that container, so Ken Burns overrode mechBreathe and the
+   cast stopped breathing (measured: sprite animationName = mechKenBurns). */
+game-screen [data-ui="background"],
+game-screen [data-content="background"] {
+  animation: mechKenBurns 38s ease-in-out infinite alternate;
+  will-change: scale;
+}
+
+/* --- Dialogue console comes alive --------------------------------------- */
+[data-screen="game"] [data-ui="who"]:not(:empty) {
+  animation: mechSpeakerLive 3.4s ease-in-out infinite;
+}
+/* Advance caret in the bottom-right of the console. */
+[data-screen="game"] text-box::before {
+  content: '▼';
+  position: absolute;
+  right: 20px;
+  bottom: 10px;
+  font-size: 0.72rem;
+  color: var(--mech-amber);
+  text-shadow: 0 0 9px rgba(251, 191, 36, 0.8);
+  animation: mechCaret 1.25s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* --- Atmospheric motes over the stage ----------------------------------- */
+.mech-motes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 6;
+}
+.mech-mote {
+  position: absolute;
+  bottom: -8px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(190, 225, 255, 0.85);
+  box-shadow: 0 0 6px rgba(150, 205, 255, 0.9);
+  animation: mechMoteDrift linear infinite;
+  will-change: transform, opacity;
+}
+.mech-mote.warm {
+  background: rgba(255, 214, 150, 0.85);
+  box-shadow: 0 0 7px rgba(251, 191, 36, 0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  game-screen [data-character],
+  game-screen [data-ui="background"],
+  game-screen [data-content="visuals"] > img,
+  [data-screen="game"] [data-ui="who"]:not(:empty),
+  [data-screen="game"] text-box::before,
+  .mech-mote {
+    animation: none !important;
+  }
+  game-screen [data-character] { translate: none; }
+  .mech-motes { display: none; }
+}

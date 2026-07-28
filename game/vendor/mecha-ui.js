@@ -515,6 +515,28 @@
         els.strip = strip;
     }
 
+    /* Drifting motes over the stage. Deterministic placement so the scene is
+       reproducible; injected into game-screen so they sit above the backdrop
+       but below the console. Skipped entirely under reduced motion. */
+    function buildMotes () {
+        var stage = doc.querySelector('game-screen');
+        if (!stage || doc.querySelector('.mech-motes')) { return; }
+        if (prefersReducedMotion()) { return; }
+        var box = el('div', 'mech-motes');
+        box.setAttribute('aria-hidden', 'true');
+        var rand = rng(0x5EED10);
+        var i, m;
+        for (i = 0; i < 14; i++) {
+            m = el('span', 'mech-mote' + (rand() > 0.62 ? ' warm' : ''));
+            m.style.left = (rand() * 100).toFixed(2) + '%';
+            m.style.animationDuration = (16 + rand() * 22).toFixed(1) + 's';
+            m.style.animationDelay = '-' + (rand() * 24).toFixed(1) + 's';
+            m.style.opacity = (0.35 + rand() * 0.5).toFixed(2);
+            box.appendChild(m);
+        }
+        stage.appendChild(box);
+    }
+
     function buildAtmosphere () {
         if (!doc.body) { return; }
         if (!doc.querySelector('.mech-ambient')) {
@@ -670,11 +692,92 @@
             queued = global.setTimeout(function () {
                 queued = null;
                 try { mountAll(doc); } catch (e) { /* never break the page */ }
+                try { syncChoices(); } catch (e) { /* never break the page */ }
             }, 120);
         });
         try {
             observer.observe(doc.documentElement, { childList: true, subtree: true });
         } catch (e) { observer = null; }
+    }
+
+    /* ================================================================== *
+     * 4b. CHOICE OVERFLOW INDICATOR
+     * ------------------------------------------------------------------
+     * The 8-way fork is taller than its scroll window: four plates were
+     * invisible with nothing on screen saying so, so the fork read as a
+     * 4-option fork and two whole routes were undiscoverable.
+     *
+     * Approach: the hint is a STICKY child appended inside the scroller
+     * itself. Earlier attempts used (a) ::after on the container, which
+     * scrolls away with the content, and (b) an absolutely positioned
+     * wrapper, which measured 0px tall because the engine's container does
+     * not contribute height to a wrapper it is positioned out of. A sticky
+     * element is laid out in normal flow at the end of the list but paints
+     * pinned to the bottom edge of the visible window — no geometry
+     * duplication, and it cannot desync from the container's real box.
+     * ================================================================== */
+
+    /* The badge lives OUTSIDE the scroller, in the empty gap between the last
+       visible plate and the dialogue console (measured ~90px at 1440x810).
+       Both earlier attempts printed over a choice label: ::after and a sticky
+       footer are pinned to the bottom EDGE of the scrollport, which is exactly
+       where the next option is being clipped. Sitting below the list, the
+       badge can never cover text, and it doubles as a visual full-stop for
+       where the list ends. */
+    function ensureHint () {
+        var hint = doc.querySelector('.mech-scroll-hint');
+        if (hint) { return hint; }
+        var stage = doc.querySelector('game-screen');
+        if (!stage) { return null; }
+        hint = doc.createElement('div');
+        hint.className = 'mech-scroll-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        hint.setAttribute('data-more', '0');
+        stage.appendChild(hint);
+        return hint;
+    }
+
+    function updateChoiceHint (container) {
+        if (!container) { return; }
+        var hint = ensureHint();
+        if (!hint) { return; }
+        var over = container.scrollHeight > container.clientHeight + 8;
+        var atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 14;
+        if (container.classList) {
+            if (over) { container.classList.add('has-overflow'); }
+            else { container.classList.remove('has-overflow'); }
+        }
+        if (!over) { hint.className = 'mech-scroll-hint'; return; }
+
+        var btns = container.querySelectorAll('button');
+        var cRect = container.getBoundingClientRect();
+        var hidden = 0, i, r;
+        for (i = 0; i < btns.length; i++) {
+            r = btns[i].getBoundingClientRect();
+            if (r.bottom > cRect.bottom + 2) { hidden++; }
+        }
+        hint.setAttribute('data-more', String(hidden));
+        /* Park it just under the list, horizontally centred on it. */
+        var stage = doc.querySelector('game-screen');
+        var sRect = stage ? stage.getBoundingClientRect() : { left: 0, top: 0 };
+        hint.style.left = Math.round(cRect.left - sRect.left + cRect.width / 2) + 'px';
+        hint.style.top = Math.round(cRect.bottom - sRect.top + 8) + 'px';
+        hint.className = 'mech-scroll-hint' + (hidden > 0 && !atBottom ? ' show' : '');
+    }
+
+    function syncChoices () {
+        var c = doc.querySelector('choice-container');
+        var hint;
+        if (!c) {
+            hint = doc.querySelector('.mech-scroll-hint');
+            if (hint) { hint.className = 'mech-scroll-hint'; }
+            return;
+        }
+        if (!c.__mechScrollBound) {
+            c.__mechScrollBound = true;
+            c.addEventListener('scroll', function () { updateChoiceHint(c); }, false);
+        }
+        updateChoiceHint(c);
     }
 
     function start () {
@@ -688,12 +791,16 @@
         try { bindParallax(); } catch (e) { /* decorative only */ }
         try { bindResize(); } catch (e) { /* decorative only */ }
         try { refresh(); } catch (e) { /* decorative only */ }
+        try { syncChoices(); } catch (e) { /* decorative only */ }
+        try { buildMotes(); } catch (e) { /* decorative only */ }
         /* The engine has no "state changed" event we can rely on offline, and
            game.js already repaints the HUD on every mutation — a slow poll is
            the cheapest way to stay in sync without touching game state. */
         if (!pollTimer) {
             pollTimer = global.setInterval(function () {
                 try { refresh(); } catch (e) { /* ignore */ }
+                try { syncChoices(); } catch (e) { /* ignore */ }
+                try { buildMotes(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -706,6 +813,7 @@
         start: start,
         refresh: refresh,
         mountAll: mountAll,
+        syncChoices: syncChoices,
         syncStripTop: syncStripTop,
         bakeTextures: bakeAll,
         plates: PLATES,
