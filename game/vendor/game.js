@@ -59,7 +59,7 @@
  * symptom of a stale cache / blocked localStorage / truncated vendor file. */
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     (function () {
-        var BUILD = '2026-07-28-r6';
+        var BUILD = '2026-07-28-r7';
         var captured = [];
         var bannerShown = false;
         window.addEventListener('error', function (e) {
@@ -381,7 +381,30 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
 
         /* Debug teleport. Jumps the live game into any graph node, starting a
          * new game first when the main menu is still up. Mirrors the engine's
-         * own choice-click cleanup (drop pending choice container + unblock). */
+         * own choice-click cleanup (drop pending choice container + unblock).
+         *
+         * HISTORY RESET IS MANDATORY: the engine's rollback() at step 0 scans
+         * history('jump') for destinations {label,0}; a teleport left there
+         * makes Back cross INTO the pre-jump session (often a self-edge
+         * Start->Start), which replays statements forward into a state where
+         * forward clicks oscillate step -1/0/1 and the scene state is set
+         * without its <img> — the "empty slide you can't leave" deadlock.
+         * With histories empty, Back at teleport start is a clean no-op
+         * ("beginning of the game" guard) and forward is linear. */
+        function wipePresentationAndHistory () {
+            try {
+                engine.element().find('[data-screen="game"] [data-content="visuals"] [data-character]').remove();
+                engine.element().find('[data-screen="game"] [data-content="visuals"] [data-image]').remove();
+            } catch (errVisuals) { /* not on the game screen — nothing visible */ }
+            try {
+                engine.state({ characters: [], images: [], scene: '' });
+            } catch (errState) { /* tolerate */ }
+            try {
+                var hist = engine.history();
+                Object.keys(hist).forEach(function (ns) { hist[ns] = []; });
+            } catch (errHist) { /* tolerate */ }
+        }
+
         function jumpToLabel (label) {
             var overlay = document.getElementById('graph-overlay');
             if (!engine.script()[label]) { console.error('[graph] unknown label:', label); return; }
@@ -392,7 +415,26 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             } catch (err) { /* not in game yet — nothing to clean */ }
             if (!engine.global('playing')) { engine.global('playing', true); }
             if (typeof engine.showScreen === 'function') { engine.showScreen('game'); }
-            engine.run('jump ' + label);
+            wipePresentationAndHistory();
+            /* run() is ASYNC: the Jump action applies on its promise chain, so
+             * the post-wipe and the first-slide nudge MUST go through .then —
+             * a synchronous wipe lands before apply() and gets overwritten. */
+            Promise.resolve(engine.run('jump ' + label)).then(function () {
+                /* The jump itself re-recorded a garbage history entry whose
+                 * source is the pre-teleport step — wipe again so rollback()
+                 * at slide 0 hits the "beginning of the game" guard instead. */
+                wipePresentationAndHistory();
+                /* run('jump') does NOT auto-chain statements: without a nudge
+                 * the player lands on an empty slide (goTo + show scene are
+                 * silent). One synthetic text-box click runs the chain to the
+                 * first visible statement — same as a fresh Start. */
+                setTimeout(function () {
+                    var tb = document.querySelector('text-box');
+                    if (tb) { tb.click(); }
+                }, 80);
+            }).catch(function (err2) {
+                console.error('[graph] teleport failed:', err2);
+            });
         }
 
         function openGraph () {

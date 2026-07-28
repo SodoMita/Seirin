@@ -5,8 +5,8 @@
  * top header status HUD, and custom responsive anime styling.
  * ========================================================================== */
 
-@import url('./monogatari.css?v=20260728r6');
-@import url('./icons-offline.css?v=20260728r6');
+@import url('./monogatari.css?v=20260728r7');
+@import url('./icons-offline.css?v=20260728r7');
 
 :root {
   --sn-bg-dark: rgba(11, 15, 25, 0.88);
@@ -753,7 +753,13 @@ game-screen [data-character="aria"]     { max-height: 75.3vh; }       /* 162cm p
 game-screen [data-character="nao"]      { max-height: 73.5vh; }       /* 158cm provisional */
 game-screen [data-character="momo"]     { max-height: 70.7vh; }       /* 152cm card        */
 game-screen [data-character="miya"]     { max-height: 48.8vh; }       /* 105cm child prov. */
-/* Splash is a colloid soft robot: a wide hovering water mass with no legs.
- * Cap her spread width as well as height, or a 1376x768 canvas overflows
- * on narrow screens long before the height limit matters. */
-game-screen [data-character="splash"]   { max-height: 60vh; max-width: 92vw; }
+/* Splash is a colloid soft robot: a wide hovering water mass with no legs —
+ * her form spreads horizontally, so she reads correctly with a smaller cap. */
+game-screen [data-character="splash"]   { max-height: 60vh; }
+
+/* Sprites scale by HEIGHT ONLY — never squeeze them to frame width.
+ * The engine default [data-character]{max-width:100%} clamps any sprite
+ * wider than the (portrait) viewport to its width, which silently shrinks
+ * its height and breaks the world-scale table above. A sprite is allowed
+ * to bleed past the sides (centered) instead. */
+game-screen [data-character] { max-width: none; }

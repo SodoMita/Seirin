@@ -248,3 +248,46 @@ test('every canon met_* contact has a route step that can set it', () => {
         assert.ok(source.includes(flag), `flag ${flag} is never set`);
     });
 });
+
+test('graph teleport wipes presentation + history so Back cannot cross the jump boundary', () => {
+    // Root cause of the "empty slide you cannot leave" deadlock: rollback() at
+    // step 0 scans history('jump') for {label,0} destinations; a teleport left
+    // there made Back cross into the pre-jump session (Start->Start self-edge),
+    // replaying statements forward into a corrupted half-state where forward
+    // clicks oscillate step -1/0/1 and the scene state has no <img>.
+    const teleportBlock = source.slice(source.indexOf('Debug teleport.'), source.indexOf('function openGraph'));
+    assert.ok(teleportBlock.includes('function wipePresentationAndHistory'),
+        'teleport must have a presentation/history wiper');
+    assert.ok((teleportBlock.match(/wipePresentationAndHistory\(\);/g) || []).length >= 2,
+        'wiper must be called before AND after run(jump) (jump re-records a garbage entry)');
+    assert.ok(teleportBlock.includes("hist[ns] = []"),
+        'wiper must empty every history namespace (incl. history("jump"))');
+    assert.ok(teleportBlock.includes("engine.state({ characters: [], images: [], scene: '' })"),
+        'wiper must reset presentation state');
+    assert.ok(teleportBlock.includes('.click()'),
+        'teleport must auto-chain once so the player lands on a visible statement, not an empty slide');
+    assert.ok(!/engine\.run\('jump ' \+ label\);\s*\}/.test(teleportBlock),
+        'run(jump) must never be the last step of teleport again');
+});
+
+test('sprites scale by height only: engine max-width:100% is overridden', () => {
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    assert.ok(css.includes('max-width: none'),
+        'custom-ui.css must override the engine default [data-character] max-width:100%');
+    const worldScale = css.slice(css.indexOf('Sprite world scale'));
+    assert.ok(worldScale.includes('[data-character="miya"]'),
+        'per-character world scale table must exist');
+});
+
+test('world-scale table keeps sense: child smallest, CEO tallest of the roster', () => {
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    const heights = {};
+    for (const m of css.matchAll(/\[data-character="([a-z]+)"\]\s+\{ max-height: ([\d.]+)vh/g)) {
+        heights[m[1]] = Number(m[2]);
+    }
+    assert.ok(heights.miya && heights.momo && heights.yuki, 'world-scale rows missing');
+    assert.ok(heights.miya < 60, 'Miya is a child — must stay clearly smaller');
+    assert.ok(heights.momo < heights.yuki, 'Momo 152cm must be shorter than Yuki 167cm');
+    assert.ok(heights.kurogane >= Math.max.apply(null, Object.values(heights)),
+        'Kurogane is the tallest');
+});
