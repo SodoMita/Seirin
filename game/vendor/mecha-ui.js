@@ -765,6 +765,38 @@
         hint.className = 'mech-scroll-hint' + (hidden > 0 && !atBottom ? ' show' : '');
     }
 
+    /* ================================================================== *
+     * 4c. SLIDER FILL
+     * ------------------------------------------------------------------
+     * Firefox draws the filled portion of a range with ::-moz-range-progress,
+     * but WebKit/Blink has no equivalent — the track is uniformly unlit and a
+     * player cannot see at a glance how loud "loud" is. The fill is therefore
+     * painted as a background gradient sized to the value and refreshed on
+     * input, which works in every engine.
+     * ================================================================== */
+    function paintSlider (input) {
+        var min = parseFloat(input.min || '0');
+        var max = parseFloat(input.max || '100');
+        var val = parseFloat(input.value || '0');
+        var pct = (max > min) ? ((val - min) / (max - min)) * 100 : 0;
+        if (pct < 0) { pct = 0; } else if (pct > 100) { pct = 100; }
+        input.style.setProperty('--mech-fill', pct.toFixed(2) + '%');
+    }
+
+    function bindSliders () {
+        var inputs = doc.querySelectorAll('settings-screen input[type="range"]');
+        var i;
+        for (i = 0; i < inputs.length; i++) {
+            if (!inputs[i].__mechBound) {
+                inputs[i].__mechBound = true;
+                /* Named function so both events share one handler instance. */
+                inputs[i].addEventListener('input', function (e) { paintSlider(e.target); }, false);
+                inputs[i].addEventListener('change', function (e) { paintSlider(e.target); }, false);
+            }
+            paintSlider(inputs[i]);
+        }
+    }
+
     function syncChoices () {
         var c = doc.querySelector('choice-container');
         var hint;
@@ -793,6 +825,7 @@
         try { refresh(); } catch (e) { /* decorative only */ }
         try { syncChoices(); } catch (e) { /* decorative only */ }
         try { buildMotes(); } catch (e) { /* decorative only */ }
+        try { bindSliders(); } catch (e) { /* decorative only */ }
         /* The engine has no "state changed" event we can rely on offline, and
            game.js already repaints the HUD on every mutation — a slow poll is
            the cheapest way to stay in sync without touching game state. */
@@ -801,6 +834,7 @@
                 try { refresh(); } catch (e) { /* ignore */ }
                 try { syncChoices(); } catch (e) { /* ignore */ }
                 try { buildMotes(); } catch (e) { /* ignore */ }
+                try { bindSliders(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -814,6 +848,7 @@
         refresh: refresh,
         mountAll: mountAll,
         syncChoices: syncChoices,
+        bindSliders: bindSliders,
         syncStripTop: syncStripTop,
         bakeTextures: bakeAll,
         plates: PLATES,

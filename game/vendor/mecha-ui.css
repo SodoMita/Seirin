@@ -1399,7 +1399,7 @@ settings-screen input[type="range"] {
   appearance: none;
   display: block;
   width: 100%;
-  height: 22px;
+  height: 32px;
   margin: 2px 0 6px;
   background: transparent;   /* the track pseudo-elements paint instead */
   cursor: pointer;
@@ -1412,24 +1412,46 @@ settings-screen input[type="range"]:focus-visible {
 
 /* track */
 settings-screen input[type="range"]::-webkit-slider-runnable-track {
-  height: 10px;
+  height: 12px;
+  border: none;
+  border-radius: 0;
   background:
-    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0 6px, transparent 6px 8px),
-    linear-gradient(180deg, #05080d, #131b27);
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
-  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+    /* filled portion, sized by --mech-fill (set by mecha-ui.js: WebKit has no
+       ::-moz-range-progress equivalent, so the fill must be a background) */
+    linear-gradient(90deg,
+      rgba(126, 226, 255, 0.30) 0 var(--mech-fill, 0%), transparent var(--mech-fill, 0%)),
+    linear-gradient(180deg,
+      rgba(190, 240, 255, 0.85) 0 2px,
+      rgba(56, 189, 248, 0.92) 2px 7px,
+      rgba(18, 116, 162, 0.95) 7px 12px)
+      0 0 / var(--mech-fill, 0%) 100% no-repeat,
+    /* tick scale */
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0 1px, transparent 1px 26px),
+    /* lit top lip + machined channel */
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.16) 0 1px,
+      #05080e 1px 3px,
+      #0c131c 3px 8px,
+      #1a2432 8px 11px,
+      rgba(255, 255, 255, 0.10) 11px 12px);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.95);
 }
 settings-screen input[type="range"]::-moz-range-track {
-  height: 10px;
+  height: 12px;
+  border: none;
   background:
-    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0 6px, transparent 6px 8px),
-    linear-gradient(180deg, #05080d, #131b27);
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
-  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0 1px, transparent 1px 26px),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.16) 0 1px,
+      #05080e 1px 3px,
+      #0c131c 3px 8px,
+      #1a2432 8px 11px,
+      rgba(255, 255, 255, 0.10) 11px 12px);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.95);
 }
 /* filled portion (Firefox can do this natively; WebKit cannot) */
 settings-screen input[type="range"]::-moz-range-progress {
-  height: 10px;
+  height: 12px;
   background: linear-gradient(180deg, #7fd8ff, var(--mech-cyan) 45%, #1c7ea8);
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
 }
@@ -1438,27 +1460,37 @@ settings-screen input[type="range"]::-moz-range-progress {
 settings-screen input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 22px;
-  margin-top: -6px;                 /* centre against the 10px track */
+  margin-top: -10px;   /* centre the 30px knob on the 12px track */
+  width: 22px;
+  height: 30px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px),
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
-    linear-gradient(160deg, #cfe0f2 0%, #7d8da5 38%, #39445a 78%, #9fb0c6 100%);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 10px rgba(56, 189, 248, 0.35);
-  clip-path: polygon(50% 0, 100% 22%, 100% 78%, 50% 100%, 0 78%, 0 22%);
+    linear-gradient(180deg, rgba(255,255,255,.75) 0 2px, transparent 2px),
+    linear-gradient(180deg, transparent 40%, rgba(251,191,36,.95) 40% 60%, transparent 60%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.42) 0 2px, transparent 2px 5px),
+    linear-gradient(160deg, #e8f1fb 0%, #9fb0c6 30%, #4a5770 62%, #232c3b 85%, #8496ad 100%);
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(56, 189, 248, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  clip-path: polygon(50% 0, 100% 18%, 100% 82%, 50% 100%, 0 82%, 0 18%);
   border: none;
+  cursor: grab;
 }
 settings-screen input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 22px;
+  width: 22px;
+  height: 30px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px),
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 4px),
-    linear-gradient(160deg, #cfe0f2 0%, #7d8da5 38%, #39445a 78%, #9fb0c6 100%);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 10px rgba(56, 189, 248, 0.35);
-  clip-path: polygon(50% 0, 100% 22%, 100% 78%, 50% 100%, 0 78%, 0 22%);
+    linear-gradient(180deg, rgba(255,255,255,.75) 0 2px, transparent 2px),
+    linear-gradient(180deg, transparent 40%, rgba(251,191,36,.95) 40% 60%, transparent 60%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.42) 0 2px, transparent 2px 5px),
+    linear-gradient(160deg, #e8f1fb 0%, #9fb0c6 30%, #4a5770 62%, #232c3b 85%, #8496ad 100%);
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(56, 189, 248, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  clip-path: polygon(50% 0, 100% 18%, 100% 82%, 50% 100%, 0 82%, 0 18%);
   border: none;
+  cursor: grab;
 }
 settings-screen input[type="range"]:hover::-webkit-slider-thumb {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75), 0 0 16px rgba(56, 189, 248, 0.75);

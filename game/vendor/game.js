@@ -583,7 +583,39 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             menuConfig.buttons.push({ string: 'GraphAtlas', data: { action: 'open-graph' } });
         }
         if (typeof engine.translation === 'function') {
-            engine.translation('English', { GraphAtlas: 'ГРАФ МАРШРУТОВ · ОТЛАДКА' });
+            /* The game ships Russian-only, but the engine boots the 'English'
+               string table, so every piece of built-in chrome (quick menu,
+               settings, save/load, help) rendered in English next to Russian
+               dialogue. Override the table in place rather than switching
+               language: MultiLanguage is off and the Russian table would drag
+               in a language-selection screen we do not want. */
+            engine.translation('English', {
+                GraphAtlas: 'ГРАФ МАРШРУТОВ · ОТЛАДКА',
+                /* main menu */
+                Start: 'НАЧАТЬ', Load: 'ЗАГРУЗИТЬ', Settings: 'НАСТРОЙКИ',
+                Help: 'СПРАВКА', Gallery: 'ГАЛЕРЕЯ', Credits: 'АВТОРЫ',
+                /* quick menu */
+                Back: 'НАЗАД', Hide: 'СКРЫТЬ', Show: 'ПОКАЗАТЬ', Log: 'ЖУРНАЛ',
+                AutoPlay: 'АВТО', Stop: 'СТОП', Skip: 'ПЕРЕМОТКА', Save: 'СОХРАНИТЬ',
+                Quit: 'ВЫХОД', Close: 'ЗАКРЫТЬ',
+                /* settings screen */
+                Audio: 'ЗВУК', Music: 'Громкость музыки', Sound: 'Громкость эффектов',
+                Voice: 'Громкость голоса', Video: 'Громкость видео',
+                TextSpeed: 'Скорость текста', AutoPlaySpeed: 'Скорость автопрокрутки',
+                Language: 'Язык', Resolution: 'Разрешение', FullScreen: 'Полный экран',
+                Windowed: 'В окне',
+                /* save / load */
+                LoadButton: 'Загрузить', DeleteSlot: 'Удалить', Overwrite: 'Перезаписать',
+                SaveInSlot: 'Сохранить в слот', LoadSlots: 'Сохранения',
+                NoSavedGames: 'Нет сохранений', SaveGame: 'Сохранить игру',
+                LoadAutoSaveSlots: 'Автосохранения', Cancel: 'Отмена', Confirm: 'Подтвердить',
+                /* dialogs */
+                Delete: 'Удалить', OK: 'ОК',
+                Quit_Confirmation: 'Выйти из игры?',
+                Delete_Confirmation: 'Удалить это сохранение?',
+                Load_Confirmation: 'Загрузить сохранение? Несохранённый прогресс будет потерян.',
+                Overwrite_Confirmation: 'Перезаписать это сохранение?'
+            });
         }
         engine.preferences({ 'TextSpeed': 30, 'AutoPlaySpeed': 5,
             'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 } });
