@@ -88,11 +88,20 @@ test('index.html ships the engine markup skeleton (white-screen regression)', ()
     assert.ok(rootMatch[1].includes('<main-menu>'), '#vn-root must not be an empty div');
 });
 
-test('debug route atlas: HUD button, overlay, generator and teleport are wired', () => {
+test('debug route atlas: menu entry, overlay, generator and teleport are wired', () => {
     const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
-    assert.match(html, /id="btn-graph"/);
+    // The atlas must live in the MAIN MENU, never as an in-game HUD button.
+    assert.doesNotMatch(html, /id="btn-graph"/);
     assert.match(html, /id="graph-overlay"/);
     assert.match(html, /fa-network-wired/);
+    assert.match(source, /registerListener\('open-graph'/);
+    assert.match(source, /menuConfig\.buttons\.push\(\{ string: 'GraphAtlas'/);
+    assert.match(source, /GraphAtlas/);
+    // The engine configuration setter replaces config wholesale — a partial
+    // object there kills boot (lost quick-menu/credits). Pin the safe path.
+    const configStart = source.indexOf('var menuConfig = engine.configuration');
+    const configBlock = source.slice(configStart, configStart + 600);
+    assert.doesNotMatch(configBlock, /engine\.configuration\(\{/);
     assert.match(source, /function renderGraph \(\)/);
     assert.match(source, /data-graph-jump/);
     assert.match(source, /engine\.run\('jump ' \+ label\)/);
@@ -104,6 +113,14 @@ test('debug route atlas: HUD button, overlay, generator and teleport are wired',
         'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation']
         .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
+});
+
+test('stat-only choices carry a real engine action (rollback regression)', () => {
+    // Regression: callback-only choices (onChosen, no Do) broke the Back
+    // command — engine.revert(undefined) rejected, stats stayed applied and
+    // the choice never reappeared. effectChoice must ship Do = vn.reversible.
+    assert.match(source, /function effectChoice \(text, effectSpec\) \{\s*return \{ Text: text, Do: vn\.reversible\(effectSpec\) \};/);
+    assert.doesNotMatch(source, /return \{ Text: text, onChosen: effect\.onChosen, onRevert: effect\.onRevert \};/);
 });
 
 test('system screens stack above the HUD (settings must stay closable on mobile)', () => {

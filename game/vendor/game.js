@@ -316,15 +316,16 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             engine.run('jump ' + label);
         }
 
+        function openGraph () {
+            renderGraph();
+            var overlay = document.getElementById('graph-overlay');
+            if (overlay) { overlay.hidden = false; }
+        }
+
         function wireGraph () {
-            var openBtn = document.getElementById('btn-graph');
             var closeBtn = document.getElementById('btn-graph-close');
             var overlay = document.getElementById('graph-overlay');
-            if (!openBtn || !overlay) { return; }
-            openBtn.addEventListener('click', function () {
-                renderGraph();
-                overlay.hidden = false;
-            });
+            if (!overlay) { return; }
             if (closeBtn) {
                 closeBtn.addEventListener('click', function () { overlay.hidden = true; });
             }
@@ -429,6 +430,18 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             'Storage': { 'Adapter': 'LocalStorage', 'Store': 'SeirinGame_Save' },
             'Skip': 150
         });
+        /* Debug atlas entry lives in the MAIN MENU — it must never sit in the
+         * in-game HUD. engine.configuration() returns the LIVE config object
+         * and the setter REPLACES it wholesale, so mutate the menu's button
+         * list in place — never call the setter with a partial object
+         * (boot dies: quick-menu/credits keys go missing). */
+        var menuConfig = engine.configuration('main-menu');
+        if (menuConfig && menuConfig.buttons) {
+            menuConfig.buttons.push({ string: 'GraphAtlas', data: { action: 'open-graph' } });
+        }
+        if (typeof engine.translation === 'function') {
+            engine.translation('English', { GraphAtlas: 'ГРАФ МАРШРУТОВ · ОТЛАДКА' });
+        }
         engine.preferences({ 'TextSpeed': 30, 'AutoPlaySpeed': 5,
             'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 } });
         engine.storage({
@@ -459,9 +472,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var effect = vn.choiceEffect(effectSpec);
             return { Text: text, Do: 'jump ' + target, onChosen: effect.onChosen, onRevert: effect.onRevert };
         }
+        /* Stat-only options carry their effect as a REAL engine action: a
+         * FailSafe reversible Function statement. The engine runs Apply on
+         * click and Revert on rollback. This used to be a callback-only
+         * option (onChosen/onRevert, no Do) — the engine's Back command
+         * reverts choice.Do and rejected on undefined ("The action did not
+         * match any of the ones registered"), so stats stayed applied and the
+         * choice never reappeared. Never ship callback-only choices. */
         function effectChoice (text, effectSpec) {
-            var effect = vn.choiceEffect(effectSpec);
-            return { Text: text, onChosen: effect.onChosen, onRevert: effect.onRevert };
+            return { Text: text, Do: vn.reversible(effectSpec) };
         }
 
         engine.script({
@@ -715,6 +734,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             wireArchives();
             wireGraph();
             wireFastForward();
+            engine.registerListener('open-graph', { callback: openGraph });
             engine.init('#vn-root').then(updateHUD).catch(function (err) { console.error('Monogatari init error:', err); });
         }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); } else { boot(); }

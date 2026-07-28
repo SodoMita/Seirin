@@ -636,11 +636,6 @@ main-menu button:hover {
   0%, 100% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35); }
   25%, 60% { box-shadow: 0 0 0 3px var(--sn-amber-glow), 0 0 26px rgba(251, 191, 36, 0.6); }
 }
-@keyframes graphPulse {
-  from { box-shadow: 0 0 0 rgba(56, 189, 248, 0); }
-  50%  { box-shadow: 0 0 12px rgba(56, 189, 248, 0.7); }
-  to   { box-shadow: 0 0 0 rgba(56, 189, 248, 0); }
-}
 
 /* Modal entrances */
 .archives-panel, .graph-panel { animation: modalIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.15) both; }
@@ -655,9 +650,8 @@ main-menu button:nth-child(4) { animation-delay: 0.26s; }
 main-menu button:nth-child(5) { animation-delay: 0.33s; }
 main-menu button:nth-child(6) { animation-delay: 0.40s; }
 
-/* HUD brand gently hums; the graph button blinks for discovery */
+/* HUD brand gently hums */
 .hud-brand { animation: brandGlow 4s ease-in-out infinite alternate; }
-#btn-graph { animation: graphPulse 3.2s ease-in-out 2; }
 
 /* Text box slides up when the game screen opens */
 [data-screen="game"] [data-ui="text-box"] { animation: textboxIn 0.45s ease both; }
@@ -734,7 +728,7 @@ main-menu button:focus-visible,
   main-menu button,
   [data-screen="game"] [data-ui="text-box"],
   [data-screen="game"] [data-ui="choices"] button,
-  main-screen::before, .hud-brand, #btn-graph, .graph-node.flash {
+  main-screen::before, .hud-brand, .graph-node.flash {
     animation: none !important;
   }
 }

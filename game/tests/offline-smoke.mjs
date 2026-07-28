@@ -68,7 +68,20 @@ if (menuEl) {
     // Components render lazily on connect; if the menu buttons are there the
     // engine's menu setup survived boot in this environment.
     const menuButtons = menuEl.querySelectorAll('button');
-    check('main menu renders its buttons', menuButtons.length >= 2, String(menuButtons.length));
+    check('main menu renders its buttons', menuButtons.length >= 4, String(menuButtons.length));
+    // Debug atlas entry point: a MAIN MENU button, never an in-game HUD button.
+    const menuGraph = menuEl.querySelector('[data-action="open-graph"]');
+    check('debug atlas lives in the main menu, not the HUD',
+        !!menuGraph && !w.document.getElementById('btn-graph'),
+        'menu entry=' + !!menuGraph + ', hud button=' + !!w.document.getElementById('btn-graph'));
+    if (menuGraph) {
+        menuGraph.click(); await new Promise(resolve => setTimeout(resolve, 250));
+        const overlay = w.document.getElementById('graph-overlay');
+        check('atlas opens from the main menu (pre-start)', overlay && overlay.hidden === false);
+        const closeBtn = w.document.getElementById('btn-graph-close');
+        if (closeBtn) { closeBtn.click(); await new Promise(resolve => setTimeout(resolve, 120)); }
+        check('atlas closes again', overlay && overlay.hidden === true);
+    }
 }
 check('runtime makes no network calls', network.length === 0, network.join(', '));
 const lint = w.engine ? w.eval('(() => window.FailSafe.vn(window.engine, { silent: true }).lintScript({ silent: true }))()') : { ok: false, issues: ['engine did not boot'] };
@@ -88,12 +101,17 @@ const microChoice = w.engine && w.engine.script().Start
     .map(function (step) { return step && step.Choice; }).filter(Boolean)
     .find(function (choice) { return !!choice.Believe; });
 if (microChoice) {
-    const before = w.engine.storage('player').miya_affinity;
-    microChoice.Believe.onChosen();
-    const chosen = w.engine.storage('player').miya_affinity;
-    microChoice.Believe.onRevert();
-    check('belief micro-choice applies +2 affinity and rewinds exactly',
-        chosen === before + 2 && w.engine.storage('player').miya_affinity === before);
+    // Stat-only choices are real engine actions: Do = vn.reversible(spec).
+    const fn = microChoice.Believe.Do && microChoice.Believe.Do.Function;
+    check('belief micro-choice is a reversible Function action', !!fn && typeof fn.Apply === 'function');
+    if (fn) {
+        const before = w.engine.storage('player').miya_affinity;
+        fn.Apply();
+        const chosen = w.engine.storage('player').miya_affinity;
+        fn.Revert();
+        check('belief micro-choice applies +2 affinity and rewinds exactly',
+            chosen === before + 2 && w.engine.storage('player').miya_affinity === before);
+    }
 }
 // Route first-minutes beats: every micro-choice must apply and rewind exactly.
 const routeBeats = [
@@ -112,12 +130,17 @@ routeBeats.forEach(function (beat) {
         .find(function (c) { return !!c[beat[1]]; });
     check('route micro-beat exists: ' + beat[0] + ' / ' + beat[1], !!choice);
     if (choice) {
-        const before = w.engine.storage('player')[beat[2]];
-        choice[beat[1]].onChosen();
-        const chosen = w.engine.storage('player')[beat[2]];
-        choice[beat[1]].onRevert();
-        check('route micro-beat ' + beat[1] + ' applies +' + beat[3] + ' and rewinds',
-            chosen === before + beat[3] && w.engine.storage('player')[beat[2]] === before);
+        const fn = choice[beat[1]].Do && choice[beat[1]].Do.Function;
+        check('route micro-beat ' + beat[1] + ' is a reversible Function action',
+            !!fn && typeof fn.Apply === 'function' && typeof fn.Revert === 'function');
+        if (fn) {
+            const before = w.engine.storage('player')[beat[2]];
+            fn.Apply();
+            const chosen = w.engine.storage('player')[beat[2]];
+            fn.Revert();
+            check('route micro-beat ' + beat[1] + ' applies +' + beat[3] + ' and rewinds',
+                chosen === before + beat[3] && w.engine.storage('player')[beat[2]] === before);
+        }
     }
 });
 const start = w.document.querySelector('main-menu [data-action="start"]');
@@ -131,6 +154,17 @@ if (start) {
     }
     check('prologue reaches the belief micro-choice', count() === 3, String(count()));
     if (count() === 3) {
+        const before = w.engine.storage('player').miya_affinity;
+        w.document.querySelectorAll('choice-container button[data-choice]')[0].click();
+        await new Promise(resolve => setTimeout(resolve, 400));
+        check('belief micro-choice applies its effect', w.engine.storage('player').miya_affinity === before + 2);
+        // ROLLBACK REGRESSION: the engine Back command reverts choice.Do;
+        // stat-only choices must rewind stats and re-present the choice.
+        await w.engine.revert().catch(() => {});
+        await new Promise(resolve => setTimeout(resolve, 800));
+        check('back after a stat-only choice rewinds stats and reshows it',
+            w.engine.storage('player').miya_affinity === before && count() === 3,
+            'affinity=' + w.engine.storage('player').miya_affinity + ', options=' + count());
         w.document.querySelectorAll('choice-container button[data-choice]')[0].click();
         await new Promise(resolve => setTimeout(resolve, 300));
     }
@@ -144,6 +178,14 @@ if (start) {
         // Choice order: Home, Bar, Freelance, Philosophy, LoneFighter, Miya, AI.
         choices[5].click(); await new Promise(resolve => setTimeout(resolve, 900));
         check('Miya choice applies its affinity effect', w.engine.storage('player').miya_affinity === before + 5);
+        // ROLLBACK REGRESSION: route choices rewind the jump AND the stats.
+        await w.engine.revert().catch(() => {});
+        await new Promise(resolve => setTimeout(resolve, 900));
+        check('back after a route choice returns to the 7-way fork',
+            w.engine.storage('player').miya_affinity === before && count() === 7,
+            'affinity=' + w.engine.storage('player').miya_affinity + ', options=' + count());
+        w.document.querySelectorAll('choice-container button[data-choice]')[5].click();
+        await new Promise(resolve => setTimeout(resolve, 900));
         const action = w.engine.script().MiyaRoute.find(step => step && step.Function && step.Function.Apply);
         const prior = w.engine.storage('player').miya_affinity;
         action.Function.Apply(); action.Function.Revert();
@@ -171,11 +213,11 @@ if (skipBtn) {
     check('fast-forward button disengages cleanly',
         !w.engine.global('skip') && !skipBtn.classList.contains('active'));
 }
-const graphBtn = w.document.getElementById('btn-graph');
-if (graphBtn) {
-    graphBtn.click(); await new Promise(resolve => setTimeout(resolve, 250));
+const graphMenuBtn = w.document.querySelector('[data-action="open-graph"]');
+if (graphMenuBtn) {
+    graphMenuBtn.click(); await new Promise(resolve => setTimeout(resolve, 250));
     const overlay = w.document.getElementById('graph-overlay');
-    check('debug route atlas opens from the HUD', overlay && overlay.hidden === false);
+    check('debug route atlas opens mid-game too', overlay && overlay.hidden === false);
     const nodes = w.document.querySelectorAll('.graph-node');
     check('route atlas auto-renders all 14 shipped labels', nodes.length === 14, String(nodes.length));
     const branchCard = w.document.getElementById('graph-node-SoloRoute5');
