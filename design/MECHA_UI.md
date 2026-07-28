@@ -180,3 +180,60 @@ the build checklist):
 | `02_material_study.jpg` | six armour materials incl. "scuffed paint + bruises" |
 | `03_motion_spec.jpg` | motion vocabulary and timings |
 | `04_hud_detail.jpg` | HUD widget anatomy: bolt shadows, segment gaps, LED bloom |
+
+---
+
+# Session 2 — recovery + system-screen coverage
+
+## The data-loss incident (read this before any future merge)
+
+Merge `904fa18` resolved conflicts by taking main's stale side wholesale and
+silently destroyed **1,292 lines**:
+
+| File | Before | After |
+|---|---|---|
+| `game/vendor/game.js` | 965 | 170 |
+| `game/tests/game.test.mjs` | 331 | 49 |
+| `game/tests/offline-smoke.mjs` | 270 | 94 |
+
+Gone with them: all 17 story labels, the route atlas, the archives codex,
+`LABEL_TITLES`, the boot watchdog. `index.html` still shipped the modal markup,
+so Archives and the atlas were dead UI pointing at deleted handlers. The
+long-standing `labels is not defined` unit failure was the same merge
+truncating a test mid-file.
+
+Recovered verbatim from `aba98eb`. **Unit suite went 37/1 → 61/61.**
+
+**Lesson:** after any merge touching `game/`, run
+`wc -l game/vendor/game.js` (expect ~965+) and `npm test` (expect 61) before
+committing. A merge that *deletes* 1,292 lines while reporting success is the
+failure mode to watch for.
+
+## What this session added
+
+| Area | Before | After |
+|---|---|---|
+| Settings | white text on near-black, default blue-circle sliders | bolted panels, machined tracks, hex knurled knobs, visible fill |
+| Quick menu / Quit | unstyled engine chrome, English | bolted rail, Russian, Quit in danger red |
+| Icons | Font Awesome / Unicode shim (tofu, emoji, stray "х") | custom CSS-mask vectors everywhere |
+| 8-way fork | 4 of 8 options visible, no indication | amber "ЕЩЁ n ▼" counter, reserved space, machined scrollbar |
+| Dialogue field | static | breathing sprites, Ken Burns, pulsing speaker, motes, caret |
+| Engine strings | English | Russian |
+
+## Traps worth remembering
+
+- **Font Awesome rewrites `<i class="fas">` into `<svg class="svg-inline--fa">`**,
+  so rules keyed on `.fas` stop matching once FA runs. `retagIcons()` re-tags
+  each replacement. The injected span must *not* carry `fas` — `monogatari.css`
+  has `.fas`-scoped rules that force it to `display:none`.
+- **WebKit slider tracks ignore `border` and clip the thumb with `clip-path`.**
+  Draw the channel with background layers only.
+- **WebKit has no `::-moz-range-progress`.** The fill must be a background
+  gradient sized from JS.
+- **`cssRules` is unreadable over `file://`** — a probe reporting "0 rules" is a
+  CORS false negative, not a CSS error.
+- **The route atlas is a main-menu entry, never a HUD button** — `game.test.mjs`
+  asserts `index.html` contains no `id="btn-graph"`.
+- Sprite motion uses `translate:`, never `transform:` (the engine owns
+  transform for left/center/right anchoring), and Ken Burns must be scoped to
+  the background element or it silently overrides sprite breathing.
