@@ -1237,7 +1237,11 @@ html.mech-alarm   #hud-alert-level::before { animation: mechStrobe 0.5s steps(1,
 @media screen and (max-width: 62em) {
   .hud-btn span:not([class]) { display: none; }   /* icon-only actions */
   .hud-btn { padding: 7px 11px; }
-  .mech-strip { top: auto; bottom: 0; left: 0; right: 0; clip-path: none; }
+  /* The strip used to be parked at bottom:0 here — precisely where the
+     engine's quick-menu bar lives, so the telemetry ticker printed straight
+     over НАЗАД/СКРЫТЬ/ЖУРНАЛ and swallowed their taps. It stays under the
+     dashboard at every size; only its inset relaxes. */
+  .mech-strip { left: 0; right: 0; clip-path: none; }
 }
 @media screen and (max-width: 37.5em) {
   .cyber-top-hud { padding: 8px 14px; gap: 8px; }
@@ -1975,3 +1979,523 @@ game-screen [data-content="background"] {
 }
 .cyber-top-hud .hud-brand { display: inline-flex; align-items: center; gap: 8px; }
 .hud-badge > .mech-icon, .hud-badge > .fas { margin-right: 2px; }
+
+/* ============================================================================
+ * 21. BOTTOM STACK — one owner for everything pinned to the bottom edge
+ * ----------------------------------------------------------------------------
+ * Reported: "нижняя лента с seirin net перегораживает кнопки. И вообще много
+ * что перегораживает."
+ *
+ * Three separate things were all claiming the bottom of the screen with no
+ * coordination: the engine's quick-menu (position:absolute bottom:0, z 11),
+ * the telemetry strip (moved to bottom:0 under 62em) and the build badge.
+ * They stacked on top of each other and ate each other's taps.
+ *
+ * The rule now: the quick-menu OWNS the bottom edge. Nothing else may occupy
+ * it. --mech-qm-h is the measured height of that bar (written by mecha-ui.js)
+ * and every other bottom-anchored element clears it.
+ * ========================================================================== */
+:root { --mech-qm-h: 40px; }
+
+/* --- Quick menu: never lose a button off the left edge -------------------
+   The engine sets justify-content:flex-end; when nine Russian captions no
+   longer fit, the overflow ran off the LEFT side of the viewport and НАЗАД /
+   СКРЫТЬ became unreachable (measured at 880px: x = -212 and -111).
+   Centre the row and let it wrap onto a second line instead. */
+quick-menu {
+  position: absolute;
+  top: auto !important;
+  bottom: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 2.5rem;
+  z-index: 85;                 /* above the strip (79), below modals (200) */
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center !important;
+  align-content: center;
+  row-gap: 2px;
+  padding: 4px 10px;
+}
+quick-menu button { flex: 0 0 auto; }
+
+/* Landscape phones are the tight case: drop the captions and keep the icons,
+   which fits all nine actions on one row and keeps every tap target. */
+@media screen and (max-width: 56em), screen and (max-height: 30em) {
+  quick-menu button > [data-string] { display: none !important; }
+  quick-menu button { padding: 6px 10px; }
+  quick-menu button::before { width: 17px; height: 17px; }
+}
+
+/* --- Everything else clears the bar -------------------------------------- */
+[data-screen="game"] text-box {
+  bottom: calc(var(--mech-qm-h) + 8px) !important;
+}
+/* Build badge is developer chrome: it must never sit on top of gameplay.
+   Parked in the quick-menu's own gutter (the bar is centred, so its left end
+   is empty) and dimmed. It stays legible for bug reports without competing
+   with the dialogue. */
+#seirin-build-badge {
+  bottom: 2px !important;
+  left: 6px !important;
+  opacity: .38 !important;
+  z-index: 86 !important;
+}
+@media screen and (max-height: 34em) {
+  #seirin-build-badge { opacity: .28 !important; font-size: 9px !important; }
+}
+/* The strip is a HUD element: it belongs under the dashboard, never at the
+   bottom. Pinned here so a future breakpoint cannot move it back. */
+.mech-strip {
+  top: var(--mech-strip-top, 74px) !important;
+  bottom: auto !important;
+}
+
+/* --- Main menu: title and buttons must not collide -----------------------
+   In landscape the plates started at y=13 while the title sits at 16%, so
+   "СЭЙРИН" printed straight through the НАЧАТЬ/ЗАГРУЗИТЬ plates. The menu
+   becomes a scrollable column that begins below the title block. */
+@media screen and (max-height: 34em) {
+  main-screen::before { top: 6%; font-size: clamp(1.4rem, 5vw, 2.4rem); }
+  main-screen::after  { top: calc(6% + clamp(1.7rem, 6vw, 3rem)); font-size: .6rem; }
+  main-menu {
+    top: auto !important;
+    bottom: 0 !important;
+    height: 62% !important;
+    justify-content: flex-start !important;
+    overflow-y: auto;
+    padding: 4px 0 10px !important;
+  }
+  main-menu button {
+    min-height: 40px !important;
+    padding: 6px 20px 6px 34px !important;
+    font-size: .82rem !important;
+    margin: 4px 0 !important;
+  }
+}
+
+/* ============================================================================
+ * 22. ENGINE MODALS — alert / confirm ("выхода меню не стилизовано")
+ * ----------------------------------------------------------------------------
+ * The Quit confirmation is an <alert-modal> rendered by the engine: a plain
+ * white card with grey OS buttons, dropped on top of the mecha UI. It is the
+ * single most jarring surface in the game because it appears at the moment
+ * the player is deciding whether to leave.
+ * ========================================================================== */
+alert-modal,
+message-modal,
+[data-component="alert-modal"],
+[data-component="message-modal"] {
+  background: rgba(4, 7, 13, 0.78) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 300;
+}
+
+alert-modal .modal__content,
+message-modal .modal__content,
+alert-modal > div,
+message-modal > div {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.30) 60%),
+    linear-gradient(150deg, #232e40 0%, #10161f 100%) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: var(--sn-text-main) !important;
+  padding: 26px 30px 22px !important;
+  width: min(460px, calc(100% - 40px)) !important;
+  max-width: none !important;
+  clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 16px),
+      calc(100% - 16px) 100%, 0 100%, 0 20px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 18px 44px rgba(0, 0, 0, 0.8);
+}
+/* Amber caution bar across the top — this dialog always asks something. */
+alert-modal .modal__content::before,
+message-modal .modal__content::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent,
+      var(--mech-amber) 30%, #fff 50%, var(--mech-amber) 70%, transparent);
+}
+
+alert-modal [data-content="message"],
+message-modal [data-content="message"] {
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 1.12rem !important;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #eaf2fb !important;
+  text-align: center;
+  margin: 6px 0 20px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+alert-modal [data-content="actions"],
+message-modal [data-content="actions"] {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+alert-modal [data-content="actions"] button,
+message-modal [data-content="actions"] button {
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 11px 26px !important;
+  min-width: 128px;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  color: #dbe7f5 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(0, 0, 0, 0.30)),
+    linear-gradient(150deg, #2b3648 0%, #151d29 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 3px 7px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px),
+      calc(100% - 9px) 100%, 0 100%, 0 9px);
+  transition: filter 0.18s ease, transform 0.14s ease;
+}
+alert-modal [data-content="actions"] button:hover,
+message-modal [data-content="actions"] button:hover {
+  filter: brightness(1.28) drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+  transform: translateY(-1px);
+}
+/* The destructive action is unmistakably red; cancel stays neutral. */
+alert-modal [data-action="quit"],
+alert-modal [data-action="delete"] {
+  color: #fff0f0 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.28)),
+    linear-gradient(150deg, #7f2230 0%, #3a1017 100%) !important;
+}
+alert-modal [data-action="quit"]:hover,
+alert-modal [data-action="delete"]:hover {
+  filter: brightness(1.3) drop-shadow(0 0 12px rgba(248, 113, 113, 0.6));
+}
+
+/* ============================================================================
+ * 23. DIALOG LOG — history with click-to-rewind (Ren'Py style)
+ * ----------------------------------------------------------------------------
+ * Requested: "в меню истории хотелось бы добавить возвращение в место истории
+ * по нажатию на него как в renpy".
+ * The engine's log is display-only. mecha-ui.js tags each row with the step it
+ * belongs to and makes it activate a rollback; the styling below advertises
+ * that the rows are now interactive.
+ * ========================================================================== */
+dialog-log {
+  background: rgba(4, 7, 13, 0.82) !important;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  z-index: 300;
+}
+dialog-log .modal__content {
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.30) 60%),
+    linear-gradient(150deg, #202a3a 0%, #0e141d 100%) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: var(--sn-text-main) !important;
+  width: min(820px, calc(100% - 28px)) !important;
+  max-height: 84vh;
+  padding: 18px 20px 16px !important;
+  clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 18px),
+      calc(100% - 18px) 100%, 0 100%, 0 22px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 18px 44px rgba(0, 0, 0, 0.8);
+}
+dialog-log [data-content="log"] {
+  overflow-y: auto;
+  max-height: 68vh;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, .55) rgba(8, 12, 18, .6);
+}
+dialog-log [data-content="log"]::-webkit-scrollbar { width: 9px; }
+dialog-log [data-content="log"]::-webkit-scrollbar-track { background: #06090e; }
+dialog-log [data-content="log"]::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7fd8ff, #38bdf8 45%, #1c7ea8);
+}
+
+dialog-log [data-spoke] {
+  position: relative;
+  margin: 0 0 8px;
+  padding: 10px 46px 10px 14px;
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.22) 60%),
+    linear-gradient(150deg, #1b2432 0%, #101720 100%);
+  border-left: 3px solid rgba(56, 189, 248, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.14s ease;
+}
+dialog-log [data-spoke] > span {
+  display: block;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+dialog-log [data-spoke] p {
+  margin: 0;
+  padding: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #dbe6f3;
+}
+dialog-log [data-spoke="narrator"],
+dialog-log [data-spoke].unnamed { border-left-color: rgba(148, 163, 184, 0.4); }
+
+/* Rewindable rows (tagged by mecha-ui.js). */
+dialog-log [data-log-jump] { cursor: pointer; }
+dialog-log [data-log-jump]:hover,
+dialog-log [data-log-jump]:focus-visible {
+  background:
+    linear-gradient(170deg, rgba(56, 189, 248, 0.16), rgba(0, 0, 0, 0.22) 60%),
+    linear-gradient(150deg, #22354a 0%, #131c28 100%);
+  border-left-color: var(--mech-amber);
+  transform: translateX(2px);
+  outline: none;
+}
+/* Rewind affordance, mirroring Ren'Py's clickable backlog. */
+dialog-log [data-log-jump]::after {
+  content: '↶';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.05rem;
+  color: rgba(148, 163, 184, 0.45);
+  transition: color 0.18s ease;
+}
+dialog-log [data-log-jump]:hover::after { color: var(--mech-amber); }
+dialog-log [data-log-jump]:active { transform: translateX(2px) scale(0.995); }
+
+dialog-log [data-content="placeholder"] {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+dialog-log > .modal__content > button[data-action="dialog-log"] {
+  display: block;
+  margin: 12px auto 0;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 30px;
+  border: none;
+  color: #dbe7f5;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(0, 0, 0, 0.30)),
+    linear-gradient(150deg, #2b3648 0%, #151d29 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 3px 7px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+  cursor: pointer;
+}
+
+/* Hint line explaining the interaction, injected by mecha-ui.js. */
+.mech-log-hint {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: rgba(148, 163, 184, 0.7);
+  text-align: center;
+  margin: 0 0 10px;
+}
+
+/* ============================================================================
+ * 24. UI SCALE CONTROL (built by mecha-ui.js)
+ * ----------------------------------------------------------------------------
+ * The engine's own Resolution setting is Electron-only and never renders in a
+ * browser, so a phone player had no way to change interface size. This scales
+ * the root font-size, which every rem in the theme follows.
+ * ========================================================================== */
+.mech-scale {
+  position: relative;
+  isolation: isolate;
+  padding: 18px 22px 20px;
+  margin: 0 auto 18px;
+  max-width: 520px;
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.055), rgba(0, 0, 0, 0.30) 60%),
+    linear-gradient(150deg, #212b3c 0%, #121926 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px),
+      calc(100% - 14px) 100%, 0 100%, 0 14px);
+  text-align: center;
+}
+.mech-scale::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 8px;
+  width: 14px; height: 14px;
+  border-left: 2px solid rgba(251, 191, 36, 0.55);
+  border-top: 2px solid rgba(251, 191, 36, 0.55);
+  pointer-events: none;
+}
+.mech-scale-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.mech-scale-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 84px;
+  padding: 9px 12px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  color: #cfdcec;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(0, 0, 0, 0.28)),
+    linear-gradient(150deg, #2b3648 0%, #151d29 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 6px rgba(0, 0, 0, 0.55);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px),
+      calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: filter 0.18s ease, transform 0.14s ease;
+}
+.mech-scale-btn small {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: rgba(148, 163, 184, 0.85);
+  font-weight: 400;
+}
+.mech-scale-btn:hover { filter: brightness(1.25); transform: translateY(-1px); }
+.mech-scale-btn.active {
+  color: #120d02;
+  background: linear-gradient(180deg, #ffe6a3, var(--mech-amber) 55%, #c98f08);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.mech-scale-btn.active small { color: rgba(30, 20, 2, 0.75); }
+.mech-scale-note {
+  margin: 12px 0 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  color: rgba(148, 163, 184, 0.7);
+}
+
+/* ============================================================================
+ * 25. COMPACT CONSOLE — speaker plate lifted onto the top edge
+ * ----------------------------------------------------------------------------
+ * Requested: "имя говорящего может стоять на панели выше по оси Y, а сама
+ * панель быть более низкой."
+ *
+ * The name row used to occupy a full grid row INSIDE the console, so the
+ * panel had to be tall enough for badge + rule + text. Lifting the badge so
+ * it straddles the console's top edge (like a riveted nameplate on a hatch)
+ * gives that vertical space back to the dialogue and lets the panel shrink.
+ *
+ * The engine lays text-box out with CSS grid ("header" / "side-image text"),
+ * so the name row is removed from flow with position:absolute rather than
+ * display:none — the grid areas must keep resolving or the dialogue column
+ * collapses.
+ * ========================================================================== */
+[data-screen="game"] text-box {
+  min-height: 0 !important;
+  padding: 14px 30px 16px !important;
+  overflow: visible;
+}
+
+[data-screen="game"] text-box [data-content="name"] {
+  position: absolute;
+  left: 26px;
+  top: 0;
+  transform: translateY(-52%);   /* straddle the panel's top edge */
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  pointer-events: none;
+}
+
+[data-screen="game"] [data-ui="who"] {
+  padding: 5px 22px 5px 13px;
+  font-size: 1rem;
+  /* Solid backing: the badge now overhangs the artwork, so it cannot rely on
+     the console behind it for contrast. */
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.40) 62%),
+    linear-gradient(150deg, #22405c 0%, #0a1521 100%);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75);
+}
+
+/* The amber rule under the name is no longer needed — the badge itself is the
+   separator now, and the rule wasted another 10px of height. */
+[data-screen="game"] text-box [data-content="text"] {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 2px;
+}
+[data-screen="game"] [data-ui="say"] {
+  font-size: 1.06rem;
+  line-height: 1.5;
+}
+[data-screen="game"] text-box p { padding: 0.3rem 0.4rem; }
+
+/* Narration (no speaker) needs no reserved space at all. */
+[data-screen="game"] text-box [data-content="name"]:has([data-ui="who"]:empty) { display: none; }
+
+@media screen and (max-width: 37.5em), screen and (max-height: 30em) {
+  [data-screen="game"] text-box { padding: 12px 18px 13px !important; }
+  [data-screen="game"] text-box [data-content="name"] { left: 14px; }
+  [data-screen="game"] [data-ui="who"] { font-size: 0.86rem; padding: 4px 16px 4px 10px; }
+  [data-screen="game"] [data-ui="say"] { font-size: 0.95rem; line-height: 1.42; }
+}
+
+/* ============================================================================
+ * 26. SHORT-VIEWPORT HUD — landscape phones
+ * ----------------------------------------------------------------------------
+ * A phone in landscape is ~400px tall: the two-row dashboard from the width
+ * ladder plus the telemetry strip ate a third of the screen and pushed the
+ * action buttons into a second row that overlapped the scene. Height is the
+ * scarce axis here, not width, so the dashboard is forced back to a single
+ * compact row and the strip is dropped entirely.
+ * ========================================================================== */
+@media screen and (max-height: 34em) {
+  .cyber-top-hud {
+    flex-wrap: nowrap !important;
+    top: 6px;
+    left: 8px;
+    right: 8px;
+    padding: 5px 20px !important;
+    min-height: 0 !important;
+    gap: 8px !important;
+    font-size: 0.72rem;
+  }
+  .cyber-top-hud > .hud-group { flex-wrap: nowrap !important; gap: 6px !important; }
+  .hud-brand { font-size: 0.62rem; }
+  .hud-badge { padding: 3px 9px 3px 15px !important; font-size: 0.7rem; }
+  .hud-badge::before { left: 6px; width: 4px; height: 4px; margin-top: -2px; }
+  .hud-btn { padding: 4px 9px; }
+  .hud-btn span:not([class]) { display: none; }   /* icon-only HUD actions */
+  .hud-instruments { display: none !important; }
+  /* Telemetry is pure flavour; on a 400px-tall screen it is 5% of the view. */
+  .mech-strip { display: none !important; }
+  [data-mech="dash"] > .mech-l-rivets { display: none; }
+}

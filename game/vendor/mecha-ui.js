@@ -407,6 +407,21 @@
         doc.documentElement.style.setProperty('--mech-strip-top', Math.round(r.bottom + 6) + 'px');
     }
 
+    /* The engine's quick-menu owns the bottom edge, and its height is not
+       knowable from CSS: the caption row wraps to two lines on narrow screens.
+       Publish the measured height so the text box, the build badge and the
+       choice window can all clear it instead of printing over Back/Quit. */
+    function syncQuickMenu () {
+        var qm = doc.querySelector('quick-menu');
+        if (!qm || !qm.getBoundingClientRect) { return; }
+        var r;
+        try { r = qm.getBoundingClientRect(); } catch (e) { return; }
+        /* A hidden quick-menu (splash screen, distraction-free) reports 0 —
+           fall back to the CSS default rather than collapsing the layout. */
+        if (!r || !r.height) { return; }
+        doc.documentElement.style.setProperty('--mech-qm-h', Math.round(r.height) + 'px');
+    }
+
     function mountAll (root) {
         var scope = root || doc;
         var i, j, found;
@@ -828,6 +843,179 @@
         }
     }
 
+    /* ================================================================== *
+     * 4e. HISTORY LOG — click a line to rewind to it (Ren'Py style)
+     * ------------------------------------------------------------------
+     * The engine's <dialog-log> is display-only. Rows are appended in
+     * play order, so the Nth row from the END is N rollbacks away.
+     *
+     * Rewinding uses engine.rollback() in a chain rather than a jump: every
+     * step reversal runs the action's own revert (and therefore FailSafe's
+     * onRevert for stat changes), so affinities, flags and the alert level
+     * unwind exactly as the Back button would. A jump would teleport the
+     * cursor and leave the stats where they were — silently corrupting a
+     * playthrough, which is far worse than not offering the feature.
+     *
+     * Rows are only made clickable while the log is open and the game is
+     * actually playing.
+     * ================================================================== */
+    var rewinding = false;
+
+    function rewindSteps (count) {
+        if (rewinding || count <= 0) { return; }
+        if (!global.engine || typeof global.engine.rollback !== 'function') { return; }
+        rewinding = true;
+        var left = count;
+        var step = function () {
+            if (left <= 0) {
+                rewinding = false;
+                /* Close the log so the player sees where they landed. */
+                try {
+                    var dl = doc.querySelector('dialog-log');
+                    if (dl && dl.setState) { dl.setState({ active: false }); }
+                    else if (dl && dl.classList) { dl.classList.remove('modal--active'); }
+                } catch (e) { /* leave it open rather than throw */ }
+                return;
+            }
+            left--;
+            var r;
+            try { r = global.engine.rollback(); } catch (e) { rewinding = false; return; }
+            Promise.resolve(r).then(function () {
+                global.setTimeout(step, 40);
+            }).catch(function () { rewinding = false; });
+        };
+        step();
+    }
+
+    function tagLogRows () {
+        var log = doc.querySelector('dialog-log [data-content="log"]');
+        if (!log) { return; }
+        var rows = log.querySelectorAll('[data-spoke]');
+        var total = rows.length;
+        var playing = false;
+        try { playing = !!(global.engine && global.engine.global('playing')); } catch (e) { playing = false; }
+        var i, row, back;
+        for (i = 0; i < total; i++) {
+            row = rows[i];
+            /* Distance from the newest line: the last row is "here" (0). */
+            back = total - 1 - i;
+            if (!playing || back <= 0) {
+                row.removeAttribute('data-log-jump');
+                row.removeAttribute('tabindex');
+                row.removeAttribute('role');
+                continue;
+            }
+            row.setAttribute('data-log-jump', String(back));
+            row.setAttribute('tabindex', '0');
+            row.setAttribute('role', 'button');
+            row.setAttribute('title', 'Вернуться к этой реплике (−' + back + ')');
+        }
+        if (!log.__mechLogBound) {
+            log.__mechLogBound = true;
+            log.addEventListener('click', function (evt) {
+                var el = evt.target;
+                while (el && el !== log) {
+                    if (el.getAttribute && el.getAttribute('data-log-jump')) {
+                        rewindSteps(parseInt(el.getAttribute('data-log-jump'), 10) || 0);
+                        return;
+                    }
+                    el = el.parentNode;
+                }
+            }, false);
+            log.addEventListener('keydown', function (evt) {
+                var key = evt.key;
+                if (key !== 'Enter' && key !== ' ' && evt.keyCode !== 13 && evt.keyCode !== 32) { return; }
+                var el = evt.target;
+                if (el && el.getAttribute && el.getAttribute('data-log-jump')) {
+                    evt.preventDefault();
+                    rewindSteps(parseInt(el.getAttribute('data-log-jump'), 10) || 0);
+                }
+            }, false);
+        }
+        /* One-line explanation of the affordance, above the entries. */
+        var content = doc.querySelector('dialog-log .modal__content');
+        if (content && playing && total > 1 && !content.querySelector('.mech-log-hint')) {
+            var hint = el('p', 'mech-log-hint', 'НАЖМИТЕ НА РЕПЛИКУ, ЧТОБЫ ВЕРНУТЬСЯ К НЕЙ');
+            content.insertBefore(hint, content.firstChild);
+        }
+    }
+
+    /* ================================================================== *
+     * 4f. UI SCALE ("нет в настройках выбора dpi")
+     * ------------------------------------------------------------------
+     * The engine ships a Resolution control, but it is Electron-only: its
+     * settings screen calls it from electron() and a browser build never
+     * renders it. On a phone the whole interface is therefore locked to the
+     * device's own DPI, which is why the HUD feels oversized in landscape.
+     *
+     * This adds a real, browser-native control: a scale factor applied as
+     * font-size on the root, so every rem-based measurement in the theme
+     * follows it. The value persists in localStorage (already the engine's
+     * storage backend, so no new dependency and no network).
+     * ================================================================== */
+    var SCALE_KEY = 'SeirinGame_UIScale';
+    var SCALE_STEPS = [
+        { v: 0.8,  label: 'МЕЛКИЙ' },
+        { v: 0.9,  label: 'КОМПАКТНЫЙ' },
+        { v: 1,    label: 'ОБЫЧНЫЙ' },
+        { v: 1.15, label: 'КРУПНЫЙ' },
+        { v: 1.3,  label: 'ОЧЕНЬ КРУПНЫЙ' }
+    ];
+
+    function readScale () {
+        var raw = null;
+        try { raw = global.localStorage ? global.localStorage.getItem(SCALE_KEY) : null; } catch (e) { raw = null; }
+        var n = parseFloat(raw);
+        if (!n || n < 0.7 || n > 1.5) { return 1; }
+        return n;
+    }
+
+    function applyScale (n) {
+        /* 100% == 16px, the browser default the theme was designed against. */
+        doc.documentElement.style.fontSize = (16 * n).toFixed(2) + 'px';
+        try { if (global.localStorage) { global.localStorage.setItem(SCALE_KEY, String(n)); } } catch (e) { /* private mode */ }
+        /* Chrome measurements all shift with the root font size. */
+        try { syncStripTop(); syncQuickMenu(); } catch (e) { /* ignore */ }
+    }
+
+    function buildScaleControl () {
+        var screen = doc.querySelector('settings-screen');
+        if (!screen || doc.querySelector('.mech-scale')) { return; }
+        /* Mount beside the existing text-speed block so it reads as a
+           first-class setting rather than something bolted on. */
+        var host = screen.querySelector('[data-content="auto-play-speed-controller"]');
+        if (!host) { host = screen.querySelector('[data-settings="audio"]'); }
+        if (!host || !host.parentNode) { return; }
+
+        var box = el('div', 'mech-scale');
+        box.setAttribute('data-settings', 'scale');
+        var current = readScale();
+        var html = '<h3>МАСШТАБ ИНТЕРФЕЙСА</h3><div class="mech-scale-row">';
+        var i;
+        for (i = 0; i < SCALE_STEPS.length; i++) {
+            html += '<button type="button" class="mech-scale-btn' +
+                (Math.abs(SCALE_STEPS[i].v - current) < 0.001 ? ' active' : '') +
+                '" data-scale="' + SCALE_STEPS[i].v + '">' +
+                Math.round(SCALE_STEPS[i].v * 100) + '%<small>' + SCALE_STEPS[i].label + '</small></button>';
+        }
+        html += '</div><p class="mech-scale-note">Меняет размер всего интерфейса. Полезно на телефоне в горизонтальном режиме.</p>';
+        box.innerHTML = html;
+        host.parentNode.insertBefore(box, host.nextSibling);
+
+        box.addEventListener('click', function (evt) {
+            var t = evt.target;
+            while (t && t !== box && !(t.getAttribute && t.getAttribute('data-scale'))) { t = t.parentNode; }
+            if (!t || t === box) { return; }
+            var v = parseFloat(t.getAttribute('data-scale'));
+            if (!v) { return; }
+            applyScale(v);
+            var all = box.querySelectorAll('.mech-scale-btn');
+            var k;
+            for (k = 0; k < all.length; k++) { all[k].className = 'mech-scale-btn'; }
+            t.className = 'mech-scale-btn active';
+        }, false);
+    }
+
     function syncChoices () {
         var c = doc.querySelector('choice-container');
         var hint;
@@ -844,12 +1032,17 @@
     }
 
     function start () {
+        /* Restore the saved UI scale before anything measures the layout. */
+        try { applyScale(readScale()); } catch (e) { /* default 16px */ }
         try { bakeAll(); } catch (e) { /* CSS fallbacks cover this */ }
         try { buildAtmosphere(); } catch (e) { /* decorative only */ }
         try { buildInstruments(); } catch (e) { /* decorative only */ }
         try { buildStrip(); } catch (e) { /* decorative only */ }
         try { mountAll(doc); } catch (e) { /* decorative only */ }
         try { syncStripTop(); } catch (e) { /* decorative only */ }
+        try { syncQuickMenu(); } catch (e) { /* decorative only */ }
+        try { tagLogRows(); } catch (e) { /* decorative only */ }
+        try { buildScaleControl(); } catch (e) { /* decorative only */ }
         try { observeDom(); } catch (e) { /* decorative only */ }
         try { bindParallax(); } catch (e) { /* decorative only */ }
         try { bindResize(); } catch (e) { /* decorative only */ }
@@ -868,6 +1061,9 @@
                 try { buildMotes(); } catch (e) { /* ignore */ }
                 try { bindSliders(); } catch (e) { /* ignore */ }
                 try { retagIcons(); } catch (e) { /* ignore */ }
+                try { syncQuickMenu(); } catch (e) { /* ignore */ }
+                try { tagLogRows(); } catch (e) { /* ignore */ }
+                try { buildScaleControl(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -884,6 +1080,11 @@
         bindSliders: bindSliders,
         retagIcons: retagIcons,
         syncStripTop: syncStripTop,
+        syncQuickMenu: syncQuickMenu,
+        tagLogRows: tagLogRows,
+        applyScale: applyScale,
+        readScale: readScale,
+        rewindSteps: rewindSteps,
         bakeTextures: bakeAll,
         plates: PLATES,
         mounted: function () { return mountCount; },
