@@ -88,6 +88,42 @@ test('index.html ships the engine markup skeleton (white-screen regression)', ()
     assert.ok(rootMatch[1].includes('<main-menu>'), '#vn-root must not be an empty div');
 });
 
+test('debug route atlas: HUD button, overlay, generator and teleport are wired', () => {
+    const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
+    assert.match(html, /id="btn-graph"/);
+    assert.match(html, /id="graph-overlay"/);
+    assert.match(html, /fa-network-wired/);
+    assert.match(source, /function renderGraph \(\)/);
+    assert.match(source, /data-graph-jump/);
+    assert.match(source, /engine\.run\('jump ' \+ label\)/);
+    // Every shipped label has a hand-written atlas title (structure itself is
+    // auto-derived from engine.script(); titles are the only manual part).
+    const start = source.indexOf('var LABEL_TITLES');
+    const titlesBlock = source.slice(start, source.indexOf('};', start));
+    ['Start', 'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
+        'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
+        'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation']
+        .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
+});
+
+test('system screens stack above the HUD (settings must stay closable on mobile)', () => {
+    // Regression: vendored monogatari.css gives screens no z-index, so the
+    // z-80 HUD covered the settings screen AND its [data-action=back] circle.
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    assert.match(css, /\[data-screen\]:not\(\[data-screen="game"\]\)\s*\{[^}]*z-index:\s*90/);
+    assert.match(css, /\[data-action="back"\]\s*\{[^}]*border: 1px solid var\(--sn-glass-border\)/);
+});
+
+test('interface animations exist and respect reduced-motion preference', () => {
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    ['modalIn', 'fadeSlideUp', 'titleGlow', 'textboxIn', 'nodeFlash'].forEach(name => {
+        assert.ok(css.includes('@keyframes ' + name), `missing @keyframes ${name}`);
+    });
+    assert.match(css, /prefers-reduced-motion:\s*reduce/);
+    // Choice cascade must exist for at least the first three buttons.
+    assert.match(css, /\[data-ui="choices"\] button:nth-child\(3\)\s*\{\s*animation-delay/);
+});
+
 test('fast-forward is wired: HUD button in markup, Skip > 0 in settings', () => {
     const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
     assert.match(html, /id="btn-skip"/);

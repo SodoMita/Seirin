@@ -171,6 +171,32 @@ if (skipBtn) {
     check('fast-forward button disengages cleanly',
         !w.engine.global('skip') && !skipBtn.classList.contains('active'));
 }
+const graphBtn = w.document.getElementById('btn-graph');
+if (graphBtn) {
+    graphBtn.click(); await new Promise(resolve => setTimeout(resolve, 250));
+    const overlay = w.document.getElementById('graph-overlay');
+    check('debug route atlas opens from the HUD', overlay && overlay.hidden === false);
+    const nodes = w.document.querySelectorAll('.graph-node');
+    check('route atlas auto-renders all 14 shipped labels', nodes.length === 14, String(nodes.length));
+    const branchCard = w.document.getElementById('graph-node-SoloRoute5');
+    check('atlas shows the vn.branch forks of Solo 5',
+        !!(branchCard && branchCard.querySelector('[data-graph-goto="Solo5BadEnd"]') &&
+            branchCard.querySelector('[data-graph-goto="Solo5Standoff"]')));
+    const miyaChip = w.document.querySelector('#graph-node-Start [data-graph-goto="MiyaRoute"]');
+    if (miyaChip) {
+        miyaChip.click(); await new Promise(resolve => setTimeout(resolve, 150));
+        const targetCard = w.document.getElementById('graph-node-MiyaRoute');
+        check('atlas edge chips flash their target card',
+            !!(targetCard && targetCard.classList.contains('flash')));
+    }
+    const jumpBtn = w.document.querySelector('[data-graph-jump="SoloRoute4"]');
+    if (jumpBtn) {
+        jumpBtn.click(); await new Promise(resolve => setTimeout(resolve, 1500));
+        check('atlas teleport moves the live game into the node',
+            w.engine.state('label') === 'SoloRoute4', String(w.engine.state('label')));
+        check('atlas overlay closes on teleport', overlay.hidden === true);
+    }
+}
 check('no unmapped icons', Object.keys((w.IconsOffline && w.IconsOffline.missing) || {}).length === 0);
 const relevant = errors.filter(error => !/settings saved|first time|Cannot convert undefined|null to object|localStorage/i.test(error));
 check('no unexpected console errors', relevant.length === 0, relevant.join(' | '));

@@ -30,6 +30,9 @@
             <button type="button" class="hud-btn" id="btn-skip" aria-pressed="false" title="Быстрая перемотка текста">
                 <i class="fas fa-fast-forward"></i><span>ПЕРЕМОТКА</span>
             </button>
+            <button type="button" class="hud-btn" id="btn-graph" title="Отладочный граф маршрутов и телепорт">
+                <i class="fas fa-network-wired"></i><span>ГРАФ</span>
+            </button>
             <button type="button" class="hud-btn" id="btn-archives">
                 <i class="fas fa-book"></i><span>АРХИВ</span>
             </button>
@@ -75,6 +78,21 @@
                 </button>
             </div>
             <div id="archives-body" class="archives-body"></div>
+        </div>
+    </div>
+
+    <!-- ROUTE GRAPH DEBUG MODAL (opened by #btn-graph, wired in vendor/game.js).
+         The graph itself is generated at runtime from engine.script(), so the
+         map can never drift out of sync with the shipped story. -->
+    <div id="graph-overlay" class="graph-overlay" hidden>
+        <div class="graph-panel" role="dialog" aria-modal="true" aria-labelledby="graph-title">
+            <div class="graph-head">
+                <span id="graph-title"><i class="fas fa-network-wired"></i><span>ГРАФ МАРШРУТОВ — ОТЛАДКА</span></span>
+                <button type="button" class="hud-btn" id="btn-graph-close">
+                    <i class="fas fa-times"></i><span>ЗАКРЫТЬ</span>
+                </button>
+            </div>
+            <div id="graph-body" class="graph-body"></div>
         </div>
     </div>
 

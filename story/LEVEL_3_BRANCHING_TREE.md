@@ -194,5 +194,7 @@ jump targets, absence of quoted `vn.goTo` strings, presence of a fully-armed
 (micro-choice strictly before each commitment node; micro-choices never
 jump), and the Solo 5 balance lock (worst-case watchful alert < 30 ≤ any
 strike path). `offline-smoke.mjs` plays the real engine through the 7-way
-choice into the Miya branch and back, and applies+reverts one micro-beat per
-route checking exact stat deltas and rewind.
+choice into the Miya branch and back, applies+reverts one micro-beat per
+route, and drives the debug route atlas: it auto-renders all 14 nodes from
+`engine.script()`, shows Solo 5's `vn.branch` forks, navigates an edge, and
+teleports the live game into `SoloRoute4`.

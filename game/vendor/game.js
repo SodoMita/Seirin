@@ -71,6 +71,26 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             ai:     'Рут ИИ'
         };
 
+        /* Display names for the debug route atlas. The atlas STRUCTURE is
+         * auto-generated from engine.script() (choices, branches, jumps,
+         * endings); only titles are hand-written cosmetics. */
+        var LABEL_TITLES = {
+            Start:                 'Пролог · Развилка трёх улиц',
+            SoloRoute1:            'Соло I · Закрытые жалюзи',
+            SoloRoute2:            'Соло II · Клуб «Null-Point»',
+            SoloRoute3:            'Соло III · 84-й этаж',
+            SoloRoute4:            'Соло IV · Скамейка и зеркало',
+            SoloRoute5:            'Соло V · Додзё, подготовка',
+            Solo5BadEnd:           'ФИНАЛ · Ловушка №1: захвачен',
+            Solo5Standoff:         'ФИНАЛ · Ничья',
+            MiyaRoute:             'Рут Мии · Игровая комната',
+            MiyaEndingHarmony:     'ФИНАЛ · Гармония фракций',
+            MiyaEndingGuardian:    'ФИНАЛ · Хранитель без магии',
+            AIRoute:               'Рут ИИ · Доки Aquaforge',
+            AIEndingTranscendence: 'ФИНАЛ · Трансцендентность',
+            AIEndingIsolation:     'ФИНАЛ · Тишина в аквариуме'
+        };
+
         var ARCHIVE_CONTACTS = [
             ['met_miya',    'Мия Кагэцуки'],
             ['met_reika',   'Рейка Такасиро'],
@@ -128,6 +148,203 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         function syncArchives () {
             var overlay = document.getElementById('archives-overlay');
             if (overlay && !overlay.hidden) { renderArchives(); }
+        }
+
+        /* -------------------- Debug route atlas (auto-generated) -------------
+         * Walks engine.script() and derives every fork: choice options with a
+         * jump target, vn.branch condition arms, direct jumps and 'end'
+         * markers. Story data itself is never parsed by hand here, so the map
+         * always mirrors the shipped script. Pure UI except jumpToLabel(). */
+        function truncateText (s, n) {
+            s = String(s);
+            return s.length > n ? s.slice(0, n - 1) + '…' : s;
+        }
+
+        function collectLabelInfo (label) {
+            var steps = engine.script()[label] || [];
+            var info = { id: label, title: LABEL_TITLES[label] || label, edges: [], ending: false, banner: null };
+            steps.forEach(function (step) {
+                var m;
+                if (typeof step === 'string') {
+                    if (step === 'end') {
+                        info.ending = true;
+                    } else if (step.indexOf('jump ') === 0) {
+                        info.edges.push({ text: 'переход', target: step.slice(5).replace(/^\s+|\s+$/g, ''), kind: 'jump' });
+                    } else {
+                        m = step.match(/\[([^\]]+)\]/);
+                        if (step.indexOf('sys ') === 0 && m) { info.banner = m[1].replace(/^\s+|\s+$/g, ''); }
+                    }
+                    return;
+                }
+                if (step && step.Choice) {
+                    Object.keys(step.Choice).forEach(function (key) {
+                        var opt = step.Choice[key];
+                        var target = null;
+                        if (!opt || typeof opt !== 'object' || typeof opt.Text !== 'string') { return; }
+                        if (typeof opt.Do === 'string' && opt.Do.indexOf('jump ') === 0) {
+                            target = opt.Do.slice(5).replace(/^\s+|\s+$/g, '');
+                        }
+                        info.edges.push({ text: opt.Text, target: target, kind: target ? 'choice' : 'stat' });
+                    });
+                }
+                if (step && step.Conditional) {
+                    ['True', 'False'].forEach(function (arm) {
+                        var cmd = step.Conditional[arm];
+                        if (typeof cmd === 'string' && cmd.indexOf('jump ') === 0) {
+                            info.edges.push({
+                                text: 'ветвление: если ' + (arm === 'True' ? 'условие верно' : 'условие ложно'),
+                                target: cmd.slice(5).replace(/^\s+|\s+$/g, ''), kind: 'branch'
+                            });
+                        }
+                    });
+                }
+            });
+            return info;
+        }
+
+        function computeLabelDepths (infos, labels) {
+            var depth = {}, queue = [], i;
+            if (infos.Start) { depth.Start = 0; queue.push('Start'); }
+            while (queue.length) {
+                var cur = queue.shift();
+                infos[cur].edges.forEach(function (edge) {
+                    if (edge.target && infos[edge.target] && depth[edge.target] === undefined) {
+                        depth[edge.target] = depth[cur] + 1;
+                        queue.push(edge.target);
+                    }
+                });
+            }
+            // Unreachable labels (defensive: there should be none) go to the end.
+            for (i = 0; i < labels.length; i++) {
+                if (depth[labels[i]] === undefined) { depth[labels[i]] = 99; }
+            }
+            return depth;
+        }
+
+        function renderGraph () {
+            var body = document.getElementById('graph-body');
+            if (!body || !engine.script()) { return; }
+            var script = engine.script();
+            var labels = Object.keys(script);
+            var infos = {}, depths, columns = [], html = '', maxDepth = 0, i, j;
+            labels.forEach(function (label) { infos[label] = collectLabelInfo(label); });
+            depths = computeLabelDepths(infos, labels);
+            labels.forEach(function (label) { if (depths[label] > maxDepth) { maxDepth = depths[label]; } });
+            for (i = 0; i <= maxDepth; i++) { columns.push([]); }
+            labels.forEach(function (label) { columns[depths[label]].push(label); });
+
+            var current = engine.state('label') || null;
+            var p = engine.storage('player') || {};
+            html += '<div class="graph-stats">' +
+                '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
+                '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
+                '</div>';
+            html += '<div class="graph-hint">Колонки = расстояние от пролога. Карточка показывает все выходы. ' +
+                'Клик по цели прокручивает к ней · «ПЕРЕЙТИ» телепортирует игру в этот узел.</div>';
+            html += '<div class="graph-cols">';
+            for (i = 0; i < columns.length; i++) {
+                html += '<div class="graph-col">';
+                for (j = 0; j < columns[i].length; j++) {
+                    var info = infos[columns[i][j]];
+                    html += '<div class="graph-node' + (info.ending ? ' ending' : '') +
+                        (current === info.id ? ' current' : '') + '" id="graph-node-' + info.id + '">' +
+                        '<div class="graph-node-title">' + info.title + '</div>' +
+                        '<div class="graph-node-id">' + info.id + '</div>' +
+                        (info.banner ? '<div class="graph-node-banner">[ ' + truncateText(info.banner, 44) + ' ]</div>' : '') +
+                        (current === info.id ? '<div class="graph-node-here">ВЫ ЗДЕСЬ</div>' : '');
+                    if (info.edges.length) {
+                        html += '<div class="graph-edges">';
+                        info.edges.forEach(function (edge) {
+                            html += '<div class="graph-edge ' + edge.kind + '">';
+                            if (edge.target && infos[edge.target]) {
+                                html += '<span class="graph-edge-text">' + truncateText(edge.text, 34) + '</span>' +
+                                    '<button type="button" class="graph-target" data-graph-goto="' + edge.target + '">' +
+                                    truncateText(infos[edge.target].title, 26) + '</button>';
+                            } else {
+                                html += '<span class="graph-edge-text">' + truncateText(edge.text, 40) + '</span>' +
+                                    '<span class="graph-edge-stat">стат</span>';
+                            }
+                            html += '</div>';
+                        });
+                        html += '</div>';
+                    }
+                    html += '<button type="button" class="graph-jump" data-graph-jump="' + info.id + '">ПЕРЕЙТИ СЮДА</button>' +
+                        '</div>';
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            body.innerHTML = html;
+        }
+
+        function syncGraph () {
+            var overlay = document.getElementById('graph-overlay');
+            if (overlay && !overlay.hidden) { renderGraph(); }
+        }
+
+        function highlightGraphNode (label) {
+            var node = document.getElementById('graph-node-' + label);
+            if (!node) { return; }
+            var prev = document.querySelectorAll('.graph-node.flash');
+            Array.prototype.forEach.call(prev, function (el) { el.classList.remove('flash'); });
+            node.classList.add('flash');
+            setTimeout(function () { node.classList.remove('flash'); }, 1600);
+            if (typeof node.scrollIntoView === 'function') {
+                try {
+                    node.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } catch (err) {
+                    node.scrollIntoView();
+                }
+            }
+        }
+
+        /* Debug teleport. Jumps the live game into any graph node, starting a
+         * new game first when the main menu is still up. Mirrors the engine's
+         * own choice-click cleanup (drop pending choice container + unblock). */
+        function jumpToLabel (label) {
+            var overlay = document.getElementById('graph-overlay');
+            if (!engine.script()[label]) { console.error('[graph] unknown label:', label); return; }
+            if (overlay) { overlay.hidden = true; }
+            try {
+                engine.element().find('choice-container').remove();
+                engine.global('block', false);
+            } catch (err) { /* not in game yet — nothing to clean */ }
+            if (!engine.global('playing')) { engine.global('playing', true); }
+            if (typeof engine.showScreen === 'function') { engine.showScreen('game'); }
+            engine.run('jump ' + label);
+        }
+
+        function wireGraph () {
+            var openBtn = document.getElementById('btn-graph');
+            var closeBtn = document.getElementById('btn-graph-close');
+            var overlay = document.getElementById('graph-overlay');
+            if (!openBtn || !overlay) { return; }
+            openBtn.addEventListener('click', function () {
+                renderGraph();
+                overlay.hidden = false;
+            });
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () { overlay.hidden = true; });
+            }
+            overlay.addEventListener('click', function (event) {
+                if (event.target === overlay) { overlay.hidden = true; return; }
+                var el = event.target;
+                while (el && el !== overlay) {
+                    if (el.getAttribute) {
+                        var go = el.getAttribute('data-graph-goto');
+                        var jump = el.getAttribute('data-graph-jump');
+                        if (go) { highlightGraphNode(go); return; }
+                        if (jump) { jumpToLabel(jump); return; }
+                    }
+                    el = el.parentNode;
+                }
+            });
+            document.addEventListener('keydown', function (event) {
+                var esc = event.key === 'Escape' || event.keyCode === 27;
+                if (esc && !overlay.hidden) { overlay.hidden = true; }
+            });
         }
 
         function wireArchives () {
@@ -201,6 +418,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             }
             lastAlertLevel = level;
             syncArchives();
+            syncGraph();
             syncSkipButton();
         }
 
@@ -495,6 +713,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var lint = vn.lintScript({ silent: true });
             if (!lint.ok) { console.error('[FailSafe] script lint:', lint.issues); }
             wireArchives();
+            wireGraph();
             wireFastForward();
             engine.init('#vn-root').then(updateHUD).catch(function (err) { console.error('Monogatari init error:', err); });
         }
