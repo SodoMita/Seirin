@@ -34,6 +34,10 @@ test('storage schema supplies complete, safe defaults', () => {
     assert.equal(checked.ok, true);
     assert.equal(checked.value.player.name, 'Рэн');
     assert.equal(checked.value.player.akatomi_alert, 0);
+    // The engine script is a plain ES5 browser file, so derive the route
+    // labels directly from its script-object entries rather than relying on
+    // an undeclared test fixture.
+    const labels = [...source.matchAll(/^\s{12}([A-Za-z][A-Za-z0-9]*): \[/gm)].map(m => m[1]);
     assert.deepEqual(labels.sort(), ['AIRoute', 'MiyaRoute', 'SoloRoute1', 'SoloRoute4', 'Start'].sort());
     // routeChoice constructs its jump dynamically, so inspect every supplied
     // target rather than looking for a literal `jump Label` in the source.
