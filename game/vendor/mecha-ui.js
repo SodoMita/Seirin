@@ -797,6 +797,37 @@
         }
     }
 
+    /* ================================================================== *
+     * 4d. FIRST-PARTY ICON GUARD
+     * ------------------------------------------------------------------
+     * Font Awesome's JS replaces every <i class="fas fa-x"> with an
+     * <svg class="svg-inline--fa fa-x">, which drops the .fas class our
+     * mask rules key on — the HUD buttons fell back to the icon shim's
+     * Unicode glyph (the graph modal's close button rendered a stray "х").
+     * Re-tag the replacement with .mech-icon and the original fa-* name so
+     * the CSS mask applies to whichever form is in the DOM.
+     * ================================================================== */
+    function retagIcons () {
+        var scopes = doc.querySelectorAll('.cyber-top-hud, .archives-head, .graph-head');
+        var i, svgs, j, svg, cls, m;
+        for (i = 0; i < scopes.length; i++) {
+            svgs = scopes[i].querySelectorAll('svg.svg-inline--fa');
+            for (j = 0; j < svgs.length; j++) {
+                svg = svgs[j];
+                if (svg.__mechTagged) { continue; }
+                svg.__mechTagged = true;
+                cls = svg.getAttribute('class') || '';
+                m = cls.match(/fa-[a-z0-9-]+/);
+                if (!m) { continue; }
+                /* Insert a span carrying the mask, and hide the SVG via CSS. */
+                var span = doc.createElement('span');
+                span.className = 'mech-icon ' + m[0];
+                span.setAttribute('aria-hidden', 'true');
+                if (svg.parentNode) { svg.parentNode.insertBefore(span, svg); }
+            }
+        }
+    }
+
     function syncChoices () {
         var c = doc.querySelector('choice-container');
         var hint;
@@ -826,6 +857,7 @@
         try { syncChoices(); } catch (e) { /* decorative only */ }
         try { buildMotes(); } catch (e) { /* decorative only */ }
         try { bindSliders(); } catch (e) { /* decorative only */ }
+        try { retagIcons(); } catch (e) { /* decorative only */ }
         /* The engine has no "state changed" event we can rely on offline, and
            game.js already repaints the HUD on every mutation — a slow poll is
            the cheapest way to stay in sync without touching game state. */
@@ -835,6 +867,7 @@
                 try { syncChoices(); } catch (e) { /* ignore */ }
                 try { buildMotes(); } catch (e) { /* ignore */ }
                 try { bindSliders(); } catch (e) { /* ignore */ }
+                try { retagIcons(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -849,6 +882,7 @@
         mountAll: mountAll,
         syncChoices: syncChoices,
         bindSliders: bindSliders,
+        retagIcons: retagIcons,
         syncStripTop: syncStripTop,
         bakeTextures: bakeAll,
         plates: PLATES,

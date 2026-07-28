@@ -1874,3 +1874,90 @@ game-screen [data-content="background"] {
   game-screen [data-character] { translate: none; }
   .mech-motes { display: none; }
 }
+
+/* ============================================================================
+ * 20. HUD + MODAL ICONS — custom glyphs for first-party chrome
+ * ----------------------------------------------------------------------------
+ * These buttons use vendor/icons-offline.css, which maps fa-* classes to
+ * Unicode characters rendered by whatever system font is present. That is a
+ * correctness win offline, but the glyphs are inconsistent between platforms
+ * and some (✖, ▣, 🌐) render as tofu, a stray letterform or an emoji at the
+ * wrong weight — the graph modal's close button showed a bare "х".
+ *
+ * Same technique as the quick menu: blank the shim's ::before content and
+ * paint a themed CSS-mask glyph instead. Vector, offline, recolourable, and
+ * identical on every platform.
+ * ========================================================================== */
+/* Font Awesome's JS rewrites <i class="fas fa-x"> into <svg class="svg-inline--fa
+   fa-x">, so a rule keyed only on .fas silently stops matching once FA runs
+   (measured: #btn-skip's icon was an <svg>, not an <i>). Both forms are
+   matched, and the SVG's own paths are blanked so only the mask shows. */
+.cyber-top-hud svg.svg-inline--fa,
+.archives-head svg.svg-inline--fa,
+.graph-head svg.svg-inline--fa { display: none !important; }
+
+.cyber-top-hud .fas,
+.archives-head .fas,
+.graph-head .fas,
+.mech-icon {
+  display: inline-block !important;
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center;  mask-position: center;
+  -webkit-mask-size: contain;     mask-size: contain;
+}
+/* Kill the Unicode fallback so it cannot double-render beside the mask. */
+.cyber-top-hud .fas::before,
+.archives-head .fas::before,
+.graph-head .fas::before { content: '' !important; display: none !important; }
+
+/* brand — microchip */
+.cyber-top-hud .fa-microchip {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><rect x="6" y="6" width="12" height="12"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" stroke-linecap="square"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><rect x="6" y="6" width="12" height="12"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" stroke-linecap="square"/></g></svg>');
+}
+/* location — map pin */
+.cyber-top-hud .fa-map-marker-alt {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M12 22s7-7.6 7-12.6A7 7 0 0 0 5 9.4C5 14.4 12 22 12 22z"/><circle cx="12" cy="9.4" r="2.6"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M12 22s7-7.6 7-12.6A7 7 0 0 0 5 9.4C5 14.4 12 22 12 22z"/><circle cx="12" cy="9.4" r="2.6"/></g></svg>');
+}
+/* pilot — helmet */
+.cyber-top-hud .fa-user-secret {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M4 13a8 8 0 0 1 16 0v5H4z"/><path d="M4 13h16" stroke-linecap="square"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M4 13a8 8 0 0 1 16 0v5H4z"/><path d="M4 13h16" stroke-linecap="square"/></g></svg>');
+}
+/* route — terminal prompt */
+.cyber-top-hud .fa-terminal {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2" stroke-linecap="square"><path d="M4 6l5 5-5 5M12 16h8"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2" stroke-linecap="square"><path d="M4 6l5 5-5 5M12 16h8"/></g></svg>');
+}
+/* alert — shield */
+.cyber-top-hud .fa-shield-alt {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2" d="M12 2.5 20 6v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2" d="M12 2.5 20 6v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>');
+}
+/* skip — double chevron + bar */
+.cyber-top-hud .fa-fast-forward {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M3 5l8 7-8 7zM11 5l8 7-8 7z"/><rect fill="black" x="20" y="5" width="2.4" height="14"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M3 5l8 7-8 7zM11 5l8 7-8 7z"/><rect fill="black" x="20" y="5" width="2.4" height="14"/></svg>');
+}
+/* archive — data ledger */
+.cyber-top-hud .fa-book,
+.archives-head .fa-book {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M16 7h4v13h-4" /><path d="M7 8h6M7 11.5h6" stroke-linecap="square"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M16 7h4v13h-4" /><path d="M7 8h6M7 11.5h6" stroke-linecap="square"/></g></svg>');
+}
+/* atlas — node network */
+.graph-head .fa-network-wired {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><rect x="9" y="2" width="6" height="5"/><rect x="2" y="17" width="6" height="5"/><rect x="16" y="17" width="6" height="5"/><path d="M12 7v5M5 17v-5h14v5" stroke-linecap="square"/></g></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="black" stroke-width="2"><rect x="9" y="2" width="6" height="5"/><rect x="2" y="17" width="6" height="5"/><rect x="16" y="17" width="6" height="5"/><path d="M12 7v5M5 17v-5h14v5" stroke-linecap="square"/></g></svg>');
+}
+/* close — a clean X (was rendering as a stray "х" letterform) */
+.archives-head .fa-times,
+.graph-head .fa-times {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2.6" stroke-linecap="square" d="M5 5l14 14M19 5L5 19"/></svg>');
+          mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2.6" stroke-linecap="square" d="M5 5l14 14M19 5L5 19"/></svg>');
+}
