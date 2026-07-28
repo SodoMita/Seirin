@@ -1894,11 +1894,13 @@ game-screen [data-content="background"] {
    matched, and the SVG's own paths are blanked so only the mask shows. */
 .cyber-top-hud svg.svg-inline--fa,
 .archives-head svg.svg-inline--fa,
-.graph-head svg.svg-inline--fa { display: none !important; }
+.graph-head svg.svg-inline--fa,
+.hud-btn svg.svg-inline--fa { display: none !important; }
 
 .cyber-top-hud .fas,
 .archives-head .fas,
 .graph-head .fas,
+.hud-btn .fas,
 .mech-icon {
   display: inline-block !important;
   width: 14px;
@@ -1912,7 +1914,8 @@ game-screen [data-content="background"] {
 /* Kill the Unicode fallback so it cannot double-render beside the mask. */
 .cyber-top-hud .fas::before,
 .archives-head .fas::before,
-.graph-head .fas::before { content: '' !important; display: none !important; }
+.graph-head .fas::before,
+.hud-btn .fas::before { content: '' !important; display: none !important; }
 
 /* brand — microchip */
 .cyber-top-hud .fa-microchip {
@@ -1961,3 +1964,14 @@ game-screen [data-content="background"] {
   -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2.6" stroke-linecap="square" d="M5 5l14 14M19 5L5 19"/></svg>');
           mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2.6" stroke-linecap="square" d="M5 5l14 14M19 5L5 19"/></svg>');
 }
+
+/* Icon/label spacing for first-party chrome buttons. The masked glyph is an
+   inline-block with no intrinsic side bearing (unlike the Unicode glyph it
+   replaced), so icon and caption collided: "✕ЗАКРЫТЬ". */
+.hud-btn, .archives-head > span, .graph-head > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.cyber-top-hud .hud-brand { display: inline-flex; align-items: center; gap: 8px; }
+.hud-badge > .mech-icon, .hud-badge > .fas { margin-right: 2px; }

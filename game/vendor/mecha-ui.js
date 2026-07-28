@@ -808,7 +808,7 @@
      * the CSS mask applies to whichever form is in the DOM.
      * ================================================================== */
     function retagIcons () {
-        var scopes = doc.querySelectorAll('.cyber-top-hud, .archives-head, .graph-head');
+        var scopes = doc.querySelectorAll('.cyber-top-hud, .archives-head, .graph-head, .hud-btn');
         var i, svgs, j, svg, cls, m;
         for (i = 0; i < scopes.length; i++) {
             svgs = scopes[i].querySelectorAll('svg.svg-inline--fa');

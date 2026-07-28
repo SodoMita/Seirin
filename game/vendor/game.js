@@ -971,8 +971,12 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var b = document.createElement('div');
             b.id = 'seirin-build-badge';
             b.textContent = 'сборка ' + (window.SeirinBoot ? window.SeirinBoot.BUILD : '?');
-            b.setAttribute('style', 'position:fixed;right:8px;bottom:6px;z-index:95;' +
-                'font:10px/1.4 monospace;color:#64748b;opacity:.75;pointer-events:none');
+            /* Sits ABOVE the engine quick-menu bar (2.5rem tall, pinned to the
+               bottom on desktop) — at bottom:6px it printed straight through
+               the ВЫХОД/Quit button. Left-aligned for the same reason: the
+               right end of that bar is where Quit lives. */
+            b.setAttribute('style', 'position:fixed;left:10px;bottom:calc(2.5rem + 6px);z-index:95;' +
+                'font:10px/1.4 monospace;color:#64748b;opacity:.6;pointer-events:none');
             (document.body || document.documentElement).appendChild(b);
         }
 
