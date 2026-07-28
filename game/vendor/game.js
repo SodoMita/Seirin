@@ -149,6 +149,37 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             });
         }
 
+        /* Fast-forward HUD button — mirrors the engine's quick-menu Skip toggle.
+         * The engine only fast-forwards when setting('Skip') > 0 ms/statement. */
+        function syncSkipButton () {
+            var btn = document.getElementById('btn-skip');
+            if (!btn) { return; }
+            var active = !!engine.global('skip');
+            if (btn.classList) { btn.classList.toggle('active', active); }
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+
+        function wireFastForward () {
+            var btn = document.getElementById('btn-skip');
+            if (!btn) { return; }
+            btn.addEventListener('click', function () {
+                engine.skip(!engine.global('skip'));
+                syncSkipButton();
+            });
+            // Keep HUD state in sync when the engine's own quick-menu Skip is used.
+            document.addEventListener('click', function (event) {
+                var el = event.target;
+                while (el && el !== document) {
+                    if (el.getAttribute && el.getAttribute('data-action') === 'skip') {
+                        setTimeout(syncSkipButton, 0);
+                        return;
+                    }
+                    el = el.parentNode;
+                }
+            }, true);
+            syncSkipButton();
+        }
+
         function updateHUD () {
             var p = engine.storage('player') || {};
             var set = function (id, icon, text) {
@@ -160,13 +191,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
             set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
             syncArchives();
+            syncSkipButton();
         }
 
         vn = FS.vn(engine, { onChange: updateHUD, silent: true });
         engine.settings({
             'Target': '#vn-root', 'ServiceWorkers': false, 'Preload': false,
             'Assets': { 'characters': 'assets/characters', 'scenes': 'assets/scenes', 'audio': 'assets/audio' },
-            'Storage': { 'Adapter': 'LocalStorage', 'Store': 'SeirinGame_Save' }
+            'Storage': { 'Adapter': 'LocalStorage', 'Store': 'SeirinGame_Save' },
+            'Skip': 150
         });
         engine.preferences({ 'TextSpeed': 30, 'AutoPlaySpeed': 5,
             'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 } });
@@ -387,6 +420,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var lint = vn.lintScript({ silent: true });
             if (!lint.ok) { console.error('[FailSafe] script lint:', lint.issues); }
             wireArchives();
+            wireFastForward();
             engine.init('#vn-root').then(updateHUD).catch(function (err) { console.error('Monogatari init error:', err); });
         }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); } else { boot(); }

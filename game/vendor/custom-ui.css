@@ -29,10 +29,11 @@
   position: relative;
 }
 
-/* Custom Dialogue Screen Layout */
+/* Custom Dialogue Screen Layout — bottom clears the engine quick-menu bar
+   * (2.5rem + 8px gap) so it never covers the Back/Save/Load buttons. */
 [data-screen="game"] [data-ui="text-box"] {
   position: absolute;
-  bottom: 24px;
+  bottom: 48px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 64px);
@@ -80,6 +81,8 @@
   transform: translate(-50%, -50%);
   width: 90%;
   max-width: 720px;
+  max-height: min(78vh, 580px);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -246,4 +249,36 @@
 .archives-route {
   font-weight: 700;
   color: var(--sn-amber-glow);
+}
+
+/* Fast-forward HUD button active state */
+.hud-btn.active {
+  background: var(--sn-cyan-glow);
+  color: #0f172a;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+  border-color: var(--sn-cyan-glow);
+}
+
+/* Narrow screens: wrap the HUD and keep the engine quick-menu off it.
+   Vendored monogatari.css pins quick-menu to top:0 under ~600px, where it
+   would sit beneath this z-80 HUD; move it to the bottom at every size. */
+@media screen and (max-width: 60em) {
+  .cyber-top-hud {
+    left: 12px;
+    right: 12px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    row-gap: 8px;
+    font-size: 0.8rem;
+  }
+  .hud-group { gap: 8px; flex-wrap: wrap; }
+}
+
+@media screen and (max-width: 37.56255em) {
+  quick-menu {
+    top: auto;
+    bottom: 0;
+    background: rgba(11, 15, 25, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
 }

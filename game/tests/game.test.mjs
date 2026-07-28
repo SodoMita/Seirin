@@ -72,6 +72,16 @@ test('stat-gated branching is actually used (vn.branch with both arms)', () => {
     assert.ok(branches.length >= 1, 'at least one vn.branch with True and False arms');
 });
 
+test('fast-forward is wired: HUD button in markup, Skip > 0 in settings', () => {
+    const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
+    assert.match(html, /id="btn-skip"/);
+    assert.match(html, /fa-fast-forward/);
+    // engine.skip(true) refuses to run when setting('Skip') === 0, so a missing
+    // setting silently yields a dead button — pin it here.
+    assert.match(source, /'Skip':\s*[1-9]\d*/);
+    assert.match(source, /engine\.skip\(!engine\.global\('skip'\)\)/);
+});
+
 test('every canon met_* contact has a route step that can set it', () => {
     // met_lumina stays unreachable for now (no Chorus of the Abyss route yet);
     // everything else must be settable or the Archives codex lies.

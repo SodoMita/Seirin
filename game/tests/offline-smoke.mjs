@@ -98,6 +98,16 @@ if (archivesBtn) {
     if (closeBtn) { closeBtn.click(); await new Promise(resolve => setTimeout(resolve, 100)); }
     check('archives codex closes again', overlay && overlay.hidden === true);
 }
+const skipBtn = w.document.getElementById('btn-skip');
+if (skipBtn) {
+    check('fast-forward enabled by engine settings', w.engine.setting('Skip') > 0, String(w.engine.setting('Skip')));
+    skipBtn.click(); await new Promise(resolve => setTimeout(resolve, 300));
+    check('fast-forward button engages the skip loop',
+        !!w.engine.global('skip') && skipBtn.classList.contains('active'));
+    skipBtn.click(); await new Promise(resolve => setTimeout(resolve, 120));
+    check('fast-forward button disengages cleanly',
+        !w.engine.global('skip') && !skipBtn.classList.contains('active'));
+}
 check('no unmapped icons', Object.keys((w.IconsOffline && w.IconsOffline.missing) || {}).length === 0);
 const relevant = errors.filter(error => !/settings saved|first time|Cannot convert undefined|null to object|localStorage/i.test(error));
 check('no unexpected console errors', relevant.length === 0, relevant.join(' | '));
