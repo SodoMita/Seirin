@@ -2,7 +2,15 @@
  * Seirin: Night Shift — Resonance 2030 (New Game Engine Code)
  * ----------------------------------------------------------------------------
  * ES5 Browser & Node Compatible Visual Novel Code in game/
- * Supports Chapter 0 Street Walk, 5 Solo Routes, Miya Ritual Route, AI Route
+ * Chapter 0 street walk with 8 canon choices (LEVEL_1..3 v3): 5 Solo Routes,
+ * Miya Ritual Route (mid-route node M.1), AI Route (mid-route node AI.1)
+ * and the Momo PG-13 romance-comedy route (mid-route node MO.1).
+ * Ren is a mechanic apprentice AND a supervised combat-mecha pilot
+ * (Scrap-Titan 04) who rides his own rebuilt motorcycle "Стриж" — the
+ * machines are route furniture everywhere, not a character-sheet sticker.
+ * Every route opens with its own first-minutes beat: arrival -> voice beat ->
+ * teaching micro-choice (effectChoice, instant stat feedback) -> escalation.
+ * Stats are load-bearing: Solo 5 ending is gated by akatomi_alert (vn.branch).
  * Uses HUD icon markup: fa-map-marker-alt, fa-coins, fa-terminal, fa-user-secret, fa-shield-alt
  * ========================================================================== */
 (function (root, factory) {
@@ -21,6 +29,7 @@
                 procrastination:     FS.schema.number({ int: true, min: 0 }).default(0),
                 philosophical_depth: FS.schema.number({ int: true, min: 0 }).default(0),
                 miya_affinity:       FS.schema.number({ int: true, min: 0 }).default(0),
+                momo_affinity:       FS.schema.number({ int: true, min: 0 }).default(0),
                 ai_empathy:          FS.schema.number({ int: true, min: 0 }).default(0),
                 akatomi_alert:       FS.schema.number({ int: true, min: 0 }).default(0),
                 location:            FS.schema.string().default('Тэцуба: Улица')
@@ -33,6 +42,7 @@
                 met_saya:              FS.schema.boolean().default(false),
                 met_lumina:            FS.schema.boolean().default(false),
                 met_kurogane:          FS.schema.boolean().default(false),
+                met_momo:              FS.schema.boolean().default(false),
                 ritual_started:        FS.schema.boolean().default(false),
                 magic_rejected:        FS.schema.boolean().default(false),
                 happy_ending_achieved: FS.schema.boolean().default(false)
