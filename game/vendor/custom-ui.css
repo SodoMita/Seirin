@@ -1123,3 +1123,156 @@ main-menu button {
   [data-screen="game"] text-box { min-height: 100px; padding: 14px 18px; }
   [data-screen="game"] choice-container { width: calc(100% - 24px); }
 }
+
+
+/* ============================================================================
+   SYSTEM DECK — unified squemorph mecha skin
+   System screens used to fall back to Monogatari's flat black controls. These
+   rules intentionally target the engine's real custom-element markup.
+   Bevels are painted inside each plate (gradient + inset highlights), never
+   simulated with a larger outlined object behind it.
+   ========================================================================== */
+@keyframes deckTelemetry {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 72px 0, 0 0, 0 0; }
+}
+@keyframes deckBeacon {
+  0%, 100% { opacity: .45; transform: scale(.82); }
+  45% { opacity: 1; transform: scale(1); }
+}
+
+/* All non-story screens become readable, self-contained command decks. */
+[data-screen]:not([data-screen="game"]) {
+  color: #dce8ef;
+  background-color: #080c13;
+  background-image:
+    linear-gradient(90deg, rgba(62, 224, 255, .055) 1px, transparent 1px),
+    linear-gradient(rgba(62, 224, 255, .035) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% -25%, #1d2b3b 0%, #0d131d 48%, #070a10 100%);
+  background-size: 36px 36px, 36px 36px, 100% 100%;
+  animation: deckTelemetry 16s linear infinite;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: clamp(4.8rem, 9vh, 6.6rem) clamp(1rem, 5vw, 4.5rem) 2.5rem;
+}
+[data-screen]:not([data-screen="game"]) > h2 {
+  position: relative;
+  margin: 0 auto 2rem;
+  width: min(960px, 100%);
+  padding: .7rem 1.1rem .7rem 1.4rem;
+  color: #f1f8fb;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.05rem, 2.3vw, 1.6rem);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(41, 60, 76, .96), rgba(12, 18, 27, .98));
+  border-left: 4px solid var(--sn-amber-glow);
+  box-shadow: inset 0 1px rgba(255,255,255,.16), inset 0 -2px rgba(0,0,0,.55), 0 10px 24px rgba(0,0,0,.38);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 16px);
+}
+[data-screen]:not([data-screen="game"]) > h2::after {
+  content: 'SYS//ONLINE';
+  float: right;
+  font: .58rem 'Share Tech Mono', monospace;
+  color: var(--sn-cyan-glow);
+  letter-spacing: .12em;
+  padding-top: .35rem;
+}
+
+/* Controls / slots share an actual machined plate treatment. */
+[data-screen]:not([data-screen="game"]) button:not([data-action="back"]),
+[data-screen]:not([data-screen="game"]) select,
+[data-screen]:not([data-screen="game"]) input:not([type="range"]),
+save-slot {
+  color: #e7f5fa;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: .07em;
+  background: linear-gradient(145deg, rgba(57, 75, 91, .98) 0%, rgba(24, 34, 46, .98) 46%, rgba(10, 15, 23, .99) 47%, rgba(18, 26, 36, .99) 100%);
+  border: 1px solid rgba(113, 211, 239, .43);
+  border-bottom-color: rgba(0,0,0,.9);
+  border-radius: 0;
+  box-shadow: inset 1px 1px rgba(255,255,255,.14), inset -1px -2px rgba(0,0,0,.64), 0 6px 13px rgba(0,0,0,.34);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 10px);
+}
+[data-screen]:not([data-screen="game"]) button:not([data-action="back"]):hover,
+[data-screen]:not([data-screen="game"]) button:not([data-action="back"]):focus-visible {
+  color: #fff;
+  border-color: var(--sn-amber-glow);
+  background: linear-gradient(145deg, #41576a, #172332 48%, #253849 100%);
+  box-shadow: inset 1px 1px rgba(255,255,255,.2), inset -1px -2px rgba(0,0,0,.7), 0 0 0 1px rgba(251,191,36,.22), 0 0 18px rgba(251,191,36,.25);
+}
+
+/* Settings: high contrast panels and real tactile sliders, not blue dots. */
+settings-screen .row {
+  width: min(1000px, 100%);
+  margin: 0 auto;
+  gap: clamp(1rem, 3vw, 2.4rem);
+}
+settings-screen [data-settings] {
+  position: relative;
+  margin: 0 0 1rem;
+  padding: 1.1rem 1.25rem 1.3rem;
+  text-align: left;
+  color: #c4d4dd;
+  background: linear-gradient(135deg, rgba(32,46,60,.94), rgba(10,16,25,.96));
+  border-left: 3px solid rgba(56,189,248,.75);
+  box-shadow: inset 0 1px rgba(255,255,255,.11), inset 0 -2px rgba(0,0,0,.5), 0 10px 18px rgba(0,0,0,.28);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 14px);
+}
+settings-screen [data-settings]::before {
+  content: '';
+  position: absolute; right: 12px; top: 14px; width: 7px; height: 7px;
+  background: var(--sn-emerald-glow); box-shadow: 0 0 9px var(--sn-emerald-glow);
+  animation: deckBeacon 1.8s ease-in-out infinite;
+}
+settings-screen h3 { margin: 0 0 .75rem; color: var(--sn-amber-glow); font: 700 .95rem 'Orbitron', sans-serif; letter-spacing: .1em; }
+settings-screen span { color: #d8e7ec; font-weight: 600; }
+settings-screen input[type="range"] {
+  display: block;
+  width: min(100%, 25rem);
+  height: 20px;
+  margin: .35rem 0 1.05rem;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+settings-screen input[type="range"]::-webkit-slider-runnable-track { height: 7px; background: repeating-linear-gradient(90deg, #0a111a 0 9px, #192b37 9px 11px); border: 1px solid #507080; box-shadow: inset 0 2px 3px #000; }
+settings-screen input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; background: linear-gradient(135deg, #e7f5f3, #54cdd7 45%, #1b586d); border: 1px solid #d4ffff; border-radius: 0; box-shadow: 0 0 10px rgba(56,189,248,.8), inset 1px 1px #fff; clip-path: polygon(20% 0,100% 0,100% 80%,80% 100%,0 100%,0 20%); }
+settings-screen input[type="range"]::-moz-range-track { height: 7px; background: repeating-linear-gradient(90deg, #0a111a 0 9px, #192b37 9px 11px); border: 1px solid #507080; }
+settings-screen input[type="range"]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 0; background: #54cdd7; border: 1px solid #d4ffff; }
+
+/* Save/load, gallery, help and credits inherit legible deck typography. */
+load-screen, save-screen, gallery-screen, help-screen, credits-screen { font-family: 'Rajdhani', sans-serif; font-size: 1.05rem; }
+save-slot { min-height: 10rem; }
+save-slot:hover { filter: drop-shadow(0 0 10px rgba(56,189,248,.42)); }
+
+/* Quick menu: CSS-built role glyphs replace the vendor's default FA icons.
+   It stays above decisions, and confirmation modals sit above both. */
+quick-menu { z-index: 130 !important; height: 3.25rem; max-height: 3.25rem; padding: .35rem .7rem; box-sizing: border-box; background: linear-gradient(90deg, rgba(7,12,19,.94), rgba(24,37,48,.95), rgba(7,12,19,.94)) !important; border-top: 1px solid rgba(91,208,232,.35); }
+quick-menu button { position: relative; min-width: 3rem; height: 2.4rem; margin: 0 .12rem !important; padding: .25rem .48rem !important; color: #b9d8df !important; font: 700 .7rem 'Share Tech Mono', monospace !important; letter-spacing: .06em; background: linear-gradient(145deg, #263846, #0d151e) !important; border: 1px solid rgba(91,208,232,.35) !important; border-radius: 0 !important; clip-path: polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px); }
+quick-menu button > .fas { display: none !important; }
+quick-menu button::before { display: inline-block; margin-right: .38rem; color: var(--sn-cyan-glow); font-size: 1rem; vertical-align: -1px; }
+quick-menu button:nth-child(1)::before { content: '◀'; }
+quick-menu button:nth-child(2)::before { content: '▣'; }
+quick-menu button:nth-child(3)::before { content: '◆'; }
+quick-menu button:nth-child(4)::before { content: '⚙'; }
+quick-menu button:nth-child(5)::before { content: '×'; color: var(--sn-amber-glow); }
+quick-menu button:hover { color: #fff !important; background: linear-gradient(145deg, #385464, #132530) !important; border-color: var(--sn-amber-glow) !important; box-shadow: 0 0 12px rgba(251,191,36,.28); }
+message-modal, alert-modal { z-index: 300 !important; }
+
+@media screen and (max-width: 37.5em) {
+  [data-screen]:not([data-screen="game"]) { padding: 4.3rem .7rem 1.4rem; }
+  [data-screen]:not([data-screen="game"]) > h2 { margin-bottom: 1rem; font-size: 1rem; }
+  [data-screen]:not([data-screen="game"]) > h2::after { display: none; }
+  settings-screen [data-settings] { padding: .9rem; }
+  quick-menu { overflow-x: auto; justify-content: flex-start; }
+  quick-menu button { min-width: 2.65rem; }
+  quick-menu button > [data-string] { display: none !important; }
+  quick-menu button::before { margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-screen]:not([data-screen="game"]), settings-screen [data-settings]::before { animation: none !important; }
+}
