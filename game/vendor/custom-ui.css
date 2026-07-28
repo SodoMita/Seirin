@@ -5,8 +5,8 @@
  * top header status HUD, and custom responsive anime styling.
  * ========================================================================== */
 
-@import url('./monogatari.css?v=20260728r5');
-@import url('./icons-offline.css?v=20260728r5');
+@import url('./monogatari.css?v=20260728r6');
+@import url('./icons-offline.css?v=20260728r6');
 
 :root {
   --sn-bg-dark: rgba(11, 15, 25, 0.88);
@@ -732,3 +732,28 @@ main-menu button:focus-visible,
     animation: none !important;
   }
 }
+
+/* === Sprite world scale (height-normalized lineup) ===================
+ * Sprites share one world scale, feet on the bottom edge; height becomes
+ * the only variable. Source table: ai_agent_docs/skills/seirin-character-art
+ * /references/sprite-spec.md ("Cross-character scale") — card-backed values
+ * (yuki 167, momo 152) marked "card", the rest provisional pending owner.
+ * Anchor: ren 172cm -> 80vh (engine default), 1cm = 0.465vh.
+ * Fix for "Miya looks huge, Splash looks tiny beside adults". */
+game-screen [data-character="kurogane"] { max-height: 87.4vh; }       /* 188cm provisional */
+game-screen [data-character="kaito"]    { max-height: 80.9vh; }       /* 174cm provisional */
+game-screen [data-character="lumina"]   { max-height: 80.9vh; }       /* 174cm provisional */
+game-screen [data-character="ren"]      { max-height: 80vh; }         /* 172cm anchor      */
+game-screen [data-character="reika"]    { max-height: 79.1vh; }       /* 170cm provisional */
+game-screen [data-character="stella"]   { max-height: 78.1vh; }       /* 168cm provisional */
+game-screen [data-character="yuki"]     { max-height: 77.7vh; }       /* 167cm card        */
+game-screen [data-character="saya"]     { max-height: 77.2vh; }       /* 166cm provisional */
+game-screen [data-character="kitsune"]  { max-height: 76.3vh; }       /* 164cm provisional */
+game-screen [data-character="aria"]     { max-height: 75.3vh; }       /* 162cm provisional */
+game-screen [data-character="nao"]      { max-height: 73.5vh; }       /* 158cm provisional */
+game-screen [data-character="momo"]     { max-height: 70.7vh; }       /* 152cm card        */
+game-screen [data-character="miya"]     { max-height: 48.8vh; }       /* 105cm child prov. */
+/* Splash is a colloid soft robot: a wide hovering water mass with no legs.
+ * Cap her spread width as well as height, or a 1376x768 canvas overflows
+ * on narrow screens long before the height limit matters. */
+game-screen [data-character="splash"]   { max-height: 60vh; max-width: 92vw; }

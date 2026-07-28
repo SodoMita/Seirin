@@ -68,14 +68,32 @@ Record the actual box per character in a sidecar next to the sprite:
 Sprites share one world scale so nobody looks wrong standing next to anyone
 else. Feet sit on the canvas bottom edge; height is the variable.
 
-**Heights are a design answer, not an art-agent decision.** Record each
-character's height and head ratio in `assets/cast.json` once decided, then
-build the table below from those answers before the first sprite. Until then
-this is empty on purpose.
+**Heights are a design answer, not an art-agent decision.** Values backed by
+an approved card are marked *card*; everything else is a **provisional**
+placeholder pending the project owner and must not be cited as canon.
 
-| Character | Height | Head ratio | Sprite height at 4096 canvas |
+| Character | Height | Source | Runtime scale (Ren = 80vh anchor) |
 |---|---|---|---|
-| _(unanswered)_ | | | |
+| kurogane | 188 cm | provisional, confirm | 87.4vh |
+| kaito | 174 cm | provisional, confirm | 80.9vh |
+| lumina | 174 cm | provisional, confirm | 80.9vh |
+| ren | 172 cm | provisional, confirm (anchor) | 80.0vh |
+| reika | 170 cm | provisional, confirm | 79.1vh |
+| stella | 168 cm | provisional, confirm | 78.1vh |
+| yuki | 167 cm | **card** (`yuki_card.png`) | 77.7vh |
+| saya | 166 cm | provisional, confirm | 77.2vh |
+| kitsune | 164 cm | provisional, confirm | 76.3vh |
+| aria | 162 cm | provisional, confirm | 75.3vh |
+| nao | 158 cm | provisional, confirm | 73.5vh |
+| momo | 152 cm | **card** (`momo_card.png`) | 70.7vh |
+| miya | 105 cm | provisional (5 y.o. child), confirm | 48.8vh |
+| splash | n/a — colloid soft robot | design doc (water body, no legs) | 60vh tall, 92vw wide form |
+
+The runtime scale is wired in `game/vendor/custom-ui.css` ("Sprite world
+scale"): all shipped sprites stand on the canvas bottom edge, so one
+`max-height` per `data-character` reproduces relative height. Anchor:
+172 cm = 80vh (the engine default) ⇒ 1 cm ≈ 0.465vh. When the owner
+confirms a height, update the table *and* the CSS value in the same commit.
 
 Head-ratio convention: roughly 7 heads for adults, 6.5 for teens, 4–5 for young
 children, chibi at 2. Confirm per character rather than assuming.
@@ -99,24 +117,68 @@ neutral makes a whole game feel cheap.
 
 ## Naming
 
+Three kinds of files live around a character, and the suffix must say which
+kind a file is **at a glance** — a wrong guess here has already shipped a
+character card as a runtime sprite twice:
+
+1. **Reference** — `<id>_reference.png` · `<id>_reference_sheet.png`
+   Anything on a **complex in-world background** used to anchor identity:
+   illustrations, turnaround sheets, multi-view sheets. References are
+   identity locks and documentation. They are **never** matted and **never**
+   shipped as runtime sprites.
+2. **Card** — `<id>_card.png`
+   An archive/promo artifact: the figure on a designed background **with
+   text overlays** (name, age, role, quote, traits). Cards carry no alpha
+   and are **never** runtime sprites either. Card text is, however, the
+   cheapest place to steal verified facts from — Momo's 152 cm and Yuki's
+   167 cm come straight from their cards.
+3. **Sprite** — `<id>_<variant>_<expression>.png` (e.g. `<id>_normal.png`)
+   A cut-out figure with **straight alpha** recovered by white/black
+   triangulation. This is the **only** kind allowed in
+   `game/assets/characters/` — a file in that directory without meaningful
+   transparency is a pipeline bug, not an asset (`tools/check_matte.py`
+   proves it: it must report double-digit `%` of clear or partial pixels).
+
+Production intermediates (committed under `characters/<id>/plates/`,
+never installed as sprites):
+
 ```
-characters/<id>/<id>_<variant>_<expression>.png
-characters/<id>/<id>_sheet_turnaround.png
+characters/<id>/plates/<id>_white.png  # white plate — sprite draft on #FFFFFF
+characters/<id>/plates/<id>_black.png  # black plate — same pose over #000000
+```
+
+Plates are committed: they are the only exact source from which the sprite's
+matte can be regenerated after a costume or pose edit.
+
+Approved outputs at the character root:
+
+```
+characters/<id>/<id>_matted.png        # triangulation result == sprite
+characters/<id>/<id>_alpha.png         # alpha map sidecar
+characters/<id>/<id>_normal.png        # runtime sprite (copy of matted)
+game/assets/characters/<id>_normal.png # the same sprite, engine-wired
 characters/<id>/<id>_hero.png
 characters/<id>/<id>_chibi.png
 cg/cg_<scene-slug>.png
 ```
 
+A retired identity keeps its slot suffix plus a version/tombstone marker,
+never plain deletion: `<id>_reference_sheet_v1_retired.png`.
+
+Sanity rule: **if the background is a designed scene, or the corners are
+opaque, or there is text baked in — it is a reference or a card, no matter
+what the file is called.** Fix the name, not the taxonomy.
+
 - `<id>` matches the character's `id` in `cast.json` exactly.
-- `<variant>` is `default` or a wardrobe-variant slug. Every character should
-  have at least two — see `wardrobe-questions.md`.
+- `<variant>` is `default`/`normal` or a wardrobe-variant slug. Every
+  character should have at least two — see `wardrobe-questions.md`.
 - `<expression>` is a core-set id or a character-specific expression slug.
 - Lowercase, underscores, ASCII. No spaces, no Cyrillic, no generator-default
   names like `krea-2-turbo_a_...` — those are unusable in an engine path and
   are the reason the current `characters/` directory is hard to navigate.
 
-Work-in-progress iterations go in `characters/_wip/` and are not committed;
-only approved assets land at the paths above.
+Work-in-progress iterations go in `characters/<id>/_wip/`; only approved
+assets land at the paths above.
 
 ## Engine wiring (Monogatari, offline)
 

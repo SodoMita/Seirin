@@ -9,8 +9,8 @@
 ## Current production direction
 
 ### Consistency sheets
-- Use a **green background** for mannequin, turnaround, and other consistency sheets.
-- Do not remove the background from sheet-level sources.
+- Use a **complex in-world background** for mannequin, turnaround, and other consistency sheets — the environment anchors identity. (The flat-green variant is retired: alpha is never keyed off a colour, it is triangulated from the white/black plate pair.)
+- Do not remove the background from sheet-level sources. Sheets save as `<id>_reference.png` / `<id>_reference_sheet.png`, never as sprites.
 - Sheets are references for identity, pose, scale, and cross-view consistency; they are not final runtime sprites.
 - Generate the complete clothed character when that is more reliable than generating isolated wardrobe pieces.
 - Runtime-separated pieces may still be authored manually where needed. For Lyra, planned independent pieces include boots, dress, nimbus, and hair.
@@ -51,10 +51,16 @@ plates *is* the alpha, so the plates must composite the figure honestly over
 each background rather than paste it opaquely onto both.
 
 - `tools/triangulate_matte.py` — white + black pair -> RGBA (+ optional alpha map)
+- `tools/resize_and_triangulate.py` — aligns plate sizes, then runs the two above
 - `tools/triangulate_sheet_extract.py` — same, for a sheet, sliced into named sprites
 - `tools/check_matte.py` — verify a matte over non-white/black backgrounds;
   `--report` flags flattened plates, binary alpha and edge contamination
 - `tools/composite_over.py` — composite a sprite onto a background image
+
+Naming: reference sheets, cards and runtime sprites carry distinct suffixes
+(`<id>_reference_sheet.png` / `<id>_card.png` / `<id>_normal.png`) — the
+taxonomy and the "sprites only in `game/assets/characters/`" rule live in
+`ai_agent_docs/skills/seirin-character-art/references/sprite-spec.md`.
 
 (`apply_mask.py` was listed here historically but never existed in this repo.)
 

@@ -142,13 +142,32 @@ Order matters — each stage locks identity for the next, and each takes the
 previous approved asset as a **reference image**. A prompt alone will not hold
 identity across a dozen assets; a reference image will.
 
-1. **Turnaround** on flat green `#00B140` — never in any character's palette,
-   so it cannot contaminate the design.
-2. **Sprite** ← turnaround as reference.
-3. **Expressions** ← the approved *sprite*, head-only edits inside the locked
+1. **Reference** on a **complex in-world background** — workshop, night
+   city, shrine grounds; the environment anchors identity and mood. This
+   produces `<id>_reference.png` / `<id>_reference_sheet.png`, and the
+   `<id>_card.png` variant if text overlays are wanted. References and
+   cards are never matted — see the naming taxonomy in
+   `references/sprite-spec.md`.
+2. **White plate** ← reference as identity image: the sprite figure,
+   full body, on plain pure white `#FFFFFF` (`plates/<id>_white.png`).
+3. **Black plate** ← an *edit of the white plate*: identical pose,
+   position, scale and clothes, background replaced with plain pure black
+   `#000000` (`plates/<id>_black.png`). Check corners are actually black;
+   generators sometimes answer with white again — regenerate, don't ratio it.
+4. **Triangulate** the white/black pair → the sprite with straight alpha
+   (`<id>_matted.png` → `<id>_normal.png` → `game/assets/characters/`).
+   The plate pair is **committed** alongside the sprite — it is the only way
+   to redo the exact matte after an edit.
+5. **Expressions** ← the approved *sprite*, head-only edits inside the locked
    face box. Generate each from the same sprite; never chain.
-4. **Hero shot / CG** ← sprite for identity.
-5. **Chibi**, **matte plates** as needed.
+6. **Hero shot / CG** ← sprite for identity. **Chibi** as needed.
+
+> ⚠️ **Not a single-colour green screen anymore.** An earlier version of this
+> guide told agents to render the turnaround on flat green `#00B140`. That
+> recipe is retired: alpha is recovered **only** from the white/black plate
+> pair, and a lone flat-colour background invites chroma-key thinking, which
+> destroys soft edges and the translucent parts (Splash). Complex background
+> first for identity, then pure WHITE, then pure BLACK for the matte.
 
 Save each prompt and result as you go (step 2 of the non-negotiables).
 
