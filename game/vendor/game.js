@@ -59,7 +59,7 @@
  * symptom of a stale cache / blocked localStorage / truncated vendor file. */
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     (function () {
-        var BUILD = '2026-07-28-r7';
+        var BUILD = '2026-07-28-r8';
         var captured = [];
         var bannerShown = false;
         window.addEventListener('error', function (e) {
