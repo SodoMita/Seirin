@@ -5,8 +5,8 @@
  * top header status HUD, and custom responsive anime styling.
  * ========================================================================== */
 
-@import url('./monogatari.css');
-@import url('./icons-offline.css');
+@import url('./monogatari.css?v=20260728r5');
+@import url('./icons-offline.css?v=20260728r5');
 
 :root {
   --sn-bg-dark: rgba(11, 15, 25, 0.88);

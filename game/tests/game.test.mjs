@@ -123,6 +123,48 @@ test('stat-only choices carry a real engine action (rollback regression)', () =>
     assert.doesNotMatch(source, /return \{ Text: text, onChosen: effect\.onChosen, onRevert: effect\.onRevert \};/);
 });
 
+test('boot watchdog shows a visible error card instead of a silent white screen', () => {
+    // Regression: when ANY boot prerequisite failed (stale cached vendor js,
+    // blocked localStorage, truncated monogatari.js), the page used to stay
+    // an empty white void. The watchdog must hook both error channels and be
+    // installed BEFORE the guarded engine block (it exists precisely for the
+    // case when Monogatari itself never loads).
+    assert.match(source, /'seirin-boot-banner'/);
+    assert.match(source, /unhandledrejection/);
+    assert.match(source, /window\.SeirinBoot/);
+    assert.ok(source.indexOf('BOOT WATCHDOG') < source.indexOf('window.Monogatari && window.FailSafe'),
+        'watchdog must be installed before the engine-wiring guard');
+});
+
+test('init failure and success both surface visibly (build badge + fail hook)', () => {
+    assert.match(source, /stampBuildBadge/);
+    assert.match(source, /SeirinBoot\.fail/);
+});
+
+test('every local asset reference in index.html carries a cache-busting version', () => {
+    // A player who opened an older build may otherwise keep running the
+    // broken cached game.js/custom-ui.css long after the fix shipped.
+    const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
+    const refs = html.match(/(?:src|href)="(?:vendor|assets)\/[^"]+"/g) || [];
+    assert.ok(refs.length >= 8, 'expected at least 8 local asset references, got ' + refs.length);
+    refs.forEach(function (ref) {
+        assert.ok(/\?v=\d{6,}/.test(ref), 'missing cache-bust version: ' + ref);
+    });
+});
+
+test('engine settings use the real AssetsPath key (dead Assets key removed)', () => {
+    // The engine ONLY reads AssetsPath (same as cyber-nexus). A stray
+    // 'Assets' key silently did nothing.
+    assert.match(source, /'AssetsPath':\s*\{/);
+    assert.doesNotMatch(source, /'Assets':\s*\{/);
+});
+
+test('debug overlays stack above system screens (graph visible over the menu)', () => {
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    assert.match(css, /\.graph-overlay\s*\{[^}]*z-index:\s*200/);
+    assert.match(css, /\.archives-overlay\s*\{[^}]*z-index:\s*200/);
+});
+
 test('system screens stack above the HUD (settings must stay closable on mobile)', () => {
     // Regression: vendored monogatari.css gives screens no z-index, so the
     // z-80 HUD covered the settings screen AND its [data-action=back] circle.

@@ -50,6 +50,85 @@
 }));
 
 /* PART 2 — Browser engine wiring. All script mutations use FailSafe actions. */
+
+/* BOOT WATCHDOG — runs even when vendor/monogatari.js never loaded (which is
+ * exactly the failure it exists for). If a few seconds after page load there
+ * is still no rendered main menu and no running game, the player gets a
+ * visible diagnostic card with the build id, the captured JS errors and a
+ * storage probe — instead of the silent white void that used to be the only
+ * symptom of a stale cache / blocked localStorage / truncated vendor file. */
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    (function () {
+        var BUILD = '2026-07-28-r5';
+        var captured = [];
+        var bannerShown = false;
+        window.addEventListener('error', function (e) {
+            if (!e || !e.message || captured.length >= 6) { return; }
+            var where = e.filename ? String(e.filename).split('/').pop() + ':' + e.lineno : '?';
+            captured.push(e.message + ' @ ' + where);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+            if (captured.length >= 6) { return; }
+            var r = e && e.reason;
+            captured.push('Promise: ' + (r && r.message ? r.message : String(r)));
+        });
+        function storageStatus () {
+            try {
+                localStorage.setItem('__seirin_probe', '1');
+                localStorage.removeItem('__seirin_probe');
+                return 'ok';
+            } catch (e) { return 'НЕДОСТУПНО (' + e.name + ') — включите доступ к данным сайтов'; }
+        }
+        function esc (s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        function showBanner (reasons) {
+            if (bannerShown) { return; }
+            bannerShown = true;
+            var rows = [];
+            var i;
+            for (i = 0; i < reasons.length; i++) { rows.push('<li>' + esc(reasons[i]) + '</li>'); }
+            var errHtml = captured.length
+                ? '<div style="margin-top:10px;font-size:11px;color:#fca5a5">' +
+                  captured.map(esc).join('<br>') + '</div>'
+                : '<div style="margin-top:10px;font-size:11px;color:#94a3b8">JS-ошибок не перехвачено.</div>';
+            var d = document.createElement('div');
+            d.id = 'seirin-boot-banner';
+            d.setAttribute('style',
+                'position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;' +
+                'background:#070a14;color:#e2e8f0;display:flex;align-items:center;justify-content:center;' +
+                'font:14px/1.5 monospace;padding:24px');
+            d.innerHTML =
+                '<div style="max-width:640px;border:1px solid #f87171;border-radius:12px;padding:20px 22px;background:#0b1020">' +
+                '<div style="color:#f87171;font-weight:bold;letter-spacing:1px">СЭЙРИН · ДВИЖОК НЕ ЗАПУСТИЛСЯ</div>' +
+                '<ul style="margin:10px 0 0 18px;padding:0;color:#e2e8f0">' + rows.join('') + '</ul>' +
+                errHtml +
+                '<div style="margin-top:12px;font-size:12px;color:#94a3b8">' +
+                'Полностью закройте вкладку и откройте index.html заново (при запуске через сервер — Ctrl+F5). ' +
+                'Если баннер остался, сообщите разработчику номер сборки: <b style="color:#e2e8f0">' + BUILD + '</b></div>' +
+                '</div>';
+            (document.body || document.documentElement).appendChild(d);
+        }
+        window.SeirinBoot = {
+            BUILD: BUILD,
+            fail: function (reason) { showBanner([reason]); },
+            errors: captured
+        };
+        setTimeout(function () {
+            if (document.querySelectorAll('main-menu button').length > 0) { return; }
+            var playing = false;
+            try { playing = !!(window.Monogatari && window.Monogatari.default && window.Monogatari.default.global('playing')); } catch (e) { /* stay false */ }
+            if (playing) { return; }
+            var reasons = [];
+            if (!window.Monogatari) { reasons.push('vendor/monogatari.js не загрузился (файл не найден или повреждён)'); }
+            else if (!window.FailSafe) { reasons.push('vendor/failsafe.js не загрузился (файл не найден или повреждён)'); }
+            else { reasons.push('движок загружен, но главное меню не отрисовано за 8 секунд'); }
+            reasons.push('localStorage: ' + storageStatus());
+            showBanner(reasons);
+        }, 8000);
+    }());
+}
+
 if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
     (function () {
         'use strict';
@@ -424,9 +503,19 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         }
 
         vn = FS.vn(engine, { onChange: updateHUD, silent: true });
+        /* Asset paths: the engine ONLY reads the AssetsPath tree (as in
+         * cyber-nexus). A stray 'Assets' key here used to be dead config —
+         * the defaults happened to match the on-disk layout, which is why
+         * nothing visibly broke, but that was luck, not design. */
         engine.settings({
+            'Name': 'Сэйрин: Ночная смена — Резонанс 2030',
+            'Version': '1.2.0',
             'Target': '#vn-root', 'ServiceWorkers': false, 'Preload': false,
-            'Assets': { 'characters': 'assets/characters', 'scenes': 'assets/scenes', 'audio': 'assets/audio' },
+            'AssetsPath': {
+                'root': 'assets', 'characters': 'characters', 'scenes': 'scenes',
+                'images': 'images', 'icons': 'icons', 'music': 'music', 'sounds': 'sounds',
+                'ui': 'ui', 'videos': 'videos', 'voices': 'voices', 'gallery': 'gallery'
+            },
             'Storage': { 'Adapter': 'LocalStorage', 'Store': 'SeirinGame_Save' },
             'Skip': 150
         });
@@ -726,6 +815,20 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 'end'
             ]
         });
+        /* Tiny build stamp in the corner of the title screen, so a player
+         * (and we) can always tell WHICH build is actually running — the
+         * difference between "bug not fixed" and "browser cached the old
+         * build" is otherwise invisible. */
+        function stampBuildBadge () {
+            if (document.getElementById('seirin-build-badge')) { return; }
+            var b = document.createElement('div');
+            b.id = 'seirin-build-badge';
+            b.textContent = 'сборка ' + (window.SeirinBoot ? window.SeirinBoot.BUILD : '?');
+            b.setAttribute('style', 'position:fixed;right:8px;bottom:6px;z-index:95;' +
+                'font:10px/1.4 monospace;color:#64748b;opacity:.75;pointer-events:none');
+            (document.body || document.documentElement).appendChild(b);
+        }
+
         function boot () {
             var validation = vn.validateStorage(STORAGE_SCHEMA, { repair: true });
             if (validation.isErr()) { console.error('[FailSafe] storage check:', validation.error); }
@@ -735,7 +838,12 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             wireGraph();
             wireFastForward();
             engine.registerListener('open-graph', { callback: openGraph });
-            engine.init('#vn-root').then(updateHUD).catch(function (err) { console.error('Monogatari init error:', err); });
+            engine.init('#vn-root').then(function () { stampBuildBadge(); updateHUD(); }).catch(function (err) {
+                console.error('Monogatari init error:', err);
+                if (window.SeirinBoot) {
+                    window.SeirinBoot.fail('сбой engine.init: ' + (err && err.message ? err.message : String(err)));
+                }
+            });
         }
         if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); } else { boot(); }
     }());
