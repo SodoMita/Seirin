@@ -75,16 +75,28 @@ if (start) {
     check('new game reaches Start', w.engine.state('label') === 'Start');
     for (let i = 0; i < 6; i++) { await w.engine.run('next').catch(() => {}); await new Promise(resolve => setTimeout(resolve, 350)); }
     const choices = w.document.querySelectorAll('choice-container button[data-choice]');
-    check('opening reaches route choice', choices.length === 4, String(choices.length));
+    check('opening reaches the 7-way canon route choice', choices.length === 7, String(choices.length));
     if (choices.length) {
         const before = w.engine.storage('player').miya_affinity;
-        choices[1].click(); await new Promise(resolve => setTimeout(resolve, 900));
+        // Choice order: Home, Bar, Freelance, Philosophy, LoneFighter, Miya, AI.
+        choices[5].click(); await new Promise(resolve => setTimeout(resolve, 900));
         check('Miya choice applies its affinity effect', w.engine.storage('player').miya_affinity === before + 5);
         const action = w.engine.script().MiyaRoute.find(step => step && step.Function && step.Function.Apply);
         const prior = w.engine.storage('player').miya_affinity;
         action.Function.Apply(); action.Function.Revert();
         check('reversible action restores exact snapshot', w.engine.storage('player').miya_affinity === prior);
     }
+}
+const archivesBtn = w.document.getElementById('btn-archives');
+if (archivesBtn) {
+    archivesBtn.click(); await new Promise(resolve => setTimeout(resolve, 200));
+    const overlay = w.document.getElementById('archives-overlay');
+    const body = w.document.getElementById('archives-body');
+    check('archives codex opens from live storage',
+        overlay && overlay.hidden === false && body && body.innerHTML.length > 0);
+    const closeBtn = w.document.getElementById('btn-archives-close');
+    if (closeBtn) { closeBtn.click(); await new Promise(resolve => setTimeout(resolve, 100)); }
+    check('archives codex closes again', overlay && overlay.hidden === true);
 }
 check('no unmapped icons', Object.keys((w.IconsOffline && w.IconsOffline.missing) || {}).length === 0);
 const relevant = errors.filter(error => !/settings saved|first time|Cannot convert undefined|null to object|localStorage/i.test(error));

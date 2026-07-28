@@ -39,11 +39,17 @@ test('storage schema supplies complete, safe defaults', () => {
 
 test('all declared story jumps target real labels', () => {
     const labels = [...source.matchAll(/^\s{12}([A-Za-z][A-Za-z0-9]*): \[/gm)].map(m => m[1]);
-    assert.deepEqual(labels.sort(), ['AIRoute', 'MiyaRoute', 'SoloRoute1', 'SoloRoute4', 'Start'].sort());
+    assert.deepEqual(labels.sort(), [
+        'Start',
+        'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
+        'Solo5BadEnd', 'Solo5Standoff',
+        'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
+        'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation'
+    ].sort());
     // routeChoice constructs its jump dynamically, so inspect every supplied
     // target rather than looking for a literal `jump Label` in the source.
     const jumps = [...source.matchAll(/routeChoice\([\s\S]*?,\s*'([A-Za-z][A-Za-z0-9]*)'/g)].map(m => m[1]);
-    assert.equal(jumps.length, 4);
+    assert.equal(jumps.length, 11);
     jumps.forEach(label => assert.ok(labels.includes(label), `missing target ${label}`));
 });
 
@@ -51,4 +57,25 @@ test('choices use the matched FailSafe choiceEffect callback pair', () => {
     assert.match(source, /onChosen: effect\.onChosen, onRevert: effect\.onRevert/);
     assert.doesNotMatch(source, /onRevert:\s*function/);
     assert.ok((source.match(/vn\.goTo\(/g) || []).length >= 5, 'each location change is reversible');
+});
+
+test('location changes are real vn.goTo actions, never quoted command strings', () => {
+    // Regression: route labels once carried 'vn.goTo("Location")' as a plain
+    // string, which the engine cannot execute (unknown action id).
+    assert.doesNotMatch(source, /['"]vn\.goTo\(/);
+    assert.equal(source.indexOf('vn.goTo(&quot;'), -1);
+});
+
+test('stat-gated branching is actually used (vn.branch with both arms)', () => {
+    assert.match(source, /vn\.branch\(/);
+    const branches = [...source.matchAll(/vn\.branch\([\s\S]*?\{[\s\S]*?True:[\s\S]*?False:[\s\S]*?\}\)/g)];
+    assert.ok(branches.length >= 1, 'at least one vn.branch with True and False arms');
+});
+
+test('every canon met_* contact has a route step that can set it', () => {
+    // met_lumina stays unreachable for now (no Chorus of the Abyss route yet);
+    // everything else must be settable or the Archives codex lies.
+    ['met_miya', 'met_reika', 'met_saya', 'met_kurogane', 'met_splash', 'met_stella'].forEach(flag => {
+        assert.ok(source.includes(flag), `flag ${flag} is never set`);
+    });
 });

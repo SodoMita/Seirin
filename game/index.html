@@ -36,6 +36,19 @@
     <!-- MONOGATARI CONTAINER -->
     <div id="vn-root"></div>
 
+    <!-- ARCHIVES CODEX MODAL (opened by #btn-archives, wired in vendor/game.js) -->
+    <div id="archives-overlay" class="archives-overlay" hidden>
+        <div class="archives-panel" role="dialog" aria-modal="true" aria-labelledby="archives-title">
+            <div class="archives-head">
+                <span id="archives-title"><i class="fas fa-book"></i><span>АРХИВ СЭЙРИН</span></span>
+                <button type="button" class="hud-btn" id="btn-archives-close">
+                    <i class="fas fa-times"></i><span>ЗАКРЫТЬ</span>
+                </button>
+            </div>
+            <div id="archives-body" class="archives-body"></div>
+        </div>
+    </div>
+
     <script src="vendor/failsafe.js"></script>
     <script src="vendor/monogatari.js"></script>
     <script src="vendor/icons-offline.js"></script>

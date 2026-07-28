@@ -1,0 +1,12 @@
+{
+    "name": "seirin-game",
+    "private": true,
+    "description": "Seirin: Night Shift — Resonance 2030. Runtime ships zero npm dependencies; jsdom is dev-only for tests/offline-smoke.mjs.",
+    "scripts": {
+        "test": "node --test tests/failsafe.test.mjs tests/icons-offline.test.mjs tests/game.test.mjs",
+        "smoke": "REQUIRE_JSDOM=1 node tests/offline-smoke.mjs"
+    },
+    "devDependencies": {
+        "jsdom": "^30.0.0"
+    }
+}
