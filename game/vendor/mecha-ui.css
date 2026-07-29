@@ -446,6 +446,14 @@
  * toward the viewer on top of the tilt, which is what actually separates it
  * from the panel behind it instead of just skewing in place. */
 [data-mech="plate"].mech-hot {
+  /* !important on filter: main-menu buttons also carry the mechPlateIdle
+     idle-breathing animation, which keyframes `filter`. Per the cascade, a
+     running CSS animation outranks a plain (non-!important) author
+     declaration for the same property, so without !important here the idle
+     animation silently won every frame and the directional contact-shadow
+     below never actually rendered — verified live: computed filter stayed
+     mechPlateIdle's brightness/drop-shadow pair regardless of pointer
+     position until this was added. */
   transform-style: preserve-3d;
   transform:
     perspective(700px)
@@ -455,7 +463,8 @@
   transition: transform 0.09s linear, filter 0.16s ease-out;
   filter:
     drop-shadow(0 1px 0 rgba(255, 255, 255, 0.14))
-    drop-shadow(calc(var(--mech-lmx) * -10px) calc(10px + var(--mech-lmy) * -6px) 18px rgba(0, 0, 0, 0.62));
+    drop-shadow(calc(var(--mech-lmx) * -10px) calc(10px + var(--mech-lmy) * -6px) 18px rgba(0, 0, 0, 0.62))
+    !important;
 }
 /* Depth separation between layers under hot tilt: the gloss (topmost visual
    layer) pushes forward and the rivets/edge (hardware, bolted to the base)
