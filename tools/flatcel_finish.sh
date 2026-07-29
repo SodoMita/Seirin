@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
+# ============================================================================
+# ⚠️  SUPERSEDED 2026-07-29 — DO NOT USE FOR NEW WORK.
+# Use tools/img_pipeline/run.sh instead (plain C, no ImageMagick). This file
+# is kept only because OPERATIONS.md forbids deleting/overwriting existing
+# repo history-adjacent tooling; it is not wired into any current workflow.
+#
+# Why it was retired: even after the upscale-before-matte ordering fix below
+# was applied, ImageMagick's `-fuzz` corner flood-fill left a soft band of
+# partial-alpha pixels along every line-art edge. That band was invisible in
+# the PNG but WebP's lossy alpha compression requantized it into visible
+# halftone/dither-looking noise — caught by the project owner in the first
+# shipped batch (commit e0ea244). tools/img_pipeline/matte_floodfill.c fixes
+# this with a real border-seeded BFS flood fill that produces a clean binary
+# alpha plus exactly one antialiased feather ring, leaving nothing for lossy
+# WebP compression to dither. See tools/img_pipeline/GLSL_ATTEMPT_NOTES.md
+# and ai_agent_docs/skills/seirin-character-art/_session_notes.md for the
+# full defect history and how it was verified fixed.
+# ============================================================================
+#
 # tools/flatcel_finish.sh — finish a flat-cel-shaded, pure-white-background
 # sprite generation into a shippable straight-alpha runtime asset.
 #

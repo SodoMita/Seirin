@@ -1,5 +1,11 @@
 # 03 — Known defects to fix next session (2026-07-29, post-review)
 
+**⚠️ Read `HANDOFF_2026-07-29.md` in this same directory first** — it is the
+up-to-date, ran-out-of-context-so-wrote-a-full-handoff summary of the whole
+session (state table per character, cleanup notes, tooling usage, remaining
+work). This file is the earlier defect log the handoff was written from;
+kept for detail/history, but the handoff is the entry point.
+
 User caught three real problems in the first restyle pass (commit
 `e0ea244`). None of these are style disagreements — they are execution bugs.
 Recording them here per OPERATIONS.md "honest reporting" before the next

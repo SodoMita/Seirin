@@ -270,4 +270,10 @@ Approved assets and `characters/*/prompts/` are committed. `_wip/` is not.
 - `references/appeal-and-safety.md` — appeal per age band, hard limits.
 - `references/qa-checklist.md` — pre-ship checks.
 - `references/sources.md` — the professional books and where to fetch them.
+- `HANDOFF_2026-07-29.md` — **read this before resuming the 2026-07-29
+  Miya/Kurogane flat-shading restyle pass.** Per-character state table,
+  cleanup notes (what's safe to delete vs what must never be touched),
+  tooling usage (`tools/img_pipeline/`, not `tools/flatcel_finish.sh`), and
+  the remaining generation work (kitsune/yuki/lumina/momo/saya emotions).
+- `_session_notes.md` — the defect log the above handoff was written from.
 
