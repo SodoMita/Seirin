@@ -1696,6 +1696,237 @@ settings-screen button:not([data-action="back"]) {
   color: #e6eff9;
 }
 
+/* --- 15a. SAVE/LOAD SCREENS — data-cartridge pass -------------------------
+   The base system-screen armour (§15) gives the backdrop, title stencil and
+   button typography, but save/load slots were still engine-default coloured
+   rectangles with a white text input. Each save-slot is now a bolted data
+   cartridge: chamfered steel frame, viewport window, stenciled name-plate,
+   amber timestamp, and a red indicator for the delete rivet.
+   ========================================================================== */
+
+/* --- Save name input: recessed instrument field, not a white text box ---- */
+save-screen input[data-input="slotName"],
+load-screen input[data-input="slotName"] {
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25));
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-top-color: rgba(0, 0, 0, 0.8);
+  border-radius: 0;
+  color: #e6f2ff;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  padding: 8px 14px;
+  min-width: 220px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 8px rgba(56, 189, 248, 0.12);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+save-screen input[data-input="slotName"]::placeholder,
+load-screen input[data-input="slotName"]::placeholder {
+  color: rgba(148, 180, 210, 0.55);
+  font-style: italic;
+}
+save-screen input[data-input="slotName"]:focus,
+load-screen input[data-input="slotName"]:focus {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+/* Save button: proper plate with padding. The generic rule (§15) already
+   sets font; this gives it body, padding, and a chamfer. */
+save-screen button[data-action="save"],
+load-screen button[data-action="save"] {
+  position: relative;
+  isolation: isolate;
+  padding: 8px 22px;
+  margin-left: 8px;
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.08), rgba(0,0,0,0.30) 60%),
+    linear-gradient(150deg, #2a3548, #151d2c);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    inset 0 -1px 0 rgba(0,0,0,0.6),
+    0 4px 12px rgba(0,0,0,0.5);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  cursor: pointer;
+  transition: filter 0.18s ease, box-shadow 0.18s ease;
+}
+save-screen button[data-action="save"]:hover,
+load-screen button[data-action="save"]:hover {
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -1px 0 rgba(0,0,0,0.6),
+    0 4px 14px rgba(0,0,0,0.5),
+    0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+/* "No saved games" empty-state message. */
+save-screen slot-container p[data-string],
+load-screen slot-container p[data-string] {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(148, 180, 210, 0.5);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.8);
+  padding: 3rem 0;
+  text-align: center;
+}
+
+/* --- Save-slot: data cartridge ------------------------------------------- */
+save-slot,
+load-screen save-slot {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+save-slot:hover {
+  transform: translateY(-3px);
+}
+
+/* --- Viewport window: the background/screenshot preview ------------------
+   Engine sets a flat div[data-content="background"] with background-image.
+   Give it a monitor-window frame: inset border, amber scanline at the top. */
+save-slot [data-content="background"] {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  border: 2px solid rgba(30, 42, 60, 0.95);
+  border-top: 3px solid rgba(56, 189, 248, 0.45);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    inset 0 2px 10px rgba(0, 0, 0, 0.55),
+    0 0 6px rgba(56, 189, 248, 0.12);
+  background-size: cover;
+  background-position: 50% 35%;
+  background-color: #0a0e16;
+}
+/* Subtle scanline overlay on the viewport — a CRT touch. */
+save-slot [data-content="background"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.08) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+/* --- Badge: stenciled name label on the cartridge ------------------------ */
+save-slot .badge {
+  position: relative;
+  display: block;
+  padding: 5px 10px;
+  background:
+    linear-gradient(90deg, rgba(18, 25, 38, 0.95), rgba(26, 36, 52, 0.9));
+  border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+  font-family: 'Orbitron', 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #dceaf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.3), 0 1px 0 rgba(0,0,0,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+}
+
+/* --- Figcaption: amber timestamp readout --------------------------------- */
+save-slot figcaption {
+  padding: 6px 10px;
+  background: linear-gradient(180deg, rgba(12, 18, 28, 0.9), rgba(8, 12, 20, 0.95));
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  color: var(--mech-amber, #fbbf24);
+  text-shadow: 0 0 6px rgba(251, 191, 36, 0.3);
+  text-transform: uppercase;
+  border-top: 1px solid rgba(251, 191, 36, 0.15);
+}
+save-slot figcaption small {
+  display: block;
+  font-size: 0.65rem;
+  color: rgba(184, 202, 223, 0.6);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* --- Delete button: red indicator rivet ---------------------------------- */
+save-slot [data-delete] {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 40% 35%, #ff5555, #aa2020 60%, #661515);
+  border: 1px solid rgba(255, 100, 100, 0.5);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.6rem;
+  box-shadow:
+    0 0 6px rgba(255, 50, 50, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  opacity: 0.55;
+  z-index: 3;
+  transition: opacity 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+  cursor: pointer;
+}
+save-slot [data-delete]:hover {
+  opacity: 1;
+  box-shadow:
+    0 0 12px rgba(255, 50, 50, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: scale(1.12);
+}
+save-slot [data-delete] svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* --- Slot grid: let the row flex-wrap with sensible minimum widths ------- */
+save-screen [data-content="slots"],
+load-screen [data-content="slots"] {
+  padding: 1rem 1.5rem 2rem;
+  gap: 16px;
+}
+save-screen slot-container,
+load-screen slot-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+save-screen save-slot,
+load-screen save-slot {
+  flex: 0 1 280px;
+  max-width: 320px;
+  min-width: 200px;
+  margin: 0;
+}
+
 /* ============================================================================
  * 16. QUICK MENU — the in-game action bar
  * ----------------------------------------------------------------------------
