@@ -6,10 +6,14 @@
     <title>Сэйрин: Ночная смена — Резонанс 2030 | Visual Novel</title>
     <meta name="description" content="Visual Novel: Seirin: Night Shift — Resonance 2030. Runs 100% offline." />
 
-    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260728r10" />
-    <link rel="stylesheet" href="vendor/monogatari.css?v=20260728r10" />
-    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260728r10" />
-    <link rel="stylesheet" href="vendor/custom-ui.css?v=20260728r10" />
+    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/monogatari.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/custom-ui.css?v=20260728r11" />
+    <!-- 2.5D skeuomorphic mecha armour skin. MUST stay last: it repaints the
+         flat reskin in vendor/custom-ui.css and relies on winning the cascade
+         at equal specificity. Layer markup is injected by vendor/mecha-ui.js. -->
+    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260728r11" />
 </head>
 <body>
 
@@ -93,10 +97,15 @@
         </div>
     </div>
 
-    <script src="vendor/failsafe.js?v=20260728r10"></script>
-    <script src="vendor/monogatari.js?v=20260728r10"></script>
-    <script src="vendor/icons-offline.js?v=20260728r10"></script>
-    <script src="vendor/game.js?v=20260728r10"></script>
+    <script src="vendor/failsafe.js?v=20260728r11"></script>
+    <script src="vendor/monogatari.js?v=20260728r11"></script>
+    <script src="vendor/icons-offline.js?v=20260728r11"></script>
+    <script src="vendor/game.js?v=20260728r11"></script>
+    <!-- Mecha skin driver: bakes metal/wear textures on a canvas, injects the
+         armour layer stack, builds the HUD instrument rail + telemetry strip,
+         and drives the indicators from engine storage. Read-only w.r.t. game
+         state; loads after game.js so window.engine already exists. -->
+    <script src="vendor/mecha-ui.js?v=20260728r11"></script>
 
 </body>
 </html>
