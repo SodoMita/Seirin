@@ -662,3 +662,138 @@ something the player must hit.
 
 Asked directly, so measured directly: Miya's sprite carries `mechBreathe` at
 4.1s and its rendered top edge travels **11.9px** over a cycle.
+
+---
+
+# Session 9 — real-browser audit, rivets, 3D tilt, breathing, a critical regression
+
+User report (paraphrased): *rivets are animated, most animations are unused
+or invisible, the 2.5D doesn't look like 3D at all, sprite and button
+animation "make no sense."* Every claim below was checked against a real
+Chromium (extracted per the §1 recipe in `HANDOFF.md`, `/tmp/cbin/chromium`),
+not assumed from reading CSS.
+
+## Rivets were genuinely animated — confirmed, fixed
+
+`[data-screen="game"] text-box [data-content="text"]::after` packed the
+running edge-light AND both bolt-row gradients into one `background-image`
+list sharing one `background-position` keyframe (`mechEdgeRun`). Measured
+live: sampling `getComputedStyle(el, '::after').backgroundPosition` every
+900ms showed the bolt-row position changing in lockstep with the edge light
+(`16px 5px` was never actually fixed — the whole list moved together). Rivets
+are hardware; they cannot slide. Fixed by moving the two bolt-row gradients
+onto `::before` (the static face layer, which already has
+`animation: none !important` two rules later) and leaving `::after` with only
+the edge-light gradient. Verified: bolt background-position is now a constant
+`0px 0px` across 6 samples at 900ms while the edge light keeps moving.
+
+## Main-menu title overlapped the button rail
+
+Reproduced at a plain 1280×720 desktop viewport — no touch, no odd DPI. Title
+bottom edge (`main-screen::before`, `top:16%`) sat at y=195, first button top
+at y=173: a 22px overlap with no `@media` guard covering that height. The
+existing `max-height:34em` breakpoint only helped short *phone* viewports; it
+never touched normal desktop sizes because the title was `top:16%` (a
+percentage of an *arbitrary* height) racing an absolutely-positioned,
+independently-centered `main-menu` with no shared layout parent.
+
+Fixed structurally: retired both pseudo-elements, mounted a real
+`.mech-title-block` (mecha-ui.js, `buildTitleBlock()`) as `main-screen`'s
+first flex child, and made `main-menu` the second child sized to whatever's
+left (`flex: 1 1 auto`, its own `justify-content: center`). Two flex siblings
+in a column cannot occupy the same pixels — verified `overlapPx: 0` at
+1280×720, 1920×1080, 1366×768, 1440×900, 390×844 portrait AND 844×390
+landscape (the worst case from prior sessions).
+
+## The 2.5D tilt was one global rotation, not parallax
+
+`--mech-mx/--mech-my` were written once to `<html>` from whole-viewport
+pointer position, and EVERY plate on screen read the same two numbers into an
+identical `rotateX/rotateY`. That is not parallax — every plate skews exactly
+together as one flat sheet regardless of where the plate itself sits, which
+is why it never read as "3D": there is no per-object relationship between
+cursor position and any given plate's tilt. Angles were also tiny (max
+≈1.5°) — measured `matrix3d` at opposing viewport corners differed by
+0.05 in the relevant off-diagonal terms, well under what a flat gradient can
+sell as depth.
+
+Replaced with two tiers:
+- **Ambient** (`--mech-mx/--mech-my`, unchanged mechanism): a small
+  whole-cockpit sway, kept modest on purpose — it's context.
+- **Local hot tilt** (`--mech-lmx/--mech-lmy`, NEW): mecha-ui.js tracks which
+  `plate`/`chip` element is currently under the pointer, tags it `.mech-hot`,
+  and writes the pointer's position *relative to that element's own
+  rectangle* (-1..1, center 0) as an inline style — only on that one element.
+  CSS gives `.mech-hot` an order-of-magnitude larger rotation (±11°/±14° vs
+  the ambient ±1.1°/±1.5°) plus `translateZ` to lift it 14px toward the
+  viewer, and a small extra `translateZ` push on the gloss/face layers so the
+  stack reads as several separated physical sheets, not one card. Press
+  (`:active`) sinks the same plate `translateZ(-5px)` past flush instead of
+  the old flat `translateY(1px)`.
+
+  Verified: `--mech-lmx/--mech-lmy` correctly track pointer position inside
+  the button's own box (left-mid → lmx≈-0.7, right-mid → lmx≈0.9, etc.), and
+  a 2× DPI screenshot pair at opposing corners shows the rim highlight and
+  shading visibly flip sides (pixel diff ~45% of the crop).
+
+  **Bug found in my own first pass:** `document.addEventListener('mouseleave',
+  clearHot, true)` looked right but is wrong — `mouseleave` doesn't bubble,
+  but a capture-phase listener on `document` still fires on every internal
+  boundary the pointer crosses (e.g. the button's own `<span>` label), so it
+  cleared `.mech-hot` while the cursor was still plainly inside the button.
+  Fixed with `mouseout` + `relatedTarget` (null only on a genuine page exit).
+
+## Sprite "breathing" was floating
+
+Measured the sprite's own bottom edge (`getBoundingClientRect().bottom`) over
+one `mechBreathe` cycle: it travelled from y=720 to y=707.5 and back — 12.5px
+of daylight opening under the character's feet every 3.6s, because the old
+keyframe's amplitude was almost entirely `translate: 0 -14px` (added last
+session to make the loop "visible" after it was found to be imperceptible).
+That fixed the visibility complaint and created a new one: real breathing
+does not move your feet.
+
+Rewritten to anchor `scale` at `transform-origin: 50% 100%` (the sprite's own
+bottom edge) with no `translate` at all, plus a tiny `rotate` off-phase so it
+reads as a weight shift rather than a rigid zoom. Verified over 12 samples at
+350ms: bottom edge now varies by 0.6px (688.0–688.6) while the top edge moves
+~27px as the torso "expands" upward. Splash is the deliberate exception — a
+legless hovering colloid mass — and keeps a real vertical float
+(`mechHover`, renamed from `mechBreatheSoft`).
+
+## A critical regression, caught before commit
+
+Making `main-screen` a flex column required giving it `display: flex`, and
+the fast version was `main-screen { display: flex !important; ... }` on the
+bare element. That is `!important` on a selector with no `.active` — it beats
+the engine's own `[data-screen]{display:none}` rule REGARDLESS of which
+screen the engine thinks is current, so once the game started, both
+`main-screen` (never actually hidden) and `game-screen` were visible at once,
+side by side, sharing the viewport 640px/640px. Screenshotted before it was
+believed fixed — see the routine in `design/preview/shots/final_dialogue.png`
+history if diffing. Fixed by scoping every such rule to `main-screen.active`,
+matching the engine's own selector exactly. Re-verified across every screen
+transition (menu → load/settings/help → back → game) with
+`document.querySelectorAll('[data-screen]')` filtered to non-zero rects: **one
+screen visible at a time, every transition, no exceptions.**
+
+**Lesson for next time:** when overriding a `[data-screen]`-family visibility
+rule with `!important`, always match the engine's own conditional selector
+(`.active`), never the bare tag — the engine's toggle only works by removing
+`.active`, so an unconditional visibility override silently defeats it. This
+is a variant of the "equal-specificity override" trap already logged in the
+trap table at the top of this file, but with `!important` instead of load
+order as the mechanism.
+
+## What did NOT need fixing
+
+Checked and found correct, contrary to a first-glance reading of the bug
+report:
+- Choice-plate off-screen slide-in, gauge live values, telemetry ticker,
+  tap-ring, `mechIconBob` on quick-menu icons, main-menu idle breathing —
+  all present, running, and responding correctly to real interaction
+  (verified live, not just "declared in CSS").
+- `prefers-reduced-motion` still collapses to 1 running animation and the
+  material stays intact (screenshotted).
+- `node --test` (61/61), `es5-scan`, and `offline-smoke.mjs` (jsdom, 55+
+  checks) all pass unchanged after every fix in this session.
