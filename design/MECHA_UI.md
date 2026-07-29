@@ -310,3 +310,61 @@ PASS small_phone  tbH= 58 blocked=[] offscreen=[]
 Requested and deferred to the next turn by the user: the animation pass
 (sprite/scene motion is in place, but the interface itself still needs more
 2.5D motion).
+
+---
+
+# Session 4 — ticker to the top, nameplate out of the console, numeric scale
+
+## Why the speaker name kept getting cut off
+
+This is the important lesson of the session. The badge was lifted above the
+console with a negative `translate`, and it looked correct in the DOM — but the
+console is cut to shape with `clip-path`, and **`clip-path` clips every
+descendant regardless of `overflow: visible`**. So exactly the part that
+overhung the panel was the part being erased.
+
+Measured before the fix: badge `y=456`, panel `y=464` — an 8px overhang, all of
+it clipped. No `z-index`, `overflow` or stacking-context change can rescue an
+element from an ancestor's clip; it has to leave the ancestor.
+
+The nameplate is now `.mech-speaker`, a **sibling** of `<text-box>` positioned
+just above it by `syncSpeaker()`. The engine's `[data-ui="who"]` stays in the
+DOM (the engine writes into it, and its grid area must keep resolving or the
+dialogue column collapses) but is collapsed to zero size. Text and the
+character's colour are mirrored across each line.
+
+| Check | Result |
+|---|---|
+| Plate tracks speaker over 8 consecutive lines | OK (Рэн → Мия → Рэн → …) |
+| Narration line with no speaker | plate hides |
+| At 140% UI scale | still above panel, on-screen |
+
+## Ticker as the top rail
+
+`.mech-strip` now spans `y=0`, edge to edge, and the dashboard clears it via
+`--mech-hud-top` — measured from the rail rather than hardcoded, because the
+UI-scale setting changes the rail's height. As a top rail it costs ~16px, cheap
+enough to keep on landscape phones where it previously had to be hidden for
+colliding with the button bar.
+
+## UI scale is now a number
+
+Five preset buttons replaced with a numeric readout (tabular figures so digits
+do not jitter while stepping), −/+ steppers of 5%, a slider and a reset, over
+60–160%.
+
+| Action | Root font | Stored |
+|---|---|---|
+| +2 steps from 100 | 17.6px | `1.1` |
+| slider → 130 | 20.8px | `1.3` |
+| reset | 16px | `1` |
+
+## Audit
+
+```
+PASS phone_land  stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
+PASS phone_port  stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
+PASS small       stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
+PASS tablet      stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
+PASS desktop     stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
+```
