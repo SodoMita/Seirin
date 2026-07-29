@@ -797,3 +797,99 @@ report:
   material stays intact (screenshotted).
 - `node --test` (61/61), `es5-scan`, and `offline-smoke.mjs` (jsdom, 55+
   checks) all pass unchanged after every fix in this session.
+
+---
+
+# Session 10 — save/load screens, audio note, concept boards
+
+**Date:** 2026-07-29 · **Branch:** `arena/019faf00-seirin`
+**Trigger:** continuation from the Session 9 handoff; open items §4.
+
+## Save/Load screen dedicated pass
+
+The system-screen armour (§15) gave the dark instrument-bay backdrop,
+stencilled titles, and button typography, but save/load slots were still
+engine-default: coloured rectangles (`background-color: var(--main-color)`,
+`border-radius: 3px`) with a white text input for the slot name and a
+`padding: 0` save button.
+
+### What was measured before the fix
+
+| Element | Before (computed) |
+|---|---|
+| `save-slot` | transparent bg, `clip-path` present (from `data-mech="plate"`), `box-shadow: none`, white text |
+| `.badge` | transparent bg, white 11px text, no font-family override |
+| `[data-content="background"]` | 160px, thin border, no frame treatment |
+| `figcaption` | 16px white, default padding |
+| `[data-delete]` | 32×32px dark circle, 50% border-radius |
+| `input[data-input="slotName"]` | white background, gray border — looked like a 1998 form |
+| `button[data-action="save"]` | `padding: 0`, dark bg, no plate body |
+
+The JS half already tagged every `save-slot` with `data-mech="plate"` and
+injected the four `.mech-l` layers (face/wear/gloss/edge), so the plate
+substructure was there — it just had no layout or sub-element styling.
+
+### What changed
+
+**CSS** (`mecha-ui.css`, ~230 lines added in §15a):
+
+| Element | After |
+|---|---|
+| `save-slot` | flex column, chamfered clip-path, hover translateY(-3px) |
+| `[data-content="background"]` | 140px viewport window, cyan top-lip, inset shadow, CRT scanline overlay via `::after` |
+| `.badge` | Orbitron stencil label on dark steel strip, ellipsis overflow |
+| `figcaption` | amber timestamp, uppercase Rajdhani, bordered top |
+| `[data-delete]` | 26×26px red indicator rivet, radial gradient, 55% opacity → 100% on hover |
+| `input[data-input="slotName"]` | dark recessed field, cyan border glow on focus, italic placeholder |
+| `button[data-action="save"]` | chamfered plate with proper 8px 22px padding, drop-shadow hover |
+| `slot-container p[data-string]` | stencilled empty-state message |
+| `slot-container` | flex-wrap grid, 280px base, 200–320px range |
+
+**Verification (real Chromium 131, `@sparticuz/chromium`):**
+
+| Check | Result |
+|---|---|
+| Save slot width | 288px (flex: 0 1 280px) |
+| Badge font | Orbitron 11.52px, color rgb(220, 234, 248) |
+| Background height | 140px, border-top rgba(56, 189, 248, 0.45) |
+| Figcaption color | rgb(251, 191, 36) — amber |
+| Delete button | radial-gradient red, positioned top-right 4px |
+| All tests | 61/61 pass, smoke PASS, ES5 clean, probe 19 plates |
+
+## Audio status note
+
+The engine ships four volume sliders (Music, Sound, Voice, Video) in the
+settings screen. These ARE wired to the engine's Volume preferences and
+persist across saves. But no audio files ship in `game/assets/` — the
+sliders move but have nothing to affect. Per the handoff: "a control that
+does nothing is a small lie in the UI."
+
+Fix: `buildAudioNote()` in `mecha-ui.js` appends a `.mech-audio-note`
+paragraph to the audio panel. Dashed amber border, warning icon, muted
+text: "Аудиофайлы ещё не добавлены. Ползунки работают — настройки
+сохранятся, когда появится звук." Called from both the initial start and
+the DOM observer re-mount, so it survives screen transitions.
+
+## Concept boards 06–08
+
+Three new reference boards generated for the mecha UI build checklist:
+
+| Board | Purpose |
+|---|---|
+| `06_plate_taxonomy.jpg` | Cross-section reference for 6 plate types (console housing, instrument bay, data cartridge, control plate, structural frame, indicator strip) with material callouts |
+| `07_settings_dashboard.jpg` | Settings screen concept showing bolted equipment panels, machined sliders, and scale control layout |
+| `08_save_load_cartridges.jpg` | Data cartridge save slots with viewport windows, amber labels, and delete indicator LEDs |
+
+These inform CSS bevel/gradient recipes the same way `01–04` were used for
+the original armour pass and `05` for button states.
+
+## Verified state at end of session
+
+| Check | Result |
+|---|---|
+| `node --test` (61 tests) | 61 pass, 0 fail |
+| `offline-smoke.mjs` | SMOKE PASSED |
+| `es5-scan.mjs` | clean |
+| `mecha-ui.probe.mjs` | 19 plates, 0 errors, indicators correct |
+| `wc -l mecha-ui.css` | ~3690 lines (+231 from session start) |
+| `wc -l mecha-ui.js` | ~1640 lines (+28 from session start) |
