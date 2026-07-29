@@ -1073,9 +1073,16 @@ main-screen {
     linear-gradient(rgba(8, 10, 18, 0.82), rgba(6, 8, 14, 0.96)),
     url('../assets/scenes/courtyard.png?v=20260728r11') center/cover no-repeat !important;
   animation: none;
-  /* [data-screen].active already sets display:flex; flex-direction:column
-     (monogatari.css) — this just makes the intent explicit and pins it
-     against anything upstream changing later. */
+}
+/* [data-screen].active is what the engine toggles (monogatari.css:
+   `[data-screen]{display:none}` / `.active{display:flex}`). Scoping the
+   flex-column declarations to `.active` here, instead of the bare
+   `main-screen` selector, matters: an unconditional `display:flex !important`
+   on main-screen showed the title screen and the game screen SIDE BY SIDE at
+   the same time — main-screen never actually hides once forced visible,
+   because `!important` on a bare-element selector beats the engine's own
+   `[data-screen]{display:none}` regardless of which screen is active. */
+main-screen.active {
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
