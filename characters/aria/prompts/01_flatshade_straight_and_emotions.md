@@ -19,3 +19,12 @@ toe, bouncy light stance. Same outfit/identity/canvas/background.
 Whole-body sad edit: downcast glossy eyes, small frown, shoulders drawn in,
 arms crossed hugging herself, weight back on heels, withdrawn closed-off
 stance. Same outfit/identity/canvas/background.
+
+## Defect found on review (2026-07-29, post-ship)
+`_wip/aria_happy_v2_wholebody.png` / shipped `aria_happy_v2.png` has an extra
+third hand: in addition to both hands correctly raised to the headphones, a
+disembodied hand appears gripping the coat hem near her right hip. Not caught
+before commit `e0ea244`. **Needs regeneration** with an explicit
+"exactly two hands, both at the headphones, no third hand anywhere" negative
+constraint. See `../../ai_agent_docs/skills/seirin-character-art/_session_notes.md`
+for the full defect list across characters.
