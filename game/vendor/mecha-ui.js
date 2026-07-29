@@ -717,8 +717,7 @@
                 queued = null;
                 try { mountAll(doc); } catch (e) { /* never break the page */ }
                 try { syncChoices(); } catch (e) { /* never break the page */ }
-                try { syncSpeaker(); } catch (e) { /* never break the page */ }
-                try { syncModalFlag(); } catch (e) { /* never break the page */ }
+                        try { syncModalFlag(); } catch (e) { /* never break the page */ }
             }, 120);
         });
         try {
@@ -982,7 +981,7 @@
         doc.documentElement.style.fontSize = (16 * n).toFixed(3) + 'px';
         try { if (global.localStorage) { global.localStorage.setItem(SCALE_KEY, String(n)); } } catch (e) { /* private mode */ }
         /* Every chrome measurement is in rem, so re-measure after a change. */
-        try { syncStripTop(); syncQuickMenu(); syncSpeaker(); } catch (e) { /* ignore */ }
+        try { syncStripTop(); syncQuickMenu(); } catch (e) { /* ignore */ }
     }
 
     /* Numeric UI-scale control: a percentage readout with −/+ steppers and a
@@ -1042,65 +1041,14 @@
         paintSlider(range);
     }
 
-    /* ================================================================== *
-     * 4g. SPEAKER NAMEPLATE — mirrored OUTSIDE the clipped console
-     * ------------------------------------------------------------------
-     * The console is cut to shape with clip-path, and clip-path clips every
-     * descendant no matter what overflow says. So a badge lifted above the
-     * panel edge simply lost its overhang to the clip — the reported
-     * "имя ... обрезается фоном диалога".
-     *
-     * The engine's [data-ui="who"] stays where it is (its grid area has to
-     * keep resolving, and the engine writes into it), but is collapsed to
-     * zero size. Its text and colour are mirrored into a sibling element
-     * positioned just above the console, outside the clip, where there is no
-     * panel background behind it.
-     * ================================================================== */
-    function syncSpeaker () {
-        var box = doc.querySelector('text-box');
-        var who = doc.querySelector('[data-ui="who"]');
-        if (!box || !box.parentNode) { return; }
-
-        var plate = doc.querySelector('.mech-speaker');
-        if (!plate) {
-            plate = doc.createElement('div');
-            plate.className = 'mech-speaker';
-            plate.setAttribute('aria-hidden', 'true');   /* the real name is in the DOM already */
-            box.parentNode.insertBefore(plate, box);
-        }
-
-        var name = who ? (who.textContent || '') : '';
-        name = name.replace(/^\s+|\s+$/g, '');
-        /* Narration lines have no speaker: hide the plate entirely rather
-           than leaving an empty chip floating over the artwork. */
-        if (!name || !box.offsetParent) {
-            if (plate.className !== 'mech-speaker') { plate.className = 'mech-speaker'; }
-            return;
-        }
-
-        if (plate.__mechName !== name) {
-            plate.__mechName = name;
-            plate.textContent = name;
-        }
-        /* Inherit the character colour the engine puts on the original. */
-        var colour = '';
-        try { colour = global.getComputedStyle(who).color; } catch (e) { colour = ''; }
-        if (colour && plate.style.color !== colour) { plate.style.color = colour; }
-
-        /* Park it straddling the console's top edge. Both are positioned
-           against game-screen, so convert through that box. */
-        var host = box.parentNode;
-        var hRect, bRect;
-        try {
-            hRect = host.getBoundingClientRect();
-            bRect = box.getBoundingClientRect();
-        } catch (e) { return; }
-        if (!bRect || !bRect.height) { return; }
-        var pH = plate.offsetHeight || 26;
-        plate.style.left = Math.round(bRect.left - hRect.left + 18) + 'px';
-        plate.style.top = Math.round(bRect.top - hRect.top - pH * 0.62) + 'px';
-        if (plate.className !== 'mech-speaker show') { plate.className = 'mech-speaker show'; }
-    }
+    /* NOTE: there is deliberately no speaker-plate code here any more.
+       The nameplate used to be mirrored into a sibling element and positioned
+       from JS every frame-ish, which the user correctly spotted as "выглядит
+       будто имя перемещается скриптом" — it lagged a frame behind the line.
+       It is now pure CSS: <text-box> is a transparent container and the
+       console plating lives on [data-content="text"], so the engine's own
+       name row is simply the list item above the background. See the SPEAKER
+       NAMEPLATE block in mecha-ui.css. */
 
     /* ================================================================== *
      * 4h. MODAL-OPEN FLAG (performance)
@@ -1161,7 +1109,6 @@
         try { syncQuickMenu(); } catch (e) { /* decorative only */ }
         try { tagLogRows(); } catch (e) { /* decorative only */ }
         try { buildScaleControl(); } catch (e) { /* decorative only */ }
-        try { syncSpeaker(); } catch (e) { /* decorative only */ }
         try { syncModalFlag(); } catch (e) { /* decorative only */ }
         try { observeDom(); } catch (e) { /* decorative only */ }
         try { bindParallax(); } catch (e) { /* decorative only */ }
@@ -1184,7 +1131,6 @@
                 try { syncQuickMenu(); } catch (e) { /* ignore */ }
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
-                try { syncSpeaker(); } catch (e) { /* ignore */ }
                 try { syncModalFlag(); } catch (e) { /* ignore */ }
             }, 900);
         }
@@ -1204,7 +1150,6 @@
         syncStripTop: syncStripTop,
         syncQuickMenu: syncQuickMenu,
         tagLogRows: tagLogRows,
-        syncSpeaker: syncSpeaker,
         syncModalFlag: syncModalFlag,
         applyScale: applyScale,
         readScale: readScale,

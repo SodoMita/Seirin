@@ -2497,35 +2497,52 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
   overflow: visible;
 }
 
-/* SPEAKER NAMEPLATE — lives OUTSIDE the console, as its own element.
+/* SPEAKER NAMEPLATE — pure CSS, no scripted positioning.
  *
- * Why it cannot be a child of <text-box>: the console is cut to shape with
- * clip-path, and clip-path clips EVERY descendant regardless of
- * overflow:visible. Lifting the badge with a negative translate therefore just
- * sliced its top 8px off against the panel edge (measured: badge y=456 vs
- * panel y=464, overhang 8px, all of it clipped) — which is exactly the
- * "обрезается фоном" report.
+ * The user's suggestion, and it is the right one: make the name and the panel
+ * background two rows of one vertical list. The name is then simply the row
+ * ABOVE the background — no negative offsets, no measuring, nothing for JS to
+ * keep in sync (the plate visibly lagged a frame behind the spoken line).
  *
- * mecha-ui.js mirrors the speaker into <div class="mech-speaker">, a sibling
- * of the console positioned just above it. Being outside the clipped element,
- * it renders whole, and there is no panel background behind it. The engine's
- * own name row stays in the DOM (its grid area must keep resolving) but is
- * collapsed to zero size.
+ * How it works:
+ *   <text-box> keeps the engine's grid but becomes a transparent CONTAINER,
+ *   so its clip-path no longer exists to cut the name off — that clip is what
+ *   mangled every earlier attempt.
+ *   The console plating moves down onto [data-content="text"], the row that
+ *   actually holds the dialogue. The header row (the name) sits above that
+ *   plating in normal flow: it renders whole, with no background behind it.
  */
-[data-screen="game"] text-box [data-content="name"] {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
+[data-screen="game"] text-box {
+  background: none !important;
+  clip-path: none !important;
+  filter: none !important;
+  overflow: visible;
+  padding: 0 !important;
+  min-height: 0 !important;
 }
+/* Armour layers belonged to the container; the text row paints itself now. */
+[data-screen="game"] text-box > .mech-l { display: none !important; }
 
-.mech-speaker {
-  position: absolute;
-  z-index: 60;                 /* above the console (50), below modals */
-  display: none;
+/* Row 1 — nameplate, in normal flow, above the plating. */
+[data-screen="game"] text-box [data-content="name"] {
+  position: static;
+  display: flex;
+  align-items: flex-end;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  opacity: 1;
+  margin: 0 0 -2px 18px;   /* -2px tucks the plate base under the panel lip */
+  padding: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-screen="game"] [data-ui="who"] {
+  display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: calc(100% - 36px);
   padding: 5px 22px 5px 13px;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 800;
@@ -2533,48 +2550,92 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #dff1ff;
   background:
     linear-gradient(170deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.42) 62%),
     linear-gradient(150deg, #22405c 0%, #0a1521 100%);
+  border: none;
   border-left: 3px solid var(--mech-cyan);
+  border-radius: 0;
+  box-shadow: none;
   clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
   text-shadow: 0 0 10px rgba(56, 189, 248, 0.6), 0 1px 0 rgba(0, 0, 0, 0.9);
   filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
-  pointer-events: none;
 }
-.mech-speaker.show { display: inline-flex; }
-/* Live indicator, matching the old in-panel badge. */
-.mech-speaker::after {
-  content: '';
-  width: 5px;
-  height: 5px;
-  margin-left: 9px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 8px currentColor;
-  animation: mechPulse 1.6s ease-in-out infinite;
-}
+[data-screen="game"] [data-ui="who"]:empty { display: none; }
 
-/* The amber rule under the name is no longer needed — the badge itself is the
-   separator now, and the rule wasted another 10px of height. */
+/* Row 2 — the console plating, carrying the dialogue. */
 [data-screen="game"] text-box [data-content="text"] {
+  grid-column: 1 / -1;        /* span the (unused) side-image column too */
+  position: relative;
+  isolation: isolate;
+  padding: 16px 30px 18px;
+  /* A dimmer rim than the standard plate: at 55px tall the full machined
+     gradient washed the panel out and swallowed the dialogue. */
+  background: linear-gradient(158deg,
+      #6f7e93 0%, #47536a 18%, #2a3346 48%, #161d29 78%, #55627a 100%);
+  clip-path: polygon(34px 0, 100% 0, 100% calc(100% - 18px),
+      calc(100% - 18px) 100%, 0 100%, 0 34px);
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
   border-top: none;
   margin-top: 0;
-  padding-top: 2px;
 }
+[data-screen="game"] text-box [data-content="text"]::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  background-color: #161d2a;
+  background-image:
+    linear-gradient(180deg,
+      rgba(6, 10, 16, 0.10) 0%, rgba(4, 7, 12, 0.64) 22%,
+      rgba(4, 7, 12, 0.64) 68%, rgba(6, 11, 18, 0.34) 88%,
+      rgba(28, 40, 58, 0.16) 100%),
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none);
+  background-size: auto, auto, 128px 128px;
+  clip-path: polygon(32px 0, 100% 0, 100% calc(100% - 16px),
+      calc(100% - 16px) 100%, 0 100%, 0 32px);
+}
+[data-screen="game"] text-box [data-content="text"]::after {
+  /* Running edge light + the bolt rows the container used to carry. Both live
+     on this pseudo-element so the plating reads as one machined panel rather
+     than a plain dark rectangle. */
+  content: '';
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    /* amber running light along the top lip */
+    linear-gradient(90deg, transparent,
+      rgba(251, 191, 36, 0.9) 45%, #fff 50%, rgba(251, 191, 36, 0.9) 55%, transparent),
+    /* bolt row, top */
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.30) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 50% 62%, rgba(0, 0, 0, 0.60) 0 1.8px, transparent 2.5px),
+    /* bolt row, bottom */
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.30) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 50% 62%, rgba(0, 0, 0, 0.60) 0 1.8px, transparent 2.5px);
+  background-size: 55% 2px, 30px 8px, 30px 8px, 30px 8px, 30px 8px;
+  background-position: 0 0, 16px 5px, 16px 5px, 16px calc(100% - 5px), 16px calc(100% - 5px);
+  background-repeat: no-repeat, repeat-x, repeat-x, repeat-x, repeat-x;
+  animation: mechEdgeRun 5.5s ease-in-out infinite;
+}
+[data-screen="game"] text-box [data-content="side-image"]:empty { display: none; }
+
 [data-screen="game"] [data-ui="say"] {
   font-size: 1.06rem;
   line-height: 1.5;
 }
-[data-screen="game"] text-box p { padding: 0.3rem 0.4rem; }
 
 /* Narration (no speaker) needs no reserved space at all. */
 [data-screen="game"] text-box [data-content="name"]:has([data-ui="who"]:empty) { display: none; }
 
 @media screen and (max-width: 37.5em), screen and (max-height: 30em) {
-  [data-screen="game"] text-box { padding: 12px 18px 13px !important; }
-  .mech-speaker { font-size: 0.86rem; padding: 4px 16px 4px 10px; }
+  [data-screen="game"] [data-ui="who"] { font-size: 0.86rem; padding: 4px 16px 4px 10px; }
+  [data-screen="game"] text-box [data-content="text"] { padding: 12px 18px 13px; }
   [data-screen="game"] [data-ui="say"] { font-size: 0.95rem; line-height: 1.42; }
 }
 

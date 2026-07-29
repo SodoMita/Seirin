@@ -62,3 +62,11 @@ test-results/
 # Note: archives/*.tar.gz + archives/*.bundle are INTENTIONAL, small project
 # snapshots produced by tools/ and stay tracked. If you ever generate
 # throwaway archives elsewhere, ignore those paths individually instead.
+
+# UI reference screenshots: JPEG only. A full-page PNG screenshot is ~1-2 MB
+# and these are review material, not assets — 45 of them once reached 34 MB in
+# Git (they now weigh 3.4 MB as JPEG). Capture with
+# `node design/tools/shrink-shots.mjs` after taking new ones, which converts
+# and deletes the PNGs. Concept boards are JPEG for the same reason.
+design/preview/shots/*.png
+design/concepts/*.png
