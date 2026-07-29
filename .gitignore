@@ -70,3 +70,9 @@ test-results/
 # and deletes the PNGs. Concept boards are JPEG for the same reason.
 design/preview/shots/*.png
 design/concepts/*.png
+
+# Compiled art-pipeline binaries: rebuild each session with
+# tools/img_pipeline/build.sh (gcc -O2, a few seconds). Source (.c/.h) is
+# committed; the platform-specific binary is not.
+tools/img_pipeline/upscale_filter
+tools/img_pipeline/matte_floodfill
