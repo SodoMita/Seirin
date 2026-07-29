@@ -632,15 +632,21 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             workshop: 'workshop.png', tsukimachi: 'tsukimachi.png', lab: 'lab.png',
             cathedral: 'cathedral.png', port: 'port.png', dojo: 'dojo.png' });
         engine.characters({
-            ren: { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal.png' } },
+            /* 2026-07-29 art pass: normal sprites upscaled to the Miya/Kurogane
+             * flat-shading style at 2048px delivery (4x source, WebP). ren and
+             * kaito additionally gained whole-body happy/sad expression sprites
+             * (sprites.happy / sprites.sad) — not yet used by any 'show
+             * character' line, available for future script work. Originals are
+             * kept at characters/<id>/<id>_normal.png, untouched. */
+            ren: { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal_v2.webp', happy: 'ren_happy_v2.webp', sad: 'ren_sad_v2.webp' } },
             miya: { name: 'Мия Кагэцуки', color: '#f472b6', directory: '', sprites: { normal: 'miya_normal.png' } },
             splash: { name: 'S.P.L.A.S.H.', color: '#38bdf8', directory: '', sprites: { normal: 'splash_normal.png' } },
             stella: { name: 'Стелла', color: '#e879f9', directory: '', sprites: { normal: 'stella_normal.png' } },
-            reika: { name: 'Рейка Такасиро', color: '#f87171', directory: '', sprites: { normal: 'reika_normal.png' } },
-            saya: { name: 'Сая Мизуки', color: '#38bdf8', directory: '', sprites: { normal: 'saya_normal.png' } },
+            reika: { name: 'Рейка Такасиро', color: '#f87171', directory: '', sprites: { normal: 'reika_normal_v2.webp' } },
+            saya: { name: 'Сая Мизуки', color: '#38bdf8', directory: '', sprites: { normal: 'saya_normal_v2.webp' } },
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.png' } },
-            kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.png' } },
-            momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.png' } },
+            kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal_v2.webp', happy: 'kaito_happy_v2.webp', sad: 'kaito_sad_v2.webp' } },
+            momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal_v2.webp' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' }
         });
