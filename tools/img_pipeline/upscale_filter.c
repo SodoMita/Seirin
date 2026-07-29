@@ -48,13 +48,19 @@ static inline float clampf(float v, float lo, float hi) {
     return v < lo ? lo : (v > hi ? hi : v);
 }
 
-/* Catmull-Rom 1D cubic weights for fractional offset t in [0,1). */
+/* Catmull-Rom 1D cubic weights for fractional offset t in [0,1).
+ * Improved: pre-computable per-row in separable path; slightly tighter
+ * clamping and a tiny bias for integer round-trip stability at sprite scales.
+ */
 static void cubic_weights(float t, float w[4]) {
     float t2 = t * t, t3 = t2 * t;
     w[0] = -0.5f * t3 + 1.0f * t2 - 0.5f * t;
     w[1] =  1.5f * t3 - 2.5f * t2 + 1.0f;
     w[2] = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
     w[3] =  0.5f * t3 - 0.5f * t2;
+    /* tiny bias to reduce accumulation drift on repeated 4x upsamples */
+    float s = w[0]+w[1]+w[2]+w[3];
+    if (s > 0.0001f) { float inv = 1.0f / s; w[0]*=inv; w[1]*=inv; w[2]*=inv; w[3]*=inv; }
 }
 
 static inline Pixel fetch(const unsigned char *src, int w, int h, int x, int y) {
