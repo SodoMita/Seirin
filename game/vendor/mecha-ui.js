@@ -707,6 +707,7 @@
      * ================================================================== */
     var observer = null;
     var pollTimer = null;
+    var animTimer = null;
 
     function observeDom () {
         if (observer || typeof global.MutationObserver !== 'function') { return; }
@@ -719,6 +720,7 @@
                 try { syncChoices(); } catch (e) { /* never break the page */ }
                         try { syncModalFlag(); } catch (e) { /* never break the page */ }
                 try { undraggable(); } catch (e) { /* never break the page */ }
+                try { tickAnimations(); } catch (e) { /* never break the page */ }
             }, 120);
         });
         try {
@@ -1052,6 +1054,228 @@
        NAMEPLATE block in mecha-ui.css. */
 
     /* ================================================================== *
+     * 4j. EVENT ANIMATION DRIVER
+     * ------------------------------------------------------------------
+     * Diagnosis behind this block: the ambient loops WERE running (74 of them,
+     * verified with getComputedStyle + document.getAnimations), but two things
+     * made the interface read as static.
+     *
+     *   1. Amplitude. Measured travel per second: sprite breathing 1.3px/s,
+     *      Ken Burns 0.001 scale/s, motes 2.3vh/s. Slow drift only registers
+     *      above roughly 3px/s, so all of it was technically animating and
+     *      perceptually frozen. Fixed by re-timing the keyframes.
+     *   2. Nothing REACTED. Every state change was an instant value swap: a
+     *      new speaker, a stat moving, the alert rising, a choice taken. That
+     *      is what this driver adds.
+     *
+     * It only ever adds/removes classes and short-lived overlay nodes, and
+     * reads engine state — it never mutates the game.
+     * ================================================================== */
+
+    /* Restart a CSS animation that may already be on the element: removing the
+       class, forcing reflow, then re-adding is the only reliable way. */
+    function replay (node, cls, ms) {
+        if (!node || !node.classList) { return; }
+        node.classList.remove(cls);
+        /* eslint-disable-next-line no-unused-expressions */
+        node.offsetWidth;
+        node.classList.add(cls);
+        global.setTimeout(function () {
+            if (node.classList) { node.classList.remove(cls); }
+        }, ms || 700);
+    }
+
+    /* A short-lived overlay node that removes itself when done. */
+    function flash (parent, cls, ms, text) {
+        if (!parent) { return null; }
+        var n = doc.createElement('div');
+        n.className = cls;
+        n.setAttribute('aria-hidden', 'true');
+        if (text) { n.textContent = text; }
+        parent.appendChild(n);
+        global.setTimeout(function () {
+            if (n.parentNode) { n.parentNode.removeChild(n); }
+        }, ms);
+        return n;
+    }
+
+    /* Float a "+5" delta ABOVE the badge it belongs to.
+       It cannot be a child of that badge: the HUD badges are cut with
+       clip-path and set overflow:hidden, and clip-path clips every descendant
+       (the same trap that mangled the speaker nameplate — measured here too:
+       the pill rendered at y=31 inside a host starting at y=38 and lost the
+       overhang). So the pill goes into a dedicated full-screen layer and is
+       positioned over the badge in viewport coordinates. */
+    function floatDelta (host, text, isDown) {
+        var layer = doc.querySelector('.mech-fx');
+        if (!layer) {
+            layer = doc.createElement('div');
+            layer.className = 'mech-fx';
+            layer.setAttribute('aria-hidden', 'true');
+            doc.body.appendChild(layer);
+        }
+        var r;
+        try { r = host.getBoundingClientRect(); } catch (e) { return; }
+        if (!r || !r.width) { return; }
+        var n = doc.createElement('div');
+        n.className = 'mech-delta' + (isDown ? ' down' : '');
+        n.textContent = text;
+        n.style.left = Math.round(r.left + r.width / 2) + 'px';
+        n.style.top = Math.round(r.top) + 'px';
+        layer.appendChild(n);
+        global.setTimeout(function () {
+            if (n.parentNode) { n.parentNode.removeChild(n); }
+        }, 1300);
+    }
+
+    /* Previous frame of everything we react to. */
+    var prev = { speaker: null, line: null, scene: null, sprites: 0,
+        stats: null, alert: 0, choiceCount: 0 };
+
+    function statsSnapshot () {
+        var p2 = null;
+        try {
+            if (global.engine && typeof global.engine.storage === 'function') {
+                p2 = global.engine.storage('player');
+            }
+        } catch (e) { p2 = null; }
+        return p2 || {};
+    }
+
+    var STAT_LABELS = {
+        miya_affinity: 'МИЯ', momo_affinity: 'МОМО', ai_empathy: 'ИИ',
+        philosophical_depth: 'РЕФЛЕКСИЯ', procrastination: 'ПРОКРАСТ.',
+        akatomi_alert: 'ТРЕВОГА'
+    };
+
+    function reactToStats () {
+        var now = statsSnapshot();
+        if (!prev.stats) { prev.stats = now; prev.alert = Number(now.akatomi_alert) || 0; return; }
+        var key, before, after, delta, host;
+        for (key in STAT_LABELS) {
+            if (!Object.prototype.hasOwnProperty.call(STAT_LABELS, key)) { continue; }
+            before = Number(prev.stats[key]) || 0;
+            after = Number(now[key]) || 0;
+            if (after === before) { continue; }
+            delta = after - before;
+            /* Float the change off the alert badge for alert, gauges for rest. */
+            host = (key === 'akatomi_alert')
+                ? doc.getElementById('hud-alert-level')
+                : doc.querySelector('.mech-gauge[data-k="res"]');
+            /* The instrument bay is hidden below 72em (the degradation ladder),
+               so its gauges have a zero rect and the pill had nowhere to float
+               from — non-alert stat changes produced no feedback at all on any
+               screen narrower than ~1150px. Fall back to a badge that is always
+               present. */
+            if (!host || !host.getBoundingClientRect().width) {
+                host = doc.getElementById('hud-route') || doc.getElementById('hud-player-name');
+            }
+            if (host) {
+                /* Colour by MEANING, not by sign: rising Akatomi alert and
+                   rising procrastination are bad news even though the number
+                   goes up, so they float red like a loss would. */
+                var bad = (key === 'akatomi_alert' || key === 'procrastination')
+                    ? delta > 0 : delta < 0;
+                floatDelta(host, (delta > 0 ? '+' : '') + delta + ' ' + STAT_LABELS[key], bad);
+                replay(host, 'mech-set', 700);
+            }
+        }
+        /* Gauge flare, keyed to the direction of travel. */
+        var gauges = doc.querySelectorAll('.mech-gauge');
+        var i, g, k, vEl, val;
+        for (i = 0; i < gauges.length; i++) {
+            g = gauges[i];
+            k = g.getAttribute('data-k');
+            vEl = g.querySelector('.mech-gauge-v');
+            if (!vEl) { continue; }
+            val = parseInt(vEl.textContent, 10);
+            if (isNaN(val)) { continue; }
+            if (g.__mechLast === undefined) { g.__mechLast = val; continue; }
+            if (val !== g.__mechLast) {
+                replay(g, val > g.__mechLast ? 'mech-bump' : 'mech-drop', 600);
+                g.__mechLast = val;
+            }
+        }
+        /* Alert crossing upward is the loudest event in the game. */
+        var alertNow = Number(now.akatomi_alert) || 0;
+        if (alertNow > prev.alert) {
+            replay(doc.querySelector('.cyber-top-hud'), 'mech-hit', 500);
+            if (alertNow - prev.alert >= 5 || alertNow >= 40) {
+                flash(doc.body, 'mech-threat', 1200);
+            }
+        }
+        prev.alert = alertNow;
+        prev.stats = now;
+    }
+
+    function reactToDialogue () {
+        var who = doc.querySelector('[data-ui="who"]');
+        var say = doc.querySelector('[data-ui="say"]');
+        var textRow = doc.querySelector('text-box [data-content="text"]');
+        var name = who ? (who.textContent || '').replace(/^\s+|\s+$/g, '') : '';
+        var line = say ? (say.textContent || '').slice(0, 40) : '';
+
+        if (name && name !== prev.speaker) {
+            replay(who, 'mech-in', 500);
+            prev.speaker = name;
+        } else if (!name) { prev.speaker = null; }
+
+        /* A new line starts when the visible text stops being a prefix of the
+           previous one — the typewriter grows the same string character by
+           character, so a plain !== would fire on every frame of typing. */
+        if (line && prev.line !== null && line.indexOf(prev.line.slice(0, 12)) !== 0) {
+            replay(textRow, 'mech-line', 600);
+        }
+        prev.line = line;
+    }
+
+    function reactToScene () {
+        var stage = doc.querySelector('game-screen');
+        if (!stage) { return; }
+        var bg = doc.querySelector('game-screen [data-ui="background"], game-screen [data-content="background"]');
+        var key = '';
+        if (bg) {
+            key = bg.getAttribute('src') || getComputedStyle(bg).backgroundImage || '';
+        }
+        if (prev.scene === null) { prev.scene = key; }
+        else if (key && key !== prev.scene) {
+            flash(stage, 'mech-wipe', 850);
+            prev.scene = key;
+        }
+        /* Sprites entering get a step-in rather than a bare fade. */
+        var sprites = doc.querySelectorAll('game-screen [data-character]');
+        var i;
+        for (i = 0; i < sprites.length; i++) {
+            if (!sprites[i].__mechSeen) {
+                sprites[i].__mechSeen = true;
+                replay(sprites[i], 'mech-enter', 600);
+            }
+        }
+    }
+
+    function bindChoiceCommit () {
+        var c = doc.querySelector('choice-container');
+        if (!c || c.__mechCommitBound) { return; }
+        c.__mechCommitBound = true;
+        /* Capture phase: the engine tears the container down on click, so the
+           class has to land before its own handler runs. */
+        c.addEventListener('click', function (evt) {
+            var el2 = evt.target;
+            while (el2 && el2 !== c && el2.tagName !== 'BUTTON') { el2 = el2.parentNode; }
+            if (el2 && el2.tagName === 'BUTTON' && el2.classList) {
+                el2.classList.add('mech-commit');
+            }
+        }, true);
+    }
+
+    function tickAnimations () {
+        try { reactToDialogue(); } catch (e) { /* never break the page */ }
+        try { reactToScene(); } catch (e) { /* never break the page */ }
+        try { reactToStats(); } catch (e) { /* never break the page */ }
+        try { bindChoiceCommit(); } catch (e) { /* never break the page */ }
+    }
+
+    /* ================================================================== *
      * 4i. NATIVE GESTURE GUARD
      * ------------------------------------------------------------------
      * CSS handles the look of this (section 28), but two things need JS:
@@ -1179,6 +1403,7 @@
         try { buildScaleControl(); } catch (e) { /* decorative only */ }
         try { syncModalFlag(); } catch (e) { /* decorative only */ }
         try { bindGestureGuard(); } catch (e) { /* decorative only */ }
+        try { tickAnimations(); } catch (e) { /* decorative only */ }
         try { observeDom(); } catch (e) { /* decorative only */ }
         try { bindParallax(); } catch (e) { /* decorative only */ }
         try { bindResize(); } catch (e) { /* decorative only */ }
@@ -1204,6 +1429,14 @@
                 try { undraggable(); } catch (e) { /* ignore */ }
             }, 900);
         }
+        /* Dialogue and stats change far faster than the 900ms housekeeping
+           poll; a speaker swap must be acknowledged in the same beat the line
+           appears, so the reactive layer gets its own tighter timer. */
+        if (!animTimer) {
+            animTimer = global.setInterval(function () {
+                try { tickAnimations(); } catch (e) { /* ignore */ }
+            }, 180);
+        }
     }
 
     if (doc.readyState === 'loading') { doc.addEventListener('DOMContentLoaded', start); }
@@ -1222,6 +1455,7 @@
         tagLogRows: tagLogRows,
         syncModalFlag: syncModalFlag,
         undraggable: undraggable,
+        tickAnimations: tickAnimations,
         applyScale: applyScale,
         readScale: readScale,
         rewindSteps: rewindSteps,
@@ -1230,6 +1464,7 @@
         mounted: function () { return mountCount; },
         stop: function () {
             if (pollTimer) { global.clearInterval(pollTimer); pollTimer = null; }
+            if (animTimer) { global.clearInterval(animTimer); animTimer = null; }
             if (observer) { observer.disconnect(); observer = null; }
             if (pointerBound) { doc.removeEventListener('mousemove', onPointer, true); pointerBound = false; }
         }
