@@ -2092,11 +2092,22 @@ message-modal,
   z-index: 300;
 }
 
+/* monogatari.css ships `.modal>*{width:40%}` and centres .modal__content with
+   position:absolute + translate(-50%,-50%). Those win over a bare element
+   selector, which is why the dialog rendered as a full-height 40% column.
+   Matching .modal__content explicitly (and keeping the engine's centring
+   transform) is what makes the card size to its content. */
+alert-modal.modal > .modal__content,
+message-modal.modal > .modal__content,
 alert-modal .modal__content,
-message-modal .modal__content,
-alert-modal > div,
-message-modal > div {
-  position: relative;
+message-modal .modal__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: auto !important;
+  max-height: 86vh;
+  overflow: auto;
   isolation: isolate;
   background:
     linear-gradient(170deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.30) 60%),
@@ -2170,13 +2181,19 @@ message-modal [data-content="actions"] button:hover {
   filter: brightness(1.28) drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
   transform: translateY(-1px);
 }
-/* The destructive action is unmistakably red; cancel stays neutral. */
+/* The destructive action is unmistakably red; cancel stays neutral.
+   !important because the generic actions rule above shares specificity and
+   would win on source order. */
+alert-modal [data-content="actions"] button[data-action="quit"],
+alert-modal [data-content="actions"] button[data-action="delete"],
 alert-modal [data-action="quit"],
 alert-modal [data-action="delete"] {
   color: #fff0f0 !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.28)),
-    linear-gradient(150deg, #7f2230 0%, #3a1017 100%) !important;
+    linear-gradient(150deg, #8f2434 0%, #431219 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 3px 7px rgba(0, 0, 0, 0.6),
+    0 0 14px rgba(248, 113, 113, 0.25);
 }
 alert-modal [data-action="quit"]:hover,
 alert-modal [data-action="delete"]:hover {
@@ -2199,6 +2216,11 @@ dialog-log {
   z-index: 300;
 }
 dialog-log .modal__content {
+  /* Column layout so the Close button is a flex item that always reserves its
+     own row — as a plain block it was pushed past the panel's max-height and
+     rendered half-clipped behind the bottom edge. */
+  display: flex;
+  flex-direction: column;
   background:
     linear-gradient(170deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.30) 60%),
     linear-gradient(150deg, #202a3a 0%, #0e141d 100%) !important;
@@ -2213,8 +2235,10 @@ dialog-log .modal__content {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 18px 44px rgba(0, 0, 0, 0.8);
 }
 dialog-log [data-content="log"] {
+  flex: 1 1 auto;
+  min-height: 0;             /* let the scroller shrink inside the flex column */
   overflow-y: auto;
-  max-height: 68vh;
+  max-height: none;
   padding-right: 6px;
   scrollbar-width: thin;
   scrollbar-color: rgba(56, 189, 248, .55) rgba(8, 12, 18, .6);
@@ -2288,7 +2312,8 @@ dialog-log [data-content="placeholder"] {
   color: #64748b;
 }
 dialog-log > .modal__content > button[data-action="dialog-log"] {
-  display: block;
+  flex: none;
+  align-self: center;
   margin: 12px auto 0;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 800;

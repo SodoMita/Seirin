@@ -611,6 +611,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 LoadAutoSaveSlots: 'Автосохранения', Cancel: 'Отмена', Confirm: 'Подтвердить',
                 /* dialogs */
                 Delete: 'Удалить', OK: 'ОК',
+                Confirm: 'Выйти из игры? Несохранённый прогресс будет потерян.',
                 Quit_Confirmation: 'Выйти из игры?',
                 Delete_Confirmation: 'Удалить это сохранение?',
                 Load_Confirmation: 'Загрузить сохранение? Несохранённый прогресс будет потерян.',
