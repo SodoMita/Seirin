@@ -2767,3 +2767,96 @@ html.mech-modal-open alert-modal .modal__content {
   contain: layout paint style;
 }
 .graph-col { content-visibility: auto; contain-intrinsic-size: auto 380px; }
+
+/* ============================================================================
+ * 28. VIEWPORT LOCK & NATIVE TOUCH GESTURES
+ * ----------------------------------------------------------------------------
+ * Reported: "страница с игрой не должна скроллиться" and "долгое нажатие на
+ * спрайты не должно вызывать меню картинки".
+ *
+ * A visual novel is a fixed-viewport app, but the page was still a scrollable
+ * document with default image behaviour, so on a phone the player could drag
+ * the whole game up and down and long-pressing a character opened the
+ * browser's Save/Copy image sheet on top of the scene.
+ *
+ * Measured before the fix (400x820, touch emulation):
+ *   overscroll-behavior: auto   -> rubber-band / pull-to-refresh reached
+ *                                  the document
+ *   touch-action: auto          -> pan + double-tap zoom on the stage
+ *   sprite draggable = true     -> drag ghost, and the long-press menu
+ *   -webkit-touch-callout unset -> iOS/Android image sheet on long press
+ *
+ * custom-ui.css already set `body { overflow: hidden }`, but on mobile it is
+ * the ROOT element that scrolls, and `overflow` alone does not stop
+ * overscroll chaining or the callout — hence all four properties below.
+ * ========================================================================== */
+
+html {
+  /* The document itself must not scroll or rubber-band. `position: fixed` is
+     the only thing that reliably stops iOS Safari from panning the page when
+     an inner element hits its scroll end. */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  /* pan/zoom gestures belong to the game, not the browser chrome */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  /* Kill the tap flash Chrome/Android paints over every touched element. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- Artwork is not a document image ------------------------------------
+   Sprites, backgrounds and CGs must behave like rendered scenery: no long-press
+   "Save image" sheet, no drag ghost, no selection. Applied to the elements
+   rather than globally so real UI text stays selectable where it matters. */
+game-screen img,
+game-screen [data-character],
+game-screen [data-image],
+game-screen [data-ui="background"],
+save-slot img,
+gallery-screen img,
+.mech-l,
+text-box [data-content="character-expression"] {
+  -webkit-touch-callout: none;         /* the image context menu itself */
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;                /* scenery is never a tap target */
+}
+
+/* Chrome for the same treatment, but these stay interactive. */
+.cyber-top-hud,
+quick-menu,
+main-menu,
+choice-container,
+text-box,
+.mech-strip,
+.graph-panel,
+.archives-panel,
+dialog-log {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Dialogue and codex text stays selectable — a player may want to copy a line
+   or a lore entry, and that is a deliberate long-press, not an accident. */
+[data-ui="say"],
+[data-content="dialog"],
+dialog-log [data-spoke] p,
+.archives-body {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}

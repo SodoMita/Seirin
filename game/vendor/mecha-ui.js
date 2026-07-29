@@ -718,6 +718,7 @@
                 try { mountAll(doc); } catch (e) { /* never break the page */ }
                 try { syncChoices(); } catch (e) { /* never break the page */ }
                         try { syncModalFlag(); } catch (e) { /* never break the page */ }
+                try { undraggable(); } catch (e) { /* never break the page */ }
             }, 120);
         });
         try {
@@ -1051,6 +1052,73 @@
        NAMEPLATE block in mecha-ui.css. */
 
     /* ================================================================== *
+     * 4i. NATIVE GESTURE GUARD
+     * ------------------------------------------------------------------
+     * CSS handles the look of this (section 28), but two things need JS:
+     *
+     *   1. The engine writes draggable="true" onto every sprite <img> it
+     *      renders. That is a DOM property, not a style, so no stylesheet can
+     *      switch it off — and it is what produces the drag ghost and feeds
+     *      the long-press image menu on Android.
+     *   2. contextmenu must be suppressed over artwork so a long press (which
+     *      the browser reports as a right-click) does not open Save/Copy image
+     *      on top of the scene. Dialogue text is deliberately excluded so a
+     *      player can still long-press to select and copy a line.
+     *
+     * Listeners are delegated on the document, so they also cover sprites the
+     * engine renders later without re-binding per element.
+     * ================================================================== */
+    function isArtwork (node) {
+        var el2 = node;
+        while (el2 && el2 !== doc.body) {
+            if (el2.tagName === 'IMG' || el2.tagName === 'CANVAS') { return true; }
+            if (el2.classList && el2.classList.contains('mech-l')) { return true; }
+            el2 = el2.parentNode;
+        }
+        return false;
+    }
+
+    function isSelectableText (node) {
+        var el2 = node;
+        while (el2 && el2 !== doc.body) {
+            if (el2.getAttribute) {
+                var ui = el2.getAttribute('data-ui');
+                var content = el2.getAttribute('data-content');
+                if (ui === 'say' || content === 'dialog') { return true; }
+                if (el2.tagName === 'P' && el2.parentNode &&
+                    el2.parentNode.getAttribute &&
+                    el2.parentNode.getAttribute('data-spoke') !== null) { return true; }
+            }
+            el2 = el2.parentNode;
+        }
+        return false;
+    }
+
+    function undraggable () {
+        var imgs = doc.querySelectorAll('game-screen img, save-slot img, gallery-screen img, text-box img');
+        var i;
+        for (i = 0; i < imgs.length; i++) {
+            if (imgs[i].draggable !== false) { imgs[i].draggable = false; }
+        }
+    }
+
+    var gesturesBound = false;
+    function bindGestureGuard () {
+        if (gesturesBound) { return; }
+        gesturesBound = true;
+        /* Long press over artwork => no image context menu. */
+        doc.addEventListener('contextmenu', function (evt) {
+            if (isSelectableText(evt.target)) { return; }
+            if (isArtwork(evt.target)) { evt.preventDefault(); }
+        }, false);
+        /* No drag ghosts from sprites, ever. */
+        doc.addEventListener('dragstart', function (evt) {
+            if (isArtwork(evt.target)) { evt.preventDefault(); }
+        }, false);
+        undraggable();
+    }
+
+    /* ================================================================== *
      * 4h. MODAL-OPEN FLAG (performance)
      * ------------------------------------------------------------------
      * Measured: the route atlas scrolled at 6 fps because 73 CSS animations
@@ -1110,6 +1178,7 @@
         try { tagLogRows(); } catch (e) { /* decorative only */ }
         try { buildScaleControl(); } catch (e) { /* decorative only */ }
         try { syncModalFlag(); } catch (e) { /* decorative only */ }
+        try { bindGestureGuard(); } catch (e) { /* decorative only */ }
         try { observeDom(); } catch (e) { /* decorative only */ }
         try { bindParallax(); } catch (e) { /* decorative only */ }
         try { bindResize(); } catch (e) { /* decorative only */ }
@@ -1132,6 +1201,7 @@
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
                 try { syncModalFlag(); } catch (e) { /* ignore */ }
+                try { undraggable(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -1151,6 +1221,7 @@
         syncQuickMenu: syncQuickMenu,
         tagLogRows: tagLogRows,
         syncModalFlag: syncModalFlag,
+        undraggable: undraggable,
         applyScale: applyScale,
         readScale: readScale,
         rewindSteps: rewindSteps,
