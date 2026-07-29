@@ -28,7 +28,7 @@ restyle images regenerated fresh, or (b) sourcing from the still-opaque
 **Action: regenerate every character's base + emotion sprites through the
 fixed `flatcel_finish.sh`, not by patching pixels post-hoc.**
 
-## 2. Aria "happy" has an extra (fourth) hand — REGENERATE
+## 2. Aria "happy" has an extra (fourth) hand — FIXED (aria_happy_v4)
 `characters/aria/aria_happy_v2.png`: the edit added a third arm/hand holding
 the coat hem at hip height in addition to both hands correctly raised to the
 headphones. Visible at full res, right side of the hip, holding a fold of
@@ -41,7 +41,7 @@ per iteration.md, this is exactly the kind of generator artifact the
 qa-checklist's "generator artifacts" pass exists to catch, and it was missed
 before shipping.**
 
-## 3. Reika base restyle lost real garment detail — REGENERATE
+## 3. Reika base restyle lost real garment detail — FIXED (reika_normal_v4)
 `characters/reika/reika_normal_v2.png` vs `characters/reika/reika_normal.png`:
 the flat-shading pass flattened the jacket's camo/tonal fabric texture to a
 single flat black, dropped a second chest pin/emblem next to the
@@ -67,3 +67,34 @@ work-in-progress until superseded by corrected regenerations under a new
 and pass review; until then the v2 sprites remain wired (they are a real
 quality improvement over the originals for everyone except Reika/Aria-happy,
 and are not broken enough to pull without a replacement ready).
+
+## Update 2026-07-29 (later in session) — both fixed and verified
+
+Both defects above are now fixed and independently re-verified (crops
+checked over magenta background, not just trusted from commit messages):
+
+- **Fringing/halo (defect 1):** `characters/ren/ren_normal_v3.png` wrench-tip
+  and hair edges checked at 900x900 crop over `#FF00FF` — clean edge, zero
+  white halo pixels.
+- **Halftone/dither alpha noise:** `ren_normal_v3.webp` alpha channel vs
+  `ren_normal_v3.png` alpha channel — `compare -metric AE` = **0**, i.e. the
+  WebP re-encode is bit-identical in alpha. No dither.
+- **Aria extra hand (defect 2):** `aria_happy_v4.png` visually confirmed —
+  exactly two hands, both at the headphones, no third hand at the hip.
+- **Reika detail loss (defect 3):** `reika_normal_v4.png` visually confirmed
+  — camo/tonal jacket pattern, holstered pistol, knee pads and the skull
+  patch are all present again, much closer to the original's detail level
+  than `reika_normal_v2/v3`.
+
+`tools/img_pipeline/` (plain C, no ImageMagick, no GPU/GLSL — see
+`upscale_filter.c`'s header comment for why the GLSL/EGL/SwiftShader route
+was abandoned) is now the canonical finishing pipeline. `tools/
+flatcel_finish.sh` is superseded and should not be used for new work; it is
+kept only as a record, not deleted (OPERATIONS.md: never destroy existing
+work).
+
+Still outstanding for a future session: whole-body happy/sad emotion sprites
+for kitsune, yuki, lumina, momo, saya (ren, kaito, aria, nao already have
+them). Aria has no `engine.characters` entry in `game/vendor/game.js` yet —
+her sprites exist and are finished but unwired; decide whether to add her as
+a speaking character or leave art-only.
