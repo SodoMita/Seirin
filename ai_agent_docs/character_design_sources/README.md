@@ -1,10 +1,12 @@
 # Character Design Sources — README
 
-This directory contains the **27 primary source documents** referenced in
+This directory indexes the **27 primary source documents** referenced in
 `../Character_Design_Sourcebook_JP_CN_Manga_Anime_Gacha.pdf` (the
-"Sourcebook"). Every file here is publicly downloadable from its original
-source URL; this directory is a local mirror for offline reference by AI
-agents and human designers working on the Seirin project.
+"Sourcebook"). The source PDFs were formerly kept here as a local mirror.
+They were removed on 2026-07-29 to keep the repository lightweight: the
+Sourcebook remains the compact, self-contained orientation guide, while this
+README retains the complete file and section index for a deep-dive download
+from each source's original public publisher.
 
 ## Licensing summary
 
@@ -29,38 +31,11 @@ directory.
 
 ```
 character_design_sources/
-├── JP/                              # 17 Japanese-language sources
-│   ├── AJA_anime_industry_report_2023_summary_jp.pdf
-│   ├── AJA_anime_industry_report_2024_summary_jp.pdf
-│   ├── AJA_anime_industry_report_2025_summary_jp.pdf
-│   ├── Bunkacho_animation_research_guide.pdf
-│   ├── Bunkacho_manga_research_guide.pdf
-│   ├── Bunkacho_game_research_guide.pdf
-│   ├── METI_anime_action_plan.pdf
-│   ├── CEDEC_game_design_roadmap_2023.pdf
-│   ├── CEDEC_roadmap_engineering_2023.pdf
-│   ├── CEDEC_roadmap_production_2023.pdf
-│   ├── CEDEC_roadmap_visual_arts_2025.pdf
-│   ├── KyotoSeika_cute_character_thesis_2021.pdf       # Li Yingchao PhD thesis
-│   ├── KyotoSeeka_MangaStudies_v1_Kishida_character_expression.pdf
-│   ├── TEU_character_design_support.pdf                # Mogi PhD thesis
-│   ├── F1000_transmedia_character.pdf                  # Watabe, CC-BY 4.0
-│   ├── JSTAGE_jssd_character_design_structure.pdf      # Huang JSSD PA-36
-│   └── JSSD_2024_program_71th_conference.pdf
-├── CN/                              # 10 Chinese-language sources
-│   ├── mihoyo_gdc2021_genshin_openworld.pdf            # Cai Haoyu GDC 2021
-│   ├── netease_gdcchina15_fantastic_gaming.pdf         # Chen Junxiong
-│   ├── netease_gdcchina15_agile_iteration.pdf          # Wen Fujun
-│   ├── ea_ufc_gdcchina14_character_cn.pdf              # EA UFC (CN-version)
-│   ├── tencent_tgdc2018_honor_of_kings_character_design.txt  # Zhan Tao transcript
-│   ├── hypergryph_unite2020_arknights_3d2d_combination.txt   # Haigao transcript
-│   ├── francispress_chinese_3d_animation_character.pdf       # CC-BY
-│   ├── francispress_pixar_animation_modeling.pdf             # CC-BY
-│   ├── francispress_color_in_animation_scenes.pdf            # CC-BY
-│   └── taiwan_ntmofa_character_design_methods.pdf            # Ke Kai-Ren
-└── build/                           # Reproducibility — Sourcebook build script
-    ├── build_body.py                # 3,561-line ReportLab generator
-    └── cover.html                   # HTML/Playwright cover template
+├── JP/                              # optional local deep-dive downloads
+├── CN/                              # source transcripts retained; PDFs are not versioned
+└── build/                           # reproducibility scripts for the compact Sourcebook
+    ├── build_body.py
+    └── cover.html
 ```
 
 ## Source → Sourcebook section cross-reference

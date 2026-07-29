@@ -19,7 +19,7 @@ Visual-novel project assets and design documents for **Seirin: Night Shift — R
 - `plans/` — apartment and location plans
 - `archives/` — small asset archives, checksums and portable Git bundle
 - `tools/` — local asset storage scripts
-- `ai_agent_docs/` — design doc, image prompts, agent-skill research, and loadable Agent Skills (`skills/`)
+- `ai_agent_docs/` — compact design docs, image prompts, agent-skill research, and loadable Agent Skills (`skills/`). The character-design Sourcebook is kept here; its large public-source-PDF mirror is intentionally not versioned (see `character_design_sources/README.md`).
   - `skills/seirin-character-art/` — character design + sprite production skill:
     hard limits (`LEGAL.md`, `OPERATIONS.md`, indexed by `CONSTRAINTS.md`),
     the cast registry (`assets/cast.json`),

@@ -76,3 +76,8 @@ design/concepts/*.png
 # committed; the platform-specific binary is not.
 tools/img_pipeline/upscale_filter
 tools/img_pipeline/matte_floodfill
+
+# Public research PDFs are indexed by character_design_sources/README.md and
+# summarized in the compact Sourcebook; do not re-add the heavyweight mirror.
+ai_agent_docs/character_design_sources/JP/*.pdf
+ai_agent_docs/character_design_sources/CN/*.pdf
