@@ -398,13 +398,22 @@
     /* Park the telemetry strip directly under the dashboard. The HUD's height
        is not knowable from CSS (it depends on the instrument rail, the font
        and whether the badges wrapped), so measure it. */
+    /* The ticker is the topmost band of the interface and the dashboard sits
+       under it. Publish the ticker's measured height as --mech-hud-top so the
+       dashboard clears it at any font scale (the UI-scale setting changes the
+       ticker's height, so this cannot be a constant). */
     function syncStripTop () {
-        var hud = doc.querySelector('.cyber-top-hud');
-        if (!hud || !hud.getBoundingClientRect) { return; }
-        var r;
-        try { r = hud.getBoundingClientRect(); } catch (e) { return; }
-        if (!r || !r.height) { return; }
-        doc.documentElement.style.setProperty('--mech-strip-top', Math.round(r.bottom + 6) + 'px');
+        var strip = doc.querySelector('.mech-strip');
+        var h = 0;
+        if (strip && strip.getBoundingClientRect) {
+            try {
+                var sr = strip.getBoundingClientRect();
+                /* A hidden ticker reports 0; the dashboard then sits at the
+                   normal inset instead of leaving a gap for nothing. */
+                if (sr && sr.height && getComputedStyle(strip).display !== 'none') { h = sr.height; }
+            } catch (e) { h = 0; }
+        }
+        doc.documentElement.style.setProperty('--mech-hud-top', Math.round(h + 8) + 'px');
     }
 
     /* The engine's quick-menu owns the bottom edge, and its height is not
@@ -708,6 +717,7 @@
                 queued = null;
                 try { mountAll(doc); } catch (e) { /* never break the page */ }
                 try { syncChoices(); } catch (e) { /* never break the page */ }
+                try { syncSpeaker(); } catch (e) { /* never break the page */ }
             }, 120);
         });
         try {
@@ -954,66 +964,141 @@
      * storage backend, so no new dependency and no network).
      * ================================================================== */
     var SCALE_KEY = 'SeirinGame_UIScale';
-    var SCALE_STEPS = [
-        { v: 0.8,  label: 'МЕЛКИЙ' },
-        { v: 0.9,  label: 'КОМПАКТНЫЙ' },
-        { v: 1,    label: 'ОБЫЧНЫЙ' },
-        { v: 1.15, label: 'КРУПНЫЙ' },
-        { v: 1.3,  label: 'ОЧЕНЬ КРУПНЫЙ' }
-    ];
+    var SCALE_MIN = 60;      /* percent */
+    var SCALE_MAX = 160;
+    var SCALE_STEP = 5;
 
     function readScale () {
         var raw = null;
         try { raw = global.localStorage ? global.localStorage.getItem(SCALE_KEY) : null; } catch (e) { raw = null; }
         var n = parseFloat(raw);
-        if (!n || n < 0.7 || n > 1.5) { return 1; }
+        if (!n || n < SCALE_MIN / 100 || n > SCALE_MAX / 100) { return 1; }
         return n;
     }
 
     function applyScale (n) {
         /* 100% == 16px, the browser default the theme was designed against. */
-        doc.documentElement.style.fontSize = (16 * n).toFixed(2) + 'px';
+        doc.documentElement.style.fontSize = (16 * n).toFixed(3) + 'px';
         try { if (global.localStorage) { global.localStorage.setItem(SCALE_KEY, String(n)); } } catch (e) { /* private mode */ }
-        /* Chrome measurements all shift with the root font size. */
-        try { syncStripTop(); syncQuickMenu(); } catch (e) { /* ignore */ }
+        /* Every chrome measurement is in rem, so re-measure after a change. */
+        try { syncStripTop(); syncQuickMenu(); syncSpeaker(); } catch (e) { /* ignore */ }
     }
 
+    /* Numeric UI-scale control: a percentage readout with −/+ steppers and a
+       slider, replacing the five preset buttons. The user asked to set the
+       value as a NUMBER rather than picking a named size. */
     function buildScaleControl () {
         var screen = doc.querySelector('settings-screen');
         if (!screen || doc.querySelector('.mech-scale')) { return; }
-        /* Mount beside the existing text-speed block so it reads as a
-           first-class setting rather than something bolted on. */
         var host = screen.querySelector('[data-content="auto-play-speed-controller"]');
         if (!host) { host = screen.querySelector('[data-settings="audio"]'); }
         if (!host || !host.parentNode) { return; }
 
+        var pct = Math.round(readScale() * 100);
         var box = el('div', 'mech-scale');
         box.setAttribute('data-settings', 'scale');
-        var current = readScale();
-        var html = '<h3>МАСШТАБ ИНТЕРФЕЙСА</h3><div class="mech-scale-row">';
-        var i;
-        for (i = 0; i < SCALE_STEPS.length; i++) {
-            html += '<button type="button" class="mech-scale-btn' +
-                (Math.abs(SCALE_STEPS[i].v - current) < 0.001 ? ' active' : '') +
-                '" data-scale="' + SCALE_STEPS[i].v + '">' +
-                Math.round(SCALE_STEPS[i].v * 100) + '%<small>' + SCALE_STEPS[i].label + '</small></button>';
-        }
-        html += '</div><p class="mech-scale-note">Меняет размер всего интерфейса. Полезно на телефоне в горизонтальном режиме.</p>';
-        box.innerHTML = html;
+        box.innerHTML =
+            '<h3>МАСШТАБ ИНТЕРФЕЙСА</h3>' +
+            '<div class="mech-scale-row">' +
+              '<button type="button" class="mech-scale-step" data-step="-' + SCALE_STEP + '" aria-label="Уменьшить">&minus;</button>' +
+              '<div class="mech-scale-readout"><span class="mech-scale-value">' + pct + '</span><span class="mech-scale-unit">%</span></div>' +
+              '<button type="button" class="mech-scale-step" data-step="' + SCALE_STEP + '" aria-label="Увеличить">+</button>' +
+              '<button type="button" class="mech-scale-reset" data-reset="1">СБРОС</button>' +
+            '</div>' +
+            '<input type="range" class="mech-scale-range" min="' + SCALE_MIN + '" max="' + SCALE_MAX +
+              '" step="' + SCALE_STEP + '" value="' + pct + '" aria-label="Масштаб интерфейса">' +
+            '<p class="mech-scale-note">' + SCALE_MIN + '\u2013' + SCALE_MAX +
+              '%. Меняет размер всего интерфейса — полезно на телефоне в горизонтальном режиме.</p>';
         host.parentNode.insertBefore(box, host.nextSibling);
+
+        var readout = box.querySelector('.mech-scale-value');
+        var range = box.querySelector('.mech-scale-range');
+
+        function setPct (v) {
+            v = Math.round(v / SCALE_STEP) * SCALE_STEP;
+            if (v < SCALE_MIN) { v = SCALE_MIN; }
+            if (v > SCALE_MAX) { v = SCALE_MAX; }
+            readout.textContent = String(v);
+            if (range.value !== String(v)) { range.value = String(v); }
+            paintSlider(range);
+            applyScale(v / 100);
+            /* Flash the number so a stepper press is visibly acknowledged. */
+            readout.className = 'mech-scale-value';
+            /* eslint-disable-next-line no-unused-expressions */
+            readout.offsetWidth;
+            readout.className = 'mech-scale-value set';
+        }
 
         box.addEventListener('click', function (evt) {
             var t = evt.target;
-            while (t && t !== box && !(t.getAttribute && t.getAttribute('data-scale'))) { t = t.parentNode; }
+            while (t && t !== box && !(t.getAttribute &&
+                (t.getAttribute('data-step') || t.getAttribute('data-reset')))) { t = t.parentNode; }
             if (!t || t === box) { return; }
-            var v = parseFloat(t.getAttribute('data-scale'));
-            if (!v) { return; }
-            applyScale(v);
-            var all = box.querySelectorAll('.mech-scale-btn');
-            var k;
-            for (k = 0; k < all.length; k++) { all[k].className = 'mech-scale-btn'; }
-            t.className = 'mech-scale-btn active';
+            if (t.getAttribute('data-reset')) { setPct(100); return; }
+            setPct(parseInt(readout.textContent, 10) + parseInt(t.getAttribute('data-step'), 10));
         }, false);
+        range.addEventListener('input', function () { setPct(parseInt(range.value, 10)); }, false);
+        paintSlider(range);
+    }
+
+    /* ================================================================== *
+     * 4g. SPEAKER NAMEPLATE — mirrored OUTSIDE the clipped console
+     * ------------------------------------------------------------------
+     * The console is cut to shape with clip-path, and clip-path clips every
+     * descendant no matter what overflow says. So a badge lifted above the
+     * panel edge simply lost its overhang to the clip — the reported
+     * "имя ... обрезается фоном диалога".
+     *
+     * The engine's [data-ui="who"] stays where it is (its grid area has to
+     * keep resolving, and the engine writes into it), but is collapsed to
+     * zero size. Its text and colour are mirrored into a sibling element
+     * positioned just above the console, outside the clip, where there is no
+     * panel background behind it.
+     * ================================================================== */
+    function syncSpeaker () {
+        var box = doc.querySelector('text-box');
+        var who = doc.querySelector('[data-ui="who"]');
+        if (!box || !box.parentNode) { return; }
+
+        var plate = doc.querySelector('.mech-speaker');
+        if (!plate) {
+            plate = doc.createElement('div');
+            plate.className = 'mech-speaker';
+            plate.setAttribute('aria-hidden', 'true');   /* the real name is in the DOM already */
+            box.parentNode.insertBefore(plate, box);
+        }
+
+        var name = who ? (who.textContent || '') : '';
+        name = name.replace(/^\s+|\s+$/g, '');
+        /* Narration lines have no speaker: hide the plate entirely rather
+           than leaving an empty chip floating over the artwork. */
+        if (!name || !box.offsetParent) {
+            if (plate.className !== 'mech-speaker') { plate.className = 'mech-speaker'; }
+            return;
+        }
+
+        if (plate.__mechName !== name) {
+            plate.__mechName = name;
+            plate.textContent = name;
+        }
+        /* Inherit the character colour the engine puts on the original. */
+        var colour = '';
+        try { colour = global.getComputedStyle(who).color; } catch (e) { colour = ''; }
+        if (colour && plate.style.color !== colour) { plate.style.color = colour; }
+
+        /* Park it straddling the console's top edge. Both are positioned
+           against game-screen, so convert through that box. */
+        var host = box.parentNode;
+        var hRect, bRect;
+        try {
+            hRect = host.getBoundingClientRect();
+            bRect = box.getBoundingClientRect();
+        } catch (e) { return; }
+        if (!bRect || !bRect.height) { return; }
+        var pH = plate.offsetHeight || 26;
+        plate.style.left = Math.round(bRect.left - hRect.left + 18) + 'px';
+        plate.style.top = Math.round(bRect.top - hRect.top - pH * 0.62) + 'px';
+        if (plate.className !== 'mech-speaker show') { plate.className = 'mech-speaker show'; }
     }
 
     function syncChoices () {
@@ -1043,6 +1128,7 @@
         try { syncQuickMenu(); } catch (e) { /* decorative only */ }
         try { tagLogRows(); } catch (e) { /* decorative only */ }
         try { buildScaleControl(); } catch (e) { /* decorative only */ }
+        try { syncSpeaker(); } catch (e) { /* decorative only */ }
         try { observeDom(); } catch (e) { /* decorative only */ }
         try { bindParallax(); } catch (e) { /* decorative only */ }
         try { bindResize(); } catch (e) { /* decorative only */ }
@@ -1064,6 +1150,7 @@
                 try { syncQuickMenu(); } catch (e) { /* ignore */ }
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
+                try { syncSpeaker(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -1082,6 +1169,7 @@
         syncStripTop: syncStripTop,
         syncQuickMenu: syncQuickMenu,
         tagLogRows: tagLogRows,
+        syncSpeaker: syncSpeaker,
         applyScale: applyScale,
         readScale: readScale,
         rewindSteps: rewindSteps,

@@ -492,6 +492,9 @@
    breaks the octagon silhouette; the instrument rail drops out at narrow
    widths instead (see the responsive block). */
 .cyber-top-hud {
+  /* Sits under the ticker rail (see --mech-hud-top, written by mecha-ui.js
+     from the strip's measured height). */
+  top: var(--mech-hud-top, 30px);
   padding: 11px 34px;
   color: #9fb0c6;
   gap: 18px;
@@ -762,14 +765,16 @@
 /* ============================================================================
  * 6. DATA STRIP — scrolling telemetry rail under the HUD
  * ========================================================================== */
-/* --mech-strip-top is measured from the live HUD by mecha-ui.js, because the
-   dashboard's height depends on the instrument rail, the font and the current
-   breakpoint. The literal is only the pre-measurement fallback. */
+/* The telemetry ticker is now the topmost band of the interface: it runs edge
+   to edge along the very top of the screen and the dashboard is pushed down
+   below it (--mech-hud-top). It used to sit BETWEEN the dashboard and the
+   scene, which cost vertical space in the middle of the view and, at narrow
+   widths, collided with the quick-menu. */
 .mech-strip {
   position: absolute;
-  top: var(--mech-strip-top, 74px);
-  left: 24px;
-  right: 24px;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 20px;
   z-index: 79;
   display: flex;
@@ -2044,11 +2049,15 @@ quick-menu button { flex: 0 0 auto; }
 @media screen and (max-height: 34em) {
   #seirin-build-badge { opacity: .28 !important; font-size: 9px !important; }
 }
-/* The strip is a HUD element: it belongs under the dashboard, never at the
-   bottom. Pinned here so a future breakpoint cannot move it back. */
+/* The strip is the topmost band of the UI. Pinned here so no breakpoint can
+   move it back down onto the quick-menu (which is what caused the ticker to
+   cover НАЗАД/СКРЫТЬ), and clipped edge-to-edge so it reads as a rail. */
 .mech-strip {
-  top: var(--mech-strip-top, 74px) !important;
+  top: 0 !important;
   bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  clip-path: none !important;
 }
 
 /* --- Main menu: title and buttons must not collide -----------------------
@@ -2375,47 +2384,88 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
 }
 .mech-scale-row {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 12px;
-}
-.mech-scale-btn {
-  display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* Numeric readout — the value itself is the control's subject, so it is the
+   largest thing in the block. */
+.mech-scale-readout {
+  display: inline-flex;
+  align-items: baseline;
   gap: 2px;
-  min-width: 84px;
-  padding: 9px 12px;
+  min-width: 104px;
+  justify-content: center;
+  padding: 7px 14px;
+  background: linear-gradient(180deg, #05080d, #121a25);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.07);
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+.mech-scale-value {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--mech-amber);
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+  font-variant-numeric: tabular-nums;   /* digits must not jitter while stepping */
+}
+.mech-scale-value.set { animation: mechDigitSet 0.45s ease-out; }
+.mech-scale-unit {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: rgba(251, 191, 36, 0.65);
+}
+
+.mech-scale-step,
+.mech-scale-reset {
   border: none;
   cursor: pointer;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 800;
-  font-size: 0.92rem;
-  letter-spacing: 0.05em;
-  color: #cfdcec;
+  color: #dbe7f5;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(0, 0, 0, 0.28)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(0, 0, 0, 0.30)),
     linear-gradient(150deg, #2b3648 0%, #151d29 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 6px rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 3px 6px rgba(0, 0, 0, 0.55);
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px),
       calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: filter 0.18s ease, transform 0.14s ease;
+  transition: filter 0.16s ease, transform 0.12s ease;
 }
-.mech-scale-btn small {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.5rem;
+.mech-scale-step {
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.mech-scale-reset {
+  padding: 0 14px;
+  height: 44px;
+  font-size: 0.72rem;
   letter-spacing: 0.1em;
-  color: rgba(148, 163, 184, 0.85);
-  font-weight: 400;
 }
-.mech-scale-btn:hover { filter: brightness(1.25); transform: translateY(-1px); }
-.mech-scale-btn.active {
-  color: #120d02;
-  background: linear-gradient(180deg, #ffe6a3, var(--mech-amber) 55%, #c98f08);
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+.mech-scale-step:hover,
+.mech-scale-reset:hover { filter: brightness(1.3); transform: translateY(-1px); }
+.mech-scale-step:active,
+.mech-scale-reset:active { transform: translateY(1px); }
+
+/* The slider reuses the machined track defined for the settings ranges. */
+.mech-scale-range {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 32px;
+  margin: 12px 0 0;
+  background: transparent;
+  cursor: pointer;
 }
-.mech-scale-btn.active small { color: rgba(30, 20, 2, 0.75); }
+.mech-scale-range:focus { outline: none; }
+.mech-scale-range:focus-visible { outline: 2px solid var(--mech-cyan); outline-offset: 3px; }
+
 .mech-scale-note {
   margin: 12px 0 0;
   font-family: 'Share Tech Mono', monospace;
@@ -2447,27 +2497,63 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
   overflow: visible;
 }
 
+/* SPEAKER NAMEPLATE — lives OUTSIDE the console, as its own element.
+ *
+ * Why it cannot be a child of <text-box>: the console is cut to shape with
+ * clip-path, and clip-path clips EVERY descendant regardless of
+ * overflow:visible. Lifting the badge with a negative translate therefore just
+ * sliced its top 8px off against the panel edge (measured: badge y=456 vs
+ * panel y=464, overhang 8px, all of it clipped) — which is exactly the
+ * "обрезается фоном" report.
+ *
+ * mecha-ui.js mirrors the speaker into <div class="mech-speaker">, a sibling
+ * of the console positioned just above it. Being outside the clipped element,
+ * it renders whole, and there is no panel background behind it. The engine's
+ * own name row stays in the DOM (its grid area must keep resolving) but is
+ * collapsed to zero size.
+ */
 [data-screen="game"] text-box [data-content="name"] {
   position: absolute;
-  left: 26px;
-  top: 0;
-  transform: translateY(-52%);   /* straddle the panel's top edge */
-  z-index: 3;
-  margin: 0;
-  padding: 0;
-  width: auto;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
   pointer-events: none;
 }
 
-[data-screen="game"] [data-ui="who"] {
+.mech-speaker {
+  position: absolute;
+  z-index: 60;                 /* above the console (50), below modals */
+  display: none;
+  align-items: center;
   padding: 5px 22px 5px 13px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
   font-size: 1rem;
-  /* Solid backing: the badge now overhangs the artwork, so it cannot rely on
-     the console behind it for contrast. */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #dff1ff;
   background:
-    linear-gradient(170deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.40) 62%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.42) 62%),
     linear-gradient(150deg, #22405c 0%, #0a1521 100%);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75);
+  border-left: 3px solid var(--mech-cyan);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.6), 0 1px 0 rgba(0, 0, 0, 0.9);
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
+  pointer-events: none;
+}
+.mech-speaker.show { display: inline-flex; }
+/* Live indicator, matching the old in-panel badge. */
+.mech-speaker::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  margin-left: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  animation: mechPulse 1.6s ease-in-out infinite;
 }
 
 /* The amber rule under the name is no longer needed — the badge itself is the
@@ -2488,8 +2574,7 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
 
 @media screen and (max-width: 37.5em), screen and (max-height: 30em) {
   [data-screen="game"] text-box { padding: 12px 18px 13px !important; }
-  [data-screen="game"] text-box [data-content="name"] { left: 14px; }
-  [data-screen="game"] [data-ui="who"] { font-size: 0.86rem; padding: 4px 16px 4px 10px; }
+  .mech-speaker { font-size: 0.86rem; padding: 4px 16px 4px 10px; }
   [data-screen="game"] [data-ui="say"] { font-size: 0.95rem; line-height: 1.42; }
 }
 
@@ -2505,7 +2590,7 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
 @media screen and (max-height: 34em) {
   .cyber-top-hud {
     flex-wrap: nowrap !important;
-    top: 6px;
+    top: var(--mech-hud-top, 26px);
     left: 8px;
     right: 8px;
     padding: 5px 20px !important;
@@ -2520,7 +2605,9 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
   .hud-btn { padding: 4px 9px; }
   .hud-btn span:not([class]) { display: none; }   /* icon-only HUD actions */
   .hud-instruments { display: none !important; }
-  /* Telemetry is pure flavour; on a 400px-tall screen it is 5% of the view. */
-  .mech-strip { display: none !important; }
+  /* As a top rail the ticker costs ~16px, so it survives on short screens where
+     it previously had to be hidden for colliding with the button bar. */
+  .mech-strip { height: 16px; }
+  .mech-strip-track { font-size: 0.55rem; }
   [data-mech="dash"] > .mech-l-rivets { display: none; }
 }
