@@ -333,7 +333,12 @@
 }
 
 /* Pointer-driven specular: a soft highlight that tracks the cursor, which is
-   what actually sells the tilt as a 3D surface. */
+   what actually sells the tilt as a 3D surface. Ambient plates (dash,
+   console, housing — never .mech-hot) track the whole-viewport cursor so the
+   chrome still feels lit by where you are on the page. A hot plate overrides
+   this with its LOCAL coordinates below, so the highlight glides across the
+   one button under the pointer instead of the entire screen's plates
+   twitching together whenever the mouse moves anywhere. */
 [data-mech] > .mech-l-gloss::before {
   content: '';
   position: absolute;
@@ -342,6 +347,12 @@
       rgba(226, 240, 255, 0.16), transparent 100%);
   transform: translate3d(calc(var(--mech-mx) * 32%), calc(var(--mech-my) * 32%), 0);
   opacity: 0.85;
+}
+[data-mech].mech-hot > .mech-l-gloss::before {
+  transform: translate3d(calc(var(--mech-lmx) * 30%), calc(var(--mech-lmy) * 30%), 0);
+  background: radial-gradient(closest-side circle,
+      rgba(226, 240, 255, 0.30), transparent 100%);
+  opacity: 1;
 }
 
 /* --- rivets: bolt rows top and bottom -----------------------------------
