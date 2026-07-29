@@ -19,6 +19,49 @@ rather than replaces.
 
 ---
 
+## Read this first: engine traps that have already cost sessions
+
+Everything below was found by measurement after a visible bug, not by reading
+docs. If you are changing the UI, skim this table before you start.
+
+| Trap | Symptom | Rule |
+|---|---|---|
+| **animate.css duration** | `monogatari.css` bundles animate.css; its `.animated` class hard-sets `animation-duration: var(--animate-duration)` = **1s**. The engine puts `.animated` on backgrounds, sprites and `text-box`. | Any loop landing on an engine-managed element must pin `animation-duration` with `!important`, or your 22s Ken Burns silently runs in 1s. |
+| **clip-path clips descendants** | A child lifted outside its parent's box gets sliced, no matter what `overflow` says. Cost two sessions (speaker nameplate, then the floating stat delta). | Don't try to escape a clipped ancestor. Move the element out of it, or render it in the `.mech-fx` overlay layer. |
+| **`.fas` → `<svg>`** | Font Awesome's JS rewrites `<i class="fas fa-x">` into `<svg class="svg-inline--fa fa-x">`, so rules keyed on `.fas` stop matching once FA runs. | `retagIcons()` re-tags replacements. The injected span must **not** carry `fas` — `monogatari.css` has `.fas`-scoped rules that force `display:none`. |
+| **Equal-specificity overrides** | `[data-mech]{position:relative}` beat `.cyber-top-hud{position:absolute}` on load order and knocked the dashboard out of its corner. | Prefer JS to promote only elements computing to `static`; check specificity before adding a bare element/attribute selector. |
+| **`.modal>*{width:40%}`** | The engine's own modal rule turned the themed Quit card into a full-height 40% column. | Match `.modal__content` directly and keep the engine's `translate(-50%,-50%)` centring. |
+| **WebKit range inputs** | Slider tracks ignore `border` and `clip-path` clips the thumb away; there is no `::-moz-range-progress` equivalent. | Draw the channel with background layers only; paint the fill from JS via `--mech-fill`. |
+| **Never animate a tap target's geometry** | Drifting menu buttons on `translateY` made Playwright refuse to click them ("element is not stable") — and a moving target is genuinely harder to hit on a phone. | Animate light/shadow instead; leave the hit box still. |
+| **`file://` blocks `cssRules`** | A probe reporting "0 rules in the stylesheet" is a CORS false negative, not a CSS error. | Verify with `getComputedStyle`, not by reading `document.styleSheets`. |
+| **Pixel-diffing lies about motion** | A 0.001/s zoom changes nearly every pixel by 1–2 levels; a differ reports "88% moving" while the eye sees nothing. | Measure **amplitude per second**. Rough floor for noticing drift: ~3px/s. |
+| **Bad merges delete silently** | `904fa18` resolved conflicts toward a stale side and dropped 1,292 lines (17 labels, route atlas, codex) while reporting success. | After any merge touching `game/`: `wc -l game/vendor/game.js` (expect ~1000) and run the suite (expect 61). Good state is `aba98eb` on `arena/019fa60e-seirin`. |
+
+## Architecture in one page
+
+```
+game/index.html
+├── vendor/monogatari.{js,css}   engine + animate.css (vendored, do not edit)
+├── vendor/failsafe.js           all state mutation goes through FailSafe.vn
+├── vendor/icons-offline.{js,css}  Unicode glyph shim (no icon font, no CDN)
+├── vendor/game.js               story: 17 labels, HUD, archives, route atlas
+├── vendor/custom-ui.css         first flat theme — kept, contains layout pins
+└── vendor/mecha-ui.{css,js}     the 2.5D armour skin, loaded LAST
+```
+
+`mecha-ui.js` is **read-only with respect to game state**. It runs two timers:
+housekeeping at 900ms (mount plates, icons, sliders, log rows, modal flag) and
+a reactive tick at 180ms (speaker changes, stat deltas, scene wipes) — the
+slower poll is far too coarse to acknowledge a line of dialogue.
+
+Ownership rules that are easy to break:
+- **The quick-menu owns the bottom edge.** `--mech-qm-h` carries its measured
+  height; everything bottom-anchored clears it.
+- **The ticker owns the top edge** (`y=0`, full width); the dashboard sits
+  below it via `--mech-hud-top`.
+- **The console is a transparent container**; the plating lives on
+  `[data-content="text"]` so the speaker name can sit above it unclipped.
+
 ## The plate model
 
 A real armour panel is a stack, not a rectangle. Every themed element gets
