@@ -368,3 +368,62 @@ PASS small       stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
 PASS tablet      stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
 PASS desktop     stripY=0 speaker=shown above=true clash=false blocked=[] off=[]
 ```
+
+---
+
+# Session 5 — atlas performance, CSS-only nameplate, screenshot weight
+
+## Route atlas: 6 → 15 fps
+
+Reported as "граф маршрутов тормозит". Measured by scrolling the panel in a
+rAF loop; each suspect was toggled live to price it separately:
+
+| Change | fps |
+|---|---|
+| baseline | 6 |
+| overlay `backdrop-filter` off | 9 |
+| + mecha layers off | 11 |
+| + `filter` off | 18 |
+
+So there was no single culprit — four things were compositing every frame:
+
+1. **73 animations still running behind the modal** (ambient light, 14 motes,
+   ticker, LEDs, gauges, radar, specular sweeps). Invisible, but still fed to
+   the overlay's `backdrop-filter` on every frame.
+2. `backdrop-filter: blur(8px)` over the full viewport.
+3. `filter: drop-shadow()` on a scrolling panel — never cached, repaints with
+   the scroll.
+4. The tiled 256px bruise sheet across the largest surface in the game
+   (11 → 14 fps on its own).
+
+Fixes: `html.mech-modal-open` pauses **all** animation while any overlay is up.
+The first attempt scoped it to the HUD/game-screen/menu subtrees and missed the
+modal's own armour layers and the ticker track — 23 animations survived; it is
+2 now. Blur halved to 4px behind a darker scrim, `drop-shadow` → `box-shadow`,
+gloss and wear dropped inside modals.
+
+**Reading the numbers honestly:** this sandbox browser has no GPU and an empty
+`requestAnimationFrame` loop tops out around 20 fps, so these are *relative*
+figures. The useful measurement is that with the atlas open the page idles at
+**62 fps** and scrolling now costs roughly the idle ceiling instead of a
+quarter of it.
+
+## Nameplate without JavaScript
+
+The user spotted that the name "looked like it was moved by a script" — it was.
+Their proposed fix (name and background as two items of one vertical list) is
+what shipped:
+
+- `<text-box>` keeps the engine grid but becomes a **transparent container**,
+  which removes the `clip-path` that had been slicing the name off.
+- The plating (rim, inset face, bolt rows, amber running edge) moves onto
+  `[data-content="text"]`.
+- The header row is then simply the row above the background — no offsets, no
+  measuring, nothing to keep in sync. `syncSpeaker()` is deleted.
+
+## Screenshot weight
+
+I had let 45 PNGs reach **34 MB** tracked in Git, contradicting my own session-1
+note. Now JPEG at 1280px/q82 → **3.4 MB** (design/ overall 34 MB → 5.4 MB),
+with `design/tools/shrink-shots.mjs` to do it and a `.gitignore` rule on
+`design/preview/shots/*.png` so an un-shrunk capture cannot slip in again.
