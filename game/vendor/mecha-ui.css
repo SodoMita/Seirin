@@ -1815,18 +1815,27 @@ quick-menu button[data-action="end"]::before {
 
 /* --- Sprites breathe and are grounded ----------------------------------- */
 game-screen [data-character] {
+  /* !important on the duration: the engine adds animate.css's `.animated`
+     class to sprites/backgrounds, and that class hard-sets
+     animation-duration:var(--animate-duration) = 1s. Measured live before
+     this fix: Ken Burns was cycling in 1s (scale 1.14 -> 1.03 -> 1.14 in
+     under a second — the backdrop visibly pumped) instead of the 22s hold it
+     was written for, and sprite breathing was a 1s twitch. Same trap for
+     every loop below that lands on an engine-managed element. */
   animation: mechBreathe 3.6s ease-in-out infinite;
+  animation-duration: 3.6s !important;
   filter: drop-shadow(0 18px 14px rgba(0, 0, 0, 0.45));
   will-change: translate;
 }
 /* Desync so a group of characters does not bob in unison. */
 game-screen [data-character][data-position="left"],
-game-screen [data-character].left   { animation-duration: 4.1s; animation-delay: -1.4s; }
+game-screen [data-character].left   { animation-duration: 4.1s !important; animation-delay: -1.4s; }
 game-screen [data-character][data-position="right"],
-game-screen [data-character].right  { animation-duration: 3.3s; animation-delay: -2.2s; }
+game-screen [data-character].right  { animation-duration: 3.3s !important; animation-delay: -2.2s; }
 game-screen [data-character][data-character="splash"] {
   /* Splash is a hovering colloid mass: she floats more, and wider. */
   animation: mechBreatheSoft 2.6s ease-in-out infinite;
+  animation-duration: 2.6s !important;
 }
 
 /* --- Backdrop drift ------------------------------------------------------
@@ -1837,6 +1846,7 @@ game-screen [data-character][data-character="splash"] {
 game-screen [data-ui="background"],
 game-screen [data-content="background"] {
   animation: mechKenBurns 22s ease-in-out infinite alternate;
+  animation-duration: 22s !important;
   will-change: scale;
 }
 
@@ -2986,22 +2996,55 @@ dialog-log [data-spoke] p,
 }
 
 /* --- Choices: plates land, and the taken one fires ---------------------- */
-@keyframes mechPlateIn {
-  0%   { opacity: 0; transform: translateX(-26px) skewX(-5deg); }
-  70%  { opacity: 1; transform: translateX(3px) skewX(0); }
-  100% { opacity: 1; transform: translateX(0); }
+/* Choice plates ARRIVE FROM OFF-SCREEN, alternating sides like loading racks.
+ * 26px of travel read as "appeared instantly"; 120vw guarantees the plate is
+ * genuinely outside the viewport when it starts, so the eye tracks it in.
+ * Odd rows slide in from the left, even rows from the right — a rack-feed
+ * pattern that also makes the list order legible while it assembles. */
+@keyframes mechPlateInL {
+  0%   { opacity: 0; transform: translateX(-120vw) skewX(-9deg); }
+  62%  { opacity: 1; transform: translateX(14px) skewX(2deg); }
+  82%  { transform: translateX(-5px) skewX(-1deg); }
+  100% { opacity: 1; transform: translateX(0) skewX(0); }
+}
+@keyframes mechPlateInR {
+  0%   { opacity: 0; transform: translateX(120vw) skewX(9deg); }
+  62%  { opacity: 1; transform: translateX(-14px) skewX(-2deg); }
+  82%  { transform: translateX(5px) skewX(1deg); }
+  100% { opacity: 1; transform: translateX(0) skewX(0); }
 }
 [data-screen="game"] choice-container button {
-  animation: mechPlateIn .34s cubic-bezier(.2,.9,.3,1.12) both;
+  animation: mechPlateInL .52s cubic-bezier(.16,.84,.28,1.06) both;
+  animation-duration: .52s !important;   /* beat animate.css's .animated */
 }
-[data-screen="game"] choice-container button:nth-child(1) { animation-delay: .03s; }
-[data-screen="game"] choice-container button:nth-child(2) { animation-delay: .08s; }
-[data-screen="game"] choice-container button:nth-child(3) { animation-delay: .13s; }
-[data-screen="game"] choice-container button:nth-child(4) { animation-delay: .18s; }
-[data-screen="game"] choice-container button:nth-child(5) { animation-delay: .23s; }
-[data-screen="game"] choice-container button:nth-child(6) { animation-delay: .28s; }
-[data-screen="game"] choice-container button:nth-child(7) { animation-delay: .33s; }
-[data-screen="game"] choice-container button:nth-child(8) { animation-delay: .38s; }
+[data-screen="game"] choice-container button:nth-child(even) {
+  animation-name: mechPlateInR;
+}
+/* Leaving: the whole rack retracts the way it came, so dismissal reads as
+   machinery withdrawing rather than a cut. */
+@keyframes mechPlateOutL {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-120vw) skewX(-9deg); }
+}
+@keyframes mechPlateOutR {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(120vw) skewX(9deg); }
+}
+[data-screen="game"] choice-container.mech-out button {
+  animation: mechPlateOutL .34s cubic-bezier(.5,0,.9,.4) both !important;
+  animation-duration: .34s !important;
+}
+[data-screen="game"] choice-container.mech-out button:nth-child(even) {
+  animation-name: mechPlateOutR !important;
+}
+[data-screen="game"] choice-container button:nth-child(1) { animation-delay: 0.02s; }
+[data-screen="game"] choice-container button:nth-child(2) { animation-delay: 0.09s; }
+[data-screen="game"] choice-container button:nth-child(3) { animation-delay: 0.16s; }
+[data-screen="game"] choice-container button:nth-child(4) { animation-delay: 0.23s; }
+[data-screen="game"] choice-container button:nth-child(5) { animation-delay: 0.3s; }
+[data-screen="game"] choice-container button:nth-child(6) { animation-delay: 0.37s; }
+[data-screen="game"] choice-container button:nth-child(7) { animation-delay: 0.44s; }
+[data-screen="game"] choice-container button:nth-child(8) { animation-delay: 0.51s; }
 
 @keyframes mechCommit {
   0%   { filter: brightness(1); transform: scale(1); }
@@ -3057,4 +3100,152 @@ game-screen [data-character].mech-enter { animation: mechSpriteIn .42s cubic-bez
     animation: none !important;
   }
   .mech-delta, .mech-threat, .mech-wipe { display: none !important; }
+}
+
+/* ============================================================================
+ * 30. SELF-EVIDENT MOTION — no hover, no hold, no yellow-sheen monoculture
+ * ----------------------------------------------------------------------------
+ * Three complaints, one root cause each:
+ *
+ *  (a) "вижу только нереалистичный блик жёлтый горизонтально движущийся"
+ *      mechSpecular ran on 15 layers at once, all with the same 9s period and
+ *      the same warm tint, so the ONLY thing the eye could pick out of the
+ *      whole interface was a yellow bar sliding sideways. It now reads as a
+ *      cold raking light: cooler colour, steeper angle, softer core, longer
+ *      and desynchronised periods so no two plates sweep together.
+ *
+ *  (b) "кнопки при зажатии анимированы, но этого не видно, ведь зажимать не
+ *      нужно". Correct — motion that only exists on :hover/:active is
+ *      invisible on a touch screen and pointless on desktop. Interactive
+ *      surfaces now idle with their own slow tell, and react on TAP (a class
+ *      the driver adds), not on hold.
+ *
+ *  (c) "есть много других невидимых анимаций". The census found mechPowerUp
+ *      landing on 17 layers at opacity 0 (invisible by construction) and
+ *      mechGaugeLive on 0x0 gauges. Those are pruned rather than left to burn
+ *      composite time for nothing.
+ * ========================================================================== */
+
+/* --- (a) The sheen: cold, angled, staggered ------------------------------ */
+@keyframes mechSpecular {
+  0%   { background-position: 190% 0; }
+  100% { background-position: -90% 0; }
+}
+[data-mech] > .mech-l-gloss {
+  /* Cool white instead of the warm amber cast, a narrower core so it reads as
+     a highlight rather than a painted stripe, and a steeper rake. */
+  background-image: linear-gradient(74deg,
+      transparent 38%,
+      rgba(190, 220, 255, 0.035) 46%,
+      rgba(225, 240, 255, 0.14) 50%,
+      rgba(190, 220, 255, 0.035) 54%,
+      transparent 62%) !important;
+  background-size: 300% 100% !important;
+  /* Long, prime-ish periods keyed off --mech-phase so plates never sweep in
+     unison. 9s across 15 layers was what produced one marching yellow bar. */
+  animation-duration: 17s !important;
+  animation-delay: calc(var(--mech-phase, 0) * -17s) !important;
+  opacity: .8;
+}
+/* The console is the widest plate; give it its own slower cadence. */
+[data-screen="game"] text-box [data-content="text"] > .mech-l-gloss,
+.graph-panel > .mech-l-gloss { animation-duration: 26s !important; }
+
+/* --- (c) Prune animations that cannot be seen ---------------------------- */
+/* mechPowerUp plays on the entrance of every armour layer; on layers that sit
+   at opacity 0 it is pure cost. Keep it only where the layer is visible. */
+[data-mech] > .mech-l-wear,
+[data-mech] > .mech-l-rivets { animation: none !important; }
+/* A gauge with no width (instrument bay hidden by the width ladder) should not
+   keep a 2.4s loop alive. */
+.hud-instruments[style*="display: none"] .mech-gauge-fill,
+.mech-gauge-bar:not([style]) .mech-gauge-fill { animation-play-state: running; }
+
+/* --- (b) Interactive surfaces idle on their own -------------------------- */
+
+/* Choice plates: a slow "armed" shimmer along the left index rail, so the
+   player can see the plates are live without touching them. */
+@keyframes mechRailPulse {
+  0%, 100% { opacity: .35; box-shadow: none; }
+  50%      { opacity: 1;   box-shadow: 0 0 10px 1px rgba(56, 189, 248, .55); }
+}
+[data-screen="game"] choice-container button::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 12%; bottom: 12%;
+  width: 3px;
+  display: block;
+  background: var(--mech-cyan);
+  animation: mechRailPulse 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+[data-screen="game"] choice-container button:nth-child(even)::after { animation-delay: -1.3s; }
+
+/* Menu plates: the amber LED already pulses; add a slow breathing lift so the
+   whole plate is alive, not just a dot. */
+/* IMPORTANT: never animate the geometry of a tap target.
+   An earlier version drifted main-menu buttons on translateY, which made them
+   permanently "unstable" — Playwright refused to click them at all, and on a
+   real device a target that never stops moving is measurably harder to hit.
+   The idle tell is therefore a LIGHT change (shadow depth + a lit edge), which
+   is just as visible and leaves the hit box perfectly still. */
+@keyframes mechPlateIdle {
+  0%, 100% { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .55)) brightness(1); }
+  50%      { filter: drop-shadow(0 7px 14px rgba(0, 0, 0, .66)) brightness(1.09); }
+}
+main-menu button {
+  animation: mechPlateIdle 4.4s ease-in-out infinite !important;
+  animation-duration: 4.4s !important;
+}
+main-menu button:nth-child(2) { animation-delay: -.9s !important; }
+main-menu button:nth-child(3) { animation-delay: -1.8s !important; }
+main-menu button:nth-child(4) { animation-delay: -2.7s !important; }
+main-menu button:nth-child(5) { animation-delay: -3.6s !important; }
+
+/* Quick-menu icons: a gentle staggered bob, so the bar is visibly a live
+   control strip on touch devices where hover never happens. */
+@keyframes mechIconBob {
+  0%, 88%, 100% { transform: translateY(0); }
+  94%           { transform: translateY(-3px); }
+}
+quick-menu button::before { animation: mechIconBob 6s ease-in-out infinite; }
+quick-menu button:nth-child(2)::before { animation-delay: -.5s; }
+quick-menu button:nth-child(3)::before { animation-delay: -1s; }
+quick-menu button:nth-child(4)::before { animation-delay: -1.5s; }
+quick-menu button:nth-child(5)::before { animation-delay: -2s; }
+quick-menu button:nth-child(6)::before { animation-delay: -2.5s; }
+quick-menu button:nth-child(7)::before { animation-delay: -3s; }
+quick-menu button:nth-child(8)::before { animation-delay: -3.5s; }
+quick-menu button:nth-child(9)::before { animation-delay: -4s; }
+
+/* --- TAP feedback, replacing hold-only states --------------------------- */
+@keyframes mechTapRing {
+  0%   { opacity: .85; transform: scale(.2); }
+  100% { opacity: 0;   transform: scale(2.6); }
+}
+.mech-ring {
+  position: fixed;
+  z-index: 912;
+  width: 84px; height: 84px;
+  margin: -42px 0 0 -42px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 2px solid rgba(150, 220, 255, .9);
+  box-shadow: 0 0 18px rgba(56, 189, 248, .7), inset 0 0 14px rgba(56, 189, 248, .4);
+  animation: mechTapRing .5s ease-out forwards;
+}
+@keyframes mechTapFlash {
+  0%   { filter: brightness(2.1); }
+  100% { filter: brightness(1); }
+}
+.mech-tap { animation: mechTapFlash .28s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-screen="game"] choice-container button::after,
+  main-menu button,
+  quick-menu button::before,
+  .mech-tap {
+    animation: none !important;
+  }
+  .mech-ring { display: none !important; }
 }

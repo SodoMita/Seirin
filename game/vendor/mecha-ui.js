@@ -1253,6 +1253,42 @@
         }
     }
 
+    /* Tap feedback that does not depend on hover or hold.
+       Hover states are invisible on a touch screen and hold states require a
+       gesture nobody performs, so every interactive surface acknowledges a
+       plain tap instead: a brightness flash on the control plus an expanding
+       ring at the contact point. */
+    var tapBound = false;
+    function bindTapFeedback () {
+        if (tapBound) { return; }
+        tapBound = true;
+        doc.addEventListener('pointerdown', function (evt) {
+            var t = evt.target;
+            var hit = null;
+            while (t && t !== doc.body) {
+                if (t.tagName === 'BUTTON' || (t.getAttribute && t.getAttribute('data-log-jump'))) { hit = t; break; }
+                t = t.parentNode;
+            }
+            if (!hit) { return; }
+            replay(hit, 'mech-tap', 320);
+            var layer = doc.querySelector('.mech-fx');
+            if (!layer) {
+                layer = doc.createElement('div');
+                layer.className = 'mech-fx';
+                layer.setAttribute('aria-hidden', 'true');
+                doc.body.appendChild(layer);
+            }
+            var ring = doc.createElement('div');
+            ring.className = 'mech-ring';
+            ring.style.left = Math.round(evt.clientX) + 'px';
+            ring.style.top = Math.round(evt.clientY) + 'px';
+            layer.appendChild(ring);
+            global.setTimeout(function () {
+                if (ring.parentNode) { ring.parentNode.removeChild(ring); }
+            }, 520);
+        }, true);
+    }
+
     function bindChoiceCommit () {
         var c = doc.querySelector('choice-container');
         if (!c || c.__mechCommitBound) { return; }
@@ -1264,6 +1300,14 @@
             while (el2 && el2 !== c && el2.tagName !== 'BUTTON') { el2 = el2.parentNode; }
             if (el2 && el2.tagName === 'BUTTON' && el2.classList) {
                 el2.classList.add('mech-commit');
+                /* Retract the rest of the rack the way it arrived, so the fork
+                   closes as machinery withdrawing instead of a hard cut. */
+                var kids = c.querySelectorAll('button');
+                var i;
+                for (i = 0; i < kids.length; i++) {
+                    if (kids[i] !== el2) { kids[i].classList.add('mech-retract'); }
+                }
+                c.classList.add('mech-out');
             }
         }, true);
     }
@@ -1273,6 +1317,7 @@
         try { reactToScene(); } catch (e) { /* never break the page */ }
         try { reactToStats(); } catch (e) { /* never break the page */ }
         try { bindChoiceCommit(); } catch (e) { /* never break the page */ }
+        try { bindTapFeedback(); } catch (e) { /* never break the page */ }
     }
 
     /* ================================================================== *
@@ -1456,6 +1501,7 @@
         syncModalFlag: syncModalFlag,
         undraggable: undraggable,
         tickAnimations: tickAnimations,
+        bindTapFeedback: bindTapFeedback,
         applyScale: applyScale,
         readScale: readScale,
         rewindSteps: rewindSteps,
