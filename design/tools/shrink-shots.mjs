@@ -18,9 +18,27 @@ if (!existsSync(dir)) { console.error('no such directory: ' + dir); process.exit
 const pngs = readdirSync(dir).filter(f => f.endsWith('.png'));
 if (!pngs.length) { console.log('nothing to shrink in ' + dir); process.exit(0); }
 
+// playwright-core may live outside this repo (the sandbox installs it in
+// /tmp). Try the normal resolution first, then NODE_PATH/PLAYWRIGHT_PATH, so
+// the tool works both on a dev machine and in CI.
 let chromium;
-try { ({ chromium } = (await import('playwright-core')).default || await import('playwright-core')); }
-catch { console.error('playwright-core not installed; skipping'); process.exit(0); }
+const candidates = [
+    'playwright-core',
+    process.env.PLAYWRIGHT_PATH,
+    (process.env.NODE_PATH ? process.env.NODE_PATH.split(':')[0] + '/playwright-core/index.js' : null),
+    '/tmp/node_modules/playwright-core/index.js',
+].filter(Boolean);
+for (const c of candidates) {
+    try {
+        const mod = await import(c);
+        chromium = (mod.default && mod.default.chromium) || mod.chromium;
+        if (chromium) { break; }
+    } catch { /* try the next candidate */ }
+}
+if (!chromium) {
+    console.error('playwright-core not found. Tried:\n  ' + candidates.join('\n  '));
+    process.exit(1);
+}
 
 const exe = process.env.CHROMIUM_PATH || '/tmp/cbin/chromium';
 const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox', '--disable-gpu'] });

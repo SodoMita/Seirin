@@ -427,3 +427,54 @@ I had let 45 PNGs reach **34 MB** tracked in Git, contradicting my own session-1
 note. Now JPEG at 1280px/q82 → **3.4 MB** (design/ overall 34 MB → 5.4 MB),
 with `design/tools/shrink-shots.mjs` to do it and a `.gitignore` rule on
 `design/preview/shots/*.png` so an un-shrunk capture cannot slip in again.
+
+---
+
+# Session 6 — viewport lock, native image gestures
+
+Two mobile-only defects: the page could be dragged/scrolled, and long-pressing
+a character opened the browser's Save/Copy image sheet over the scene.
+
+## Why `body { overflow: hidden }` was not enough
+
+`custom-ui.css` already had it, but on mobile the **root element** is what
+scrolls, and `overflow` does not stop overscroll chaining or the image callout.
+Measured at 400×820 with touch emulation:
+
+| Property | Was | Effect |
+|---|---|---|
+| `overscroll-behavior` | `auto` | rubber-band / pull-to-refresh reached the document |
+| `touch-action` | `auto` | pan + double-tap zoom over the stage |
+| sprite `draggable` | `true` | drag ghost, and feeds the long-press menu |
+| `-webkit-touch-callout` | unset | Save/Copy image sheet on long press |
+
+`html` is now `position: fixed; inset: 0` with `overflow: hidden`,
+`overscroll-behavior: none`, `touch-action: manipulation`. **`position: fixed`
+is the load-bearing part** — it is the only thing that reliably stops iOS
+Safari panning the page when an inner scroller hits its end.
+
+## The half that CSS cannot do
+
+The engine writes `draggable="true"` onto every sprite `<img>`. That is a DOM
+property, so no stylesheet can override it. The fix needs both halves: CSS for
+callout/drag/select/pointer-events on scenery, and delegated
+`contextmenu`/`dragstart` guards plus `undraggable()` in JS, re-run on mutation
+so sprites the engine renders later are covered too.
+
+Dialogue and codex text are deliberately **excluded** — a long press there is an
+intentional copy. Verified: `contextmenu` is prevented over a sprite and *not*
+prevented over the dialogue line.
+
+## Regressions explicitly checked (not assumed)
+
+| Interaction | Result |
+|---|---|
+| Tap console → advance | OK — 1st tap completes typing (15→48 chars), 2nd advances |
+| Tap where sprite overlaps console | OK (step 6 → 8) |
+| Quick-menu tap | OK (opens log) |
+| Atlas / history / choices / settings scrolling | all still scroll |
+| Tap on bare background | never advanced, before *or* after (engine listens on `text-box`) |
+
+That last row matters: it looked like a regression at first, so I stashed my
+changes and re-measured on the previous commit before concluding it was
+pre-existing engine behaviour.
