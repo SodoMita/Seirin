@@ -478,3 +478,73 @@ prevented over the dialogue line.
 That last row matters: it looked like a regression at first, so I stashed my
 changes and re-measured on the previous commit before concluding it was
 pre-existing engine behaviour.
+
+---
+
+# Session 7 — "анимации: возможно они были сделаны, но не видно"
+
+Both halves of that guess turned out to be right, for two different reasons.
+
+## They existed and were running
+
+`getComputedStyle` + `document.getAnimations()` during play: **74 animations
+running, 0 paused, 0 with zero duration**, `prefers-reduced-motion` off. So
+nothing was broken.
+
+## Reason 1 — amplitude below the perception floor
+
+Slow drift only registers above roughly **3 px/s**. Measured travel per second
+before this session:
+
+| Loop | Was | Now |
+|---|---|---|
+| sprite breathing | 1.3 px/s | **3.9 px/s** |
+| Ken Burns | 0.001 scale/s | **0.005 scale/s** |
+| dust motes | 2.3 vh/s | 2.9 vh/s |
+| key light | 2.8 %/s | **6.7 %/s** |
+| ticker | 1.3 %/s | 1.9 %/s |
+
+Every ambient loop got a larger amplitude *and* a shorter period. Breathing
+also gained a slight `scale` so the chest expands rather than the whole sprite
+sliding up.
+
+**Why pixel-diffing lied:** an early measurement reported "88% of pixels
+moving" and looked like proof the animation was fine. It was not — a 0.001/s
+zoom changes almost every pixel by 1–2 levels, which a differ counts and an eye
+cannot see. Amplitude-per-second is the honest metric here, not pixel churn.
+
+## Reason 2 — nothing reacted
+
+Ambient motion makes a scene feel *alive*; event motion makes it feel
+*responsive*. The second half did not exist: every state change was an instant
+value swap. Added (driver at 180ms — the 900ms housekeeping poll is far too
+coarse for a speaker swap):
+
+| Event | Reaction |
+|---|---|
+| speaker changes | nameplate slides in |
+| new line starts | console gives a lit pulse |
+| sprite enters | steps in from below |
+| scene changes | hangar-door light wipe |
+| stat changes | gauge flare + floating `+5 МИЯ` |
+| alert rises | dashboard shake + red threat wash |
+| choice taken | plate flashes and commits |
+
+## Bugs found in my own new code
+
+- **Floating delta was clipped to nothing** — HUD badges are `clip-path`'d with
+  `overflow: hidden`; the exact descendant-clipping trap already documented for
+  the nameplate (pill at y=31 inside a host starting at y=38). Deltas now live
+  in a dedicated `.mech-fx` overlay.
+- **Non-alert deltas never appeared below ~1150px** — their anchor was the
+  instrument bay, which the degradation ladder hides at that width. Added an
+  always-present fallback anchor.
+- **Delta colour is keyed to meaning, not sign** — rising Akatomi alert and
+  rising procrastination float *red* even though the number goes up.
+
+## Verification
+
+`prefers-reduced-motion: reduce` → **74 running animations drop to 1**, threat
+wash and deltas are `display:none`, motes are not built at all — while all 18
+armour plates and the nameplate stay intact. Five-viewport audit clean, 61/61
+tests, offline smoke passed.
