@@ -197,22 +197,8 @@ this file.
 what got built (plates mounted, layers, serials, gauge response to alert level,
 late-mount coverage). Run it with `node tests/mecha-ui.probe.mjs`.
 
-Reference screenshots of every state live in `design/preview/shots/`, and the
-art-direction boards this skin was built against are in `design/concepts/`.
-
----
-
-## Screenshot index (`design/preview/shots/`)
-
-| File | Shows |
-|---|---|
-| `game_menu.jpg` / `game_menu_hover.jpg` | title screen; hover arms the hazard chevrons |
-| `game_dialogue.jpg` | cockpit console with speaker plate |
-| `game_choices.jpg` / `game_choices_hover.jpg` | numbered choice plates, rest and hover |
-| `game_alarm.jpg` / `z_hud_alarm.jpg` / `z_alert_65.jpg` | critical-alert illumination |
-| `game_mobile.jpg` | 390px phone layout |
-| `game_reduced_motion.jpg` | `prefers-reduced-motion` — full material, zero motion |
-| `z_textbox.jpg` / `z_hover.jpg` | close-ups of console and hovered plate |
+The art-direction boards this skin was built against are in `design/concepts/`.
+Screenshots are transient review artifacts and are deliberately not versioned.
 
 Concept boards in `design/concepts/` (generated as art direction, then used as
 the build checklist):
@@ -466,10 +452,9 @@ what shipped:
 
 ## Screenshot weight
 
-I had let 45 PNGs reach **34 MB** tracked in Git, contradicting my own session-1
-note. Now JPEG at 1280px/q82 → **3.4 MB** (design/ overall 34 MB → 5.4 MB),
-with `design/tools/shrink-shots.mjs` to do it and a `.gitignore` rule on
-`design/preview/shots/*.png` so an un-shrunk capture cannot slip in again.
+The JPEG review set was subsequently removed entirely: screenshots are
+transient evidence, not deliverables. `design/preview/shots/` is gitignored so
+future captures cannot silently re-inflate the repository.
 
 ---
 

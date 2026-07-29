@@ -75,8 +75,8 @@ node --test game/tests/game.test.mjs \
 cd game && npm i jsdom --prefix . --no-save --silent
 REQUIRE_JSDOM=1 node tests/offline-smoke.mjs            # -> SMOKE PASSED
 
-# Screenshots are JPEG-only in Git (see design/MECHA_UI.md, session 5)
-CHROMIUM_PATH=/tmp/cbin/chromium node design/tools/shrink-shots.mjs
+# Screenshots are transient review evidence and must not be committed.
+# design/preview/shots/ is ignored.
 
 # The older reference build keeps its own suite:
 node --test cyber-nexus/tests/failsafe.test.mjs cyber-nexus/tests/icons-offline.test.mjs

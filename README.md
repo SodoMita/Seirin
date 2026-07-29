@@ -9,8 +9,8 @@ Visual-novel project assets and design documents for **Seirin: Night Shift — R
   with jump-to-node, an archives codex, and a 2.5D skeuomorphic mecha UI
   (`vendor/mecha-ui.css` + `mecha-ui.js`). UI design notes, engine traps and
   session history: [`design/MECHA_UI.md`](design/MECHA_UI.md).
-- `design/` — UI art direction (`concepts/`), reference screenshots
-  (`preview/shots/`, JPEG only) and `tools/shrink-shots.mjs`.
+- `design/` — UI art direction (`concepts/`) and engineering notes. Transient
+  review screenshots are intentionally not versioned.
 - `cyber-nexus/` — older runnable Monogatari example VN, kept for reference ("Cyber-Nexus: The Static Singularity"). **Runs with no server, no CDN and no runtime fetch**: double-click `index.html`. Game code lives in `vendor/game.js` (story script, HUD, codex, mini-game); guarded by `vendor/failsafe.js` (schema validation, rollback-safe mutations, state machine, lint, no-fetch guard) and `vendor/icons-offline.*` (local icon glyphs — no font CDN).
 - `backgrounds/` — generated scene backgrounds
 - `characters/` — character references and iterations

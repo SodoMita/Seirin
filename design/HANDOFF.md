@@ -198,4 +198,3 @@ Nothing is known-broken. Ranked by likely value:
 | `design/MECHA_UI.md` | **The UI bible.** Starts with a trap table and a one-page architecture summary, then a per-session log of every bug, why it happened and how it was measured. |
 | `design/HANDOFF.md` | This file. |
 | `ai_agent_docs/ARENA_ENVIRONMENT.md` | Sandbox capabilities/limits (allowlisted egress, no preinstalled Python packages, non-persistent shell). |
-| `design/preview/shots/` | Reference screenshots, JPEG only. Regenerate/shrink with `design/tools/shrink-shots.mjs`. |
