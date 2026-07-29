@@ -6,11 +6,12 @@
  * Vulkan backend needing VK_EXT_headless_surface, which this sandbox's
  * software Vulkan ICD does not provide, and debugging a whole Vulkan/ANGLE
  * stack just to run one fragment shader was not worth it next to a ~150
- * line C loop that does the exact same math directly on pixels.
+ * line C loop that does the exact same math directly on pixels. Full
+ * account of what was tried: tools/img_pipeline/GLSL_ATTEMPT_NOTES.md.
  *
  * Order of operations (per this project's own spec, see
  * ai_agent_docs/skills/seirin-character-art/references/sprite-spec.md and
- * the regression recorded in tools/_gl_upscale_retired_notes.md): run this
+ * the regression recorded in tools/img_pipeline/GLSL_ATTEMPT_NOTES.md): run this
  * on the still-OPAQUE source image first. Alpha/background removal is a
  * separate later step (matte_floodfill.c) run on this program's output, at
  * final resolution — never the other way around, or the resize filter
