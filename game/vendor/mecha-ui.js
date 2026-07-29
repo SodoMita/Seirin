@@ -583,6 +583,24 @@
         }
     }
 
+    /* Real title block for main-screen, replacing the old ::before/::after
+       pseudo-title. As a normal-flow flex child ahead of <main-menu>, it
+       cannot overlap the button rail at any viewport height — the two are
+       siblings in a column, not two independently-positioned overlays. See
+       the OVERLAP note in mecha-ui.css section 9. */
+    function buildTitleBlock () {
+        var screen = doc.querySelector('main-screen');
+        if (!screen || screen.querySelector('.mech-title-block')) { return; }
+        var block = el('div', 'mech-title-block');
+        block.setAttribute('aria-hidden', 'true');
+        var title = el('span', 'mech-title', 'СЭЙРИН');
+        var sub = el('span', 'mech-sub', 'НОЧНАЯ СМЕНА \u00B7 РЕЗОНАНС 2030');
+        block.appendChild(title);
+        block.appendChild(sub);
+        if (screen.firstChild) { screen.insertBefore(block, screen.firstChild); }
+        else { screen.appendChild(block); }
+    }
+
     function clamp (n, lo, hi) { return n < lo ? lo : (n > hi ? hi : n); }
 
     function setGauge (key, pct) {
@@ -646,10 +664,48 @@
 
     /* ================================================================== *
      * 4. PARALLAX
+     * ------------------------------------------------------------------
+     * Two tiers, because one global rotation applied to every plate at once
+     * is not parallax — it is the whole screen shearing together as a single
+     * flat sheet, which is what the old ±1.1/1.5deg version did and why it
+     * did not read as 3D.
+     *
+     *   AMBIENT  (--mech-mx/--mech-my, whole-viewport, always on every
+     *   plate): a gentle structural sway, as if the cockpit itself is on a
+     *   gimbal. Small on purpose — it is background context, not the effect.
+     *
+     *   LOCAL HOT (--mech-lmx/--mech-lmy, written as an INLINE style on only
+     *   the one clickable plate under the pointer): a real per-element tilt
+     *   computed from where the pointer sits INSIDE THAT PLATE's own
+     *   rectangle, not the viewport. Only buttons (`plate`, `chip`) get it —
+     *   tilting the entire dashboard or console toward a cursor reads as
+     *   broken, not tactile, because those panels are structural, not held.
      * ================================================================== */
     var pointerBound = false;
     var pending = false;
-    var lastX = 0, lastY = 0;
+    var lastX = 0, lastY = 0, lastTarget = null;
+    var hotEl = null;
+
+    /* Only actual buttons get the strong local tilt. */
+    function hotHost (node) {
+        var t = node;
+        while (t && t !== doc.body) {
+            if (t.getAttribute) {
+                var kind = t.getAttribute('data-mech');
+                if (kind === 'plate' || kind === 'chip') { return t; }
+            }
+            t = t.parentNode;
+        }
+        return null;
+    }
+
+    function clearHot () {
+        if (!hotEl) { return; }
+        hotEl.classList.remove('mech-hot');
+        hotEl.style.removeProperty('--mech-lmx');
+        hotEl.style.removeProperty('--mech-lmy');
+        hotEl = null;
+    }
 
     function applyPointer () {
         pending = false;
@@ -660,11 +716,29 @@
         var st = doc.documentElement.style;
         st.setProperty('--mech-mx', mx.toFixed(3));
         st.setProperty('--mech-my', my.toFixed(3));
+
+        var host = hotHost(lastTarget);
+        if (host !== hotEl) {
+            clearHot();
+            hotEl = host;
+            if (hotEl) { hotEl.classList.add('mech-hot'); }
+        }
+        if (hotEl) {
+            var r;
+            try { r = hotEl.getBoundingClientRect(); } catch (e) { r = null; }
+            if (r && r.width && r.height) {
+                var lx = clamp(((lastX - r.left) / r.width) * 2 - 1, -1, 1);
+                var ly = clamp(((lastY - r.top) / r.height) * 2 - 1, -1, 1);
+                hotEl.style.setProperty('--mech-lmx', lx.toFixed(3));
+                hotEl.style.setProperty('--mech-lmy', ly.toFixed(3));
+            }
+        }
     }
 
     function onPointer (evt) {
         lastX = evt.clientX;
         lastY = evt.clientY;
+        lastTarget = evt.target;
         if (pending) { return; }
         pending = true;
         if (global.requestAnimationFrame) { global.requestAnimationFrame(applyPointer); }
@@ -684,6 +758,7 @@
             return;
         }
         doc.addEventListener('mousemove', onPointer, true);
+        doc.addEventListener('mouseleave', clearHot, true);
         pointerBound = true;
     }
 
@@ -1439,6 +1514,7 @@
         try { applyScale(readScale()); } catch (e) { /* default 16px */ }
         try { bakeAll(); } catch (e) { /* CSS fallbacks cover this */ }
         try { buildAtmosphere(); } catch (e) { /* decorative only */ }
+        try { buildTitleBlock(); } catch (e) { /* decorative only */ }
         try { buildInstruments(); } catch (e) { /* decorative only */ }
         try { buildStrip(); } catch (e) { /* decorative only */ }
         try { mountAll(doc); } catch (e) { /* decorative only */ }
@@ -1468,6 +1544,7 @@
                 try { bindSliders(); } catch (e) { /* ignore */ }
                 try { retagIcons(); } catch (e) { /* ignore */ }
                 try { syncQuickMenu(); } catch (e) { /* ignore */ }
+                try { buildTitleBlock(); } catch (e) { /* ignore */ }
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
                 try { syncModalFlag(); } catch (e) { /* ignore */ }
@@ -1497,6 +1574,7 @@
         retagIcons: retagIcons,
         syncStripTop: syncStripTop,
         syncQuickMenu: syncQuickMenu,
+        buildTitleBlock: buildTitleBlock,
         tagLogRows: tagLogRows,
         syncModalFlag: syncModalFlag,
         undraggable: undraggable,
