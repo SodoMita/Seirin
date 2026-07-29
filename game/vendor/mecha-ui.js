@@ -1132,6 +1132,29 @@
         paintSlider(range);
     }
 
+    /* ================================================================== *
+     * 4h*. AUDIO STATUS NOTE
+     * ------------------------------------------------------------------
+     * The engine ships four volume sliders (Music, Sound, Voice, Video)
+     * which DO control engine Volume preferences and persist across saves.
+     * But no audio files are shipped in game/assets/ yet — the sliders
+     * move, they just have nothing to affect. A control that visibly does
+     * nothing is a small lie in the UI, so inject a status note that
+     * tells the player the wiring is real and content is coming.
+     * ================================================================== */
+    function buildAudioNote () {
+        var audioPanel = doc.querySelector('[data-settings="audio"]');
+        if (!audioPanel || audioPanel.querySelector('.mech-audio-note')) { return; }
+        /* Only show the note when no audio channels have active playback.
+           If music or sound assets appear later, this note will still be
+           injected once at boot but can be hidden by CSS when any slider
+           drives real volume. For now, always show. */
+        var note = el('p', 'mech-audio-note');
+        note.setAttribute('data-mech-note', '1');
+        note.textContent = 'Аудиофайлы ещё не добавлены. Ползунки работают — настройки сохранятся, когда появится звук.';
+        audioPanel.appendChild(note);
+    }
+
     /* NOTE: there is deliberately no speaker-plate code here any more.
        The nameplate used to be mirrored into a sibling element and positioned
        from JS every frame-ish, which the user correctly spotted as "выглядит
@@ -1535,6 +1558,7 @@
         try { syncQuickMenu(); } catch (e) { /* decorative only */ }
         try { tagLogRows(); } catch (e) { /* decorative only */ }
         try { buildScaleControl(); } catch (e) { /* decorative only */ }
+        try { buildAudioNote(); } catch (e) { /* decorative only */ }
         try { syncModalFlag(); } catch (e) { /* decorative only */ }
         try { bindGestureGuard(); } catch (e) { /* decorative only */ }
         try { tickAnimations(); } catch (e) { /* decorative only */ }
@@ -1560,6 +1584,7 @@
                 try { buildTitleBlock(); } catch (e) { /* ignore */ }
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
+                try { buildAudioNote(); } catch (e) { /* ignore */ }
                 try { syncModalFlag(); } catch (e) { /* ignore */ }
                 try { undraggable(); } catch (e) { /* ignore */ }
             }, 900);

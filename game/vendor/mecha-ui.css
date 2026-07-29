@@ -1571,6 +1571,29 @@ settings-screen span[data-string] {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
 }
 
+/* Audio status note: "coming soon" indicator for the audio section.
+   Injected by mecha-ui.js when no audio files are shipped yet. */
+.mech-audio-note {
+  display: block;
+  margin: 14px auto 4px;
+  max-width: 380px;
+  padding: 8px 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(184, 202, 223, 0.6);
+  text-align: center;
+  border: 1px dashed rgba(251, 191, 36, 0.25);
+  background: rgba(0, 0, 0, 0.2);
+  line-height: 1.45;
+}
+.mech-audio-note::before {
+  content: '⚠ ';
+  color: var(--mech-amber, #fbbf24);
+  font-size: 0.85em;
+}
+
 /* --- Range sliders: machined track + knurled knob -----------------------
    The engine ships bare <input type="range">, which renders as the browser's
    default blue circle on an invisible track — the exact "knobs are just blue
