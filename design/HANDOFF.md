@@ -1,201 +1,222 @@
 # SEIRIN — handoff to the next agent
 
-**Date:** 2026-07-29 · **Branch:** `arena/019faa32-seirin` · **PR:** #9 (open)
-**Language with the user:** Russian. They read code output carefully and will
-spot a claim that is not backed by a measurement.
+**Date:** 2026-07-29 · **Branch:** `arena/019fadbc-seirin` (fixed for this
+session — never switch/create/push another branch)
+**Language with the user:** Russian conversationally, but this turn's request
+came through in English. They read code output carefully and want claims
+backed by a measurement, not a description of what the CSS is *supposed* to
+do.
 
 ---
 
-## 0. First 60 seconds (the sandbox WILL bite you)
+## 0. First 60 seconds (the sandbox WILL bite you — it did this session)
 
-The Arena sandbox silently re-clones this repo mid-session: the local checkout
-rolls back to the session's base commit, uncommitted files vanish, and
-`git status` cheerfully reports "clean". **This happened in 4 of the last 6
-sessions.** It is not a hypothetical.
+The Arena sandbox can silently re-clone this repo mid-session: the local
+checkout rolls back to an older commit, uncommitted local edits vanish, and
+`git status` reports "clean" as if nothing happened. **It happened again this
+session** — a local commit (`e30f284`, redoing the rivets/menu-overlap/tilt
+fixes) turned out to be a *duplicate* of work already pushed further ahead by
+an earlier turn in the same session, under commit `b66c8b9`. `git push`
+correctly rejected the stale local commit; the fix was `git fetch` +
+`git reset --hard` onto the remote tip, not force-push.
 
 ```bash
 cd /home/user/Seirin
 git log --oneline -1
-git ls-remote origin arena/019faa32-seirin | cut -f1   # compare with HEAD
+git fetch origin arena/019fadbc-seirin
+git log --oneline -1 FETCH_HEAD
 ```
 
-If they differ, recover — your work is on `origin`, not on disk:
+If `HEAD` and `FETCH_HEAD` differ, **trust `FETCH_HEAD`** — diff them
+(`git diff HEAD FETCH_HEAD --stat`) before doing anything destructive, but if
+FETCH_HEAD is a superset of your local work (as it was this session), just:
 
 ```bash
-git stash -u -q 2>/dev/null
-git fetch -q origin arena/019faa32-seirin:refs/remotes/origin/arena/019faa32-seirin
-git reset -q --hard origin/arena/019faa32-seirin
-wc -l game/vendor/mecha-ui.css game/vendor/mecha-ui.js   # expect 3259 / 1521
+git reset -q --hard FETCH_HEAD
 ```
 
-**Survival rule: commit and push every finished artifact immediately.** Not in
-a batch at the end. Unpushed equals nonexistent.
+**Survival rule, restated because it mattered again this session: commit and
+push every finished artifact immediately, not in a batch at the end.**
+Unpushed equals nonexistent, and if the sandbox resets under you, only
+`origin` survives.
 
-One caveat learned the hard way: after a sandbox reset your new commit may be
-built on the *old* base while `origin` is ahead. Don't force-push — rebase:
-
-```bash
-git rebase --onto origin/arena/019faa32-seirin <old-base> HEAD
-```
+Current verified-good state: `game/vendor/mecha-ui.css` = 3460 lines,
+`game/vendor/mecha-ui.js` = 1612 lines, `node --test` = 61/61,
+`offline-smoke.mjs` = all PASS, `es5-scan.mjs` = clean.
 
 ---
 
-## 1. Rebuilding the browser (needed for any visual work)
+## 1. Rebuilding a real browser (needed for any visual claim)
 
-`/tmp` does not survive, so Chromium must be re-extracted each session. Real
-browser binaries are blocked by the egress allowlist; npm is not. This works:
+`/tmp` does not survive between turns *or* sometimes between bash calls in
+the same turn — background servers (`python3 -m http.server &`) died
+unpredictably this session even with `nohup`/`disown`/`setsid`. If a
+static file server refuses to answer on a port you just started it on,
+re-launch it in the *same* bash call as the thing that uses it, or fall back
+to the jsdom probe below instead of fighting the server.
+
+Real Chromium (works around the egress allowlist blocking browser binary
+downloads — `npm install` reaches `registry.npmjs.org`, real browser CDNs are
+blocked):
 
 ```bash
-cd /tmp && npm i --no-audit --no-fund --prefix /tmp \
+mkdir -p /tmp/pw /tmp/cbin
+cd /tmp/pw && npm i --no-audit --no-fund --prefix /tmp/pw \
   playwright-core@1.49.0 @sparticuz/chromium@131.0.1
-mkdir -p /tmp/cbin && cd /tmp && node -e "
+node -e "
 const fs=require('fs'),z=require('zlib');
-fs.writeFileSync('/tmp/cbin/chromium', z.brotliDecompressSync(fs.readFileSync('/tmp/node_modules/@sparticuz/chromium/bin/chromium.br')));
+fs.writeFileSync('/tmp/cbin/chromium', z.brotliDecompressSync(fs.readFileSync('/tmp/pw/node_modules/@sparticuz/chromium/bin/chromium.br')));
 ['al2023','swiftshader'].forEach(n=>fs.writeFileSync('/tmp/cbin/'+n+'.tar',
-  z.brotliDecompressSync(fs.readFileSync('/tmp/node_modules/@sparticuz/chromium/bin/'+n+'.tar.br'))));"
+  z.brotliDecompressSync(fs.readFileSync('/tmp/pw/node_modules/@sparticuz/chromium/bin/'+n+'.tar.br'))));
+"
 chmod +x /tmp/cbin/chromium
 cd /tmp/cbin && mkdir -p lib && tar xf al2023.tar -C lib && tar xf swiftshader.tar -C .
-LD_LIBRARY_PATH=/tmp/cbin/lib/lib ./chromium --version   # Chromium 131
+LD_LIBRARY_PATH=/tmp/cbin/lib/lib /tmp/cbin/chromium --version   # Chromium 131
 ```
 
-Then drive it with `playwright-core` (`executablePath: '/tmp/cbin/chromium'`,
-args `--no-sandbox --disable-gpu --disable-dev-shm-usage`, and
-`LD_LIBRARY_PATH=/tmp/cbin/lib/lib` on the node process).
+Drive it with `playwright-core` (`executablePath: '/tmp/cbin/chromium'`, args
+`--no-sandbox --disable-gpu --disable-dev-shm-usage`,
+`LD_LIBRARY_PATH=/tmp/cbin/lib/lib` on the node process env). **No GPU** — an
+empty `requestAnimationFrame` loop tops out around 20fps, so FPS numbers are
+only meaningful *relative* to that ceiling; say so when reporting them.
 
-**This browser has no GPU.** An empty `requestAnimationFrame` loop tops out
-around 20fps, so FPS numbers are only meaningful *relative* to that ceiling.
-Say so when you report them; don't present 15fps as an absolute.
+**Lower-effort alternative that needs no server and survived every bash call
+this session:** `game/tests/mecha-ui.probe.mjs` boots `index.html` via jsdom
+(no network, no port) and reports plates mounted, layer counts, indicator
+response to alert level, and late-mount coverage:
 
----
+```bash
+cd game && npm i jsdom --prefix . --no-save --silent
+node tests/mecha-ui.probe.mjs
+```
 
-## 2. What this branch contains
-
-22 commits on top of `d27c0ec`. ~7,000 insertions across 77 files.
-
-**Recovery.** Merge `904fa18` had resolved conflicts toward a stale side and
-silently deleted **1,292 lines** — all 17 story labels, the route atlas, the
-archives codex, `LABEL_TITLES`, the boot watchdog — while `index.html` still
-shipped the modal markup, so Archives and the atlas were dead buttons. Restored
-from `aba98eb` (that commit lives on branch `arena/019fa60e-seirin`; after a
-sandbox re-clone you must `git fetch origin arena/019fa60e-seirin` before the
-SHA resolves). The unit suite went 37/1 → **61/61**; the long-standing
-`labels is not defined` failure was the same merge truncating a test mid-file.
-
-**New UI.** `game/vendor/mecha-ui.css` (3259 lines) + `mecha-ui.js` (1521),
-loaded last so they win the cascade over `custom-ui.css`:
-
-- 2.5D skeuomorphic armour: layered plates (rim / face / wear / gloss / rivets
-  / edge), canvas-baked metal and bruise textures published as CSS variables —
-  **no binary committed, nothing fetched**, deterministic PRNG so the wear is
-  identical every run.
-- Live HUD instruments (LEDs, segmented gauges, radar, telemetry ticker) driven
-  read-only from `engine.storage()`; alert escalates nominal → caution → alarm.
-- Themed system screens, quick-menu, engine modals; custom CSS-mask icons.
-- Route atlas reachable from the main menu; archives codex; history log with
-  Ren'Py-style click-to-rewind (chained `engine.rollback()`, so FailSafe's
-  `onRevert` unwinds stats correctly — a jump would corrupt the run).
-- Numeric UI-scale setting (60–160%, persisted in `localStorage`).
-- Viewport locked; native image long-press/drag suppressed on artwork.
-- Ambient + event animation (see §4).
+It cannot show real rendering (jsdom has no layout engine), so it cannot
+verify pixel positions, transforms, or animation amplitude — only that the
+JS ran without throwing and built the expected DOM/CSS-variable shape. For
+anything about *what it looks like*, you need the real-Chromium route above.
 
 ---
 
-## 3. Current state
+## 2. What this session did
+
+User report (paraphrased): rivets are animated, most animations are unused or
+invisible, the 2.5D doesn't look like 3D at all, sprite and button animation
+"make no sense" — wants a genuine skeuomorphic mecha UI, static concepts via
+image generation, dynamic behaviour via real math/logic (not vibes).
+
+This exact audit and fix set was **already completed and pushed** by an
+earlier turn in this same session (commits `65b8753` → `b66c8b9`, session log
+in `design/MECHA_UI.md` under "Session 9"). This turn's own redo of the same
+diagnosis (rivets, menu overlap, tilt) landed as commit `e30f284`, discovered
+to be a strict subset of what was already on `origin`, and was discarded via
+`git reset --hard` onto `origin`'s tip rather than merged or re-applied —
+**do not try to re-land `e30f284` or repeat this diagnosis**, it is already
+fixed and verified. One artifact from that discarded local work is worth
+keeping and IS committed: `design/concepts/05_squeomorph_button_states.jpg`,
+a generated reference board for physical button states (idle/hover/pressed)
+that can inform further static polish.
+
+Summary of what's actually fixed on `origin/arena/019fadbc-seirin` right now
+(full detail in `design/MECHA_UI.md`, "Session 9"):
+
+| Complaint | Root cause found | Fix |
+|---|---|---|
+| "Rivets are animated" | Bolt-row gradients shared one `background-image` list and one `background-position` keyframe with the running edge-light on the console's text panel | Split into two pseudo-elements: bolts on `::before` (never animates), edge light alone on `::after` |
+| "Main menu title overlaps buttons" | Two absolutely-positioned pseudo-elements (`top:16%`) racing an independently-centered `main-menu`, no shared layout parent, only one narrow-phone breakpoint guarded it | Real `.mech-title-block` element (`buildTitleBlock()` in JS) as `main-screen`'s first flex child; `main-menu` is the second — two flex siblings cannot share pixels |
+| "2.5D doesn't look 3D" | `--mech-mx/--mech-my` were whole-viewport pointer coords applied identically to every plate — the whole UI sheared as one flat card, at a max ~1.5° | Added `--mech-lmx/--mech-lmy`: pointer position *relative to whichever plate is under the cursor*, written only on that one `.mech-hot` element, at ~11–14° + `translateZ` lift + depth-separated sublayers |
+| "Sprite animation makes no sense" | Breathing scaled from sprite center, so the character's feet lifted 12.5px off the ground every cycle | `transform-origin: 50% 100%` (bottom edge), scale only, tiny counter-rotation for weight-shift; Splash (legless colloid) is the deliberate exception and keeps a real vertical float |
+| "Button animation makes no sense" | Hover/press only existed as flat `translateY`, invisible on touch, plus a filter-precedence bug where the idle-breathing keyframe silently outranked the new directional tilt shadow | Real per-plate tilt (`.mech-hot`) responds to tap/hover with a directional contact shadow that tracks pointer position; press sinks the plate `translateZ` negative instead of a flat nudge; `!important` fix for the animation-vs-declaration cascade trap |
+
+Also fixed in the same pass: a critical regression caught **before** commit
+(`main-screen { display:flex !important }` without `.active` scoping made
+menu and game screens render simultaneously, 640px/640px split) — logged in
+MECHA_UI.md as a cascade trap to remember (`!important` on a
+`[data-screen]`-family rule must match the engine's own `.active` condition,
+never the bare tag).
+
+---
+
+## 3. Current verified state
 
 | Check | Result |
 |---|---|
-| `node --test game/tests/{game,failsafe,icons-offline}.test.mjs` | **61 pass, 0 fail** |
-| `REQUIRE_JSDOM=1 node tests/offline-smoke.mjs` (in `game/`) | **SMOKE PASSED** |
-| `node game/tests/es5-scan.mjs game/vendor/{game,mecha-ui}.js` | clean |
-| 5-viewport audit (360→1440) | no blocked/off-screen buttons, no overlaps |
-| Text contrast | 12.9–15.2 : 1 (AAA is 7) |
-| `prefers-reduced-motion` | 74 animations → 1; plates and text intact |
-| `design/` tracked size | 6.3 MB (was 34 MB — JPEG only, PNG gitignored) |
+| `node --test game/tests/{game,failsafe,icons-offline}.test.mjs` (from `game/`) | **61 pass, 0 fail** |
+| `REQUIRE_JSDOM=1 node tests/offline-smoke.mjs` (from `game/`) | **SMOKE PASSED**, all listed checks PASS |
+| `node tests/es5-scan.mjs vendor/game.js vendor/mecha-ui.js` (from `game/`) | clean |
+| `node tests/mecha-ui.probe.mjs` (from `game/`, jsdom) | 19 plates mounted, 0 errors, indicators respond correctly to alert 0/20/55 |
+| Real-Chromium per-corner tilt probe | `.mech-hot` + correct `--mech-lmx/--mech-lmy` at all 4 reachable corners of a button (2 corners are clipped away by the plate's own chamfer geometry — expected, not a bug) |
+| Real-Chromium menu-overlap probe | `overlapPx: 0` at 1280×720, 1920×1080, 1366×768, 1440×900, 390×844, 844×390 |
 
-`MechaUI` exposes `start, refresh, mountAll, syncChoices, bindSliders,
-retagIcons, syncStripTop, syncQuickMenu, tagLogRows, syncModalFlag,
-undraggable, tickAnimations, bindTapFeedback, applyScale, readScale,
-rewindSteps, bakeTextures, plates` — useful handles when probing from a page
-evaluate.
+No known-broken item as of this handoff.
 
 ---
 
-## 4. Animation: current design
+## 4. Open items / suggested next steps
 
-Two layers, because the first alone was not enough.
+Ranked by likely value, carried over from the prior handoff plus this
+session's own notes:
 
-**Ambient loops** — retimed after measuring that everything was below the
-perception floor (~3px/s). Sprite breathing 3.9px/s, Ken Burns 0.005 scale/s,
-key light 6.7%/s. Sprite motion uses the individual `translate:` property,
-**never `transform:`** (the engine owns transform for left/center/right
-anchoring), and Ken Burns is scoped to the background element only — an earlier
-selector also matched sprite `<img>` children and silently killed breathing.
-
-**Event reactions** (`tickAnimations`, 180ms): nameplate slide-in on speaker
-change, console pulse on a new line, sprite step-in, scene wipe, gauge flare +
-floating `+5 МИЯ` delta, dashboard shake and red wash on alert, choice plates
-arriving from off-screen (120vw, alternating sides) and the rack retracting on
-commit, tap ring + flash on any button.
-
-Delta colour is keyed to **meaning, not sign**: rising Akatomi alert and rising
-procrastination float red even though the number goes up.
-
-All of it is gated in `prefers-reduced-motion`.
-
----
-
-## 5. Open items / suggested next steps
-
-Nothing is known-broken. Ranked by likely value:
-
-1. **Verify on a real device.** Everything here was measured in a GPU-less
-   headless Chromium. The user plays on Android/Brave at `localhost:8000`;
-   their screenshots have repeatedly caught things the sandbox could not
-   (native long-press menu, page scrolling, the pumping backdrop).
-2. **Audio.** `engine.settings` maps `music`/`sounds`/`voices` asset paths and
-   `engine.preferences` sets Music/Voice/Sound volumes, and the settings screen
-   renders four themed volume sliders — but **no audio files ship**
-   (`game/assets/` has only `characters/`, `scenes/`, `fonts/`). Four sliders
-   that control nothing are a small lie in the UI; either add audio or hide
-   them.
-3. **Save/load screens** got the base theme but no dedicated pass; save slots
-   are still fairly plain.
-4. **Story content** — only Chapter 0 exists; the 17 labels end quickly.
-   `LABEL_TITLES` in `game/vendor/game.js` is the map.
-5. **Route atlas performance** improved 6 → 15fps but is still the heaviest
-   screen. If it needs more, virtualise the 17 cards rather than shaving
-   further effects.
-6. Consider retiring `cyber-nexus/` or clearly marking it archived — it has
-   confused at least one agent (and this doc's own predecessor).
+1. **Verify on a real device.** Everything measured this session and last was
+   in a GPU-less headless Chromium extracted via the `@sparticuz/chromium`
+   trick above. The user plays on Android/Brave; real-device screenshots have
+   repeatedly caught things the sandbox could not (native long-press menu,
+   page scrolling, a pumping backdrop from an animate.css duration collision).
+2. **Static skeuomorphic polish via image generation.** The user explicitly
+   asked for static UI direction via the image tool and dynamic behaviour via
+   math/logic (already the project's approach — canvas-baked textures +
+   measured CSS custom properties, not hand-wavy keyframes). One reference
+   board exists: `design/concepts/05_squeomorph_button_states.jpg`
+   (idle/hover/pressed states, materials, lighting notes). Consider
+   generating a matching board for the console/dash/housing plate kinds and
+   diffing the current CSS bevel/gradient recipe against it the way
+   `design/concepts/01-04` were used as the original build checklist.
+3. **Audio.** Four themed volume sliders in Settings control nothing — no
+   audio files ship (`game/assets/` has only `characters/`, `scenes/`,
+   `fonts/`). Either add audio or hide the sliders; a control that does
+   nothing is a small lie in the UI.
+4. **Save/load screens** got the base theme but no dedicated pass.
+5. **Story content** — only Chapter 0 exists; `LABEL_TITLES` in
+   `game/vendor/game.js` is the map of the 17 labels that currently exist.
+6. **Route atlas performance** — was 6fps, improved to the sandbox's ~20fps
+   idle ceiling by pausing all animation behind an open modal + halving
+   `backdrop-filter` blur. If a real device still finds it heavy, virtualise
+   the 17 cards rather than shaving further effects.
+7. Consider retiring `cyber-nexus/` or marking it clearly archived — it has
+   confused more than one agent session now.
 
 ---
 
-## 6. Working agreements with this user
+## 5. Working agreements with this user
 
-- **Screenshots are the proof.** Show the real rendered result via
-  `present_file`; don't claim a fix without one.
-- **Measure, don't assume.** Every accepted diagnosis this chain came from a
-  number: pixel positions, fps, px/s, contrast ratios. When a fix looked like a
-  regression (tapping the background stopped advancing), the right move was to
-  stash and re-measure on the previous commit — it turned out to be
-  pre-existing engine behaviour, not damage.
-- **Report your own mistakes.** Several bugs in this chain were mine (the
-  padding "correction" that oversized every layer, the idle animation that made
-  buttons unclickable, 34MB of PNGs). Saying so plainly was fine; hiding it
-  would not have been.
-- The user is often terse and in a hurry. Open the PR as soon as the commit is
-  green and fold later work into it.
-- Push after **every** artifact (see §0).
+- **Screenshots/measurements are the proof.** Don't claim a fix without a
+  live-Chromium number (pixel positions, computed transforms, animation
+  sample sequences) or a `present_file`'d screenshot. A change that "should"
+  work per reading the CSS is not verified.
+- **Diagnose before rewriting.** This session's most valuable moves were
+  narrow, targeted fixes at a measured root cause (one shared
+  `background-position` keyframe, one missing `.active` scope, one
+  `!important` cascade loss) rather than a wholesale rewrite of the UI system.
+  The architecture (plate model, canvas-baked textures, `.mech-hot` local
+  tilt, deterministic PRNG wear) is sound; keep extending it rather than
+  replacing it.
+- **Report your own mistakes plainly.** This chain has repeatedly found and
+  fixed bugs introduced by its own prior turn (the padding "correction" that
+  oversized every layer, an idle animation that made buttons unclickable, a
+  `display:flex` regression that showed two screens at once, a filter
+  cascade loss). Say so; don't quietly patch over it.
+- The user is often terse and in a hurry. Push after **every** finished
+  artifact (see §0) — do not batch commits toward the end of a turn.
 
 ---
 
-## 7. Documentation map
+## 6. Documentation map
 
 | File | What it is for |
 |---|---|
-| `AGENTS.md` | Repo invariants, commands, conventions. Now correctly points at `game/`. |
-| `README.md` | Directory map. Now lists `game/` first as the shipping build. |
-| `design/MECHA_UI.md` | **The UI bible.** Starts with a trap table and a one-page architecture summary, then a per-session log of every bug, why it happened and how it was measured. |
+| `AGENTS.md` | Repo invariants, commands, conventions. |
+| `README.md` | Directory map; `game/` is the shipping build. |
+| `design/MECHA_UI.md` | **The UI bible.** Trap table + one-page architecture summary, then a per-session log of every bug, why it happened, and how it was measured. Read "Session 9" for this session's full detail. |
 | `design/HANDOFF.md` | This file. |
-| `ai_agent_docs/ARENA_ENVIRONMENT.md` | Sandbox capabilities/limits (allowlisted egress, no preinstalled Python packages, non-persistent shell). |
+| `ai_agent_docs/ARENA_ENVIRONMENT.md` | Sandbox capabilities/limits (allowlisted egress, no preinstalled Python packages, non-persistent shell — read before assuming a tool is available). |
 | `design/preview/shots/` | Reference screenshots, JPEG only. Regenerate/shrink with `design/tools/shrink-shots.mjs`. |
+| `design/concepts/` | Art-direction boards used as build checklists (`01`–`04` for the original armour pass, `05` for button physical states from this session). |
