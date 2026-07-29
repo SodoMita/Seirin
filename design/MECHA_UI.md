@@ -237,3 +237,76 @@ failure mode to watch for.
 - Sprite motion uses `translate:`, never `transform:` (the engine owns
   transform for left/center/right anchoring), and Ken Burns must be scoped to
   the background element or it silently overrides sprite breathing.
+
+---
+
+# Session 3 — layout collisions, modals, history rewind, UI scale
+
+Reported from a real phone (Brave, landscape + portrait). Every item was
+reproduced by measurement before being changed.
+
+## The bottom-stack collision
+
+Three elements were independently pinned to the bottom edge with no owner:
+
+| Element | Position | z-index |
+|---|---|---|
+| engine `quick-menu` | `absolute; bottom:0` | 11 |
+| `.mech-strip` (telemetry) | moved to `bottom:0` under 62em | 79 |
+| build badge | `bottom:6px` | 95 |
+
+Measured at 880×400 the strip sat at y=380..400 while the bar was y=360..400,
+so the SEIRIN NET ticker painted over НАЗАД/СКРЫТЬ/ЖУРНАЛ **and swallowed
+their taps** (it is `pointer-events:none`, but the strip's own background hid
+them and the badge intercepted clicks).
+
+**Rule now: the quick-menu owns the bottom edge.** `--mech-qm-h` carries its
+measured height and everything else clears it. The strip is pinned under the
+dashboard at every breakpoint.
+
+## Quick-menu buttons ran off the left edge
+
+The engine sets `justify-content:flex-end`. Once nine Russian captions no
+longer fit, the overflow went off the **left** side: at 880px `НАЗАД` was at
+x=−212 and `СКРЫТЬ` at x=−111. That is why "кнопки назад нет" — it existed,
+just outside the viewport. The bar now centres, wraps, and drops captions to
+icons on short/narrow viewports.
+
+## Verification method
+
+Rather than eyeballing, every viewport is checked by hit-testing:
+`document.elementFromPoint()` at each button's centre must return that button.
+
+```
+PASS phone_land   tbH= 58 blocked=[] offscreen=[]
+PASS phone_port   tbH= 58 blocked=[] offscreen=[]
+PASS tablet       tbH= 67 blocked=[] offscreen=[]
+PASS desktop      tbH= 67 blocked=[] offscreen=[]
+PASS small_phone  tbH= 58 blocked=[] offscreen=[]
+```
+
+## Other fixes
+
+- **Compact console.** The speaker badge left the grid's header row and now
+  straddles the panel's top edge; the console shrank **166px → 58px**. The name
+  row is `position:absolute`, not `display:none` — the engine's grid areas must
+  keep resolving or the dialogue column collapses.
+- **Quit dialog.** `monogatari.css` ships `.modal>*{width:40%}` plus absolute
+  centring; a bare element selector lost, so the themed card rendered as a
+  full-height 40% column. Match `.modal__content` directly and keep the
+  engine's translate centring. The red on `[data-action="quit"]` needs
+  `!important` (same specificity as the generic actions rule, loses on order).
+- **History rewind (Ren'Py style).** Rows chain `engine.rollback()` rather than
+  jumping, so each reversal runs FailSafe's `onRevert` and stats unwind
+  correctly. A jump would move the cursor and leave affinities applied —
+  silently corrupting the save. Verified step 9 → 2.
+- **UI scale.** The engine's Resolution control is Electron-only (wired from
+  `electron()` and never rendered in a browser), so phone players had no DPI
+  option at all. Added a five-step control that sets the root font-size and
+  persists in `localStorage`.
+
+## Still open
+
+Requested and deferred to the next turn by the user: the animation pass
+(sprite/scene motion is in place, but the interface itself still needs more
+2.5D motion).
