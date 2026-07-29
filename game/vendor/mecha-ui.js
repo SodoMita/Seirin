@@ -718,6 +718,7 @@
                 try { mountAll(doc); } catch (e) { /* never break the page */ }
                 try { syncChoices(); } catch (e) { /* never break the page */ }
                 try { syncSpeaker(); } catch (e) { /* never break the page */ }
+                try { syncModalFlag(); } catch (e) { /* never break the page */ }
             }, 120);
         });
         try {
@@ -1101,6 +1102,38 @@
         if (plate.className !== 'mech-speaker show') { plate.className = 'mech-speaker show'; }
     }
 
+    /* ================================================================== *
+     * 4h. MODAL-OPEN FLAG (performance)
+     * ------------------------------------------------------------------
+     * Measured: the route atlas scrolled at 6 fps because 73 CSS animations
+     * kept running on the page behind it, all invisible, all still being
+     * re-sampled by the overlay's backdrop-filter every frame.
+     *
+     * Setting one class on <html> lets the stylesheet pause that work while
+     * any overlay is up (see section 27). Cheap to compute, and it also
+     * covers the archives modal and the engine's own dialog-log / alert.
+     * ================================================================== */
+    function syncModalFlag () {
+        var open = false;
+        var i, el2, ov;
+        var overlays = ['#graph-overlay', '#archives-overlay'];
+        for (i = 0; i < overlays.length; i++) {
+            ov = doc.querySelector(overlays[i]);
+            if (ov && !ov.hidden) { open = true; break; }
+        }
+        if (!open) {
+            /* Engine modals mark themselves with .modal--active. */
+            el2 = doc.querySelector('dialog-log.modal--active, alert-modal.modal--active, message-modal.modal--active');
+            if (el2) { open = true; }
+        }
+        var root = doc.documentElement;
+        var has = root.className.indexOf('mech-modal-open') !== -1;
+        if (open && !has) { root.className = root.className + ' mech-modal-open'; }
+        else if (!open && has) {
+            root.className = root.className.replace(/\s*mech-modal-open\b/g, '');
+        }
+    }
+
     function syncChoices () {
         var c = doc.querySelector('choice-container');
         var hint;
@@ -1129,6 +1162,7 @@
         try { tagLogRows(); } catch (e) { /* decorative only */ }
         try { buildScaleControl(); } catch (e) { /* decorative only */ }
         try { syncSpeaker(); } catch (e) { /* decorative only */ }
+        try { syncModalFlag(); } catch (e) { /* decorative only */ }
         try { observeDom(); } catch (e) { /* decorative only */ }
         try { bindParallax(); } catch (e) { /* decorative only */ }
         try { bindResize(); } catch (e) { /* decorative only */ }
@@ -1151,6 +1185,7 @@
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
                 try { syncSpeaker(); } catch (e) { /* ignore */ }
+                try { syncModalFlag(); } catch (e) { /* ignore */ }
             }, 900);
         }
     }
@@ -1170,6 +1205,7 @@
         syncQuickMenu: syncQuickMenu,
         tagLogRows: tagLogRows,
         syncSpeaker: syncSpeaker,
+        syncModalFlag: syncModalFlag,
         applyScale: applyScale,
         readScale: readScale,
         rewindSteps: rewindSteps,

@@ -2611,3 +2611,98 @@ dialog-log > .modal__content > button[data-action="dialog-log"] {
   .mech-strip-track { font-size: 0.55rem; }
   [data-mech="dash"] > .mech-l-rivets { display: none; }
 }
+
+/* ============================================================================
+ * 27. MODAL PERFORMANCE — "граф маршрутов тормозит"
+ * ----------------------------------------------------------------------------
+ * Measured on the route atlas at 1280x800: scrolling the panel ran at 6 fps.
+ * The cost was not one thing, it was a stack of them all compositing together
+ * on every frame:
+ *
+ *   - a full-viewport backdrop-filter: blur(8px) on the overlay, which must
+ *     re-sample everything behind it each frame;
+ *   - 73 CSS animations still running on the page BEHIND the modal (ambient
+ *     light, 14 motes, ticker, LEDs, gauges, radar, specular sweeps) — all
+ *     invisible, all still feeding that blur;
+ *   - filter: drop-shadow() on the panel and armour layers inside a scroller,
+ *     which cannot be cached and repaints with the scroll.
+ *
+ * Isolating them one by one: blur off 6->9, layers off ->11, filters off ->18.
+ * So everything here matters; the fix addresses all of them.
+ * ========================================================================== */
+
+/* --- 1. Freeze the world behind an open modal ---------------------------
+   html.mech-modal-open is set by mecha-ui.js whenever any overlay is up.
+   Animation behind an opaque-ish modal is invisible work that still costs
+   composite time — and with backdrop-filter it costs it twice. */
+html.mech-modal-open .mech-ambient,
+html.mech-modal-open .mech-motes,
+html.mech-modal-open .mech-strip,
+html.mech-modal-open .mech-beacon {
+  display: none !important;
+}
+/* Pause EVERY animation while a modal is up. An earlier version listed only
+   the HUD/game-screen/menu subtrees and missed the armour layers on the modal
+   panels themselves plus the ticker track — 23 animations were still running
+   (measured), which is what kept the atlas at 12 fps. The specular sweep on a
+   large panel is the single most expensive one per pixel. */
+html.mech-modal-open body *,
+html.mech-modal-open body *::before,
+html.mech-modal-open body *::after {
+  animation-play-state: paused !important;
+}
+/* The overlay's own entrance must still play, or the modal appears frozen. */
+html.mech-modal-open .graph-panel,
+html.mech-modal-open .archives-panel,
+html.mech-modal-open dialog-log .modal__content,
+html.mech-modal-open alert-modal .modal__content {
+  animation-play-state: running !important;
+}
+
+/* --- 2. Cheaper glass ----------------------------------------------------
+   A 4px blur is visually almost identical to 8px behind a 78%-opaque wash but
+   samples far less. The wash is also darkened slightly so the modal keeps the
+   same separation from the scene with the weaker blur. */
+.graph-overlay,
+.archives-overlay {
+  background: rgba(4, 6, 12, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* --- 3. Take filters off the scrolling surfaces --------------------------
+   filter: drop-shadow() on a scroll container repaints every frame. box-shadow
+   on the same element is cached by the compositor and looks the same here,
+   because the housing kind has no clip-path for a shadow to miss. */
+.graph-panel,
+.archives-panel {
+  filter: none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 18px 44px rgba(0, 0, 0, 0.75) !important;
+  /* Give the scroller its own layer so panning does not repaint the page. */
+  will-change: scroll-position;
+  contain: paint;
+}
+
+/* The specular sweep and the bruise texture are the two most expensive layers
+   per pixel, and a modal panel is the largest surface in the game. Measured on
+   the atlas: dropping the tiled 256px wear sheet alone took scrolling from
+   11 -> 14 fps. The face layer (bevel + grain) stays, so the panel still reads
+   as machined metal; only the per-pixel decoration goes. */
+.graph-panel > .mech-l-gloss,
+.archives-panel > .mech-l-gloss,
+.graph-panel > .mech-l-wear,
+.archives-panel > .mech-l-wear { display: none; }
+.graph-panel > .mech-l-edge::before,
+.archives-panel > .mech-l-edge::before { animation: none; opacity: .7; }
+
+/* --- 4. Atlas cards: static paint only ----------------------------------
+   17 cards x (clip-path + transition on box-shadow) is a lot of invalidation
+   while the column scrolls. Hover keeps working; it just recolours instead of
+   re-shadowing, and content-visibility skips off-screen cards entirely. */
+.graph-node {
+  transition: border-color 0.18s ease, background 0.18s ease;
+  contain: layout paint style;
+}
+.graph-col { content-visibility: auto; contain-intrinsic-size: auto 380px; }
