@@ -3152,14 +3152,22 @@ game-screen [data-character].mech-enter { animation: mechSpriteIn .42s cubic-bez
 .graph-panel > .mech-l-gloss { animation-duration: 26s !important; }
 
 /* --- (c) Prune animations that cannot be seen ---------------------------- */
-/* mechPowerUp plays on the entrance of every armour layer; on layers that sit
-   at opacity 0 it is pure cost. Keep it only where the layer is visible. */
+/* Wear and rivet layers are static decoration — they never needed an entrance
+   animation of their own. */
 [data-mech] > .mech-l-wear,
 [data-mech] > .mech-l-rivets { animation: none !important; }
-/* A gauge with no width (instrument bay hidden by the width ladder) should not
-   keep a 2.4s loop alive. */
-.hud-instruments[style*="display: none"] .mech-gauge-fill,
-.mech-gauge-bar:not([style]) .mech-gauge-fill { animation-play-state: running; }
+
+/* CENSUS FOOTNOTE — the remaining "invisible" entries are not waste:
+ *   mechPowerUp x17 at opacity 0  — these are armour layers on screens that
+ *     are not currently shown (settings/save/load). The 0.5s entrance has
+ *     already finished; computed style still reports `running` only because
+ *     animation-fill-mode:both keeps the final frame applied. A finished
+ *     animation costs nothing per frame, and it must stay armed so the plate
+ *     energises correctly when that screen is opened.
+ *   mechGaugeLive x3 on 0x0 gauges — the instrument bay hidden by the width
+ *     ladder; a zero-area element is not composited.
+ *   modalIn x2 on 0x0 panels — closed modals, same reasoning.
+ * Verified: with a modal open, syncModalFlag pauses everything anyway. */
 
 /* --- (b) Interactive surfaces idle on their own -------------------------- */
 

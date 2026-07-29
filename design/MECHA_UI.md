@@ -548,3 +548,74 @@ coarse for a speaker swap):
 wash and deltas are `display:none`, motes are not built at all — while all 18
 armour plates and the nameplate stay intact. Five-viewport audit clean, 61/61
 tests, offline smoke passed.
+
+---
+
+# Session 8 — the sheen monoculture, off-screen plates, hover-free motion
+
+## The bug behind "нереалистичный блик"
+
+`monogatari.css` bundles **animate.css**, whose `.animated` class hard-sets
+`animation-duration: var(--animate-duration)` = **1s**. The engine puts
+`.animated` on backgrounds, sprites and `text-box`, so it silently overrode
+every duration in this stylesheet.
+
+Measured consequence: the backdrop's 22s Ken Burns was actually cycling in
+**one second** — sampled `scale` went 1.138 → 1.031 → 1.046 in 1.35s, i.e. the
+background was *pumping*. Sprite breathing was a 1s twitch. Meanwhile
+`mechSpecular` ran on 15 layers on one shared 9s period with a warm tint, so
+the only motion the eye could resolve in the whole UI was one yellow bar
+sliding sideways — exactly what was reported.
+
+| | Before | After |
+|---|---|---|
+| Ken Burns period | 1s (pumping) | 22s, verified |
+| Sheen | 15 layers, 9s, warm, same phase | 17s / 26s, cold, 74°, phase-offset |
+
+**Rule:** any loop that lands on an engine-managed element must pin
+`animation-duration` with `!important`, or animate.css wins.
+
+## Choice plates arrive from off-screen
+
+26px of travel read as "appeared in place". Plates now start at 120vw and
+alternate sides like a loading rack. Measured live at 1000px wide:
+
+```
++ 18ms  [-949, 1449, -949]   <- genuinely outside the viewport
++188ms  [  85,  988, -949]
++647ms  [ 256,  256,  250]   <- seated
+plate 1 travelled 1229px
+```
+
+Choosing an option retracts the remaining rack the way it came.
+
+## Hover/hold motion replaced with idle + tap
+
+Motion that only exists on `:hover`/`:active` is invisible on touch and
+pointless elsewhere. Interactive surfaces now have their own idle tell (pulsing
+index rail on choice plates, light-breath on menu plates, staggered bob on
+quick-menu icons) and respond to a plain **tap**: brightness flash + expanding
+ring at the contact point.
+
+### A defect my own idle animation introduced
+
+The first version drifted menu buttons on `translateY`. Playwright then refused
+to click them — *"element is not stable"*. That is a real defect, not a test
+artifact: **a tap target that never stops moving is harder to hit on a real
+device too.** The idle tell is now a light/shadow change, leaving the hit box
+perfectly still. Worth remembering as a rule: never animate the geometry of
+something the player must hit.
+
+## Census footnote — the remaining "invisible" entries are not waste
+
+- `mechPowerUp` ×17 at opacity 0 → armour layers on screens that are not
+  currently shown. The 0.5s entrance already finished; computed style still
+  says `running` only because `animation-fill-mode: both` keeps the last frame.
+  A finished animation costs nothing per frame and must stay armed.
+- `mechGaugeLive` ×3 on 0×0 gauges, `modalIn` ×2 on 0×0 panels → zero-area
+  elements are not composited.
+
+## Sprite breathing — yes, it is live
+
+Asked directly, so measured directly: Miya's sprite carries `mechBreathe` at
+4.1s and its rendered top edge travels **11.9px** over a cycle.
