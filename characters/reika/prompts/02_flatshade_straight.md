@@ -21,3 +21,16 @@ gradient rendering, not delete distinguishing detail. **Needs regeneration**
 with an explicit instruction to preserve every emblem/pin/pattern element as
 flat-coloured shapes rather than erasing them. See
 `../../ai_agent_docs/skills/seirin-character-art/_session_notes.md`.
+
+## Regeneration — reika_normal_v4 (2026-07-29, fixes the defect above)
+`_wip/reika_normal_v4_flatshade_detailed.png` ← same style references (Miya
+chibi sheet, Kurogane sprite) + `reika_normal.png` as identity, but the
+prompt now explicitly lists every surface detail that must survive the flat
+cel-shading pass: the camo/tonal jacket print (rendered as flat colored
+shapes, not deleted), the second chest pin next to the skull patch, the
+bodysuit's quilted panel seams, the holstered pistol, belt pouches, knee
+pads. Result: **accepted** — camo pattern, second pin, holster and knee pads
+all present; upscaled via `tools/img_pipeline` (upscale_filter 4096px +
+matte_floodfill) → `reika_normal_v4.png`/`.webp`, delivery WebP at
+`game/assets/characters/reika_normal_v4.webp`, wired into
+`game/vendor/game.js` replacing `reika_normal_v3.webp`.

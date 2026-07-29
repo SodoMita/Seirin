@@ -642,7 +642,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             miya: { name: 'Мия Кагэцуки', color: '#f472b6', directory: '', sprites: { normal: 'miya_normal.png' } },
             splash: { name: 'S.P.L.A.S.H.', color: '#38bdf8', directory: '', sprites: { normal: 'splash_normal.png' } },
             stella: { name: 'Стелла', color: '#e879f9', directory: '', sprites: { normal: 'stella_normal.png' } },
-            reika: { name: 'Рейка Такасиро', color: '#f87171', directory: '', sprites: { normal: 'reika_normal_v3.webp' } },
+            reika: { name: 'Рейка Такасиро', color: '#f87171', directory: '', sprites: { normal: 'reika_normal_v4.webp' } },
             saya: { name: 'Сая Мизуки', color: '#38bdf8', directory: '', sprites: { normal: 'saya_normal_v3.webp' } },
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.png' } },
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal_v3.webp', happy: 'kaito_happy_v3.webp', sad: 'kaito_sad_v3.webp' } },

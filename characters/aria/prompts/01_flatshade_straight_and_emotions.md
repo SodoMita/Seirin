@@ -28,3 +28,18 @@ before commit `e0ea244`. **Needs regeneration** with an explicit
 "exactly two hands, both at the headphones, no third hand anywhere" negative
 constraint. See `../../ai_agent_docs/skills/seirin-character-art/_session_notes.md`
 for the full defect list across characters.
+
+## Regeneration — aria_happy_v3 (2026-07-29, fixes the extra-hand defect above)
+`_wip/aria_happy_v3_twohands.png` ← edit of the corrected `aria_normal_v3.png`
+base (itself reprocessed through the new upscale-then-matte pipeline, see
+`ai_agent_docs/skills/seirin-character-art/_session_notes.md`), with an
+explicit anatomical constraint: "ONLY her two natural hands and arms are
+visible anywhere in the image ... do not add any third arm, extra hand, or
+disembodied hand anywhere else ... check the hips, waist and coat hem area
+are completely free of any hand or fingers." Result: **accepted** — exactly
+two hands, both correctly raised to the headphones, no phantom third hand at
+the hip. Upscaled via `tools/img_pipeline` → `aria_happy_v4.png`/`.webp` (kept
+the `_v4` suffix to stay ahead of the already-used `_v3` normal/sad names for
+this character). Aria is not currently wired into `game/vendor/game.js`
+(no `aria:` entry in `engine.characters`), so this asset is ready but unused
+until she is added to the script.
