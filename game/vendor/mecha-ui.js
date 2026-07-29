@@ -758,7 +758,20 @@
             return;
         }
         doc.addEventListener('mousemove', onPointer, true);
-        doc.addEventListener('mouseleave', clearHot, true);
+        /* NOT 'mouseleave' on document: that event is non-bubbling but still
+           runs its CAPTURE phase through every ancestor of whatever inner
+           element (e.g. the button's text <span>) the pointer left, so a
+           capture-phase listener on document fires on every internal
+           boundary crossing inside a button, not just on leaving the page.
+           Measured: it cleared .mech-hot while the pointer was still plainly
+           inside the button, because the inline <span> label is narrower
+           than the plate. 'mouseout' bubbles normally and exposes
+           relatedTarget, so it can tell a real page-exit (relatedTarget
+           null) from an internal hand-off (relatedTarget still in the
+           document) — only the former should drop the hot plate. */
+        doc.addEventListener('mouseout', function (evt) {
+            if (!evt.relatedTarget) { clearHot(); }
+        }, false);
         pointerBound = true;
     }
 
