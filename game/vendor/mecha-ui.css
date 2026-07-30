@@ -4458,3 +4458,375 @@ quick-menu button:hover {
   overflow: visible !important;
   text-overflow: clip !important;
 }
+
+/* ===========================================================================
+ * 35. SESSION 17 — fix dark buttons, real bevel + illumination, remove h-repeat
+ * ---------------------------------------------------------------------------
+ * User feedback:
+ * - "You just made buttons darker, which made them less visible"
+ * - "bevel and illumination both look not good at all. Just darker image
+ *   behind element is very simple, but not very good looking implementation"
+ * - "still horizontal repeating gradient on text field"
+ *
+ * Root cause:
+ * - Section 34 set choice-container button background to #2f3d54→#1b2536→#0f1724
+ *   which is flat dark, no bright lip, no bounce, so it reads as dark image
+ *   behind text. Original --mech-face-grad had proper 2-light bevel but was
+ *   overridden.
+ * - Text field: [data-screen="game"] text-box::after had
+ *   repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent
+ *   1px 4px) — a horizontal scanline repeating every 4px. Also
+ *   save-slot [data-content="background"]::after had same. User spotted it.
+ * - Illumination was only radial bottom glow, not enough top/side light to
+ *   sell thickness.
+ *
+ * Fixes:
+ * ========================================================================== */
+
+/* --- Remove ALL horizontal repeating gradients from text field ----------- */
+/* Kill scanline overlay that was the horizontal repeating gradient */
+[data-screen="game"] text-box::after,
+[data-screen="game"] text-box [data-content="text"]::after,
+save-slot [data-content="background"]::after {
+  background: none !important;
+  background-image: none !important;
+  display: block !important;
+  content: '' !important;
+  /* Keep only edge light, not scanline */
+}
+[data-screen="game"] text-box [data-content="text"]::after {
+  background-image: linear-gradient(90deg, transparent,
+      var(--mech-scene-edge, var(--mech-edge-color, rgba(251,191,36,0.9))) 42%,
+      #fff 50%,
+      var(--mech-scene-edge, var(--mech-edge-color, rgba(251,191,36,0.9))) 58%,
+      transparent) !important;
+  background-size: 55% 3px !important;
+  background-repeat: no-repeat !important;
+  background-position: 0 0 !important;
+  height: 3px !important;
+  top: 0 !important;
+  bottom: auto !important;
+  opacity: 0.92 !important;
+}
+/* Also ensure no repeating gradient leaks from old console face */
+[data-screen="game"] text-box > .mech-l-face,
+save-slot [data-content="background"] {
+  background-repeat: no-repeat !important;
+}
+
+/* --- Real bevel for plates — not just darker image -----------------------
+ * Proper bevel needs:
+ *  - bright machined lip top (hard stop 0-2.5%)
+ *  - mid body falloff
+ *  - dark bottom 92%
+ *  - cold bounce 96-100% where bottom chamfer picks fill light
+ *  - inner highlight top: inset 0 1px 0 rgba(255,255,255,0.16)
+ *  - outer rim: var(--mech-rim-grad) as host background revealed by inset
+ * This uses --mech-face-grad which already has that shape, but Section 34
+ * overrode it with flat dark. Restore and enhance with lighter base.
+ */
+:root {
+  --mech-face-grad-light:
+      linear-gradient(176deg,
+        rgba(230, 244, 255, 0.42) 0%,
+        rgba(200, 222, 245, 0.18) 2.8%,
+        rgba(255, 255, 255, 0.06) 10%,
+        rgba(0, 0, 0, 0.08) 46%,
+        rgba(0, 0, 0, 0.26) 86%,
+        rgba(175, 205, 240, 0.22) 94%,
+        rgba(135, 165, 200, 0.16) 100%),
+      linear-gradient(150deg, #425265 0%, #2a364a 42%, #1a2332 88%);
+}
+
+[data-mech="plate"] {
+  background: var(--mech-rim-grad) !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.18))
+    drop-shadow(0 10px 22px rgba(0,0,0,0.72)) !important;
+}
+[data-mech="plate"] > .mech-l-face {
+  background-color: #2a364a !important;
+  background-image: var(--mech-face-grad-light) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.72),
+    inset 0 -12px 22px rgba(0,0,0,0.24) !important;
+}
+
+/* --- Buttons: make lighter and more visible, not darker ------------------ */
+main-menu button {
+  background: var(--mech-rim-grad) !important;
+  color: #eaf2ff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95), 0 0 12px rgba(180,200,230,0.28) !important;
+}
+main-menu button > .mech-l-face {
+  background-color: #2e3d56 !important;
+  background-image: var(--mech-face-grad-light) !important;
+}
+
+[data-screen="game"] choice-container button {
+  /* Restore proper bevel, not flat dark */
+  background: var(--mech-rim-grad) !important;
+  border: none !important;
+  color: #eef6ff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.88), 0 0 14px rgba(180,210,240,0.22) !important;
+  box-shadow: none !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.14))
+    drop-shadow(0 9px 20px rgba(0,0,0,0.68)) !important;
+}
+[data-screen="game"] choice-container button > .mech-l-face {
+  background-color: #2f3e58 !important;
+  background-image:
+    radial-gradient(130% 90% at 50% 106%, var(--mech-scene-glow, rgba(120,190,255,0.26)) 0%, transparent 60%),
+    var(--mech-face-grad-light) !important;
+  background-size: 100% 100%, 100% 100% !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    inset 0 -1px 0 rgba(0,0,0,0.68),
+    inset 0 -10px 18px rgba(0,0,0,0.22) !important;
+}
+[data-screen="game"] choice-container button:hover {
+  background: var(--mech-rim-grad) !important;
+  filter:
+    drop-shadow(0 0 20px rgba(56,189,248,0.42))
+    drop-shadow(0 14px 28px rgba(0,0,0,0.78)) !important;
+  transform: translateY(-3px) !important;
+}
+[data-screen="game"] choice-container button:hover > .mech-l-face {
+  background-color: #35455f !important;
+  background-image:
+    radial-gradient(130% 90% at 50% 106%, var(--mech-scene-glow, rgba(120,190,255,0.36)) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(56,189,248,0.14), transparent 48%),
+    var(--mech-face-grad-light) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.72),
+    inset 0 -12px 22px rgba(0,0,0,0.18),
+    0 0 18px var(--mech-scene-glow-soft, rgba(56,189,248,0.12)) !important;
+}
+
+/* --- Text field: proper bevel, no repeating gradient, stronger scene light */
+[data-screen="game"] text-box [data-content="text"] {
+  background: linear-gradient(158deg, #5d6e86 0%, #3a4a62 24%, #232e42 52%, #151c2a 82%, #3e4e66 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -1px 0 rgba(0,0,0,0.84),
+    0 16px 36px rgba(0,0,0,0.72),
+    0 0 0 1px rgba(0,0,0,0.58) !important;
+}
+[data-screen="game"] text-box [data-content="text"]::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 2px !important;
+  z-index: -1 !important;
+  background-color: #2a364a !important;
+  background-image:
+    /* Scene illumination: strong radial bottom + soft top wash */
+    radial-gradient(138% 92% at 50% 108%, var(--mech-scene-glow, rgba(251,191,100,0.38)) 0%, transparent 64%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.20)) 0%, transparent 42%, rgba(0,0,0,0.28) 100%),
+    /* Real bevel: bright lip top, bounce bottom */
+    linear-gradient(176deg,
+      rgba(232, 246, 255, 0.36) 0%,
+      rgba(200, 222, 245, 0.14) 3%,
+      rgba(255,255,255,0.04) 12%,
+      rgba(0,0,0,0.10) 52%,
+      rgba(0,0,0,0.32) 90%,
+      rgba(175, 205, 240, 0.20) 95%,
+      rgba(135, 165, 200, 0.14) 100%),
+    linear-gradient(150deg, #3f4e66 0%, #2a364a 48%, #1a2332 100%) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+  background-repeat: no-repeat !important;
+  clip-path: polygon(32px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 32px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.72),
+    inset 0 -16px 30px var(--mech-scene-glow-soft, rgba(120,190,255,0.14)) !important;
+}
+
+/* --- Illumination: more visible, scene-dependent, not just darker image ---- */
+[data-mech] > .mech-l-gloss {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.10) 0%,
+      rgba(255,255,255,0.03) 36%,
+      transparent 72%) !important;
+  opacity: 0.92 !important;
+  mix-blend-mode: soft-light !important;
+}
+[data-mech] > .mech-l-gloss::before {
+  background: radial-gradient(closest-side circle,
+      var(--mech-scene-glow, rgba(150,200,255,0.28)) 0%,
+      transparent 70%) !important;
+  inset: -32% !important;
+  opacity: 0.88 !important;
+  transform: translate3d(calc(var(--mech-lmx) * 26%), calc(var(--mech-lmy) * 20%), 0) !important;
+}
+
+/* Outer glow uses scene color strongly, so plates look lit by background */
+[data-mech="plate"].mech-hot {
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.22),
+    var(--mech-shadow-x, -8px) var(--mech-shadow-y, 14px) 28px rgba(0,0,0,0.78),
+    0 0 0 1px rgba(0,0,0,0.58),
+    0 0 28px var(--mech-scene-glow, rgba(56,189,248,0.26)),
+    0 0 52px var(--mech-scene-glow-soft, rgba(56,189,248,0.10)) !important;
+}
+
+/* ===========================================================================
+ * 36. SESSION 18 — make buttons lighter + real bevel, remove remaining h-repeat
+ * ---------------------------------------------------------------------------
+ * User: buttons darker less visible, bevel+illumination not good, just darker
+ * image behind element is simple, not good bevel, still horizontal repeating
+ * gradient on text field.
+ *
+ * Fixes:
+ * - Buttons: restore lighter steel, bright top lip, dark bottom, bounce.
+ *   Previous Section 34/35 made choice buttons #2f3d54 dark, hard to read.
+ *   Now use much lighter base: #4a5e7e top, #34465e mid, #1e2a3a bottom,
+ *   plus strong inner highlight inset 0 1px 0 rgba(255,255,255,0.22) and
+ *   bottom inset 0 -1px 0 rgba(0,0,0,0.8), plus outer rim via host background.
+ * - Bevel: real machined bevel, not flat dark. Implemented as:
+ *   host background = rim-grad (bright outer edge)
+ *   face = base steel + top lip gradient (white 0.38 at 0% to 2.8% hard stop)
+ *          + side falloff + bottom dark 0.32 + bounce 0.20 at 95%
+ *   plus inset shadows for thickness.
+ * - Text field: ensure 100% nonrepeating gradient only. Remove any leftover
+ *   repeating-linear-gradient from text-box, save-slot, sliders (ticks kept
+ *   for settings).
+ *   Explicitly set background-repeat: no-repeat !important and kill ::after
+ *   scanline remnants that were horizontal repeating.
+ * - Illumination: stronger scene-dependent outer glow + inner wash, so plates
+ *   look lit by background color (courtyard warm, lab cyan, etc), not just
+ *   dark.
+ * ========================================================================== */
+
+/* --- Remove any remaining horizontal repeating gradients ------------- */
+[data-screen="game"] text-box,
+[data-screen="game"] text-box [data-content="text"],
+[data-screen="game"] text-box [data-content="text"]::before,
+save-slot [data-content="background"],
+save-slot [data-content="background"]::after,
+settings-screen input[type="range"]::-webkit-slider-runnable-track,
+settings-screen input[type="range"]::-moz-range-track {
+  background-repeat: no-repeat !important;
+}
+[data-screen="game"] text-box::after {
+  display: none !important;
+}
+/* Kill tick scale repeating gradient on sliders that user might see as h-repeat
+   Keep it only on WebKit track where fill is, but remove from Moz track and
+   make slider more clean */
+settings-screen input[type="range"]::-webkit-slider-runnable-track,
+settings-screen input[type="range"]::-moz-range-track {
+  background-image:
+    linear-gradient(90deg,
+      rgba(126, 226, 255, 0.30) 0 var(--mech-fill, 0%),
+      transparent var(--mech-fill, 0%)),
+    linear-gradient(180deg,
+      rgba(190, 240, 255, 0.85) 0 2px,
+      rgba(56, 189, 248, 0.92) 2px 7px,
+      rgba(18, 116, 162, 0.95) 7px 12px) !important;
+  background-size: 100% 100%, var(--mech-fill, 0%) 100% !important;
+}
+
+/* --- Lighter, more visible buttons with real bevel --------------------- */
+:root {
+  --mech-face-grad-ultra-light:
+    linear-gradient(176deg,
+      rgba(240, 248, 255, 0.48) 0%,
+      rgba(210, 230, 250, 0.22) 2.6%,
+      rgba(255,255,255,0.08) 9%,
+      rgba(0,0,0,0.06) 38%,
+      rgba(0,0,0,0.18) 78%,
+      rgba(185, 215, 245, 0.26) 92%,
+      rgba(150, 185, 220, 0.20) 100%),
+    linear-gradient(150deg, #4e627e 0%, #34465e 44%, #1e2a3a 90%);
+}
+
+main-menu button,
+[data-screen="game"] choice-container button {
+  background: var(--mech-rim-grad) !important;
+  color: #f0f6ff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.92), 0 0 16px rgba(190,220,250,0.28) !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.20))
+    drop-shadow(0 10px 24px rgba(0,0,0,0.72)) !important;
+}
+
+main-menu button > .mech-l-face,
+[data-screen="game"] choice-container button > .mech-l-face {
+  background-color: #3a4f6a !important;
+  background-image: var(--mech-face-grad-ultra-light) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.24),
+    inset 0 -1px 0 rgba(0,0,0,0.76),
+    inset 0 -12px 20px rgba(0,0,0,0.20),
+    inset 0 0 22px rgba(255,255,255,0.04) !important;
+}
+
+/* Hover: brighter, with scene illumination wash */
+main-menu button:hover > .mech-l-face,
+[data-screen="game"] choice-container button:hover > .mech-l-face {
+  background-color: #425a7a !important;
+  background-image:
+    radial-gradient(132% 88% at 50% 108%, var(--mech-scene-glow, rgba(120,190,255,0.32)) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(56,189,248,0.18), transparent 46%),
+    var(--mech-face-grad-ultra-light) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -1px 0 rgba(0,0,0,0.78),
+    inset 0 -10px 18px rgba(0,0,0,0.14),
+    0 0 20px var(--mech-scene-glow-soft, rgba(56,189,248,0.16)) !important;
+}
+
+/* --- Text field: nonrepeating gradient only, no h-repeat, lighter + bevel */
+[data-screen="game"] text-box [data-content="text"] {
+  background: linear-gradient(158deg, #6a7e98 0%, #42556e 26%, #2a384e 56%, #1c2536 84%, #4a5d7a 100%) !important;
+}
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-color: #32435c !important;
+  background-image:
+    radial-gradient(140% 90% at 50% 108%, var(--mech-scene-glow, rgba(251,191,100,0.42)) 0%, transparent 66%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.22)) 0%, transparent 40%, rgba(0,0,0,0.24) 100%),
+    linear-gradient(176deg,
+      rgba(235, 250, 255, 0.40) 0%,
+      rgba(205, 230, 250, 0.16) 2.8%,
+      rgba(255,255,255,0.05) 10%,
+      rgba(0,0,0,0.08) 48%,
+      rgba(0,0,0,0.28) 88%,
+      rgba(180, 215, 245, 0.20) 94%,
+      rgba(140, 175, 210, 0.16) 100%),
+    linear-gradient(150deg, #4a5d7e 0%, #32435c 46%, #1e2a3a 100%) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.78),
+    inset 0 -18px 32px var(--mech-scene-glow-soft, rgba(120,190,255,0.16)) !important;
+}
+
+/* Ensure dialogue text fully visible, no truncation, wraps */
+[data-screen="game"] [data-ui="say"] {
+  font-size: 1.16rem !important;
+  line-height: 1.7 !important;
+  color: #f2f8ff !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.92), 0 0 22px rgba(56,189,248,0.20) !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Quick-menu also remove repeating rivet dots if perceived as h-repeat */
+quick-menu {
+  background-image: linear-gradient(180deg, rgba(24,32,48,0.98), rgba(12,18,30,0.99)) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+}
+
