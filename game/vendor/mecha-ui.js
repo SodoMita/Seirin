@@ -704,6 +704,8 @@
         hotEl.classList.remove('mech-hot');
         hotEl.style.removeProperty('--mech-lmx');
         hotEl.style.removeProperty('--mech-lmy');
+        hotEl.style.removeProperty('--mech-shadow-x');
+        hotEl.style.removeProperty('--mech-shadow-y');
         hotEl = null;
     }
 
@@ -731,6 +733,12 @@
                 var ly = clamp(((lastY - r.top) / r.height) * 2 - 1, -1, 1);
                 hotEl.style.setProperty('--mech-lmx', lx.toFixed(3));
                 hotEl.style.setProperty('--mech-lmy', ly.toFixed(3));
+                /* Shadow follows tilt: no calc() inside filter (which broke
+                   in some engines and flattened preserve-3d). JS writes px. */
+                var sx = Math.round(lx * -12);
+                var sy = Math.round(12 + ly * -8);
+                hotEl.style.setProperty('--mech-shadow-x', sx + 'px');
+                hotEl.style.setProperty('--mech-shadow-y', sy + 'px');
             }
         }
     }
@@ -1055,8 +1063,8 @@
      * storage backend, so no new dependency and no network).
      * ================================================================== */
     var SCALE_KEY = 'SeirinGame_UIScale';
-    var SCALE_MIN = 60;      /* percent */
-    var SCALE_MAX = 160;
+    var SCALE_MIN = 35;      /* percent — was 60, too narrow; allow phones to shrink UI */
+    var SCALE_MAX = 230;     /* percent — was 160, allow desktop / low-vision zoom */
     var SCALE_STEP = 5;
 
     function readScale () {
