@@ -1351,14 +1351,14 @@
     function sceneTintFromKey (k) {
         if (!k) { return null; }
         var s = String(k).toLowerCase();
-        if (s.indexOf('courtyard') !== -1) { return { glow: 'rgba(251, 191, 100, 0.18)', soft: 'rgba(251, 191, 100, 0.07)', edge: 'rgba(251, 191, 36, 0.85)' }; }
-        if (s.indexOf('cathedral') !== -1) { return { glow: 'rgba(160, 175, 210, 0.18)', soft: 'rgba(160, 175, 210, 0.07)', edge: 'rgba(148, 163, 184, 0.85)' }; }
-        if (s.indexOf('dojo') !== -1) { return { glow: 'rgba(210, 180, 120, 0.20)', soft: 'rgba(210, 180, 120, 0.08)', edge: 'rgba(180, 150, 90, 0.85)' }; }
-        if (s.indexOf('lab') !== -1) { return { glow: 'rgba(110, 220, 220, 0.22)', soft: 'rgba(110, 220, 220, 0.08)', edge: 'rgba(56, 189, 248, 0.90)' }; }
-        if (s.indexOf('miya_room') !== -1 || (s.indexOf('miya') !== -1 && s.indexOf('room') !== -1)) { return { glow: 'rgba(255, 190, 150, 0.20)', soft: 'rgba(255, 190, 150, 0.08)', edge: 'rgba(255, 170, 120, 0.85)' }; }
-        if (s.indexOf('port') !== -1) { return { glow: 'rgba(110, 160, 220, 0.22)', soft: 'rgba(110, 160, 220, 0.08)', edge: 'rgba(90, 140, 210, 0.90)' }; }
-        if (s.indexOf('tsukimachi') !== -1) { return { glow: 'rgba(130, 150, 200, 0.18)', soft: 'rgba(130, 150, 200, 0.06)', edge: 'rgba(120, 140, 190, 0.85)' }; }
-        if (s.indexOf('workshop') !== -1) { return { glow: 'rgba(200, 170, 110, 0.20)', soft: 'rgba(200, 170, 110, 0.08)', edge: 'rgba(190, 160, 100, 0.85)' }; }
+        if (s.indexOf('courtyard') !== -1) { return { glow: 'rgba(251, 191, 100, 0.34)', soft: 'rgba(251, 191, 100, 0.16)', edge: 'rgba(251, 191, 36, 0.85)' }; }
+        if (s.indexOf('cathedral') !== -1) { return { glow: 'rgba(160, 175, 210, 0.32)', soft: 'rgba(160, 175, 210, 0.14)', edge: 'rgba(148, 163, 184, 0.85)' }; }
+        if (s.indexOf('dojo') !== -1) { return { glow: 'rgba(210, 180, 120, 0.36)', soft: 'rgba(210, 180, 120, 0.18)', edge: 'rgba(180, 150, 90, 0.85)' }; }
+        if (s.indexOf('lab') !== -1) { return { glow: 'rgba(110, 220, 220, 0.38)', soft: 'rgba(110, 220, 220, 0.18)', edge: 'rgba(56, 189, 248, 0.90)' }; }
+        if (s.indexOf('miya_room') !== -1 || (s.indexOf('miya') !== -1 && s.indexOf('room') !== -1)) { return { glow: 'rgba(255, 190, 150, 0.36)', soft: 'rgba(255, 190, 150, 0.18)', edge: 'rgba(255, 170, 120, 0.85)' }; }
+        if (s.indexOf('port') !== -1) { return { glow: 'rgba(110, 160, 220, 0.38)', soft: 'rgba(110, 160, 220, 0.18)', edge: 'rgba(90, 140, 210, 0.90)' }; }
+        if (s.indexOf('tsukimachi') !== -1) { return { glow: 'rgba(130, 150, 200, 0.32)', soft: 'rgba(130, 150, 200, 0.14)', edge: 'rgba(120, 140, 190, 0.85)' }; }
+        if (s.indexOf('workshop') !== -1) { return { glow: 'rgba(200, 170, 110, 0.36)', soft: 'rgba(200, 170, 110, 0.18)', edge: 'rgba(190, 160, 100, 0.85)' }; }
         return null;
     }
 

@@ -929,7 +929,7 @@
       rgba(6, 11, 18, 0.34) 88%,
       rgba(28, 40, 58, 0.16) 100%),
     linear-gradient(112deg, rgba(150, 190, 240, 0.10) 0%, transparent 34%, transparent 74%, rgba(120, 160, 210, 0.06) 100%),
-    var(--mech-face-grad) 0 1px, transparent 1px 3px));
+    var(--mech-face-grad);
   background-size: 100% 100%;
 }
 /* Wear is scaled up and strengthened on the console: at 256px the tile
@@ -1314,8 +1314,8 @@ quick-menu button > .fas { font-size: 1rem !important; }
  * actually carries the illumination animation. */
 .mech-ambient {
   background: radial-gradient(40% 56% at 30% 22%,
-      rgba(150, 196, 255, 0.085) 0%,
-      rgba(120, 170, 240, 0.035) 46%,
+      var(--mech-scene-glow, rgba(150, 196, 255, 0.085)) 0%,
+      var(--mech-scene-glow-soft, rgba(120, 170, 240, 0.035)) 46%,
       transparent 76%);
   mix-blend-mode: plus-lighter;
   animation: mechAmbientLight 15s ease-in-out infinite;
@@ -4005,15 +4005,16 @@ choice-container { overflow-y: auto !important; }
 [data-mech="plate"] > .mech-l-face,
 [data-mech="chip"] > .mech-l-face,
 [data-screen="game"] text-box [data-content="text"]::before {
-  /* Blend scene tint into existing face grad — face still has depth,
-     but hue shifts with bg, so illumination feels like it comes from scene. */
+  /* Strong, visible scene illumination — looks lit by background */
   background-image:
+    radial-gradient(130% 90% at 50% 105%, var(--mech-scene-glow) 0%, transparent 58%),
     linear-gradient(176deg,
       var(--mech-scene-glow-soft) 0%,
-      transparent 42%,
-      rgba(0,0,0,0.18) 100%),
-    var(--mech-face-grad),
-    none !important;
+      transparent 38%,
+      rgba(0,0,0,0.22) 100%),
+    var(--mech-face-grad) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100% !important;
+  box-shadow: inset 0 -10px 22px var(--mech-scene-glow-soft), inset 0 1px 0 rgba(255,255,255,0.10) !important;
 }
 
 /* Pointer highlight now uses scene tint, so cursor light feels like scene light */
@@ -4048,6 +4049,31 @@ game-screen [data-character][data-character="splash"] {
   filter: drop-shadow(0 14px 12px rgba(0,0,0,0.38)) !important;
   will-change: auto !important;
 }
+
+
+/* Extra outer glow so plates look lit by scene — stronger */
+[data-mech="plate"].mech-hot {
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20),
+    var(--mech-shadow-x, -8px) var(--mech-shadow-y, 14px) 28px rgba(0,0,0,0.78),
+    0 0 0 1px rgba(0,0,0,0.6),
+    0 0 26px var(--mech-scene-glow, rgba(56,189,248,0.22)),
+    0 0 48px var(--mech-scene-glow-soft, rgba(56,189,248,0.08)) !important;
+}
+[data-screen="game"] text-box [data-content="text"] {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -18px 28px var(--mech-scene-glow-soft),
+    0 12px 32px rgba(0,0,0,0.72),
+    0 0 32px var(--mech-scene-glow-soft) !important;
+}
+[data-screen="game"] text-box [data-content="text"]::after {
+  /* Edge light uses scene edge color — clearly visible */
+  background-image: linear-gradient(90deg, transparent, var(--mech-scene-edge, var(--mech-edge-color, rgba(251,191,36,0.9))) 42%, #fff 50%, var(--mech-scene-edge, var(--mech-edge-color, rgba(251,191,36,0.9))) 58%, transparent) !important;
+  height: 3px !important;
+  opacity: 0.95 !important;
+}
+
 
 /* Keep Ken Burns but very gentle, no pumping — scene still alive a bit */
 @keyframes mechKenBurns {
