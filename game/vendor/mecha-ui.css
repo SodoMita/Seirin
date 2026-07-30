@@ -3968,3 +3968,103 @@ quick-menu { z-index: 85 !important; }
 main-screen, main-menu, choice-container, text-box, .cyber-top-hud { overflow: visible; }
 main-menu { overflow-y: auto !important; }
 choice-container { overflow-y: auto !important; }
+
+/* ===========================================================================
+ * 32. SESSION 12 — user request: kill annoying specular sweep, illumination
+ *     should follow bg/scene, remove breathing (not visible)
+ * ---------------------------------------------------------------------------
+ *  • Specular sweep was that diagonal bright line traveling across every
+ *    plate — user found it annoying. Removed completely.
+ *  • Instead, illumination now comes from two sources that feel natural:
+ *    1) pointer highlight (already) tinted by scene color,
+ *    2) scene-dependent tint variable --mech-scene-glow set by JS from bg name
+ *       (courtyard warm, lab cyan, port blue, etc.).
+ *    Plates get a soft top wash using that tint, no animation.
+ *  • Breathing (mechBreathe, mechHover) removed — set animation:none for all
+ *    [data-character]. Sprites stay perfectly still, grounded.
+ *  • Ken Burns kept but softened: slower, subtler, so bg feels alive without
+ *    distracting from dialogue.
+ * ========================================================================== */
+
+/* Kill the moving specular line everywhere */
+[data-mech] > .mech-l-gloss,
+[data-mech] > .mech-l-gloss::before,
+[data-mech] > .mech-l-gloss::after {
+  animation: none !important;
+  background-image: none !important;
+  background-position: 0 0 !important;
+}
+[data-mech] > .mech-l-gloss {
+  /* Keep gloss layer, but as a static soft top wash tinted by scene.
+     No sweep, no line. Subtle: 8% white top, scene glow in middle. */
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.08) 0%,
+      rgba(255,255,255,0.02) 38%,
+      transparent 72%) !important;
+  opacity: 0.9 !important;
+  mix-blend-mode: soft-light !important;
+}
+
+/* Scene-dependent illumination — JS writes --mech-scene-glow / --mech-scene-glow-soft */
+:root {
+  --mech-scene-glow: rgba(120, 190, 255, 0.16);
+  --mech-scene-glow-soft: rgba(120, 190, 255, 0.06);
+}
+[data-mech="plate"] > .mech-l-face,
+[data-mech="chip"] > .mech-l-face,
+[data-screen="game"] text-box [data-content="text"]::before {
+  /* Blend scene tint into existing face grad — face still has depth,
+     but hue shifts with bg, so illumination feels like it comes from scene. */
+  background-image:
+    linear-gradient(176deg,
+      var(--mech-scene-glow-soft) 0%,
+      transparent 42%,
+      rgba(0,0,0,0.18) 100%),
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+}
+
+/* Pointer highlight now uses scene tint, so cursor light feels like scene light */
+[data-mech] > .mech-l-gloss::before {
+  background: radial-gradient(closest-side circle,
+      var(--mech-scene-glow, rgba(150,200,255,0.22)) 0%,
+      transparent 72%) !important;
+  transform: translate3d(calc(var(--mech-lmx) * 28%), calc(var(--mech-lmy) * 22%), 0) !important;
+  opacity: 0.85 !important;
+  inset: -30% !important;
+}
+
+/* Edge running light stays, but use scene tint for its base */
+[data-mech] > .mech-l-edge::before {
+  /* keep animation but much more subtle, shorter */
+  animation: mechEdgeRun 8s ease-in-out infinite !important;
+}
+
+/* --- REMOVE BREATHING — sprites static, grounded -------------------------- */
+@keyframes mechBreathe { from, to { scale: 1; rotate: 0deg; translate: 0 0; } }
+@keyframes mechHover { from, to { translate: 0 0; scale: 1; rotate: 0deg; } }
+game-screen [data-character],
+game-screen [data-character].left,
+game-screen [data-character].right,
+game-screen [data-character][data-position],
+game-screen [data-character][data-character="splash"] {
+  animation: none !important;
+  translate: none !important;
+  scale: none !important;
+  rotate: none !important;
+  transform-origin: 50% 100% !important;
+  filter: drop-shadow(0 14px 12px rgba(0,0,0,0.38)) !important;
+  will-change: auto !important;
+}
+
+/* Keep Ken Burns but very gentle, no pumping — scene still alive a bit */
+@keyframes mechKenBurns {
+  0%   { scale: 1.01; translate: -0.4% 0.2%; }
+  100% { scale: 1.06; translate: 0.4% -0.2%; }
+}
+game-screen [data-ui="background"],
+game-screen [data-content="background"] {
+  animation: mechKenBurns 34s ease-in-out infinite alternate !important;
+  animation-duration: 34s !important;
+}
