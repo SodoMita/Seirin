@@ -1,0 +1,294 @@
+# Sources
+
+The design grammar in this skill is distilled from the professional Japanese
+character-design literature and Chinese gacha production practice.
+
+## How to use this file
+
+Sources are split into two tiers:
+
+- **Tier A — fetchable.** Free, complete, and readable right now with the
+  agent's web-fetch tool (not with `curl` — see the sandbox note below). Everything in `design-canon.md` that is stated as concrete
+  geometry (the eye typology, the 6:3:1 mass ratio, shape language) traces to
+  Tier A and can be verified in full.
+- **Tier B — purchase-only.** The books. Only their tables of contents,
+  publisher blurbs and professional reviews are public. These shaped the
+  *structure* of the skill (which fields exist, and why) rather than supplying
+  copyable text.
+
+**The books are not bundled and were not downloaded.** They are copyrighted and
+sold; obtaining them from shadow libraries would put pirated provenance behind
+the art direction of a product intended for commercial release, which is a real
+liability in a publisher or platform review. If you want the full contents,
+buy them — they are inexpensive (¥1,000-2,750) and the Kindle editions are
+immediate.
+
+**Sandbox note.** Bash egress is *allowlisted*: package registries (pypi, npm)
+and GitHub work, but general web hosts do not — `curl`/`wget` cannot reach a
+documentation site, and `raw.githubusercontent.com` is blocked even though
+`github.com` is not. Only the agent's web-fetch tooling reaches the open web,
+and it returns text into the conversation rather than files on disk. So there is
+no path to download a book or PDF here even setting the licensing question
+aside. See `../../ARENA_ENVIRONMENT.md`.
+
+## Tier B — books (purchase-only; TOC and reviews are public)
+
+### 『キャラクターデザインの教科書 メイキングで学ぶ魅力的な人物イラストの描き方』
+Playce / MdN, 2015. ISBN 978-4-8443-6556-3. B5, 160pp.
+
+The source of the **`symbol_set`** field. Its closing section
+「キャラクター記号学」 (character semiotics, pp.137-157) enumerates 目 (eyes,
+p.138) / 眉 (brows, p.142) / 口 (mouth, p.143) / 輪郭 (contour, p.144) /
+肌 (skin, p.146) / 髪型 (hair, p.147) / 体型 (body, p.153) / 配色 (colour,
+p.155) as *signs* encoding personality, closing with 「記号を組み合わせた
+キャラクター」 — a character assembled from chosen signs.
+
+Also the source of the **design vs illustration split** we use for
+turnaround/sprite vs hero shot; toi8's 「戦闘力と性格を表す配色」 (palette
+encodes power and temperament) and 「画面の情報量をコントロールする」
+(control information density → our `visual_density`); and つなこ's staged
+escalation discipline behind the rarity tiers.
+
+- Full TOC with page numbers: https://books.mdn.co.jp/books/3215303020/
+- Detailed TOC + review: http://comics.blog.shinobi.jp/character/キャラクターデザインの教科書
+- Publisher release notes: https://books.mdn.co.jp/release/43417/
+
+### 『アニメーター室田雄平が考えるヒットするキャラクターデザインの作り方』
+Yuhei Murota, Genkosha, 2020. ISBN 978-4-7683-1387-9.
+
+By the Love Live! character designer. Source of the **cast-level**
+differentiation rule: a marketable roster is designed as a *set*, with colour,
+costume logic and silhouette allocated across characters so each is
+individually memorable and instantly distinguishable from teammates. Covers
+「女子の作られたかわいさや魅力」 (constructed cuteness and appeal),
+「デザインにおける色の選び方」 (colour selection), 「アイドル衣装の合わせ方」
+(costume coordination).
+
+- Publisher page: https://www.hanmoto.com/bd/isbn/9784768313879
+- Description + TOC: https://honto.jp/netstore/pd-book_30491575.html
+
+### 『「キャラクター」のデザイン&描き方 カラフルポップで魅せるイラスト技巧』
+くるみつ, 2021. ISBN 978-4-7986-2594-9.
+
+By a social-game character/card illustrator. Strong on ポーズ・シルエットの
+作り方 (pose and silhouette construction) and 色の選び方 (colour selection)
+specifically for gacha card art.
+
+- https://www.amazon.co.jp/dp/4798625949
+
+### 『萌え絵の教科書 vol.5 ゲーム絵師が教える！ファンタジーイラストの基本ルール』
+天野英, 2017. Front-line vs back-line character construction rules for game
+illustration — useful when adding characters with a clear combat/support role.
+
+## Tier A — fetchable craft references
+
+These are complete and free. Open them directly.
+
+- **Eye typology by personality** — Clip Studio, thorough, illustrated and
+  directly usable: https://tips.clip-studio.com/ja-jp/articles/6521
+  Maps size / curve / outer-corner tilt / gloss to personality, then gives
+  eleven concrete character types with the geometry for each. This is the full
+  source of the eye tables in `design-canon.md`, reproduced there in summary —
+  **open the original when assigning eyes to a new character**, because the
+  illustrations carry information the table cannot.
+- **Eye variation by character type** — https://www.clipstudio.net/oekaki/archives/152284
+- **Silhouette, Big/Mid/Small and shape language** — https://posani.jp/blog/character-design-basics-2025.html
+  Source of the 大:中:小 = 6:3:1 mass ratio and the black-fill test phrasing.
+- **Yoyogi Animation Academy instructors' book roundup** — useful map of which
+  book solves which problem: https://www.mdn.co.jp/web/book_review/4626
+
+## Tier A — Chinese gacha production practice
+
+- **《少女前线2：追放》art team breakdown** — https://game.xiaomi.com/viewpoint/1392697565_1644457607820_11
+  Character information flows 世界观 → 故事脉络 → 关键出场主角 → 相关角色
+  before anyone draws; 视觉密度 standardised per rarity tier; each character
+  assigned 视觉关键字 (visual keywords) and a defined player expectation.
+  Directly behind our `visual_density`, `memory_point` and brief-first workflow.
+- **Game character design concepts primer** — https://www.gcores.com/articles/156026
+  Geometric-ratio approach to shape language: protagonists square-dominant,
+  antagonists triangle-dominant, and why 剪影 (silhouette) is judged before
+  internal structure.
+- **二次元 scene/character rendering tips** — https://bbs.gameres.com/thread_889676_1_1.html
+  On why a well-designed silhouette beats dense detail
+  (「经过设计过的轮廓剪影比复杂的细节画面更抓人眼球」).
+
+## Project canon (in-repo, authoritative)
+
+- `ai_agent_docs/SEIRIN_Design_Document_edited.md` — §5 factions, §6 cast,
+  §10 visual and sound language, §11 commercial/merch principles.
+- `ai_agent_docs/IMAGE_PROMPTS.md` — existing background and Splash prompts;
+  the Splash blocks are hard-won and worth reading before regenerating her.
+- `ai_agent_docs/ART_PIPELINE_NEXT.md` — green-sheet convention, matting order.
+- `AGENTS.md` — offline invariants, asset and archive policy.
+
+## Further free material worth mining
+
+Not yet distilled into this skill; good next stops if a problem isn't covered.
+
+- **CEDiL** (https://cedil.cesa.or.jp) — the CEDEC digital library. Free with
+  registration; slides from Japan's largest game-developer conference,
+  including Cygames and other studios on character art production pipelines.
+- **CEDEC follow-up roundups** — https://gamemakers.jp collects publicly posted
+  slide decks each year, no registration needed.
+- **Clip Studio TIPS** (https://tips.clip-studio.com) — the single densest free
+  source of Japanese illustration craft; the eye typology above came from here.
+
+## A note on trust
+
+Where this skill states a rule as fact, it came from a Tier A source and can be
+verified there. Where it reports the *structure* of a Tier B book — that
+「キャラクター記号学」 enumerates eye/brow/mouth/contour/skin/hair/body as
+personality-encoding signs — that comes from published tables of contents and
+reviews, not from the book's text.
+
+Where the skill makes a judgement call for *this project* — the appeal tracks,
+the silhouette allocation across the roster, the locked face-box numbers, the
+cast's memory points — that is project policy, not received wisdom, and can be
+changed if it stops working.
+
+## Open items — sources not yet consulted
+
+Recorded so they are not silently forgotten.
+
+- **RESOLVED.** `Character_Design_Sourcebook_JP_CN_Manga_Anime_Gacha.pdf` is now
+  committed at `ai_agent_docs/`, together with `character_design_sources/JP/` and
+  `/CN/` (27 primary sources) and
+  `Character_Design_Brief_AI_Agent_Questionnaire.md`. Committing rather than
+  uploading is what made them persist. **The questionnaire is now the primary
+  question set for this project**; this skill's `cast.json` was reduced to the
+  wardrobe-and-reality supplement it does not cover.
+- **READ (2026-07):** `JP/TEU_character_design_support.pdf` — Mogi, Tokyo
+  University of Technology doctoral thesis. The most useful single source in
+  the set for this skill. §5.4 is an empirical colour study of **203 characters
+  across 27 works**, and it **corrected a wrong rule in this skill**: anime
+  characters measurably do not follow 60-30-10. It supplies the 11-zone colour
+  model, the 3-head/≤8-body colour counts, main colour (メインカラー), area
+  effect (面積効果), and treats ensemble colour as a separate discipline.
+  §5.2 covers silhouette measurement for group casts; §5.3 the expression
+  scrapbook by brow/eye/mouth part — the same 記号学 decomposition this skill
+  already uses, independently arrived at.
+- **READ (2026-07):** `CN/francispress_color_in_animation_scenes.pdf` — Wu,
+  Academic Journal of Humanities & Social Sciences 6(4). General colour theory
+  applied to animated *scenes*: warm/cool emotional association, cultural
+  colour meaning, colour montage across scenes, and the rule that scene colour
+  must set off the moving character rather than compete with it. Confirms the
+  expectation that scene-colour writing is largely standard colour theory —
+  useful for backgrounds and CGs, not a source of character-specific rules.
+- **Still to read in full:** the sourcebook PDF itself and the remaining
+  sources. The
+  questionnaire's Section G maps each principle to its source, so start there
+  when a specific claim needs checking.
+- **Costume-design primary texts** (Ingham & Covey; Cunningham; Arnold's
+  *Patterns of Fashion*) are cited in `wardrobe-questions.md` from their
+  documented content and standing, not from a full reading. The costume-plot
+  technique is well attested; the finer detail is not verified here.
+- **CEDiL** (cedec.cesa.or.jp) — partly addressed: four CEDEC roadmap PDFs are
+  now in `character_design_sources/JP/`. The wider library remains unmined.
+
+## Image-generator guides — the useful kind
+
+Guides to the generator itself are worth collecting, but only when they meet
+both tests:
+
+1. **Model-specific.** Written for the model actually in use (Nano-Banana class),
+   not generic "AI art tips". Prompt behaviour does not transfer reliably
+   between models.
+2. **Confirmed results, not introductions.** Shows the prompt *and* the output
+   it produced, ideally with what failed first. A guide that lists prompt
+   fragments without showing results documents someone's guess.
+
+A source meeting both is evidence about the tool and belongs in
+`references/prompt-grammar.md`. This is a different category from the character-
+design sources above: it tells you how to operate the machine, not what to make.
+Keep the two separate — a generator guide must never become a design source.
+
+Note the distinction from the prompt-tag listicles cautioned against below:
+those enumerate *subjects* ("maid", "china dress") and encode the training
+distribution. A good Nano-Banana guide covers *mechanics* — editing, identity
+preservation across edits, plate consistency, resolution behaviour.
+
+## Nano Banana — sources consulted
+
+Gathered 2026-07. These are practitioner reports, not vendor documentation;
+they meet the two tests above (model-specific, results shown) but are not
+peer-reviewed. Confidence is marked.
+
+**High confidence — corroborated across independent sources, and consistent
+with our own measurement:**
+
+- **No alpha channel; "transparent" produces a painted checkerboard.**
+  Reported consistently across r/GeminiAI, r/nanobanana, r/GoogleGeminiAI and
+  vendor-adjacent write-ups, and stated as confirmed by Google on the Gemini
+  API forums. The recommended workaround is the **white/black two-render
+  method**, which is independently what this project already does — and the
+  stated reason (the model reproduces the subject consistently between runs)
+  matches our measured alpha error of 0.0000.
+  - https://transparify.app/blog/gemini-transparent-background
+  - https://www.reddit.com/r/GeminiAI/comments/1pfdanr/
+  - https://www.reddit.com/r/nanobanana/comments/1osh0ps/
+- **Verbatim token reuse for consistency.** The most-repeated technique across
+  every practitioner source found.
+  - https://www.reddit.com/r/aitubers/comments/1s9n2ke/
+- **Turnaround sheet as the reference image.** Give the model its own
+  multi-angle blueprint so it does not hallucinate blind spots.
+  - https://www.reddit.com/r/grok/comments/1shusnl/
+- **Edits degrade quality; return to the original anchor when drift appears.**
+  - https://www.reddit.com/r/GeminiAI/comments/1qx4b6s/
+  - https://christytuckerlearning.com/nano-banana-gemini-character-image-experiments/
+
+**Medium confidence — reported repeatedly, mechanism unclear or figures
+unverified:**
+
+- **"Unchanged image" edit failure at roughly 10–40% of edits**, acknowledged
+  by Google. The percentage is one developer's observation, not a measurement.
+  - https://www.reddit.com/r/GeminiAI/comments/1r71o6w/
+  - https://skywork.ai/blog/diagnose-failed-edits-gemini-nano-banana-image-guide/
+- **Aspect-ratio drift toward 1:1.** Widely reported; severity per-ratio not
+  established. Matters for our 1:2 sprite canvas.
+- **Lead with art direction before the character.** One detailed practitioner
+  report; plausible and matches our section ordering, but single-source.
+- **Capacity: 14 reference images, ~5 consistent characters, 1K/2K/4K.** Vendor
+  and vendor-adjacent figures; the 5-character ceiling and its failure mode
+  (blended faces) come from practitioner write-ups.
+
+**Low confidence — treat as unverified:**
+
+- Percentage consistency claims ("93% consistency", "95% with 8 angles") appear
+  in SEO-driven blog posts that cite each other and misattribute benchmarks.
+  **Do not repeat these numbers.** They are listed here only so a future agent
+  recognises them as unreliable rather than rediscovering them as fact.
+
+**Not applicable to this project:** guides oriented to photorealistic portraits
+and selfies-with-celebrities. Note also that the model refuses edits involving
+real people's likenesses, which is consistent with `LEGAL.md` §2 and is not a
+limitation we need to work around.
+
+## On colour sources specifically
+
+Worth recording, because it was tested rather than assumed: **most colour
+writing in these sources is general colour theory** — warm/cool, cultural
+association, contrast, harmony — which is already well known and transfers from
+any art discipline. Scanning all 27 sources for colour content found only two
+with substantial coverage, and only one with anything anime-specific.
+
+The exception is worth the whole search: Mogi's measured study, because it
+**falsifies** a rule this skill had taken on trust. That is the shape of a
+source worth having — not one that restates known theory, but one that shows a
+widely-repeated rule does not hold in this medium.
+
+When evaluating a future colour source, ask: does it *measure* something, or
+does it restate the colour wheel?
+
+## Two cautions when adding sources
+
+**Beware AI-prompt listicles.** Searching for anime costume guidance returns
+mostly prompt-tag lists — "maid", "china dress", "bunny", "catsuit". These
+document *what image generators respond to*, which is a record of the training
+distribution, not of good design. Using them as a design source is how a cast
+converges on the same twelve costumes as everyone else's. They are occasionally
+useful as a **negative** reference: a list of what will look generic.
+
+**Distinguish craft sources from taste sources.** A costume-construction manual
+tells you how a garment is built and can be checked. A blog ranking anime
+uniforms tells you what was popular. Both can be useful; only the first
+settles an argument.
