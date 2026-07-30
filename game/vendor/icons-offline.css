@@ -1,0 +1,82 @@
+/* ============================================================================
+ * Offline icon shim — replaces the Font Awesome icon font for file:// games.
+ * ----------------------------------------------------------------------------
+ * Problem: Monogatari's CSS references Font Awesome classes (.fas.fa-*) but the
+ * icon FONT is not bundlable as text — historically the missing glyphs were
+ * filled in by a CDN <link>, which (a) needs network and (b) breaks offline.
+ * This shim maps every fa-* class actually used by the engine and by this game
+ * to a Unicode glyph rendered by system fonts. Zero bytes of font files, zero
+ * fetches, zero servers.
+ *
+ * To add an icon: add one rule below AND extend the map in icons-offline.js
+ * (the JS side warns about any unmapped icon it finds — the failsafe part).
+ * Keep icons-offline.css AFTER monogatari.css so these rules win.
+ * ========================================================================== */
+
+/* Base render rule for anything Font-Awesome-ish or shim-generated. */
+.fas::before,
+.far::before,
+.fal::before,
+.fab::before,
+[data-failsafe-icon]::before {
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+    speak: none;
+}
+
+/* ---- Engine icons (quick menu, settings, help, save slots, log) ---------- */
+.fa-arrow-left::before          { content: "\2190"; }   /* ← */
+.fa-cog::before                 { content: "\2699"; }   /* ⚙ */
+.fa-comments::before            { content: "\1F4AC"; }  /* 💬 */
+.fa-eye::before                 { content: "\1F441\FE0F"; } /* 👁 */
+.fa-eye-slash::before           { content: "\25CC"; }   /* ◌ (hidden) */
+.fa-fast-forward::before        { content: "\00BB"; }   /* » (skip) */
+.fa-lock::before                { content: "\1F512"; }  /* 🔒 */
+.fa-play-circle::before         { content: "\25B6"; }   /* ▶ (auto-play) */
+.fa-save::before                { content: "\1F4BE"; }  /* 💾 */
+.fa-sort::before                { content: "\2195"; }   /* ↕ */
+.fa-stop-circle::before         { content: "\25A0"; }   /* ■ */
+.fa-times::before               { content: "\2716"; }   /* ✖ */
+.fa-times-circle::before        { content: "\2716"; }   /* ✖ */
+.fa-undo::before                { content: "\21BA"; }   /* ↺ (rollback) */
+
+/* ---- Game icons (Cyber-Nexus HUD, choices, modals, mini-game) ------------- */
+.fa-bolt::before                { content: "\26A1"; }   /* ⚡ */
+.fa-book::before                { content: "\1F4D6"; }  /* 📖 */
+.fa-building::before            { content: "\1F3E2"; }  /* 🏢 */
+.fa-check::before               { content: "\2714"; }   /* ✔ */
+.fa-coins::before               { content: "\1FA99"; }  /* 🪙 */
+.fa-database::before            { content: "\1F5C4"; }  /* 🗄 */
+.fa-exclamation-triangle::before{ content: "\26A0"; }   /* ⚠ */
+.fa-hand-holding-heart::before  { content: "\2764"; }   /* ❤ */
+.fa-handshake::before           { content: "\1F91D"; }  /* 🤝 */
+.fa-map-marker-alt::before      { content: "\1F4CD"; }  /* 📍 */
+.fa-microchip::before           { content: "\25A3"; }   /* ▣ */
+.fa-network-wired::before       { content: "\1F310"; }  /* 🌐 */
+.fa-question::before            { content: "?"; }       /* ? */
+.fa-shield-alt::before          { content: "\1F6E1\FE0F"; } /* 🛡 */
+.fa-terminal::before            { content: ">_"; }      /* terminal prompt */
+.fa-user-secret::before         { content: "\1F575"; }  /* 🕵 */
+.fa-volume-mute::before         { content: "\1F507"; }  /* 🔇 */
+.fa-volume-up::before           { content: "\1F50A"; }  /* 🔊 */
+
+/* ---- Animations the engine/game expect from FA ---------------------------- */
+.fa-spin {
+    animation: failsafe-icon-spin 2s linear infinite;
+}
+.fa-pulse {
+    animation: failsafe-icon-spin 1s steps(8) infinite;
+}
+@keyframes failsafe-icon-spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Unmapped-icon failsafe marker (injected by icons-offline.js): renders a
+ * neutral glyph instead of a broken box, and tints it in dev so it gets seen. */
+.failsafe-icon-missing { opacity: 0.75; }
+.failsafe-icon-missing::before { content: "\25C6"; }    /* ◆ placeholder */

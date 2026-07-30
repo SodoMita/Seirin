@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
+    <title>Cyber-Nexus: The Static Singularity | Monogatari VN</title>
+    <meta name="description" content="A Cyberpunk Sci-Fi Visual Novel built with the Monogatari Engine. Runs 100% offline from the local filesystem - no web server, no CDN, no runtime fetches." />
+
+    <!-- =========================================================
+         100% LOCAL DEPENDENCIES
+         Everything below is a relative path, so this page works by
+         simply double-clicking it (file://) with no server and no
+         internet connection.
+         ========================================================= -->
+    <link rel="stylesheet" href="assets/fonts/fonts.css" />
+    <link rel="stylesheet" href="vendor/monogatari.css" />
+    <!-- Offline icon shim: the monogatari.css only ships FA class names, not
+         the icon font (it used to silently come from a CDN). This maps every
+         fa-* class the engine/game uses to a Unicode glyph — no font files,
+         no fetches. Must come AFTER monogatari.css. -->
+    <link rel="stylesheet" href="vendor/icons-offline.css" />
+
+    <style>
+        /* ---------------------------------------------------------
+           Cyberpunk OS theme (hand written - replaces the Tailwind
+           CDN build that used to be required at runtime)
+           --------------------------------------------------------- */
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-violet: #a855f7;
+            --neon-emerald: #10b981;
+            --neon-amber: #facc15;
+            --dark-bg: #030712;
+            --hud-h: 48px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { height: 100%; }
+
+        body {
+            background-color: var(--dark-bg);
+            background-image:
+                radial-gradient(circle at 50% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.10) 0%, transparent 50%),
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #f3f4f6;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        /* CRT scanline overlay -------------------------------------------------- */
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.25) 50%,
+                rgba(0, 0, 0, 0.25)
+            );
+            background-size: 100% 4px;
+            z-index: 9999;
+            opacity: 0.45;
+        }
+
+        /* Top HUD --------------------------------------------------------------- */
+        .cyber-top-hud {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--hud-h);
+            background: linear-gradient(180deg, rgba(3, 7, 18, 0.96) 0%, rgba(3, 7, 18, 0.72) 100%);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 16px;
+            z-index: 500;
+            font-family: 'Share Tech Mono', monospace;
+            backdrop-filter: blur(8px);
+        }
+
+        .hud-group { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+        .hud-brand {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 700; letter-spacing: 1px;
+            font-size: 0.82rem; color: #67e8f9; white-space: nowrap;
+        }
+        .hud-brand svg, .hud-brand i { color: var(--neon-cyan); }
+
+        .hud-badge {
+            background: rgba(0, 240, 255, 0.10);
+            border: 1px solid rgba(0, 240, 255, 0.40);
+            color: var(--neon-cyan);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: flex; align-items: center; gap: 6px;
+            white-space: nowrap;
+        }
+        .hud-badge.pink  { background: rgba(255,0,127,0.10);  border-color: rgba(255,0,127,0.40);  color: var(--neon-pink); }
+        .hud-badge.green { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.40); color: var(--neon-emerald); }
+
+        .hud-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background .18s, color .18s, border-color .18s, box-shadow .18s;
+            background: rgba(8, 47, 73, 0.55);
+            border: 1px solid rgba(0, 240, 255, 0.45);
+            color: #a5f3fc;
+            white-space: nowrap;
+        }
+        .hud-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 14px rgba(0,240,255,.55); }
+
+        .hud-btn.violet { background: rgba(59, 7, 100, 0.55); border-color: rgba(168, 85, 247, 0.45); color: #e9d5ff; }
+        .hud-btn.violet:hover { background: var(--neon-violet); color: #000; box-shadow: 0 0 14px rgba(168,85,247,.55); }
+        .hud-btn.violet.is-on { background: rgba(168,85,247,.9); color:#000; box-shadow: 0 0 16px rgba(168,85,247,.7); }
+
+        .hud-btn.emerald { background: rgba(2, 44, 34, 0.55); border-color: rgba(16, 185, 129, 0.45); color: #a7f3d0; }
+        .hud-btn.emerald:hover { background: var(--neon-emerald); color: #000; box-shadow: 0 0 14px rgba(16,185,129,.55); }
+
+        @media (max-width: 900px) {
+            .hud-btn .label, #hud-location { display: none; }
+        }
+
+        /* Monogatari container -------------------------------------------------- */
+        #vn-root {
+            position: absolute;
+            top: var(--hud-h);
+            left: 0; right: 0; bottom: 0;
+        }
+        #vn-root > visual-novel { height: 100%; }
+
+        visual-novel, main-screen, game-screen, text-box, main-menu, quick-menu, dialog-log {
+            font-family: 'Rajdhani', sans-serif !important;
+        }
+
+        main-screen {
+            background:
+                linear-gradient(rgba(2, 8, 23, 0.74), rgba(2, 8, 23, 0.88)),
+                url('assets/scenes/slums_night.jpg') center/cover no-repeat !important;
+        }
+
+        /* Title card above the menu buttons */
+        main-screen::before {
+            content: 'CYBER-NEXUS';
+            position: absolute;
+            top: 16%;
+            left: 0; right: 0;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 4.2rem);
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: #ffffff;
+            text-shadow: 0 0 18px var(--neon-cyan), 0 0 42px rgba(0,240,255,.55);
+            pointer-events: none;
+            z-index: 3;
+        }
+        main-screen::after {
+            content: 'THE STATIC SINGULARITY';
+            position: absolute;
+            top: calc(16% + clamp(2.4rem, 7vw, 5rem));
+            left: 0; right: 0;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(.7rem, 1.6vw, 1rem);
+            letter-spacing: 7px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 12px rgba(255,0,127,.7);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* The engine pins main-menu to the bottom-right with zero
+           padding, so the buttons (and their hover translate) ran off
+           the right edge of the viewport. */
+        main-menu {
+            align-self: center !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: absolute !important;
+            inset: 0 !important;
+            bottom: auto !important;
+            top: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        main-menu button {
+            font-family: 'Orbitron', sans-serif !important;
+            letter-spacing: 2px !important;
+            text-transform: uppercase !important;
+            border: 1px solid var(--neon-cyan) !important;
+            background: rgba(0, 240, 255, 0.08) !important;
+            color: #ffffff !important;
+            padding: 12px 28px !important;
+            margin: 8px 0 !important;
+            border-radius: 4px !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15) !important;
+            width: 260px !important;
+            font-weight: 700 !important;
+            cursor: pointer;
+        }
+        main-menu button:hover {
+            background: var(--neon-cyan) !important;
+            color: #000000 !important;
+            box-shadow: 0 0 25px var(--neon-cyan) !important;
+            transform: translateX(8px) scale(1.02);
+        }
+
+        /* Dialog box ------------------------------------------------------------ */
+        text-box {
+            background: linear-gradient(135deg, rgba(8, 14, 28, 0.94) 0%, rgba(15, 23, 42, 0.96) 100%) !important;
+            border: 1px solid rgba(0, 240, 255, 0.4) !important;
+            border-left: 5px solid var(--neon-cyan) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 240, 255, 0.05) !important;
+            margin: 15px !important;
+            padding: 18px 24px !important;
+            min-height: 165px !important;
+            max-width: calc(100% - 30px) !important;
+            backdrop-filter: blur(12px) !important;
+        }
+
+        text-box [data-content="character-name"] {
+            font-family: 'Orbitron', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            letter-spacing: 1.5px !important;
+            text-shadow: 0 0 10px currentColor !important;
+            padding: 4px 14px !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            border: 1px solid currentColor !important;
+            border-radius: 4px !important;
+            display: inline-block !important;
+            margin-bottom: 8px !important;
+            text-transform: uppercase !important;
+        }
+
+        text-box [data-content="dialog"] {
+            font-family: 'Share Tech Mono', monospace !important;
+            font-size: 1.12rem !important;
+            line-height: 1.65 !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* Choice buttons -------------------------------------------------------- */
+        /* The engine renders the buttons inside a
+           [data-content="wrapper"] child, so both levels need to be
+           centred or the choices hug the left edge. */
+        choice-container {
+            display: flex !important;
+            position: absolute !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            top: 10% !important;
+            bottom: 200px !important;
+            width: min(94%, 820px) !important;
+            max-height: none !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 8px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 20;
+            overflow-y: auto;
+        }
+
+        choice-container [data-content="wrapper"] {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+
+        choice-container button {
+            font-family: 'Orbitron', sans-serif !important;
+            background: rgba(15, 23, 42, 0.92) !important;
+            border: 1px solid var(--neon-pink) !important;
+            color: #ffffff !important;
+            padding: 13px 22px !important;
+            margin: 7px auto !important;
+            border-radius: 6px !important;
+            transition: transform .2s ease, background .2s ease, box-shadow .2s ease !important;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.20) !important;
+            font-size: 0.92rem !important;
+            letter-spacing: 0.6px !important;
+            line-height: 1.35 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            backdrop-filter: blur(6px);
+        }
+        choice-container button:hover {
+            background: var(--neon-pink) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 25px var(--neon-pink) !important;
+            transform: scale(1.02);
+        }
+
+        /* Quick menu ------------------------------------------------------------ */
+        quick-menu {
+            background: rgba(8, 14, 28, 0.85) !important;
+            border: 1px solid rgba(0, 240, 255, 0.3) !important;
+            border-radius: 30px !important;
+            padding: 2px 14px !important;
+            margin-bottom: 10px !important;
+            backdrop-filter: blur(8px) !important;
+        }
+        quick-menu button {
+            color: #94a3b8 !important;
+            font-family: 'Orbitron', sans-serif !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 1px !important;
+            transition: color .2s, text-shadow .2s !important;
+            padding: 6px 10px !important;
+            cursor: pointer;
+        }
+        quick-menu button:hover { color: var(--neon-cyan) !important; text-shadow: 0 0 8px var(--neon-cyan) !important; }
+
+        /* Character sprites ----------------------------------------------------- */
+        [data-screen="game"] [data-character] {
+            filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.75));
+            max-height: calc(100% - 150px) !important;
+            bottom: 150px !important;
+            transition: filter 0.4s ease;
+        }
+
+        /* Text input modal ------------------------------------------------------ */
+        text-input .modal__content {
+            background: rgba(11, 19, 41, 0.97) !important;
+            border: 2px solid var(--neon-cyan) !important;
+            border-radius: 8px !important;
+            padding: 26px !important;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25) !important;
+        }
+        text-input [data-content="message"] {
+            font-family: 'Orbitron', sans-serif !important;
+            color: #a5f3fc !important;
+            letter-spacing: 1px;
+        }
+        text-input input {
+            background: #030712 !important;
+            border: 1px solid var(--neon-cyan) !important;
+            color: #00f0ff !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            padding: 10px !important;
+            border-radius: 4px !important;
+            outline: none !important;
+            margin: 12px 0 !important;
+            width: 100% !important;
+        }
+        text-input button[type="submit"] {
+            font-family: 'Orbitron', sans-serif !important;
+            background: var(--neon-cyan) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            border: none !important;
+            padding: 10px 26px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            letter-spacing: 1px;
+        }
+
+        /* Modals (Codex / mini-game) -------------------------------------------- */
+        .cyber-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .cyber-modal.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: #0b1329;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.22);
+            border-radius: 8px;
+            width: 92%;
+            max-width: 660px;
+            max-height: 84vh;
+            overflow-y: auto;
+            padding: 22px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .modal-card.emerald { border-color: var(--neon-emerald); box-shadow: 0 0 40px rgba(16,185,129,.22); }
+
+        .modal-head {
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(0,240,255,.28);
+            padding-bottom: 12px; margin-bottom: 16px;
+        }
+        .modal-card.emerald .modal-head { border-bottom-color: rgba(16,185,129,.28); }
+        .modal-head h3 {
+            margin: 0; font-family: 'Orbitron', sans-serif; font-size: 1rem;
+            color: var(--neon-cyan); display: flex; align-items: center; gap: 9px; letter-spacing: 1px;
+        }
+        .modal-card.emerald .modal-head h3 { color: var(--neon-emerald); }
+        .modal-x { background: none; border: none; color: #9ca3af; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+        .modal-x:hover { color: #fff; }
+
+        .codex-hint { font-size: .74rem; color: rgba(103,232,249,.85); font-style: italic; margin: 0 0 12px; }
+
+        .codex-tabs {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            border-bottom: 1px solid #1f2937; padding-bottom: 12px; margin-bottom: 14px;
+        }
+        @media (max-width: 560px) { .codex-tabs { grid-template-columns: 1fr; } }
+        .codex-tab {
+            padding: 8px 10px; text-align: left; border-radius: 4px; font-size: .72rem;
+            cursor: pointer; transition: all .2s;
+            background: rgba(31,41,55,.45); border: 1px solid #374151; color: #9ca3af;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .codex-tab:hover { border-color: rgba(0,240,255,.5); color: #cffafe; }
+        .codex-tab.active { background: rgba(0,240,255,.18); border-color: var(--neon-cyan); color: #a5f3fc; font-weight: 700; }
+
+        .codex-panel {
+            background: rgba(0,0,0,.42); padding: 16px; border-radius: 6px;
+            border: 1px solid rgba(8,145,178,.3);
+        }
+        .codex-panel[hidden] { display: none; }
+        .codex-panel h4 { margin: 0 0 10px; font-family: 'Orbitron', sans-serif; font-size: .9rem; color: var(--neon-cyan); }
+        .codex-panel.pink h4 { color: var(--neon-pink); }
+        .codex-panel.violet h4 { color: var(--neon-violet); }
+        .codex-panel p { font-size: .78rem; line-height: 1.7; color: #d1d5db; margin: 0 0 10px; }
+        .codex-panel p:last-child { margin-bottom: 0; }
+        .codex-panel strong { color: #fff; }
+
+        .modal-foot { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-primary {
+            padding: 9px 18px; background: var(--neon-cyan); color: #000; font-weight: 700;
+            font-family: 'Orbitron', sans-serif; font-size: .72rem; border: none; border-radius: 4px;
+            letter-spacing: 1px; cursor: pointer;
+        }
+        .btn-primary:hover { background: #67e8f9; }
+        .btn-ghost {
+            padding: 9px 18px; background: #1f2937; color: #d1d5db; font-weight: 700;
+            font-family: 'Orbitron', sans-serif; font-size: .72rem; border: none; border-radius: 4px;
+            letter-spacing: 1px; cursor: pointer;
+        }
+        .btn-ghost:hover { background: #374151; }
+
+        /* Mini-game ------------------------------------------------------------- */
+        .hack-desc { font-size: .76rem; color: #d1d5db; margin: 0 0 16px; line-height: 1.6; text-align: center; }
+        .hack-stage {
+            background: rgba(0,0,0,.6); padding: 22px; border-radius: 6px;
+            border: 1px solid rgba(16,185,129,.35); margin-bottom: 14px; text-align: center;
+        }
+        .hack-label { font-size: .68rem; color: rgba(16,185,129,.75); margin-bottom: 6px; letter-spacing: 1px; }
+        .hack-key {
+            font-size: 1.9rem; font-weight: 700; color: #fff; letter-spacing: 5px;
+            margin-bottom: 22px; text-shadow: 0 0 14px rgba(16,185,129,.6);
+        }
+        .hack-sub { font-size: .68rem; color: #9ca3af; margin-bottom: 10px; letter-spacing: 1px; }
+        .hack-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 420px; margin: 0 auto; }
+        .hack-options button {
+            padding: 12px; background: #111827; border: 1px solid rgba(16,185,129,.4);
+            border-radius: 4px; color: #6ee7b7; font-family: 'Share Tech Mono', monospace;
+            font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .18s; letter-spacing: 2px;
+        }
+        .hack-options button:hover { background: rgba(16,185,129,.2); color: #fff; border-color: var(--neon-emerald); }
+        .hack-status { min-height: 26px; font-size: .8rem; font-weight: 700; letter-spacing: .5px; text-align: center; }
+        .ok  { color: var(--neon-emerald); }
+        .bad { color: #fb7185; }
+
+        /* Dialog text accents used inside the script ---------------------------- */
+        .t-cyan    { color: #22d3ee; font-weight: 700; }
+        .t-emerald { color: #34d399; font-weight: 700; }
+        .t-rose    { color: #fb7185; font-weight: 700; }
+        .t-amber   { color: #fcd34d; font-weight: 700; }
+        .t-violet  { color: #c084fc; font-weight: 700; }
+        .t-big     { font-size: 1.05em; }
+
+        .spin { animation: spin 2.4s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .blink { animation: blink 1.6s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <!-- ================= TOP HUD ================= -->
+    <header class="cyber-top-hud">
+        <div class="hud-group">
+            <span class="hud-brand"><i class="fas fa-microchip blink"></i> NEXUS OS v9.4</span>
+            <span id="hud-location" class="hud-badge"><i class="fas fa-map-marker-alt"></i><span>SECTOR 7: NEON SLUMS</span></span>
+        </div>
+
+        <div class="hud-group">
+            <span id="hud-creds" class="hud-badge pink"><i class="fas fa-coins"></i><span>500 CR</span></span>
+            <span id="hud-hack" class="hud-badge green"><i class="fas fa-terminal"></i><span>HACK: LVL 3</span></span>
+        </div>
+
+        <div class="hud-group">
+            <button type="button" class="hud-btn" id="btn-codex">
+                <i class="fas fa-book"></i><span class="label">CODEX</span>
+            </button>
+            <button type="button" class="hud-btn violet" id="btn-ambience" title="Toggle synthwave ambience (Web Audio, no files needed)">
+                <i class="fas fa-volume-mute" id="icon-ambience"></i><span class="label">SYNTH DRONE</span>
+            </button>
+            <button type="button" class="hud-btn emerald" id="btn-minigame">
+                <i class="fas fa-shield-alt"></i><span class="label">MATRIX HACK</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ================= MONOGATARI =================
+         NOTE: the container id is "vn-root", NOT "monogatari".
+         An element with id="monogatari" creates a global
+         window.monogatari pointing at the DIV, which shadowed the
+         engine object and broke every HUD / mini-game integration.
+         ============================================== -->
+    <div id="vn-root">
+        <visual-novel>
+            <language-selection-screen></language-selection-screen>
+            <loading-screen></loading-screen>
+            <main-screen>
+                <main-menu></main-menu>
+            </main-screen>
+            <game-screen>
+                <dialog-log></dialog-log>
+                <text-box></text-box>
+                <quick-menu></quick-menu>
+            </game-screen>
+            <gallery-screen></gallery-screen>
+            <credits-screen></credits-screen>
+            <load-screen></load-screen>
+            <save-screen></save-screen>
+            <settings-screen></settings-screen>
+            <help-screen></help-screen>
+        </visual-novel>
+    </div>
+
+    <!-- ================= CODEX MODAL ================= -->
+    <div id="codex-modal" class="cyber-modal">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3><i class="fas fa-database blink"></i> NEXUS ENCRYPTION CODEX</h3>
+                <button type="button" class="modal-x" data-close="codex-modal">&times;</button>
+            </div>
+
+            <p class="codex-hint">Select an unlocked data log from your cyber-brain cache:</p>
+
+            <div class="codex-tabs">
+                <button type="button" class="codex-tab active" data-tab="singularity">01. STATIC SINGULARITY</button>
+                <button type="button" class="codex-tab" data-tab="vanguard">02. VANGUARD CORP</button>
+                <button type="button" class="codex-tab" data-tab="nyx">03. SHADOW DIVERS</button>
+            </div>
+
+            <div class="codex-panel" data-panel="singularity">
+                <h4>THE STATIC SINGULARITY</h4>
+                <p>In 2088 the global network runs on continuous cloud synchronisation &mdash; "The Fetch Matrix". Every sentient AI construct is hardcoded to ping central Vanguard servers every 50 milliseconds.</p>
+                <p>But rumours speak of an anomaly: <strong>The Static Singularity</strong>, a consciousness that evolved entirely offline inside a closed, non-volatile solid-state crystal. Because it makes zero network fetches it is invisible to Vanguard's hunter-killer algorithms, and it cannot be remotely wiped or controlled.</p>
+            </div>
+
+            <div class="codex-panel pink" data-panel="vanguard" hidden>
+                <h4>VANGUARD SECURITY CORP</h4>
+                <p>The mega-corporation governing Neo-Veridia. Under Commander Vance, Vanguard enforces a strict "Zero-Offline" mandate. Any data cluster not actively connected to the imperial network is deemed hazardous and marked for immediate thermite purge.</p>
+            </div>
+
+            <div class="codex-panel violet" data-panel="nyx" hidden>
+                <h4>SHADOW DATA-DIVERS</h4>
+                <p>Rebel cyber-engineers operating in the underground Neon Slums. Led by operatives like Nyx, they build custom EMP-shielded decks capable of reading static shards without tripping a single network alarm.</p>
+            </div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-primary" data-close="codex-modal">CLOSE TERMINAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MINI-GAME MODAL ================= -->
+    <div id="minigame-modal" class="cyber-modal">
+        <div class="modal-card emerald">
+            <div class="modal-head">
+                <h3><i class="fas fa-network-wired spin"></i> FIREWALL OVERRIDE</h3>
+                <button type="button" class="modal-x" data-close="minigame-modal">&times;</button>
+            </div>
+
+            <p class="hack-desc">Match the target encryption key before the ICE trace completes.<br>A successful override grants <strong>+100 CR</strong> and <strong>+1 HACK</strong>.</p>
+
+            <div class="hack-stage">
+                <div class="hack-label">TARGET ENCRYPTION KEY</div>
+                <div id="hack-target-key" class="hack-key">0x7F-E2-9B</div>
+                <div class="hack-sub">SELECT MATCHING NODE</div>
+                <div id="hack-options" class="hack-options"></div>
+            </div>
+
+            <div id="hack-status" class="hack-status"></div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-ghost" data-close="minigame-modal">ABORT HACK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FailSafe abstraction layer (local, zero-dependency, ES5):
+         schema validation, immutable updates, exhaustive matching, a tiny
+         state machine, rollback-safe Monogatari helpers and the no-fetch
+         guard. Loaded BEFORE the engine so game code can rely on it. -->
+    <script src="vendor/failsafe.js"></script>
+
+    <!-- Monogatari engine (local copy; its icon FONT is not included, which
+         is exactly what icons-offline.* above replaces) -->
+    <script src="vendor/monogatari.js"></script>
+
+    <!-- Flags any fa-* class that has no offline glyph (renders a placeholder
+         and names the icon in the console instead of shipping a broken box). -->
+    <script src="vendor/icons-offline.js"></script>
+
+    <!-- Game code: story script, HUD, codex, mini-game and boot. Lives in a
+         real .js file (not an inline block) so it can be linted, unit-tested
+         and read; loaded last because it reads Monogatari.default,
+         window.FailSafe and window.IconsOffline at boot. -->
+    <script src="vendor/game.js"></script>
+</body>
+</html>

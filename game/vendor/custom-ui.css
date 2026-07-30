@@ -1,0 +1,1125 @@
+/* ============================================================================
+ * Seirin: Night Shift — Resonance 2030 Custom Visual Novel UI Theme
+ * ----------------------------------------------------------------------------
+ * Clean, glassmorphic visual novel UI with glowing badges, response cards,
+ * top header status HUD, and custom responsive anime styling.
+ * ========================================================================== */
+
+@import url('./monogatari.css?v=20260728r11');
+@import url('./icons-offline.css?v=20260728r11');
+
+:root {
+  --sn-bg-dark: rgba(11, 15, 25, 0.88);
+  --sn-glass-border: rgba(56, 189, 248, 0.25);
+  --sn-text-main: #f1f5f9;
+  --sn-cyan-glow: #38bdf8;
+  --sn-pink-glow: #f472b6;
+  --sn-amber-glow: #fbbf24;
+  --sn-purple-glow: #a855f7;
+  --sn-emerald-glow: #34d399;
+  --sn-red-glow: #f87171;
+  --sn-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Viewport geometry: the visual novel owns the whole window. Without the
+   absolute fill below, #vn-root (and every engine screen inside it) has
+   zero height — the page renders as a blank white screen. */
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #080a12;
+}
+
+#vn-root {
+  font-family: var(--sn-font-family);
+  background-color: #080a12;
+  color: var(--sn-text-main);
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#vn-root > visual-novel { height: 100%; }
+
+visual-novel, main-screen, game-screen, text-box, main-menu, quick-menu, dialog-log {
+  font-family: var(--sn-font-family);
+}
+
+/* Main menu / title screen ---------------------------------------------- */
+main-screen {
+  background:
+    linear-gradient(rgba(8, 10, 18, 0.85), rgba(8, 10, 18, 0.95)),
+    url('../assets/scenes/courtyard.png') center/cover no-repeat;
+}
+
+/* Engine system screens (main menu, settings, save/load, help, credits,
+   gallery, language, loading) must own the viewport ABOVE the custom HUD.
+   The vendored monogatari.css gives screens no z-index, so our z-80 HUD
+   covered them — including their top-left [data-action="back"] circle,
+   which made the settings screen impossible to leave on mobile. */
+[data-screen]:not([data-screen="game"]) {
+  position: relative;
+  z-index: 90;
+  background-color: #0a0d18;
+}
+
+/* Engine "back" circle, themed to the glass HUD */
+[data-screen]:not([data-screen="game"]) [data-action="back"] {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid var(--sn-glass-border);
+  color: var(--sn-cyan-glow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+[data-screen]:not([data-screen="game"]) [data-action="back"]:hover {
+  border-color: var(--sn-cyan-glow);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.45);
+  transform: translateX(-2px);
+}
+
+main-screen::before {
+  content: 'СЭЙРИН';
+  position: absolute;
+  top: 16%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 6vw, 4.2rem);
+  font-weight: 900;
+  letter-spacing: 10px;
+  color: #ffffff;
+  text-shadow: 0 0 18px var(--sn-cyan-glow), 0 0 42px rgba(56, 189, 248, 0.55);
+  pointer-events: none;
+  z-index: 3;
+}
+
+main-screen::after {
+  content: 'НОЧНАЯ СМЕНА · РЕЗОНАНС 2030';
+  position: absolute;
+  top: calc(16% + clamp(2.4rem, 7vw, 5rem));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(.7rem, 1.6vw, 1rem);
+  letter-spacing: 6px;
+  color: var(--sn-pink-glow);
+  text-shadow: 0 0 12px rgba(244, 114, 182, 0.7);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* The engine pins main-menu to the bottom-right with zero padding; center it. */
+main-menu {
+  align-self: center !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  inset: 0 !important;
+  bottom: auto !important;
+  top: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+main-menu button {
+  font-family: 'Rajdhani', sans-serif !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  background: rgba(15, 23, 42, 0.92) !important;
+  color: #f8fafc !important;
+  padding: 12px 28px !important;
+  margin: 8px 0 !important;
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  width: 260px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+}
+
+main-menu button:hover {
+  background: rgba(30, 58, 138, 0.95) !important;
+  border-color: var(--sn-cyan-glow) !important;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.5), inset 0 0 12px rgba(56, 189, 248, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+/* Custom Dialogue Screen Layout — bottom clears the engine quick-menu bar
+   * (2.5rem + 8px gap) so it never covers the Back/Save/Load buttons. */
+[data-screen="game"] [data-ui="text-box"] {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 64px);
+  max-width: 1100px;
+  min-height: 180px;
+  padding: 24px 32px;
+  background: var(--sn-bg-dark);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--sn-glass-border);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 50;
+}
+
+/* Speaker Label Badge */
+[data-screen="game"] [data-ui="who"] {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  padding: 6px 18px;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--sn-cyan-glow);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  color: var(--sn-cyan-glow);
+  text-transform: uppercase;
+}
+
+/* Dialogue Text Body */
+[data-screen="game"] [data-ui="say"] {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #e2e8f0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Choice Menu */
+[data-screen="game"] [data-ui="choices"] {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 720px;
+  max-height: min(78vh, 580px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 100;
+}
+
+[data-screen="game"] [data-ui="choices"] button {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 12px;
+  color: #f8fafc;
+  padding: 16px 24px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-screen="game"] [data-ui="choices"] button:hover {
+  background: rgba(30, 58, 138, 0.95);
+  border-color: var(--sn-cyan-glow);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.5), inset 0 0 12px rgba(56, 189, 248, 0.2);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Custom Top HUD */
+.cyber-top-hud {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  z-index: 80;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hud-brand {
+  font-weight: 700;
+  color: var(--sn-cyan-glow);
+  letter-spacing: 0.08em;
+}
+
+.hud-badge {
+  background: rgba(30, 41, 59, 0.8);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.hud-badge.amber { color: var(--sn-amber-glow); border-color: rgba(251, 191, 36, 0.3); }
+.hud-badge.pink { color: var(--sn-pink-glow); border-color: rgba(244, 114, 182, 0.3); }
+.hud-badge.red { color: var(--sn-red-glow); border-color: rgba(248, 113, 113, 0.3); }
+
+.hud-btn {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #cbd5e1;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hud-btn:hover {
+  background: var(--sn-cyan-glow);
+  color: #0f172a;
+}
+
+/* Inline text-tone utilities used by [ SYSTEM ] script lines */
+.t-cyan { color: var(--sn-cyan-glow); }
+.t-red { color: var(--sn-red-glow); }
+.t-violet { color: var(--sn-purple-glow); }
+
+/* Archives codex modal */
+.archives-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.archives-overlay[hidden] { display: none; }
+
+.archives-panel {
+  width: min(720px, calc(100% - 48px));
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--sn-bg-dark);
+  border: 1px solid var(--sn-glass-border);
+  border-radius: 16px;
+  padding: 20px 24px;
+  color: var(--sn-text-main);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.archives-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+  color: var(--sn-cyan-glow);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.archives-head > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.archives-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.archives-section h3 {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+}
+
+.archives-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
+  font-size: 0.95rem;
+}
+
+.archives-row b { font-weight: 600; }
+.archives-row.met b { color: var(--sn-emerald-glow); }
+.archives-row.unknown { color: #64748b; }
+
+.archives-route {
+  font-weight: 700;
+  color: var(--sn-amber-glow);
+}
+
+/* Fast-forward HUD button active state */
+.hud-btn.active {
+  background: var(--sn-cyan-glow);
+  color: #0f172a;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+  border-color: var(--sn-cyan-glow);
+}
+
+/* Alert badge pulse — fires whenever akatomi_alert rises (choices feel alive) */
+@keyframes alertPulse {
+  0% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
+  50% { box-shadow: 0 0 18px rgba(248, 113, 113, 0.85); transform: scale(1.06); }
+  100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
+}
+
+.hud-badge.alert-pulse { animation: alertPulse 0.7s ease-out; }
+
+/* Narrow screens: wrap the HUD and keep the engine quick-menu off it.
+   Vendored monogatari.css pins quick-menu to top:0 under ~600px, where it
+   would sit beneath this z-80 HUD; move it to the bottom at every size. */
+@media screen and (max-width: 60em) {
+  .cyber-top-hud {
+    left: 12px;
+    right: 12px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    row-gap: 8px;
+    font-size: 0.8rem;
+  }
+  .hud-group { gap: 8px; flex-wrap: wrap; }
+}
+
+@media screen and (max-width: 37.56255em) {
+  quick-menu {
+    top: auto;
+    bottom: 0;
+    background: rgba(11, 15, 25, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ============================================================================
+ * DEBUG ROUTE ATLAS MODAL (#btn-graph)
+ * ========================================================================== */
+.graph-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.graph-overlay[hidden] { display: none; }
+
+.graph-panel {
+  width: min(1180px, calc(100% - 32px));
+  max-height: 86vh;
+  overflow: auto;
+  background: var(--sn-bg-dark);
+  border: 1px solid var(--sn-glass-border);
+  border-radius: 16px;
+  padding: 20px 24px;
+  color: var(--sn-text-main);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.graph-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  color: var(--sn-cyan-glow);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.graph-head > span { display: inline-flex; align-items: center; gap: 10px; }
+
+.graph-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+.graph-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sn-cyan-glow);
+}
+.graph-chip.dim { color: #64748b; font-weight: 500; }
+
+.graph-hint {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 8px 0 14px;
+}
+
+.graph-cols {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: 2px 2px 10px;
+}
+.graph-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 235px;
+  flex: 1 0 235px;
+}
+
+.graph-node {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid var(--sn-glass-border);
+  border-radius: 12px;
+  padding: 12px 14px 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.graph-node:hover {
+  border-color: var(--sn-cyan-glow);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.25);
+}
+.graph-node.ending { border-color: rgba(168, 85, 247, 0.55); }
+.graph-node.current {
+  border-color: var(--sn-amber-glow);
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
+}
+
+.graph-node-title { font-weight: 700; color: #f8fafc; font-size: 0.95rem; }
+.graph-node-id {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: #7c8aa5;
+  margin-top: 2px;
+}
+.graph-node-banner {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sn-purple-glow);
+}
+.graph-node-here {
+  margin-top: 8px;
+  display: inline-block;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  color: #0f172a;
+  background: var(--sn-amber-glow);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.graph-edges {
+  margin-top: 10px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.25);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.graph-edge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+.graph-edge-text { color: #cbd5e1; line-height: 1.35; }
+.graph-edge.choice  .graph-edge-text::before { content: '▸ '; color: var(--sn-cyan-glow); }
+.graph-edge.branch  .graph-edge-text::before { content: '⑂ '; color: var(--sn-purple-glow); }
+.graph-edge.jump    .graph-edge-text::before { content: '→ '; color: #64748b; }
+.graph-edge.stat    .graph-edge-text::before { content: '◇ '; color: #64748b; }
+
+.graph-target {
+  flex: none;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 7px;
+  color: var(--sn-cyan-glow);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.graph-target:hover {
+  background: var(--sn-cyan-glow);
+  color: #0f172a;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+.graph-edge-stat {
+  flex: none;
+  font-size: 0.66rem;
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+.graph-jump {
+  width: 100%;
+  margin-top: 10px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 8px;
+  color: var(--sn-amber-glow);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.graph-jump:hover {
+  background: var(--sn-amber-glow);
+  color: #0f172a;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
+}
+
+/* ============================================================================
+ * ANIMATIONS & MICRO-DELIGHTS
+ * ========================================================================== */
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes titleGlow {
+  from { text-shadow: 0 0 14px var(--sn-cyan-glow), 0 0 30px rgba(56, 189, 248, 0.4); }
+  to   { text-shadow: 0 0 24px var(--sn-cyan-glow), 0 0 58px rgba(56, 189, 248, 0.75); }
+}
+@keyframes brandGlow {
+  from { text-shadow: 0 0 6px rgba(56, 189, 248, 0.35); }
+  to   { text-shadow: 0 0 14px rgba(56, 189, 248, 0.85); }
+}
+@keyframes textboxIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes nodeFlash {
+  0%, 100% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35); }
+  25%, 60% { box-shadow: 0 0 0 3px var(--sn-amber-glow), 0 0 26px rgba(251, 191, 36, 0.6); }
+}
+
+/* Modal entrances */
+.archives-panel, .graph-panel { animation: modalIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.15) both; }
+
+/* Title screen breathes */
+main-screen::before { animation: titleGlow 5s ease-in-out infinite alternate; }
+main-menu button { animation: fadeSlideUp 0.4s both; }
+main-menu button:nth-child(1) { animation-delay: 0.05s; }
+main-menu button:nth-child(2) { animation-delay: 0.12s; }
+main-menu button:nth-child(3) { animation-delay: 0.19s; }
+main-menu button:nth-child(4) { animation-delay: 0.26s; }
+main-menu button:nth-child(5) { animation-delay: 0.33s; }
+main-menu button:nth-child(6) { animation-delay: 0.40s; }
+
+/* HUD brand gently hums */
+.hud-brand { animation: brandGlow 4s ease-in-out infinite alternate; }
+
+/* Text box slides up when the game screen opens */
+[data-screen="game"] [data-ui="text-box"] { animation: textboxIn 0.45s ease both; }
+
+/* Choice cards cascade in, reading order top-down */
+[data-screen="game"] [data-ui="choices"] button { animation: fadeSlideUp 0.32s both; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(1) { animation-delay: 0.04s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(2) { animation-delay: 0.10s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(3) { animation-delay: 0.16s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(4) { animation-delay: 0.22s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(5) { animation-delay: 0.28s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(6) { animation-delay: 0.34s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(7) { animation-delay: 0.40s; }
+[data-screen="game"] [data-ui="choices"] button:nth-child(8) { animation-delay: 0.46s; }
+
+.graph-node.flash { animation: nodeFlash 1.6s ease; }
+
+/* Depth vignette over the scene — adds cinema without touching gameplay */
+game-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(4, 6, 12, 0.45) 100%);
+  z-index: 5;
+}
+
+/* Keyboard focus must be visible everywhere we restyled */
+main-menu button:focus-visible,
+[data-screen="game"] [data-ui="choices"] button:focus-visible,
+.hud-btn:focus-visible,
+.graph-target:focus-visible,
+.graph-jump:focus-visible,
+[data-action="back"]:focus-visible {
+  outline: 2px solid var(--sn-cyan-glow);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+ * MOBILE LAYOUT REFINEMENTS
+ * ========================================================================== */
+@media screen and (max-width: 37.5em) {
+  [data-screen="game"] [data-ui="text-box"] {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    transform: none;
+    bottom: 56px;
+    padding: 16px 18px;
+    min-height: 140px;
+    animation: none; /* textboxIn would fight the mobile transform */
+  }
+  [data-screen="game"] [data-ui="choices"] {
+    width: calc(100% - 24px);
+    top: 42%;
+    max-height: 62vh;
+    gap: 10px;
+  }
+  [data-screen="game"] [data-ui="choices"] button { padding: 12px 16px; font-size: 0.95rem; }
+  main-menu button { width: auto !important; min-width: min(260px, 76vw) !important; }
+  .graph-col { min-width: 200px; flex-basis: 200px; }
+  .graph-panel { padding: 14px 16px; }
+}
+
+@media screen and (max-width: 30em) {
+  .hud-btn span { display: none; } /* icon-only HUD on very small phones */
+  .cyber-top-hud { font-size: 0.74rem; }
+  .archives-panel, .graph-panel { width: calc(100% - 20px); }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .archives-panel, .graph-panel,
+  main-menu button,
+  [data-screen="game"] [data-ui="text-box"],
+  [data-screen="game"] [data-ui="choices"] button,
+  main-screen::before, .hud-brand, .graph-node.flash {
+    animation: none !important;
+  }
+}
+
+/* === Sprite world scale (height-normalized lineup) ===================
+ * Sprites share one world scale, feet on the bottom edge; height becomes
+ * the only variable. Source table: ai_agent_docs/skills/seirin-character-art
+ * /references/sprite-spec.md ("Cross-character scale") — card-backed values
+ * (yuki 167, momo 152) marked "card", the rest provisional pending owner.
+ * Anchor: ren 172cm -> 80vh (engine default), 1cm = 0.465vh.
+ * Fix for "Miya looks huge, Splash looks tiny beside adults". */
+game-screen [data-character="kurogane"] { max-height: 87.4vh; }       /* 188cm provisional */
+game-screen [data-character="kaito"]    { max-height: 80.9vh; }       /* 174cm provisional */
+game-screen [data-character="lumina"]   { max-height: 80.9vh; }       /* 174cm provisional */
+game-screen [data-character="ren"]      { max-height: 80vh; }         /* 172cm anchor      */
+game-screen [data-character="reika"]    { max-height: 79.1vh; }       /* 170cm provisional */
+game-screen [data-character="stella"]   { max-height: 78.1vh; }       /* 168cm provisional */
+game-screen [data-character="yuki"]     { max-height: 77.7vh; }       /* 167cm card        */
+game-screen [data-character="saya"]     { max-height: 77.2vh; }       /* 166cm provisional */
+game-screen [data-character="kitsune"]  { max-height: 76.3vh; }       /* 164cm provisional */
+game-screen [data-character="aria"]     { max-height: 75.3vh; }       /* 162cm provisional */
+game-screen [data-character="nao"]      { max-height: 73.5vh; }       /* 158cm provisional */
+game-screen [data-character="momo"]     { max-height: 70.7vh; }       /* 152cm card        */
+game-screen [data-character="miya"]     { max-height: 48.8vh; }       /* 105cm child prov. */
+/* Splash is a colloid soft robot: a wide hovering water mass with no legs —
+ * her form spreads horizontally, so she reads correctly with a smaller cap. */
+game-screen [data-character="splash"]   { max-height: 60vh; }
+
+/* Sprites scale by HEIGHT ONLY — never squeeze them to frame width.
+ * The engine default [data-character]{max-width:100%} clamps any sprite
+ * wider than the (portrait) viewport to its width, which silently shrinks
+ * its height and breaks the world-scale table above. A sprite is allowed
+ * to bleed past the sides (centered) instead. */
+game-screen [data-character] { max-width: none; }
+
+/* === Side anchoring pins (belt & suspenders) =========================
+ * The engine anchors 'show character at left/right' via BOTH a class and a
+ * data-position attribute on the <img>. monogatari.css only styles the
+ * class variants — so these rules re-declare the same geometry keyed on the
+ * attribute too, exactly as measured live (left flush x=0, right flush
+ * vw-w, center midpoint). No visual change in the healthy path; it just
+ * cannot silently center again. */
+game-screen [data-character].left,
+game-screen [data-character][data-position="left"] {
+  left: 0; right: auto; margin-left: 0; margin-right: auto;
+}
+game-screen [data-character].right,
+game-screen [data-character][data-position="right"] {
+  left: auto; right: 0; margin-left: auto; margin-right: 0;
+}
+game-screen [data-character].center,
+game-screen [data-character][data-position="center"] {
+  left: 0; right: 0; margin-left: auto; margin-right: auto;
+}
+
+/* === Portrait route-graph (no rightward protrusion) ==================
+ * In portrait the 14 depth columns were a 3.3-metre horizontal scroll:
+ * the next column visibly poked in from the right edge and the whole map
+ * read as broken. Stack columns vertically below 600px instead; the
+ * depth order is preserved top-to-bottom and nothing can protrude. */
+@media screen and (max-width: 37.5em) {
+  .graph-overlay { align-items: flex-start; }
+  .graph-panel {
+    width: calc(100% - 16px);
+    max-height: 93vh;
+    margin: 6px 8px;
+    padding: 14px 14px;
+  }
+  .graph-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .graph-cols {
+    flex-direction: column;
+    overflow-x: hidden;
+    gap: 14px;
+    padding-bottom: 4px;
+  }
+  .graph-col {
+    min-width: 0 !important;
+    flex: none !important;
+    width: 100%;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.18);
+    padding-bottom: 12px;
+  }
+  .graph-col:last-child { border-bottom: none; }
+  .graph-node { width: 100%; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEIRIN MECHA RESKIN — special-machinery / battle-mech interface
+   Geometry draft: chamfered 45° plates instead of blind rounding,
+   !important mirrors the earlier theme rules it replaces in cascade.
+   Rounding survives ONLY where it is semantic (LED dots, avatar rings).
+   Layer note: clip-path kills box-shadow, so every glow here is a
+   post-clip filter: drop-shadow(). New keyframes below are also gated
+   in the second prefers-reduced-motion block. */
+
+@keyframes mechScan {             /* light strip running across a plate  */
+  0%   { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+  12%  { opacity: 1; }
+  55%  { opacity: 1; }
+  100% { transform: translateX(260%) skewX(-18deg); opacity: 0; }
+}
+@keyframes mechHazard {           /* chevron drift on armed surfaces     */
+  from { background-position: 0 0; }
+  to   { background-position: 48px 0; }
+}
+@keyframes mechLed {              /* status LED heartbeat                */
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px currentColor; }
+  50%      { opacity: 0.35; box-shadow: 0 0 2px currentColor; }
+}
+@keyframes mechAmbient {          /* slow mysterious drift behind menu   */
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 64px 36px, 0 0; }
+}
+
+/* --- Main menu: hangar atmosphere --------------------------------------
+   A second animated layer over the courtyard backdrop: slow diagonal
+   maintenance-grid drift. The backdrop itself stays intact beneath.  */
+main-screen {
+  background:
+    repeating-linear-gradient(45deg, rgba(251, 191, 36, 0.03) 0 2px, transparent 2px 32px),
+    linear-gradient(rgba(8, 10, 18, 0.85), rgba(8, 10, 18, 0.95)),
+    url('../assets/scenes/courtyard.png?v=20260728r11') center/cover no-repeat !important;
+  animation: mechAmbient 14s linear infinite;
+}
+
+/* Mecha plate button: top-left/right-bottom 45° chamfers, amber LED,
+   sweep on hover, chevron rail under the text. */
+main-menu button {
+  border-radius: 0 !important;
+  clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 14px),
+    calc(100% - 14px) 100%, 0 100%, 0 22px) !important;
+  background:
+    linear-gradient(180deg, rgba(251, 191, 36, 0.14), rgba(251, 191, 36, 0) 42%),
+    linear-gradient(115deg, #131926, #0b0f18 65%) !important;
+  border: none !important;
+  border-left: 3px solid rgba(251, 191, 36, 0.75) !important;
+  box-shadow: none !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  padding-left: 34px !important;
+  position: relative;
+  overflow: hidden;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+}
+main-menu button::before {       /* status LED, running light          */
+  content: '';
+  position: absolute;
+  left: 12px; top: 50%;
+  width: 7px; height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;            /* semantic rounding: LED dots only   */
+  background: var(--sn-amber-glow);
+  color: var(--sn-amber-glow);
+  animation: mechLed 2.2s ease-in-out infinite;
+}
+main-menu button::after {        /* hover light sweep (armed on hover) */
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; width: 34%;
+  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.28), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+main-menu button:hover {
+  background:
+    repeating-linear-gradient(-45deg, rgba(251, 191, 36, 0.16) 0 8px, rgba(10, 12, 20, 0.16) 8px 16px),
+    linear-gradient(115deg, #1a2334, #0d1322 65%) !important;
+  animation: mechHazard 1.2s linear infinite;
+  border-left-color: var(--sn-cyan-glow) !important;
+  transform: translateY(-2px);
+  filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.35)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+}
+main-menu button:hover::before { background: var(--sn-cyan-glow); color: var(--sn-cyan-glow); }
+main-menu button:hover::after { animation: mechScan 0.9s ease-out infinite; }
+
+/* --- Choice plates: numbered checkpoints -------------------------------
+   Stencil index 01/02/03 marks every decision like a launch checklist. */
+[data-screen="game"] choice-container { counter-reset: mechChoice; }
+[data-screen="game"] choice-container button {
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px),
+    calc(100% - 12px) 100%, 14px 100%, 0 calc(100% - 20px));
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.10), rgba(56, 189, 248, 0) 46%),
+    linear-gradient(115deg, #121826, #0b0f18 65%);
+  border: none;
+  border-left: 3px solid rgba(56, 189, 248, 0.6);
+  box-shadow: none;
+  padding-left: 56px;
+  position: relative;
+  overflow: hidden;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+[data-screen="game"] choice-container button::before {
+  counter-increment: mechChoice;
+  content: '0' counter(mechChoice);
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  color: rgba(56, 189, 248, 0.75);
+  letter-spacing: 0.08em;
+}
+[data-screen="game"] choice-container button::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.25), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+[data-screen="game"] choice-container button:hover {
+  background:
+    repeating-linear-gradient(-45deg, rgba(56, 189, 248, 0.14) 0 8px, rgba(10, 12, 20, 0.14) 8px 16px),
+    linear-gradient(115deg, #17203a, #0d1322 65%);
+  animation: mechHazard 1.2s linear infinite;
+  border-left-color: var(--sn-amber-glow);
+  transform: translateY(-2px) scale(1.01);
+  filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.35)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+}
+[data-screen="game"] choice-container button:hover::before { color: var(--sn-amber-glow); }
+[data-screen="game"] choice-container button:hover::after { animation: mechScan 0.9s ease-out infinite; }
+
+/* --- Text box: cockpit console ------------------------------------------
+   One big chamfer on the top-left corner; faint scanline shimmer inside;
+   amber data-rail under the speaker line. Geometry repeats the designed
+   centered-panel layout (the old data-ui rule is inert on today's DOM);
+   the textboxIn keyframes are built for exactly this left:50%+translate
+   geometry — without it the panel parks half-off-screen after the fill. */
+[data-screen="game"] text-box {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 64px);
+  max-width: 1100px;
+  min-height: 180px;
+  max-height: none;
+  padding: 24px 32px;
+  background: var(--sn-bg-dark);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 50;
+  border-radius: 0;
+  clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 16px),
+    calc(100% - 16px) 100%, 0 100%, 0 30px);
+  border: none;
+  border-top: 2px solid rgba(251, 191, 36, 0.55);
+  box-shadow: none;
+  overflow: hidden;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
+}
+[data-screen="game"] text-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px);
+  pointer-events: none;
+}
+[data-screen="game"] [data-ui="who"] {
+  border-radius: 0;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  border: none;
+  border-left: 3px solid var(--sn-cyan-glow);
+  box-shadow: none;
+}
+
+/* --- Top HUD: octagonal dash with live LEDs ----------------------------- */
+.cyber-top-hud {
+  border-radius: 0;
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%,
+    calc(100% - 14px) 100%, 14px 100%, 0 50%);
+  border: none;
+  background: linear-gradient(180deg, rgba(19, 25, 38, 0.97), rgba(11, 15, 24, 0.97));
+  box-shadow: none;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
+}
+.hud-badge {
+  border-radius: 0 !important;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.hud-btn { border-radius: 0; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); position: relative; }
+.hud-btn.active { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
+.hud-btn.active::after {
+  content: '';
+  position: absolute;
+  right: 6px; top: 6px;
+  width: 6px; height: 6px;
+  border-radius: 50%;            /* semantic rounding: LED dots only   */
+  background: var(--sn-amber-glow);
+  color: var(--sn-amber-glow);
+  animation: mechLed 1.4s ease-in-out infinite;
+}
+
+/* --- Modal panels (archives / graph): machined housings -----------------
+   Squared body; corner brackets read as bolted plates. */
+.archives-panel, .graph-panel {
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  position: relative;
+}
+.archives-panel::before, .graph-panel::before,
+.archives-panel::after, .graph-panel::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(251, 191, 36, 0.65);
+  pointer-events: none;
+}
+.archives-panel::before, .graph-panel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.archives-panel::after, .graph-panel::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+/* Back circle keeps its pinned 1px glass border — chamfered octagon is
+   clipped to the same paint, so the visible outline follows the cuts. */
+[data-screen]:not([data-screen="game"]) [data-action="back"] {
+  border-radius: 0;
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+/* Reduced motion, part 2: every NEW mecha animation listed here; the
+   original reduced-motion block above stays untouched (pinned). */
+@media (prefers-reduced-motion: reduce) {
+  main-screen,
+  main-menu button, main-menu button:hover,
+  main-menu button::before, main-menu button::after,
+  [data-screen="game"] choice-container button,
+  [data-screen="game"] choice-container button::after,
+  .hud-btn.active::after {
+    animation: none !important;
+  }
+  main-menu button::before, .hud-btn.active::after { opacity: 1; }
+}
+
+/* Mecha plate buttons: never hard-clamp multi-line labels.
+   The debug atlas label wraps to 3 lines at 260px; measured 56px chrome
+   sizing boxed it. Height becomes content-driven; chamfer scales fine. */
+main-menu button {
+  height: auto !important;
+  min-height: 56px !important;
+  line-height: 1.3 !important;
+  white-space: normal !important;
+}
+
+/* Reskin selector repair, part 2: element-tag selectors above target the
+   REAL engine markup (choice-container > button, <text-box>). The old
+   [data-ui="text-box"]/[data-ui="choices"] rules up-file are inert on
+   today's DOM (kept: they are regression pins and harmless). Also wire
+   entrance delays for the tag-based plates so the stagger works again. */
+[data-screen="game"] choice-container button { animation: fadeSlideUp 0.32s both; }
+[data-screen="game"] choice-container button:nth-child(1) { animation-delay: 0.04s; }
+[data-screen="game"] choice-container button:nth-child(2) { animation-delay: 0.10s; }
+[data-screen="game"] choice-container button:nth-child(3) { animation-delay: 0.16s; }
+[data-screen="game"] choice-container button:nth-child(4) { animation-delay: 0.22s; }
+[data-screen="game"] choice-container button:nth-child(5) { animation-delay: 0.28s; }
+[data-screen="game"] choice-container button:nth-child(6) { animation-delay: 0.34s; }
+[data-screen="game"] choice-container button:nth-child(7) { animation-delay: 0.40s; }
+[data-screen="game"] choice-container button:nth-child(8) { animation-delay: 0.46s; }
+[data-screen="game"] text-box { animation: textboxIn 0.45s ease both; }
+
+/* Choice container geometry: engine centers at 50% with z-index 11 —
+   the HUD (z 80) swallows the top plate of tall forks. Restore the
+   designed 53% offset + safe scroll window; plates become a checklist
+   column (left-aligned, index rail on the left). */
+[data-screen="game"] choice-container {
+  max-height: min(78vh, 580px);
+  top: 53%;
+  z-index: 100;
+  gap: 14px;
+  padding: 10px 6px 14px;
+}
+[data-screen="game"] choice-container button {
+  margin: 0;
+  text-align: left;
+}
+
+/* Final fork/console fit: container stops above the console; console
+   height follows the dialog instead of an oversized empty cockpit. */
+[data-screen="game"] choice-container {
+  max-height: min(58vh, 560px);
+  top: 45.5%;
+}
+[data-screen="game"] text-box {
+  min-height: 120px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+@media screen and (max-width: 37.5em) {
+  [data-screen="game"] text-box { min-height: 100px; padding: 14px 18px; }
+  [data-screen="game"] choice-container { width: calc(100% - 24px); }
+}

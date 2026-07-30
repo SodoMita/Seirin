@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
+    <title>Сэйрин: Ночная смена — Резонанс 2030 | Visual Novel</title>
+    <meta name="description" content="Visual Novel: Seirin: Night Shift — Resonance 2030. Runs 100% offline." />
+
+    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/monogatari.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/custom-ui.css?v=20260728r11" />
+    <!-- 2.5D skeuomorphic mecha armour skin. MUST stay last: it repaints the
+         flat reskin in vendor/custom-ui.css and relies on winning the cascade
+         at equal specificity. Layer markup is injected by vendor/mecha-ui.js. -->
+    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260728r11" />
+</head>
+<body>
+
+    <!-- TOP HUD -->
+    <header class="cyber-top-hud">
+        <div class="hud-group">
+            <span class="hud-brand"><i class="fas fa-microchip"></i> СЭЙРИН РЕЗОНАНС 2030</span>
+            <span id="hud-location" class="hud-badge"><i class="fas fa-map-marker-alt"></i><span>Тэцуба: Улица</span></span>
+        </div>
+
+        <div class="hud-group">
+            <span id="hud-player-name" class="hud-badge amber"><i class="fas fa-user-secret"></i><span>Рэн</span></span>
+            <span id="hud-route" class="hud-badge pink"><i class="fas fa-terminal"></i><span>Начало</span></span>
+            <span id="hud-alert-level" class="hud-badge red"><i class="fas fa-shield-alt"></i><span>0%</span></span>
+        </div>
+
+        <div class="hud-group">
+            <button type="button" class="hud-btn" id="btn-skip" aria-pressed="false" title="Быстрая перемотка текста">
+                <i class="fas fa-fast-forward"></i><span>ПЕРЕМОТКА</span>
+            </button>
+            <button type="button" class="hud-btn" id="btn-archives">
+                <i class="fas fa-book"></i><span>АРХИВ</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MONOGATARI CONTAINER — engine markup skeleton.
+         NOTE 1: the container id is "vn-root", NOT "monogatari" (an element
+         with id="monogatari" creates a global window.monogatari pointing at
+         the DIV, which shadows the engine object).
+         NOTE 2: the engine renders INTO these custom elements but never
+         creates them. game/ used to ship an empty <div id="vn-root">, so
+         engine.init() aborted and the player got a white screen instead of
+         the main menu (cyber-nexus/index.html is the reference). -->
+    <div id="vn-root">
+        <visual-novel>
+            <language-selection-screen></language-selection-screen>
+            <loading-screen></loading-screen>
+            <main-screen>
+                <main-menu></main-menu>
+            </main-screen>
+            <game-screen>
+                <dialog-log></dialog-log>
+                <text-box></text-box>
+                <quick-menu></quick-menu>
+            </game-screen>
+            <gallery-screen></gallery-screen>
+            <credits-screen></credits-screen>
+            <load-screen></load-screen>
+            <save-screen></save-screen>
+            <settings-screen></settings-screen>
+            <help-screen></help-screen>
+        </visual-novel>
+    </div>
+
+    <!-- ARCHIVES CODEX MODAL (opened by #btn-archives, wired in vendor/game.js) -->
+    <div id="archives-overlay" class="archives-overlay" hidden>
+        <div class="archives-panel" role="dialog" aria-modal="true" aria-labelledby="archives-title">
+            <div class="archives-head">
+                <span id="archives-title"><i class="fas fa-book"></i><span>АРХИВ СЭЙРИН</span></span>
+                <button type="button" class="hud-btn" id="btn-archives-close">
+                    <i class="fas fa-times"></i><span>ЗАКРЫТЬ</span>
+                </button>
+            </div>
+            <div id="archives-body" class="archives-body"></div>
+        </div>
+    </div>
+
+    <!-- ROUTE GRAPH DEBUG MODAL (opened by #btn-graph, wired in vendor/game.js).
+         The graph itself is generated at runtime from engine.script(), so the
+         map can never drift out of sync with the shipped story. -->
+    <div id="graph-overlay" class="graph-overlay" hidden>
+        <div class="graph-panel" role="dialog" aria-modal="true" aria-labelledby="graph-title">
+            <div class="graph-head">
+                <span id="graph-title"><i class="fas fa-network-wired"></i><span>ГРАФ МАРШРУТОВ — ОТЛАДКА</span></span>
+                <button type="button" class="hud-btn" id="btn-graph-close">
+                    <i class="fas fa-times"></i><span>ЗАКРЫТЬ</span>
+                </button>
+            </div>
+            <div id="graph-body" class="graph-body"></div>
+        </div>
+    </div>
+
+    <script src="vendor/failsafe.js?v=20260728r11"></script>
+    <script src="vendor/monogatari.js?v=20260728r11"></script>
+    <script src="vendor/icons-offline.js?v=20260728r11"></script>
+    <script src="vendor/game.js?v=20260728r11"></script>
+    <!-- Mecha skin driver: bakes metal/wear textures on a canvas, injects the
+         armour layer stack, builds the HUD instrument rail + telemetry strip,
+         and drives the indicators from engine storage. Read-only w.r.t. game
+         state; loads after game.js so window.engine already exists. -->
+    <script src="vendor/mecha-ui.js?v=20260728r11"></script>
+
+</body>
+</html>
