@@ -1130,3 +1130,85 @@ These fulfill "send expectation and what you got to image generator to get criti
 - Tests: 61/61 pass
 
 ---
+
+# Session 16 — continue making UI better (from real screenshot review)
+
+**Date:** 2026-07-30 · **Branch:** `arena/019fb2d3-seirin`
+**Trigger:** User: "continue making ui better" + review of 8 real Chromium screenshots (01_main_menu, 02_dialogue, 03_choices, 04_save, 05_settings, 06_history, 07_graph, 08_archives)
+
+## Issues spotted in screenshots
+
+| Screen | Issue |
+|---|---|
+| **Main menu** | Background black, not courtyard — CSS referenced `courtyard.png` but asset is `courtyard.webp`, plus overlay `rgba(8,10,18,0.82)` + `0.96` made it almost black, no depth |
+| **Save** | Empty state "НЕТ СОХРАНЕНИЙ" faint grey, header "СОХРАНИ" truncated via clip-path, English date "July 30..." leaking, dev badge overlapping |
+| **Dialogue** | Text truncated "Хранителем мела - у мага с пятилетн" — `max-height` too small, `overflow:hidden` and `white-space` issues, console too dark |
+| **Choices** | Plates dark, low contrast, hover lift only 3px, could have stronger glass and cyan glow |
+| **Graph/Archives** | Body empty in first capture (overlay opened without calling `renderGraph()`), panel needed more beauty for nodes |
+| **Overall** | Entire UI very dark, scene illumination too subtle, no vignette, HUD could be brighter, quick-menu tight |
+
+## Fixes — Section 34 (267 lines added)
+
+**Main menu background:**
+- Fixed asset: `url('../assets/scenes/courtyard.webp?v=...')` (was .png)
+- Lighter overlay: `rgba(8,10,18,0.45)` + `0.68` instead of 0.82/0.96
+- Added radial glows: `radial-gradient(90% 60% at 50% 12%, rgba(56,189,248,0.18))` + amber `rgba(251,191,36,0.12)` + linear 0.04 stripes for depth
+- Added vignette overlay via `main-screen.active::before` with transparent center → dark edges 0.42, side shading 0.28/0.32
+- Title stronger: gradient `f2f8ff→dbe9ff→a8bed8→5a6b84→8fa6c2→e6eefa`, `drop-shadow 0 0 22px rgba(56,189,248,0.62) + 0 0 42px 0.28 + 0 5px 12px 0.90`, letter-spacing 12px
+- Subtitle purple `d8b4fe` with 16px + 32px glow, letter-spacing 8px
+
+**Dialogue console:**
+- Fixed truncation: `min-height:88px`, `overflow:visible`, `white-space:normal`, `word-break:break-word`, `overflow-wrap:anywhere`, `max-height:none`
+- Say text: `1.14rem/1.66`, `color:#f0f6ff`, `text-shadow 0 1px 3px 0.95 + 0 0 20px rgba(56,189,248,0.20)`, `line-height:1.66`
+- Stronger scene illumination: `radial-gradient(135% 92% at 50% 108%, var(--scene-glow,0.42) 0%, transparent 62%)` + `linear 0.20`, `box-shadow inset -14px 28px var(--soft,0.12)`
+- Console background brighter: keeps `linear-gradient(158deg, #6e7e94 0%...)` but with stronger outer shadow and scene glow
+
+**Choice plates:**
+- Higher contrast face: `linear-gradient(170deg, rgba(255,255,255,0.10), rgba(0,0,0,0.28)) + linear-gradient(152deg, #2f3d54→#1b2536→#0f1724)`, border `1px rgba(56,189,248,0.18)`, inner highlight + outer shadow
+- Hover: `translateY(-4px)`, `drop-shadow 0 0 22px rgba(56,189,248,0.52) + 0 12px 26px 0.78`, border `0.42`, inner white 0.20 + outer 1px cyan 0.22 + 12px 28px dark
+- Container gap 12px, max-height `min(56vh, 100vh-240px)`
+
+**Save screen:**
+- Improved backdrop: radial 120% 90% at 50% -10% cyan 0.16 + ochre 0.08 + grid lines
+- Empty state: `1.12rem`, `letter-spacing:0.18em`, `color:rgba(180,200,225,0.72)`, `text-shadow 0 0 18px rgba(56,189,248,0.28)`, padding `4.5rem 0`, added `::before` icon `◬` 2.2rem cyan 0.28 with glow
+- Fixed truncated header: `overflow:visible`, `clip-path:none` for save header strings
+- Hid dev build badge in save screenshots: `display:none` for `#seirin-build-badge` (was overlapping date)
+
+**Settings/history/graph/archives:**
+- Settings panels: stronger glass `rgba(255,255,255,0.07) + 0.32` + `152deg #243147→#151e2e`, shadow `inset 1px 0 0.12 + -1px 0 0.72 + 0 10px 28px 0.58 + 0 0 0 1px rgba(56,189,248,0.08)`, border `1px rgba(56,189,248,0.10)`
+- History rows: `linear-gradient 170deg 0.06→0.24 + 152deg #1e2a3e→#121a28`, border-left `3px rgba(56,189,248,0.52)`, hover `0.18 cyan wash + #263a54→#162032`
+- Graph/archives panels: `0.08→0.32 + #1c2a42→#111a2a`, shadow `inset 1px 0 0.12 + 0 24px 56px 0.84 + 0 0 0 1px 0.12`, nodes `#22334e→#131d2f` border `0.14`, current node border `0.52` + glow `0 0 18px 0.22`, titles `#e6f2ff` 800 weight, jumps `#2a3c58→#1a2538` border `0.22` hover `0.42` + `0 0 12px 0.22`
+
+**HUD/quick-menu:**
+- HUD glass: `28,38,58→14,20,34`, border `0.18`, shadow `inset 1px 0 0.16 + -1px 0 0.78 + 0 12px 32px 0.68`
+- Badges: `rgba(255,255,255,0.12)→0.32 + #2e3e5a→#1a2538`, inner highlight + `0 3px 8px 0.52`
+- Quick-menu: `24,32,48→12,18,30`, border-top `0.32`, padding `8px 16px`, gap `6px`, buttons `8px 14px 0.82rem 0.08em`, hover `0.26→0.08` + inner white 0.10 + outer 12px 0.18
+
+**Global fix:** ensure dialogue say spans don't truncate: `white-space:normal`, `overflow:visible`, `text-overflow:clip`
+
+## New screenshots (after fix)
+
+Rebuilt browser via same HANDOFF.md recipe, recaptured 8 screens:
+
+- 01_main_menu 1.2M→70K webp — now shows courtyard.webp background with cyan/amber glows, vignette, title stronger, not black
+- 02_dialogue 1.2M→108K — no truncation, say text fully wraps, stronger scene glow, more readable
+- 03_choices 1.3M→118K — higher contrast plates, stronger hover, gap 12px, more 3D
+- 04_save 204K→7.6K — empty state icon ◬ + larger stencil 1.12rem + glow, header not truncated, badge hidden
+- 05_settings 423K→30K — panels deeper glass with stronger shadow, readable
+- 06_history 363K→30K — rows more mecha, border 0.52 cyan, readable close button
+- 07_graph 252K→15K — populated with 2 sample nodes (Пролог, Соло I) + jump buttons, panel deeper, nodes with border/glow
+- 08_archives 157K→11K — populated route + alert, same deep panel
+
+Converted PNG→webp `quality 82 method 4`, committed as `design/preview/shots/0*.webp` (latest beautiful).
+
+PNGs kept locally ignored (per `.gitignore`) for editing — 1.2M,1.2M,1.3M,204K,423K,363K,252K,157K.
+
+## Verification
+
+- `node --test` 61/61 pass
+- Chromium 131 via `/tmp/cbin/chromium`
+- CSS now 4460 lines (+267 Section 34)
+- No overlap, no repeating grey steel, scene illumination 0.34-0.42 visible, 3D tilt preserved, specular removed, breathing removed, Ken Burns 34s gentle, main menu background fixed webp, dialogue no truncation, choice contrast higher, save empty state beautiful
+- Shots 8/8 recaptured after fix and committed as webp
+
+---

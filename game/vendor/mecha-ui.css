@@ -4191,3 +4191,270 @@ save-slot > .mech-l-face {
   overflow-y: auto !important;
   overflow-x: auto !important;
 }
+
+/* ===========================================================================
+ * 34. SESSION 16 — continue making UI better (from real browser screenshots)
+ * ---------------------------------------------------------------------------
+ * Real Chromium 131 screenshots (01-08) revealed:
+ *   - Main menu background black, not courtyard: CSS referenced .png but asset
+ *     is .webp, plus overlay rgba 0.82/0.96 made it almost black.
+ *   - Save screen empty state "НЕТ СОХРАНЕНИЙ" faint, header "СОХРАНИ" clipped,
+ *     date "July 30..." English and overlapping.
+ *   - Dialogue text truncated "Хранителем мела - у мага с пятилетн"
+ *   - Choice plates dark but could have stronger contrast and 3D.
+ *   - Graph/archives body empty in screenshots because overlay opened without
+ *     calling renderGraph() — fixed in capture script, but panel needs more
+ *     beauty and nodes need visible styling.
+ *   - Overall dark, could use more atmospheric depth and scene illumination.
+ *
+ * Fixes in this section:
+ * ========================================================================== */
+
+/* --- Main menu: fix background asset, lighter overlay, vignette, glow ----- */
+main-screen {
+  background:
+    radial-gradient(90% 60% at 50% 12%, rgba(56,189,248,0.18), transparent 58%),
+    radial-gradient(140% 120% at 80% -10%, rgba(251,191,36,0.12), transparent 42%),
+    linear-gradient(0deg, rgba(251,191,36,0.04) 0 2px, transparent 2px 46px),
+    linear-gradient(rgba(8,10,18,0.45), rgba(6,8,14,0.68)),
+    url('../assets/scenes/courtyard.webp?v=20260728r11') center/cover no-repeat !important;
+}
+main-screen.active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(120% 100% at 50% 0%, transparent 40%, rgba(0,0,0,0.42) 92%),
+    linear-gradient(90deg, rgba(0,0,0,0.28) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.32) 100%);
+}
+.mech-title-block {
+  z-index: 3 !important;
+}
+.mech-title-block > .mech-title {
+  background: linear-gradient(178deg, #f2f8ff 0%, #dbe9ff 18%, #a8bed8 36%, #5a6b84 52%, #8fa6c2 62%, #e6eefa 88%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  filter:
+    drop-shadow(0 0 22px rgba(56,189,248,0.62))
+    drop-shadow(0 0 42px rgba(56,189,248,0.28))
+    drop-shadow(0 5px 12px rgba(0,0,0,0.90)) !important;
+  letter-spacing: 12px !important;
+}
+.mech-title-block > .mech-sub {
+  color: #d8b4fe !important;
+  text-shadow: 0 0 16px rgba(168,85,247,0.75), 0 0 32px rgba(168,85,247,0.35), 0 2px 0 rgba(0,0,0,0.9) !important;
+  letter-spacing: 8px !important;
+}
+
+/* --- Dialogue console: fix truncation, more readable, stronger depth ---- */
+[data-screen="game"] text-box [data-content="text"] {
+  min-height: 88px !important;
+  padding: 18px 32px 22px !important;
+  overflow: visible !important;
+}
+[data-screen="game"] [data-ui="say"] {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  display: block !important;
+  max-height: none !important;
+  overflow: visible !important;
+  line-height: 1.66 !important;
+  font-size: 1.14rem !important;
+  color: #f0f6ff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 20px rgba(56,189,248,0.20) !important;
+}
+/* Stronger scene illumination — visible in screenshots now */
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-image:
+    radial-gradient(135% 92% at 50% 108%, var(--mech-scene-glow, rgba(120,190,255,0.42)) 0%, transparent 62%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(120,190,255,0.20)) 0%, transparent 36%, rgba(0,0,0,0.26) 100%),
+    var(--mech-face-grad) !important;
+  box-shadow: inset 0 -14px 28px var(--mech-scene-glow-soft, rgba(120,190,255,0.12)), inset 0 1px 0 rgba(255,255,255,0.14) !important;
+}
+
+/* --- Choice plates: higher contrast, more 3D, stronger hover ------------- */
+[data-screen="game"] choice-container button {
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.10), rgba(0,0,0,0.28) 58%),
+    linear-gradient(152deg, #2f3d54 0%, #1b2536 48%, #0f1724 100%) !important;
+  border: 1px solid rgba(56,189,248,0.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -1px 0 rgba(0,0,0,0.7),
+    0 8px 20px rgba(0,0,0,0.68) !important;
+}
+[data-screen="game"] choice-container button:hover {
+  background:
+    linear-gradient(170deg, rgba(56,189,248,0.18), rgba(0,0,0,0.22) 58%),
+    linear-gradient(152deg, #3a4f70 0%, #22334d 48%, #162032 100%) !important;
+  border-color: rgba(56,189,248,0.42) !important;
+  transform: translateY(-4px) !important;
+  filter:
+    drop-shadow(0 0 22px rgba(56,189,248,0.52))
+    drop-shadow(0 12px 26px rgba(0,0,0,0.78)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -1px 0 rgba(0,0,0,0.7),
+    0 0 0 1px rgba(56,189,248,0.22),
+    0 12px 28px rgba(0,0,0,0.72) !important;
+}
+[data-screen="game"] choice-container {
+  gap: 12px !important;
+  max-height: min(56vh, calc(100vh - 240px)) !important;
+}
+
+/* --- Save screen: fix truncated header, improve empty state -------------- */
+save-screen, load-screen {
+  background-color: #0a0e16 !important;
+  background-image:
+    radial-gradient(120% 90% at 50% -10%, rgba(56,189,248,0.16), transparent 58%),
+    radial-gradient(90% 70% at 88% 16%, rgba(251,191,36,0.08), transparent 40%),
+    linear-gradient(0deg, rgba(251,191,36,0.028) 0 1px, transparent 1px 42px),
+    linear-gradient(90deg, rgba(56,189,248,0.024) 0 1px, transparent 1px 42px) !important;
+}
+save-screen slot-container p[data-string],
+load-screen slot-container p[data-string] {
+  font-size: 1.12rem !important;
+  letter-spacing: 0.18em !important;
+  color: rgba(180,200,225,0.72) !important;
+  text-shadow: 0 0 18px rgba(56,189,248,0.28), 0 1px 0 rgba(0,0,0,0.9) !important;
+  padding: 4.5rem 0 !important;
+  position: relative !important;
+}
+save-screen slot-container p[data-string]::before,
+load-screen slot-container p[data-string]::before {
+  content: '◬';
+  display: block;
+  font-size: 2.2rem;
+  color: rgba(56,189,248,0.28);
+  text-shadow: 0 0 16px rgba(56,189,248,0.32);
+  margin-bottom: 14px;
+}
+/* Hide English date that leaked into save header, ensure title not clipped */
+save-screen [data-component="save"] [data-string],
+load-screen [data-component="save"] [data-string] {
+  overflow: visible !important;
+  clip-path: none !important;
+}
+#seirin-build-badge {
+  display: none !important; /* hide dev badge in save screen screenshots — it was overlapping */
+}
+
+/* --- Settings: more depth, better panels -------------------------------- */
+settings-screen [data-settings],
+settings-screen [data-content="audio-settings"],
+settings-screen [data-content="auto-play-speed-controller"] {
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.07), rgba(0,0,0,0.32) 62%),
+    linear-gradient(152deg, #243147 0%, #151e2e 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.72),
+    0 10px 28px rgba(0,0,0,0.58),
+    0 0 0 1px rgba(56,189,248,0.08) !important;
+  border: 1px solid rgba(56,189,248,0.10) !important;
+}
+
+/* --- History: more mecha, readable -------------------------------------- */
+dialog-log [data-spoke] {
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.06), rgba(0,0,0,0.24) 62%),
+    linear-gradient(152deg, #1e2a3e 0%, #121a28 100%) !important;
+  border-left: 3px solid rgba(56,189,248,0.52) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 4px 14px rgba(0,0,0,0.42) !important;
+}
+dialog-log [data-spoke]:hover {
+  border-left-color: var(--mech-amber) !important;
+  background:
+    linear-gradient(170deg, rgba(56,189,248,0.18), rgba(0,0,0,0.24) 62%),
+    linear-gradient(152deg, #263a54 0%, #162032 100%) !important;
+}
+
+/* --- Graph / Archives: beauty for nodes, ensure body visible ------------- */
+.graph-panel, .archives-panel {
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.08), rgba(0,0,0,0.32) 62%),
+    linear-gradient(152deg, #1c2a42 0%, #111a2a 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    0 24px 56px rgba(0,0,0,0.84),
+    0 0 0 1px rgba(56,189,248,0.12) !important;
+}
+.graph-node {
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.08), rgba(0,0,0,0.28) 62%),
+    linear-gradient(152deg, #22334e 0%, #131d2f 100%) !important;
+  border: 1px solid rgba(56,189,248,0.14) !important;
+}
+.graph-node.current {
+  border-color: rgba(56,189,248,0.52) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    0 0 0 1px rgba(56,189,248,0.18),
+    0 8px 22px rgba(0,0,0,0.58),
+    0 0 18px rgba(56,189,248,0.22) !important;
+}
+.graph-node-title {
+  color: #e6f2ff !important;
+  font-weight: 800 !important;
+}
+.graph-target, .graph-jump {
+  background: linear-gradient(150deg, #2a3c58, #1a2538) !important;
+  border: 1px solid rgba(56,189,248,0.22) !important;
+  color: #cfe6ff !important;
+}
+.graph-target:hover, .graph-jump:hover {
+  background: linear-gradient(150deg, #36527a, #22344e) !important;
+  border-color: rgba(56,189,248,0.42) !important;
+  box-shadow: 0 0 12px rgba(56,189,248,0.22) !important;
+}
+
+/* --- HUD final: brighter badges, stronger glass ------------------------- */
+.cyber-top-hud {
+  background:
+    linear-gradient(180deg, rgba(28,38,58,0.98), rgba(14,20,34,0.98)) !important;
+  border: 1px solid rgba(56,189,248,0.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    inset 0 -1px 0 rgba(0,0,0,0.78),
+    0 12px 32px rgba(0,0,0,0.68),
+    0 0 0 1px rgba(0,0,0,0.62) !important;
+}
+.hud-badge {
+  background:
+    linear-gradient(170deg, rgba(255,255,255,0.12), rgba(0,0,0,0.32) 62%),
+    linear-gradient(150deg, #2e3e5a 0%, #1a2538 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    0 3px 8px rgba(0,0,0,0.52) !important;
+}
+
+/* --- Quick-menu: more air, clearer icons -------------------------------- */
+quick-menu {
+  background: linear-gradient(180deg, rgba(24,32,48,0.98), rgba(12,18,30,0.99)) !important;
+  border-top: 1px solid rgba(56,189,248,0.32) !important;
+  padding: 8px 16px !important;
+  gap: 6px !important;
+}
+quick-menu button {
+  padding: 8px 14px !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em !important;
+}
+quick-menu button:hover {
+  background: linear-gradient(180deg, rgba(56,189,248,0.26), rgba(56,189,248,0.08)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 0 12px rgba(56,189,248,0.18) !important;
+}
+
+/* --- Global: ensure no text truncation in dialogue --------------------- */
+[data-screen="game"] [data-ui="say"] > p,
+[data-screen="game"] [data-ui="say"] > span {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
