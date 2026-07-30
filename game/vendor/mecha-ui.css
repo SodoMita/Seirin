@@ -4830,3 +4830,296 @@ quick-menu {
   background-repeat: no-repeat !important;
 }
 
+/* ===========================================================================
+ * 37. SESSION 19 — user audit: location tint higher, dialoguebox still has
+ *     repeating gradient, add rectangular metal supports, restore button
+ *     brightness + brushness (per user: "you made buttons too bright, restore
+ *     like was before start of all your edits. brushness was good keep it")
+ * ---------------------------------------------------------------------------
+ * - Location tint higher: radial illumination previously at 50% 108% bottom,
+ *   now at 50% 28% higher plus second radial at 50% 8% for top wash, opacity
+ *   increased 0.34→0.52 for stronger visible tint.
+ * - Dialoguebox repeating gradient: ensure no repeating-linear-gradient.
+ *   Explicitly set text-box [data-content="text"] and its ::before to
+ *   background-repeat no-repeat, and remove any save-slot scanline.
+ *   Also ensure wear texture does not create horizontal lines: keep but set
+ *   opacity 0.22 subtle.
+ * - Rectangular metal supports: add small rectangular brackets that look
+ *   connected to something outside edge:
+ *   • 1 to name: left side of [data-ui="who"] has small vertical support
+ *     16px wide extending -14px left, with rivet, appears bolted to outside.
+ *   • 2 to dialogbox: bottom left and bottom right corners have L-shaped
+ *     supports 18px wide 14px tall extending down, like legs mounted to outside.
+ *   • 2 to top menu: top left and top right corners have top supports 20px
+ *     wide 10px tall extending up beyond screen edge, like hangar mounts.
+ * - Restore button brightness like before start of all edits:
+ *   Before Session 11, buttons had background rim-grad + face-grad original
+ *   (darker, more gunmetal) with filter 0 1px 0 rgba(255,255,255,0.10) +
+ *   0 6px 12px rgba(0,0,0,0.62). After Sessions 11-17 we went to ultra-light
+ *   0.48 bright lip + 0.24 inner highlight + 10px 24px shadow, too bright per user.
+ *   Now restore to original brightness: use --mech-face-grad (0.30 lip) not
+ *   ultra-light 0.48, and filter less bright, but keep good bevel shape.
+ *   Color #303c50→#1c2433 base, not #4e627e→#1e2a3a light.
+ * - Restore brushness: re-add var(--mech-tex-brushed) second layer to
+ *   [data-mech] > .mech-l-face with subtle opacity, using canvas-baked texture
+ *   (random horizontal streaks) not repeating-linear fallback. This was good.
+ * ========================================================================== */
+
+/* --- Restore brushed metal texture (brushness good) ---------------------- */
+[data-mech] > .mech-l-face {
+  background-color: #1e2736 !important;
+  background-image:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, repeating-linear-gradient(92deg,
+        rgba(255,255,255,0.022) 0 1px, transparent 1px 3px)) !important;
+  background-size: 100% 100%, 128px 128px !important;
+  background-repeat: no-repeat, repeat !important;
+  background-blend-mode: normal, overlay !important;
+}
+[data-mech] > .mech-l-face::after {
+  display: none !important;
+}
+/* Keep wear subtle, not hiding brushed */
+[data-mech] > .mech-l-wear {
+  opacity: 0.28 !important;
+}
+
+/* --- Restore button brightness like before start of edits (darker, gunmetal) */
+[data-mech="plate"] {
+  background: var(--mech-rim-grad) !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.10))
+    drop-shadow(0 6px 14px rgba(0,0,0,0.64)) !important;
+}
+[data-mech="plate"] > .mech-l-face {
+  background-color: #232f42 !important;
+  background-image:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 128px 128px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.72),
+    inset 0 -10px 18px rgba(0,0,0,0.22) !important;
+}
+main-menu button,
+[data-screen="game"] choice-container button {
+  background: var(--mech-rim-grad) !important;
+  color: #e6eef5 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.92), 0 0 10px rgba(180,200,230,0.20) !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.11))
+    drop-shadow(0 7px 16px rgba(0,0,0,0.66)) !important;
+}
+main-menu button > .mech-l-face,
+[data-screen="game"] choice-container button > .mech-l-face {
+  background-color: #263447 !important;
+  background-image:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 128px 128px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -1px 0 rgba(0,0,0,0.72),
+    inset 0 -10px 18px rgba(0,0,0,0.20) !important;
+}
+main-menu button:hover,
+[data-screen="game"] choice-container button:hover {
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.14))
+    drop-shadow(0 10px 22px rgba(0,0,0,0.70)) !important;
+}
+main-menu button:hover > .mech-l-face,
+[data-screen="game"] choice-container button:hover > .mech-l-face {
+  background-color: #2d3c50 !important;
+}
+
+/* --- Location tint higher: illumination at top, stronger ---------------- */
+:root {
+  --mech-scene-glow-high: rgba(251, 191, 100, 0.52);
+  --mech-scene-glow-high-soft: rgba(251, 191, 100, 0.22);
+}
+[data-mech="plate"] > .mech-l-face,
+[data-mech="chip"] > .mech-l-face,
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-image:
+    /* Higher tint: radial at 50% 28% (higher) + second at 50% 8% top wash */
+    radial-gradient(138% 88% at 50% 28%, var(--mech-scene-glow, rgba(251,191,100,0.42)) 0%, transparent 58%),
+    radial-gradient(98% 62% at 50% 8%, var(--mech-scene-glow-soft, rgba(251,191,100,0.18)) 0%, transparent 56%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.16)) 0%, transparent 38%, rgba(0,0,0,0.22) 100%),
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 128px 128px !important;
+  background-repeat: no-repeat !important;
+}
+[data-screen="game"] text-box [data-content="text"] {
+  background: linear-gradient(158deg, #4a5c74 0%, #34465e 24%, #232f42 52%, #151c2a 82%, #3e4e66 100%) !important;
+}
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-color: #2a364a !important;
+  background-image:
+    radial-gradient(138% 88% at 50% 28%, var(--mech-scene-glow, rgba(251,191,100,0.52)) 0%, transparent 60%),
+    radial-gradient(96% 58% at 50% 6%, var(--mech-scene-glow-soft, rgba(251,191,100,0.22)) 0%, transparent 52%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.20)) 0%, transparent 42%, rgba(0,0,0,0.26) 100%),
+    linear-gradient(176deg,
+      rgba(232, 246, 255, 0.32) 0%,
+      rgba(200, 222, 245, 0.12) 3%,
+      rgba(255,255,255,0.04) 10%,
+      rgba(0,0,0,0.08) 48%,
+      rgba(0,0,0,0.28) 88%,
+      rgba(175, 205, 240, 0.18) 94%,
+      rgba(135, 165, 200, 0.14) 100%),
+    linear-gradient(150deg, #3d4e66 0%, #2a364a 46%, #1a2332 100%),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 128px 128px !important;
+}
+
+/* --- Dialoguebox still had repeating gradient: force nonrepeating only --- */
+[data-screen="game"] text-box,
+[data-screen="game"] text-box [data-content="text"],
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-repeat: no-repeat !important;
+}
+[data-screen="game"] text-box::after {
+  display: none !important;
+}
+/* Ensure wear and gloss don't introduce repeating lines */
+[data-screen="game"] text-box > .mech-l-wear,
+[data-screen="game"] text-box > .mech-l-gloss {
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+/* --- Rectangular metal supports: 1 to name, 2 to dialogbox, 2 to top menu -- */
+/* Support base style: small rectangular plate with rim and face and rivet */
+.mech-support {
+  position: absolute;
+  background: var(--mech-rim-grad);
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+}
+.mech-support::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none);
+  background-size: 100% 100%, 64px 64px;
+  background-repeat: no-repeat, repeat;
+}
+.mech-support::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5) 0 1px, #3a4458 2px);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Nameplate: 1 support on left connecting to outside */
+[data-screen="game"] text-box [data-content="name"] {
+  position: relative !important;
+  overflow: visible !important;
+}
+[data-screen="game"] text-box [data-content="name"]::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  width: 22px;
+  height: 14px;
+  margin-top: -7px;
+  background: var(--mech-rim-grad);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  z-index: 0;
+}
+[data-screen="game"] text-box [data-content="name"]::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 14px;
+  height: 8px;
+  margin-top: -4px;
+  background:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none);
+  background-size: 100% 100%, 64px 64px;
+  clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px);
+  z-index: 1;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+/* Dialogbox: 2 supports bottom left/right as legs to outside */
+[data-screen="game"] text-box [data-content="text"] {
+  position: relative !important;
+  overflow: visible !important;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg {
+  position: absolute;
+  bottom: -12px;
+  width: 26px;
+  height: 16px;
+  background: var(--mech-rim-grad);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+  z-index: 2;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg.left {
+  left: 28px;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg.right {
+  right: 28px;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--mech-face-grad);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6) 0 0.8px, #3a4458 1.8px);
+  border-radius: 50%;
+}
+
+/* Top menu: 2 supports top left/right connecting to outside top edge */
+.cyber-top-hud {
+  position: absolute !important;
+  overflow: visible !important;
+}
+.cyber-top-hud::before,
+.cyber-top-hud::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  width: 28px;
+  height: 14px;
+  background: var(--mech-rim-grad);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.55));
+  z-index: 2;
+}
+.cyber-top-hud::before {
+  left: 42px;
+}
+.cyber-top-hud::after {
+  right: 42px;
+}
+
+
