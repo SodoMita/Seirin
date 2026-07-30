@@ -1080,3 +1080,53 @@ Later: "Despite everything, keep them as png, just never commit and repo already
 - PNGs untracked, ignored, kept locally per user request
 
 ---
+
+# Session 15 — real browser screenshots via @sparticuz/chromium, critique with actual UI
+
+**Date:** 2026-07-30 · **Branch:** `arena/019fb2d3-seirin`
+**Trigger:** User note: "Other agents managed to find browser to make screenshots. Maybe some relevant docs say how to get it. As I remember, it was done using qt."
+
+## Finding the browser
+
+- Searched MDs for qt/screenshot/chromium/puppeteer → `design/HANDOFF.md` §1 contains exact recipe:
+  ```bash
+  mkdir -p /tmp/pw /tmp/cbin
+  npm i --prefix /tmp/pw playwright-core@1.49.0 @sparticuz/chromium@131.0.1
+  node -e "brotliDecompress chromium.br → /tmp/cbin/chromium, al2023.tar.br + swiftshader.tar.br"
+  LD_LIBRARY_PATH=/tmp/cbin/lib/lib /tmp/cbin/chromium --version # 131.0.6778.0
+  ```
+- This works where `puppeteer` fails: puppeteer post-install tries to download Chrome from Google storage (TLS disconnect in sandbox), while `@sparticuz/chromium` bundles the binary as `.br` inside npm package, so only npm registry needed (allowed).
+- No Qt found in repo history; Qt reference may be from older attempt. Current working method is playwright-core + sparticuz/chromium per HANDOFF.md.
+
+## Screenshots captured
+
+Wrote `/tmp/shoot.mjs` using `playwright-core` with `executablePath: /tmp/cbin/chromium`, args `--no-sandbox --disable-gpu --disable-dev-shm-usage`, viewport 1280×800, `file://` URL to `game/index.html`:
+
+1. `01_main_menu.png` 239K → webp 22K — title block `.mech-title-block` real element, not overlapping buttons, flex column verified
+2. `02_dialogue.png` 1.3M → 113K — console with scene illumination radial bottom glow visible, nonrepeating gradient, no specular line, nameplate above panel
+3. `03_choices.png` 1.3M → 120K — choice plates raised, index rail 4px cyan pulsing, hover lifts 3px, safe z-index
+4. `04_save.png` 184K → 6.9K — save grid gap 22px, delete 28px squircle at 8px inset, badge padding-right 46px, overflow visible, clip-path none host
+5. `05_settings.png` 438K → 30K — settings dashboard bolted panels, scale 35-230% readout tabular, machined track hex knob, fill via --mech-fill
+6. `06_history.png` 469K → 40K — history log modal body scroll auto, close button 168×44 12×28 chamfer 8px inline-flex centered not cropped
+7. `07_graph.png` 110K → 9.2K — routegraph overlay flex centering hidden, panel flex column hidden, body overflow auto both axes, machined scrollbar, no contain:paint
+8. `08_archives.png` 83K → 7.5K — archives codex same architecture
+
+Stored as PNG locally in `design/preview/shots/*.png` (ignored per `.gitignore`) for editing, and converted to lossy webp `quality 82 method 4` via ImageMagick for commit: total 348K vs 4.1M PNG.
+
+## Critique with actual UI
+
+Used `generate_image` with actual screenshots as reference:
+
+- `15_critique_dialogue_vs_actual.png` 2.1M local PNG (concept 12 + actual dialogue + choices) — annotates PASS for no overlap, scene illumination visible, no repeating steel, 3D tilt visible, specular removed, and TODO for stronger glass.
+- `16_critique_save_settings_graph_history.png` 1.8M local PNG (concept 13 + 4 actual) — PASS for save delete, history close, graph scroll, settings scale, main menu no overlap.
+
+These fulfill "send expectation and what you got to image generator to get critics" with real browser evidence, not imagined.
+
+## Verification
+
+- Browser: Chromium 131.0.6778.0 via `/tmp/cbin/chromium` + `LD_LIBRARY_PATH=/tmp/cbin/lib/lib`
+- Screenshots 8/8 captured, converted to webp, committed in `design/preview/shots/`
+- Concepts 09-16 kept as local PNG ignored (per user final instruction), history clean (pack 106.54 MB)
+- Tests: 61/61 pass
+
+---
