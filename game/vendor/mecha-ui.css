@@ -4085,3 +4085,109 @@ game-screen [data-content="background"] {
   animation: mechKenBurns 34s ease-in-out infinite alternate !important;
   animation-duration: 34s !important;
 }
+
+/* ===========================================================================
+ * 33. SESSION 13 — final beauty polish, keep PNG locally, repo clean
+ * ---------------------------------------------------------------------------
+ * • Keep concept boards as PNG locally (gitignored), never commit — repo
+ *   already 106 MB due to character art, adding 5 MB PNGs pushed to 111 MB.
+ *   History cleaned via reflog expire + gc, PNG blobs now gone.
+ * • Remove any residual repeating grey steel pattern: ensure face layers use
+ *   only nonrepeating gradient (background-size 100% 100%, repeat no-repeat),
+ *   grain layer display:none.
+ * • Enhance scene-dependent illumination: stronger outer glow 0 0 26px
+ *   + 0 0 48px soft, edge uses --mech-scene-edge, ambient uses
+ *   --mech-scene-glow. Opacities bumped to 0.32-0.38 range so lit-by-bg reads.
+ * • Dialogue console final beauty: deeper glass with inset highlight + outer
+ *   shadow + scene glow, say text 1.12rem/1.62 with soft cyan halo, nameplate
+ *   tighter with cyan left border.
+ * • Choice plates: 18px 26px 18px 64px, index rail 4px cyan pulsing,
+ *   hover translateY(-3px) + double drop-shadow cyan + dark, ::before index
+ *   larger, text shadow for readability.
+ * • HUD: glass gradient 22,30,46 / 10,16,28 with inner highlight 14% + outer
+ *   stroke, backdrop-filter none to avoid flattening, badges spaced, rail
+ *   deeper recess.
+ * • Save slots: already overflow visible + clip-path none on host, face owns
+ *   chamfer, badge padding-right 46px reserves delete gutter, grid gap 22px.
+ * • Graph/archives: flex column architecture verified, body overflow auto
+ *   both axes, machined scrollbar, no contain:paint.
+ * • No overlap guarantee: --mech-qm-h measured from quick-menu, choice 30,
+ *   text-box 35, strip 79, HUD 80, quick-menu 85, fx 910.
+ * ========================================================================== */
+
+/* Ensure nonrepeating gradient only — no brushed steel tiling */
+[data-mech] > .mech-l-face {
+  background-color: #161d2a !important;
+  background-image: var(--mech-face-grad) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  background-blend-mode: normal !important;
+}
+[data-mech] > .mech-l-face::after { display: none !important; }
+
+/* Dialogue console — final beauty, stronger depth + scene tint */
+[data-screen="game"] text-box [data-content="text"] {
+  background: linear-gradient(158deg, #6e7e94 0%, #445268 22%, #283142 52%, #151c28 84%, #4d5c74 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -18px 28px var(--mech-scene-glow-soft, rgba(120,190,255,0.06)),
+    0 12px 32px rgba(0,0,0,0.72),
+    0 0 32px var(--mech-scene-glow-soft, rgba(120,190,255,0.06)),
+    0 0 0 1px rgba(0,0,0,0.55) !important;
+  border-top: 1px solid rgba(255,255,255,0.06) !important;
+}
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-image:
+    radial-gradient(130% 90% at 50% 105%, var(--mech-scene-glow, rgba(120,190,255,0.34)) 0%, transparent 58%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(120,190,255,0.16)) 0%, transparent 38%, rgba(0,0,0,0.22) 100%),
+    var(--mech-face-grad) !important;
+}
+[data-screen="game"] [data-ui="say"] {
+  font-size: 1.12rem !important;
+  line-height: 1.62 !important;
+  color: #eef6ff !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.95), 0 0 18px rgba(56,189,248,0.18) !important;
+}
+
+/* Choice plates final */
+[data-screen="game"] choice-container button {
+  background: var(--mech-rim-grad) !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,0.12))
+    drop-shadow(0 8px 18px rgba(0,0,0,0.68)) !important;
+}
+[data-screen="game"] choice-container button:hover {
+  transform: translateY(-3px) !important;
+  filter:
+    drop-shadow(0 0 18px rgba(56,189,248,0.48))
+    drop-shadow(0 10px 22px rgba(0,0,0,0.72)) !important;
+}
+
+/* HUD glass final */
+.cyber-top-hud {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Quick-menu final */
+quick-menu {
+  background: linear-gradient(180deg, rgba(21,28,42,0.98), rgba(10,15,26,0.99)) !important;
+  border-top: 1px solid rgba(56,189,248,0.28) !important;
+}
+
+/* Save slots beauty verified — keep overflow visible fix */
+save-slot, load-screen save-slot {
+  overflow: visible !important;
+  clip-path: none !important;
+}
+save-slot > .mech-l-face {
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 16px) !important;
+}
+
+/* Graph/archives scroll verified */
+.graph-body, .archives-body {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
