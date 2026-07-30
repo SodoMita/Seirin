@@ -893,3 +893,65 @@ the original armour pass and `05` for button states.
 | `mecha-ui.probe.mjs` | 19 plates, 0 errors, indicators correct |
 | `wc -l mecha-ui.css` | ~3690 lines (+231 from session start) |
 | `wc -l mecha-ui.js` | ~1640 lines (+28 from session start) |
+
+---
+
+# Session 11 — beauty overhaul, no overlap, visible 3D, scroll & scale
+
+**Date:** 2026-07-30 · **Branch:** `arena/019fb2d3-seirin`
+**Trigger:** User report — ugly overlapping UI, save red circle overlaps,
+history close button cropped, routegraph bg doesn't scroll, scaling range too
+small, animations invisible / flawed 3D.
+
+## Overlap / layout bugs fixed
+
+| Reported | Root cause | Fix |
+|---|---|---|
+| **Save red circle overlaps** | Engine had `[data-delete]` at `top:-1rem right:-1rem` outside card, overlapping next card. Previous fix moved inside but kept `overflow:hidden` + `clip-path` on host, so circle was clipped and hovered over badge text. | Host `clip-path:none !important`, `overflow:visible`, face layers own chamfer. Badge `padding-right:46px` reserves delete gutter. Delete becomes 28px squircle bolt at 8px inset, opacity .92, z 6, grid gap 22px. |
+| **History close button text cropped** | Button 10px 30px padding + 9px chamfer clipped Cyrillic descenders; parent `.modal__content` own chamfer (22px/18px) ate bottom edge; flex column pushed button half outside max-height. | Button min 168×44, padding 12px 28px, chamfer 8px, `inline-flex` centered, `line-height:1.1`, `white-space:nowrap`. Parent bottom padding 24px, `overflow:hidden` (log scrolls, not modal). Same fix applied to `#btn-archives-close` / `#btn-graph-close`. |
+| **Routegraph bg not support scroll** | `.graph-panel` had `overflow:auto` + `contain:paint` + `will-change`, which clips overflow and suppresses scroll chaining on fixed overlay. Background layers scrolled with content. | New architecture: overlay = flex centering shell `overflow:hidden`; panel = column flex `overflow:hidden`; `graph-body`/`archives-body` = `flex:1 min-height:0 overflow:auto` with machined scrollbar. Background layers stay fixed on panel, body scrolls. Removed `contain:paint`. |
+| **Scaling limits too small** | 60–160% felt cramped on phone and low-vision desktop. | Expanded to **35–230%**, step 5%, slider wired, `applyScale` re-measures `--mech-qm-h` and `--mech-hud-top`. |
+| **Build badge blocked taps** | Badge at bottom left with opacity .38 but still hit-tested. | `pointer-events:none`. |
+
+Additional overlap hardening:
+- `save-screen [data-content="slots"]` max-height now `calc(100vh -200px - var(--mech-qm-h))` and bottom padding includes `--mech-qm-h`, so grid never under quick-menu even when bar wraps to two lines.
+- `[data-screen]:not([data-screen="game"])` gets `overflow-y:auto` + bottom padding `--mech-qm-h+18px` and proper scrollbar, so settings/save/load scroll on their own.
+- Global safe stacking: choice 30, text-box 35, ticker 79, HUD 80, quick-menu 85, fx 910.
+
+## 3D and animation — made visible and correct
+
+| Flaw | Fix |
+|---|---|
+| **Sheen invisible** — 0.035/0.14 opacity, 300% size, 17s period | New: core 0.38, sides 0.10, size 220%, duration 9s plates /13s console, opacity 1, cold white. Travel ~244px/s, well above 3px/s floor. |
+| **calc inside filter** — `drop-shadow(calc(lmx*-10px)…)` invalid in some engines, and `filter` flattens `preserve-3d` | JS now writes `--mech-shadow-x/y` as px (e.g. -8px/14px). CSS `filter:none` on hot, `box-shadow: var(--mech-shadow-x) var(--mech-shadow-y) 26px …`. |
+| **Isolation killed depth** — `[data-mech]{isolation:isolate}` + filter creates stacking context that flattens `preserve-3d` | Hot plates set `isolation:auto !important`, `transform-style:preserve-3d`, lift 22px, perspective 600px, ±14/18deg. Child layers pop: face 4px, gloss 12px, rivets 1px, edge 6px. Chips same but 10px lift. |
+| **Breathing too tiny** | `mechBreathe` 1→1.028 with y-jitter, still anchored 50% 100% so feet stay. |
+| **Ken Burns invisible** | 1.02→1.18 over 3 keyframes + larger pan (-1.6%→1.4%). |
+| **Motes barely visible** | 3px → 4–5px, glow + outer halo, faster drift with rotation, warm+cool. |
+| **Menu idle 1→1.09 invisible** | 1→1.24 + saturate + deeper shadow, period 3.4s, phase-offset. |
+| **Quick-menu bob -3px invisible** | -5px + brightness 1.35 + glow, staggered. |
+| **Cursor highlight faint** | Gloss `::before` radial 0.16→0.30 on hot, larger inset. |
+
+## Beauty pass
+
+- HUD glass deeper with inner highlight + outer stroke.
+- Main-menu buttons wider 320px, 18px left icon gutter, 1.02rem type.
+- Choice plates 18px 26px 18px 64px, index rail 4px pulsing, hover lifts 3px with cyan wash.
+- Console dialogue 1.12rem/1.62, nameplate tighter, caret bigger amber, text shadow for readability.
+- Graph cards hover lift -2px + border glow.
+- Scale control, slot grid, ticker all use `--mech-qm-h` so no overlap at any height.
+- Final Section 31 adds global polish: readable Cyrillic line-height, larger hit areas 44px min, soft shadows, no overflow clipping.
+
+## Verification
+
+| Check | Result |
+|---|---|
+| `node --test` 61 tests | 61 pass |
+| `es5-scan` mecha-ui.js / game.js | clean |
+| `offline-smoke.mjs` | SMOKE PASSED (csstree warning ignored) |
+| Manual checks | save delete not overlapping badge/neighbor, history close fully readable, graph body scrolls both axes, scale slider 35–230, specular visible, tilt shows depth + moving shadow, breathing + Ken Burns visible, motes glowing |
+
+## Files changed
+
+- `game/vendor/mecha-ui.css` — ~3850 lines after pass (save slot, history close, graph scroll architecture, specular 9s, real 3D, idle, motes, Section 31 beauty).
+- `game/vendor/mecha-ui.js` — SCALE 35–230, shadow px writing, clearHot removes shadow vars.
