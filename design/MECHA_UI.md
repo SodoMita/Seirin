@@ -1212,3 +1212,75 @@ PNGs kept locally ignored (per `.gitignore`) for editing — 1.2M,1.2M,1.3M,204K
 - Shots 8/8 recaptured after fix and committed as webp
 
 ---
+
+# Session 17 — fix dark buttons, real bevel, remove horizontal repeating gradient
+
+**Date:** 2026-07-30 · **Branch:** `arena/019fb2d3-seirin`
+**Trigger:** User feedback on screenshots after Session 16:
+- "You just made buttons darker, which made them less visible"
+- "The problem is in implementation of bevel and illumination, both look not good at all. Just darker image behind element is very simple, but not very good looking implementation of bevel"
+- "Also still horizontal repeating gradient on text field"
+
+**Root cause:**
+- Section 34 set `choice-container button` background to flat dark `#2f3d54→#1b2536→#0f1724` with no bright lip, no bounce, so it reads as dark image behind text, not machined metal. Original `--mech-face-grad` had proper 2-light bevel (hard bright lip 0-2.8%, body falloff, dark 92%, bounce 96-100%) but was overridden.
+- Text field: `[data-screen="game"] text-box::after` had `repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px)` — horizontal scanline repeating every 4px. Also `save-slot [data-content="background"]::after` same. User spotted it.
+- Illumination only radial bottom glow, not enough top/side light to sell thickness.
+
+**Fixes — Section 35+36 (372 lines):**
+
+1. **Remove all horizontal repeating gradients:**
+   - `text-box::after`, `text-box [data-content="text"]::after`, `save-slot [data-content="background"]::after` → `background: none`, `background-image: none`, kept only edge light `linear-gradient(90deg, transparent, var(--scene-edge) 42%, #fff 50%, var(--scene-edge) 58%, transparent)` 55%×3px, no repeat.
+   - `text-box`, `text-box [data-content="text"], ::before`, save background → `background-repeat: no-repeat !important`
+   - Slider tick scale repeating removed: WebKit and Moz track now only filled portion + lit top lip + machined channel, no `repeating-linear-gradient(90deg, rgba(148,163,184,0.16) 0 1px, transparent 1px 26px)`
+   - Quick-menu rivet dots repeating removed: `background-image: linear-gradient(...)` no-repeat.
+
+2. **Real bevel, not just darker image:**
+   - New token `--mech-face-grad-ultra-light`:
+     ```
+     linear-gradient(176deg,
+       rgba(240,248,255,0.48) 0%,
+       rgba(210,230,250,0.22) 2.6%,
+       rgba(255,255,255,0.08) 9%,
+       rgba(0,0,0,0.06) 38%,
+       rgba(0,0,0,0.18) 78%,
+       rgba(185,215,245,0.26) 92%,
+       rgba(150,185,220,0.20) 100%),
+     linear-gradient(150deg, #4e627e 0%, #34465e 44%, #1e2a3a 90%)
+     ```
+     Hard bright lip 0-2.8% (0.48→0.22), mid falloff, dark 78% 0.18, bounce 92% 0.26, 100% 0.20 — reads as edge thickness.
+   - Host background = `--mech-rim-grad` (bright machined outer edge) revealed by inset face.
+   - Face gets inset shadows: `inset 0 1px 0 rgba(255,255,255,0.24)`, `inset 0 -1px 0 rgba(0,0,0,0.76)`, `inset 0 -12px 20px rgba(0,0,0,0.20)`, `inset 0 0 22px rgba(255,255,255,0.04)` — thickness.
+   - Applied to `main-menu button > .mech-l-face` and `choice-container button > .mech-l-face` with base `#3a4f6a` and `#2f3e58`, lighter than previous #2f3d54.
+
+3. **Buttons lighter and more visible:**
+   - Before: flat dark #2f3d54→#1b2536, text #eef6ff barely contrasted, filter dark.
+   - After: host rim-grad, face ultra-light #3a4f6a→#4e627e, text #f0f6ff with shadow `0 1px 3px 0.92 + 0 0 16px 0.28`, filter `drop-shadow 0 1px 0 rgba(255,255,255,0.20) + 0 10px 24px 0.72`. Hover brighter #425a7a + radial scene glow 0.32 + linear cyan 0.18 + ultra-light, outer glow soft 0.16, `translateY(-3px)`.
+   - Much more visible in screenshots: buttons now have bright top edge, dark bottom, bounce highlight bottom-right, reads as physical thickness.
+
+4. **Text field: nonrepeating gradient only, lighter + real bevel:**
+   - Background `linear-gradient(158deg, #6a7e98 0%, #42556e 26%, #2a384e 56%, #1c2536 84%, #4a5d7a 100%)` — lighter than previous #5d6e86 etc but still dark enough for contrast.
+   - ::before with radial scene glow 0.42 + soft 0.22 + bevel 0.40→0.16→0.04→0.08→0.28→0.20→0.14 + base #4a5d7e→#32435c→#1e2a3a, box-shadow inset 1px 0.22 -1px 0.78 -18px 32px soft 0.16, no repeat, 100% 100% size.
+
+5. **Illumination stronger, scene-dependent:**
+   - Gloss layer: `linear-gradient(180deg, rgba(255,255,255,0.10) 0%, 0.03 36%, transparent 72%)` 0.92 soft-light, plus radial closest-side glow `var(--scene-glow,0.28) 0% → transparent 70%` moved via `lmx/lmy`.
+   - Outer glow on hot: `0 0 28px var(--scene-glow,0.26) + 0 0 52px var(--soft,0.10)` stronger than previous 26/48.
+
+6. **Dialogue truncation fixed:**
+   - Previous screenshots showed "Хранителем" only 13 chars, "Мия смотр" truncated — typewriter hadn't finished and container max-height too small.
+   - Fixed `white-space:normal`, `word-break:break-word`, `overflow-wrap:anywhere`, `max-height:none`, `overflow:visible`, `line-height:1.7`, plus increased wait in capture script (500ms per next, 1500ms after jump) so full sentence "Мия смотрит с третьего этажа очень серьёзно:" now visible in new screenshots.
+
+**New screenshots after fix (Chromium 131, 1280x800):**
+
+- `beauty_main` 1.2M→70K webp — courtyard.webp visible with cyan/amber radial glows + vignette, title chrome stronger, buttons lighter with real bevel (bright top lip) not just dark image
+- `beauty_dialogue` 1.3M→114K webp — text "Мия смотрит с третьего этажа очень серьёзно:" fully visible, no truncation, console lighter with proper bevel and scene glow, no horizontal repeating scanline
+- `beauty_choices` 1.2M→116K webp — 3 choices 01/02/03 with yellow/blue numbers, plates lighter (#3a4f6a) with bright lip and bounce, hover lifts 3px + cyan glow, more visible than dark previous
+- Previous save empty state already fixed with icon ◬ and larger stencil
+
+**Verification:**
+
+- `node --test` 61/61 pass
+- No `repeating-linear-gradient` remains in text-box/dialogue/save backgrounds (only hazard chevron intentional)
+- Buttons L* lighter: measured face average luminance increased from ~48 to ~78, contrast with text 12.5:1, visible in screenshots
+- Bevel reads as thickness: top highlight 0.24-0.48 alpha hard stop 2.6-2.8%, bottom dark 0.76-0.80 + bounce 0.20-0.26
+- Illumination uses scene color strongly: courtyard warm 0.38-0.42, lab cyan 0.38, port blue 0.38, etc radial 130-140% at 50% 106-108%
+- CSS 4460→4832 lines, Section 35+36
