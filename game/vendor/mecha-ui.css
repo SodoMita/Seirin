@@ -265,21 +265,14 @@
   background-color: #161d2a;
   background-image:
     var(--mech-face-grad),
-    var(--mech-tex-brushed, repeating-linear-gradient(92deg,
-        rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 3px));
-  background-size: auto, auto, 128px 128px;
+    var(--mech-face-grad);
+  background-size: 100% 100%;
   background-blend-mode: normal, normal, overlay;
 }
 
-/* Grain sits on the face so the steel is never a clean gradient. */
+/* Grain removed so the steel is never a clean gradient. */
 [data-mech] > .mech-l-face::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--mech-tex-grain, none);
-  background-size: 128px 128px;
-  mix-blend-mode: overlay;
-  opacity: 0.55;
+  display: none !important;
 }
 
 /* --- wear: the decorative bruises ---------------------------------------
@@ -936,10 +929,8 @@
       rgba(6, 11, 18, 0.34) 88%,
       rgba(28, 40, 58, 0.16) 100%),
     linear-gradient(112deg, rgba(150, 190, 240, 0.10) 0%, transparent 34%, transparent 74%, rgba(120, 160, 210, 0.06) 100%),
-    var(--mech-face-grad),
-    var(--mech-tex-brushed, repeating-linear-gradient(92deg,
-        rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 3px));
-  background-size: auto, auto, auto, auto, 128px 128px;
+    var(--mech-face-grad) 0 1px, transparent 1px 3px));
+  background-size: 100% 100%;
 }
 /* Wear is scaled up and strengthened on the console: at 256px the tile
    repeated ~4x across an 1100px panel and read as wallpaper. */
@@ -3143,7 +3134,7 @@ dialog-log > .modal__content > button[data-action="dialog-log"]::before,
       rgba(4, 7, 12, 0.64) 68%, rgba(6, 11, 18, 0.34) 88%,
       rgba(28, 40, 58, 0.16) 100%),
     var(--mech-face-grad),
-    var(--mech-tex-brushed, none),
+    none,
     /* bolt row, top (static) */
     radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.30) 0 0.7px, transparent 1.4px),
     radial-gradient(circle at 50% 62%, rgba(0, 0, 0, 0.60) 0 1.8px, transparent 2.5px),
@@ -4022,7 +4013,7 @@ choice-container { overflow-y: auto !important; }
       transparent 42%,
       rgba(0,0,0,0.18) 100%),
     var(--mech-face-grad),
-    var(--mech-tex-brushed, none) !important;
+    none !important;
 }
 
 /* Pointer highlight now uses scene tint, so cursor light feels like scene light */
