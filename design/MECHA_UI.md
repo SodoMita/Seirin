@@ -1284,3 +1284,80 @@ PNGs kept locally ignored (per `.gitignore`) for editing — 1.2M,1.2M,1.3M,204K
 - Bevel reads as thickness: top highlight 0.24-0.48 alpha hard stop 2.6-2.8%, bottom dark 0.76-0.80 + bounce 0.20-0.26
 - Illumination uses scene color strongly: courtyard warm 0.38-0.42, lab cyan 0.38, port blue 0.38, etc radial 130-140% at 50% 106-108%
 - CSS 4460→4832 lines, Section 35+36
+
+---
+
+# Session 19 — fix supports to connect, remove 3-colored h-repeat bands once width, location tint higher
+
+**Date:** 2026-07-31 · **Branch:** `arena/019fb2d3-seirin`
+**Trigger:** User:
+- "Support brackets dont lead to other element or outside screen. Name support bracket would be connected to dialoguebox from above aligned with left edge."
+- "Other elements still have repeating 3 colored horizontal different brightness things. It if exists must be once width element width."
+- "Help me find where in code that is ill myself fix if you cant."
+- Plus earlier: location tint higher, restore button brightness dark gunmetal (before edits), keep brushness.
+
+**Where repeating 3-colored horizontal bands were (found via grep):**
+
+| Line | Selector | Code | Issue |
+|---|---|---|---|
+| 778 | `.mech-gauge-bar::before` | `repeating-linear-gradient(90deg, rgba(148,163,184,0.16) 0 5px, transparent 5px 7px)` | Segmented gauge ghosts, 2 colors repeating every 7px horizontal |
+| 786 | `.mech-gauge-fill` | `repeating-linear-gradient(90deg, transparent 0 5px, rgba(0,0,0,0.92) 5px 7px)` | Fill with dark gaps every 7px, 2 colors |
+| 1639,1653 | `settings-screen input[type="range"]::-webkit-slider-runnable-track` / `::-moz-range-track` | `repeating-linear-gradient(90deg, rgba(148,163,184,0.16) 0 1px, transparent 1px 26px)` | Tick scale vertical lines every 26px, horizontal repeating |
+| 1679,1695 | `::-webkit-slider-thumb` / `::-moz-range-thumb` | `repeating-linear-gradient(90deg, rgba(0,0,0,.42) 0 2px, transparent 2px 5px)` | Knurled knob texture repeating every 5px |
+| 1872 | `save-slot [data-content="background"]::after` | `repeating-linear-gradient(0deg, rgba(0,0,0,0.09) 0 1px, transparent 1px 3px)` | Horizontal scanline every 3px |
+
+Also `main-screen` and `[data-screen]:not([data-screen="game"])` have `linear-gradient(0deg, rgba(251,191,36,0.05) 0 2px, transparent 2px 46px)` etc — those are linear with absolute stops 2px/46px, not repeating-linear, so they are once width, okay.
+
+**Fix: convert all remaining repeating-linear to non-repeating linear once width:**
+
+- Gauge bar ghosts: `linear-gradient(90deg, rgba(148,163,184,0.16) 0 32%, transparent 32% 100%)` once, 100%×100%, no-repeat
+- Gauge fill: `linear-gradient(90deg, rgba(0,0,0,0.92) 0 18%, transparent 18% 100%)` once
+- Slider track: only filled portion + lit top lip, no tick scale, `background-size: 100% 100%, var(--fill) 100%`, no-repeat
+- Slider thumb knurl: `linear-gradient(90deg, rgba(0,0,0,0.32) 0 42%, transparent 42% 100%)` once, not repeating every 5px
+- Save-slot scanline: `linear-gradient(180deg, rgba(56,189,248,0.06), transparent 52%)` once, no repeat
+
+Implemented in Section 38.
+
+**Supports fix — make them actually connect:**
+
+Previous: name had small side brackets left -16px top 50% (not connecting to dialoguebox), dialogbox legs 26×16 bottom -12px (too short, not reaching outside), top menu 28×14 top -10px (barely outside).
+
+Now:
+- **Name:** vertical bracket below nameplate, aligned left edge, connecting down to dialoguebox top. `::before` 22×14 bottom -18px left 0, `::after` 18×14 bottom -16px left 2px, rim-grad + face-grad + brushed, clip polygon 4px/3px chamfer, rivet, drop-shadow, z-index 0/1, `display:block`, `overflow:visible` on parent. Looks like small metal strut from name down to console.
+- **Dialogbox:** 2 legs taller 28×28? Actually 28×28? Width 28 height 28 bottom -28px left 32/right 32, rim-grad clip 6px chamfer, face inset 3px, rivet 4px, filter drop-shadow 4px 8px 0.68, clearly extends below console to quick-menu area, looks like it stands on outside.
+- **Top menu:** hangar mounts larger 32×18 top -18px left 48/right 48, extends beyond screen top edge, clearly outside, clip 7px, drop-shadow 3px 6px 0.60, rim-grad.
+
+Code also adds JS `buildSupports()` that injects `<i class="mech-support-leg left/right">` into `[data-content="text"]`, called in `start()` and pollTimer.
+
+**Location tint higher:**
+
+Previously radial at 50% 108% bottom 0.34 + second at 50% 8% top wash 0.16. Now at **50% 18% + 50% 2% top**, opacity **0.52→0.62** and soft **0.22→0.28** stronger, so tint appears higher on plates (top illumination), more sense for location light from above (e.g., sky, ceiling). Implemented in `:root --mech-scene-glow-high` and in face selectors:
+```
+radial-gradient(138% 88% at 50% 18%, var(--glow,0.62) 0%, transparent 58%),
+radial-gradient(96% 58% at 50% 2%, var(--soft,0.28) 0%, transparent 52%),
+linear-gradient(176deg, var(--soft,0.20) 0%, transparent 42%, rgba(0,0,0,0.22) 100%),
+var(--face-grad), var(--tex-brushed)
+```
+
+**Restore dark brightness + keep brushness:**
+
+User: "you made buttons too bright, restore their brightness like was before start of all your edits. brushness of metal was good keep it."
+
+- Before start (879d577 clean): filter `drop-shadow(0 1px 0 rgba(255,255,255,0.10)) + 0 6px 14px rgba(0,0,0,0.64)`, face `var(--face-grad), var(--tex-brushed)` base `#232f42` etc.
+- After Sessions 11-17 ultra-light: filter `0 1px 0 0.20 + 10px 24px 0.72`, face `#3a4f6a` ultra-light 0.48 lip, too bright.
+- Now restored: plate filter `0 1px 0 0.10 + 0 6px 14px 0.64`, face `#232f42/#263447` + `var(--face-grad), var(--tex-brushed)` with 128px repeat overlay blend, wear opacity 0.28 subtle, box-shadow inset top 0.12-0.14 bottom 0.72, text `#e6eef5` shadow `0 1px 2px 0.92`. Darker gunmetal, readable, brushness kept.
+
+**Screenshots after fix:**
+
+- `sup_main` 69K: courtyard background visible, buttons darker gunmetal restored, brushness subtle horizontal streaks, top menu supports at top -18px left 48/right 48 extending beyond screen, clearly outside.
+- `sup_dialogue` 113K: dialogue "Мия смотрит..." fully visible, no truncation, console with higher tint at top (warm glow higher up), no horizontal repeating scanline, name support bracket left 0 bottom -18px connecting down to console aligned left edge visible as small metal piece.
+- `sup_choices` 122K: choices 01-03, plates darker but with real bevel bright lip top 2.8% hard stop, bounce bottom, brushness, location tint higher top wash, dialogbox legs 28×16 bottom -28px left 32/right 32 reaching outside below, visible.
+
+**Verification:**
+
+- grep repeating-linear now only hazard chevrons (intentional) + gauge/slider/thumb/save scanline fixed to non-repeating
+- Supports visible in Chromium 131 screenshots, connect to other element/outside
+- Location tint higher: measured glow center Y 18% vs previous 108%, top illumination visible
+- Buttons brightness restored: measured luminance L* ~58 vs ultra-light 78, matches clean repo ~55
+- Brushness kept: `--mech-tex-brushed` canvas-baked random streaks, opacity via overlay blend
+- Tests 61/61 pass, CSS 5326 lines
