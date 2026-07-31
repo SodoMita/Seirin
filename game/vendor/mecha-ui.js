@@ -601,20 +601,6 @@
         else { screen.appendChild(block); }
     }
 
-    function buildSupports () {
-        try {
-            var text = doc.querySelector('[data-screen="game"] text-box [data-content="text"]');
-            if (text && !text.querySelector('.mech-support-leg')) {
-                var l = el('i', 'mech-support-leg left');
-                l.setAttribute('aria-hidden', 'true');
-                var r = el('i', 'mech-support-leg right');
-                r.setAttribute('aria-hidden', 'true');
-                text.appendChild(l);
-                text.appendChild(r);
-            }
-        } catch (e) { }
-    }
-
     function clamp (n, lo, hi) { return n < lo ? lo : (n > hi ? hi : n); }
 
     function setGauge (key, pct) {
@@ -1602,7 +1588,6 @@
         try { bakeAll(); } catch (e) { /* CSS fallbacks cover this */ }
         try { buildAtmosphere(); } catch (e) { /* decorative only */ }
         try { buildTitleBlock(); } catch (e) { /* decorative only */ }
-        try { buildSupports(); } catch (e) { /* decorative only */ }
         try { buildInstruments(); } catch (e) { /* decorative only */ }
         try { buildStrip(); } catch (e) { /* decorative only */ }
         try { mountAll(doc); } catch (e) { /* decorative only */ }
@@ -1634,7 +1619,6 @@
                 try { retagIcons(); } catch (e) { /* ignore */ }
                 try { syncQuickMenu(); } catch (e) { /* ignore */ }
                 try { buildTitleBlock(); } catch (e) { /* ignore */ }
-                try { buildSupports(); } catch (e) { /* ignore */ }
                 try { tagLogRows(); } catch (e) { /* ignore */ }
                 try { buildScaleControl(); } catch (e) { /* ignore */ }
                 try { buildAudioNote(); } catch (e) { /* ignore */ }
@@ -1666,7 +1650,6 @@
         syncStripTop: syncStripTop,
         syncQuickMenu: syncQuickMenu,
         buildTitleBlock: buildTitleBlock,
-        buildSupports: buildSupports,
         tagLogRows: tagLogRows,
         syncModalFlag: syncModalFlag,
         undraggable: undraggable,
