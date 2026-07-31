@@ -5122,4 +5122,205 @@ main-menu button:hover > .mech-l-face,
   right: 42px;
 }
 
+/* ===========================================================================
+ * 38. SESSION 20 — fix supports to actually connect, remove last h-repeat
+ *     3-colored bands, location tint higher, keep brushness, restore dark
+ * ---------------------------------------------------------------------------
+ * User:
+ * - Support brackets dont lead to other element or outside screen. Name
+ *   support bracket would be connected to dialoguebox from above aligned
+ *   with left edge.
+ * - Other elements still have repeating 3 colored horizontal different
+ *   brightness things. It if exists must be once width element width.
+ * - Help me find where in code that is ill myself fix if you cant.
+ *
+ * Where repeating 3-colored bands are:
+ *   Line 778-786: .mech-gauge-bar::before and .mech-gauge-fill use
+ *     repeating-linear-gradient(90deg, rgba(148,163,184,0.16) 0 5px, ...)
+ *     → 2 colors repeating every 7px, segmented gauge.
+ *   Lines 1639,1653: settings slider track tick scale
+ *     repeating-linear-gradient(90deg, rgba(148,163,184,0.16) 0 1px, transparent 1px 26px)
+ *     → vertical lines every 26px, horizontal repeating.
+ *   Lines 1679,1695: slider thumb knurl
+ *     repeating-linear-gradient(90deg, rgba(0,0,0,.42) 0 2px, transparent 2px 5px)
+ *     → knurled knob.
+ *   Line 1872: save-slot background scanline
+ *     repeating-linear-gradient(0deg, rgba(0,0,0,0.09) 0 1px, transparent 1px 3px)
+ *     → horizontal scanline every 3px.
+ *   Also main-screen and system screens have 0deg/90deg 1px lines every 42-46px
+ *   but those are linear (once), not repeating-linear, so okay.
+ *   Fix: convert all remaining repeating-linear to non-repeating linear
+ *   that spans once width element width (or remove if decorative).
+ *
+ * Supports fix:
+ * - Name: was small side brackets left -16px top 50%, not connecting to dialogbox.
+ *   Now: vertical support below nameplate, aligned left edge, connecting down
+ *   to dialoguebox top. Height 18px, bottom -18px, left 0, width 22px, looks like
+ *   bracket from name to console.
+ * - Dialogbox: was 26x16 legs bottom -12px, too short, not reaching outside.
+ *   Now: taller 28px height bottom -28px, so they visibly lead to outside below
+ *   (quick-menu area), left 32px/right 32px, more prominent, with rivet and
+ *   inner face.
+ * - Top menu: was 28x14 top -10px, too short, not clearly outside. Now: 32x18
+ *   top -18px, extends beyond screen top edge, left 48px/right 48px, more visible.
+ *
+ * Location tint higher:
+ * - Previously radial at 50% 28% + 8% (already higher than 108%). Now make even
+ *   higher: 50% 18% + 50% 2% top wash, opacity 0.52→0.62 for stronger visible tint
+ *   at top of plates, not just bottom. So location color is felt higher.
+ * ========================================================================== */
+
+/* --- Kill ALL remaining repeating-linear-gradient, make once width ------ */
+.mech-gauge-bar::before {
+  background: linear-gradient(90deg,
+    rgba(148,163,184,0.16) 0 32%,
+    transparent 32% 100%) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+}
+.mech-gauge-fill {
+  background-color: currentColor !important;
+  background-image: linear-gradient(90deg,
+    rgba(0,0,0,0.92) 0 18%,
+    transparent 18% 100%) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+}
+settings-screen input[type="range"]::-webkit-slider-runnable-track,
+settings-screen input[type="range"]::-moz-range-track {
+  background-image:
+    linear-gradient(90deg,
+      rgba(126,226,255,0.30) 0 var(--mech-fill, 0%),
+      transparent var(--mech-fill, 0%)),
+    linear-gradient(180deg,
+      rgba(190,240,255,0.85) 0 2px,
+      rgba(56,189,248,0.92) 2px 7px,
+      rgba(18,116,162,0.95) 7px 12px) !important;
+  background-size: 100% 100%, var(--mech-fill, 0%) 100% !important;
+  background-repeat: no-repeat !important;
+}
+settings-screen input[type="range"]::-webkit-slider-thumb,
+settings-screen input[type="range"]::-moz-range-thumb {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.75) 0 2px, transparent 2px),
+    linear-gradient(180deg, transparent 40%, rgba(251,191,36,.95) 40% 60%, transparent 60%),
+    linear-gradient(90deg, rgba(0,0,0,0.32) 0 42%, transparent 42% 100%),
+    linear-gradient(160deg, #e8f1fb 0%, #9fb0c6 30%, #4a5770 62%, #232c3b 85%, #8496ad 100%) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100% !important;
+  background-repeat: no-repeat !important;
+}
+save-slot [data-content="background"]::after {
+  background: linear-gradient(180deg, rgba(56,189,248,0.06), transparent 52%) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+}
+
+/* --- Supports: make them actually connect to other element / outside ---- */
+/* Name support: vertical bracket from name bottom to dialoguebox top, aligned left edge */
+[data-screen="game"] text-box [data-content="name"] {
+  overflow: visible !important;
+  position: relative !important;
+}
+[data-screen="game"] text-box [data-content="name"]::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  bottom: -18px !important;
+  top: auto !important;
+  width: 22px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  background: var(--mech-rim-grad) !important;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.55)) !important;
+  z-index: 0 !important;
+  display: block !important;
+}
+[data-screen="game"] text-box [data-content="name"]::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 2px !important;
+  bottom: -16px !important;
+  top: auto !important;
+  width: 18px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  background:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 64px 64px !important;
+  clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16) !important;
+  z-index: 1 !important;
+  display: block !important;
+}
+
+/* Dialogbox legs: taller, reach outside below, visible connection to outside */
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg {
+  height: 28px !important;
+  bottom: -28px !important;
+  width: 28px !important;
+  background: var(--mech-rim-grad) !important;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.68)) !important;
+  z-index: 3 !important;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg.left {
+  left: 32px !important;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg.right {
+  right: 32px !important;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg::before {
+  inset: 3px !important;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px) !important;
+}
+[data-screen="game"] text-box [data-content="text"] .mech-support-leg::after {
+  width: 4px !important;
+  height: 4px !important;
+  margin: -2px 0 0 -2px !important;
+}
+
+/* Top menu hangar mounts: larger, clearly outside screen top */
+.cyber-top-hud::before,
+.cyber-top-hud::after {
+  top: -18px !important;
+  width: 32px !important;
+  height: 18px !important;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px) !important;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.60)) !important;
+  background: var(--mech-rim-grad) !important;
+}
+.cyber-top-hud::before { left: 48px !important; }
+.cyber-top-hud::after { right: 48px !important; }
+
+/* --- Location tint higher: stronger top illumination ------------------- */
+[data-mech="plate"] > .mech-l-face,
+[data-mech="chip"] > .mech-l-face,
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-image:
+    radial-gradient(138% 88% at 50% 18%, var(--mech-scene-glow, rgba(251,191,100,0.62)) 0%, transparent 58%),
+    radial-gradient(96% 58% at 50% 2%, var(--mech-scene-glow-soft, rgba(251,191,100,0.28)) 0%, transparent 52%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.20)) 0%, transparent 42%, rgba(0,0,0,0.22) 100%),
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+}
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-image:
+    radial-gradient(140% 90% at 50% 18%, var(--mech-scene-glow, rgba(251,191,100,0.62)) 0%, transparent 64%),
+    radial-gradient(96% 58% at 50% 2%, var(--mech-scene-glow-soft, rgba(251,191,100,0.28)) 0%, transparent 56%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.24)) 0%, transparent 44%, rgba(0,0,0,0.26) 100%),
+    linear-gradient(176deg,
+      rgba(232, 246, 255, 0.36) 0%,
+      rgba(200, 222, 245, 0.14) 3%,
+      rgba(255,255,255,0.05) 10%,
+      rgba(0,0,0,0.10) 52%,
+      rgba(0,0,0,0.32) 90%,
+      rgba(175, 205, 240, 0.20) 95%,
+      rgba(135, 165, 200, 0.16) 100%),
+    linear-gradient(150deg, #3d4e66 0%, #2a364a 46%, #1a2332 100%),
+    var(--mech-tex-brushed, none) !important;
+}
+
+
 
