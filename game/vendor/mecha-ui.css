@@ -5294,6 +5294,92 @@ save-slot [data-content="background"]::after {
 .cyber-top-hud::before { left: 48px !important; }
 .cyber-top-hud::after { right: 48px !important; }
 
+/* ===========================================================================
+ * 39. SESSION 21 — Do not use JS where CSS can be used (supports pure CSS)
+ * ---------------------------------------------------------------------------
+ * User: "Do not use js where css can be used."
+ * Previous Section 37-38 used JS buildSupports() to inject <i class="mech-support-leg">
+ * for dialogbox legs. Now removed JS (mecha-ui.js no longer has buildSupports),
+ * and legs are pure CSS via text-box::before/::after.
+ * Also move caret from text-box::before to [data-ui="say"]::after so that
+ * text-box pseudo-elements are free for legs.
+ * Also ensure dialoguebox has no repeating gradient, only once width.
+ * ========================================================================== */
+
+/* Move caret from text-box::before to say::after so text-box free for legs */
+[data-screen="game"] text-box::before {
+  content: '' !important;
+  animation: none !important;
+  background: none !important;
+  display: block !important;
+  /* Left leg support - pure CSS, connects dialogbox to outside below, left */
+  position: absolute !important;
+  left: 36px !important;
+  bottom: -26px !important;
+  right: auto !important;
+  top: auto !important;
+  width: 28px !important;
+  height: 26px !important;
+  background: var(--mech-rim-grad) !important;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.68)) !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+}
+[data-screen="game"] text-box::after {
+  content: '' !important;
+  animation: none !important;
+  /* Right leg support - pure CSS */
+  position: absolute !important;
+  right: 36px !important;
+  bottom: -26px !important;
+  left: auto !important;
+  top: auto !important;
+  width: 28px !important;
+  height: 26px !important;
+  background: var(--mech-rim-grad) !important;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.68)) !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  display: block !important;
+}
+/* Inner face + rivet for legs using background layers (no extra pseudo) */
+[data-screen="game"] text-box::before,
+[data-screen="game"] text-box::after {
+  background-color: transparent !important;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.6) 0 1px, #3a4458 2px),
+    linear-gradient(150deg, #3a4f6a 0%, #2a364a 100%),
+    var(--mech-rim-grad) !important;
+  background-size: 100% 100%, calc(100% - 6px) calc(100% - 6px), 100% 100% !important;
+  background-position: center, 3px 3px, 0 0 !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Caret now on say, not on text-box */
+[data-screen="game"] [data-ui="say"] {
+  position: relative !important;
+}
+[data-screen="game"] [data-ui="say"]::after {
+  content: '▼' !important;
+  position: absolute !important;
+  right: 8px !important;
+  bottom: -2px !important;
+  font-size: 0.72rem !important;
+  color: var(--mech-amber) !important;
+  text-shadow: 0 0 9px rgba(251,191,36,0.8) !important;
+  animation: mechCaret 1.25s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+  display: block !important;
+}
+
+/* Ensure text-box overflow visible so legs outside are seen */
+[data-screen="game"] text-box {
+  overflow: visible !important;
+}
+
 /* --- Location tint higher: stronger top illumination ------------------- */
 [data-mech="plate"] > .mech-l-face,
 [data-mech="chip"] > .mech-l-face,
