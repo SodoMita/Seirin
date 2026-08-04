@@ -680,7 +680,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
          * new route from becoming a risky edit to the engine/UI glue. */
         function buildStoryFromArcs () {
             var registry = window.SeirinStory;
-            var order = ['prologue', 'procrastination', 'miya', 'ai', 'momo'];
+            var order = ['prologue', 'procrastination', 'anime_shorts', 'anime_comfort', 'anime_activities', 'anime_watchlist', 'anime_eva_01_07', 'anime_eva_09_16', 'anime_eva_17_24', 'anime_eva_25_end', 'anime_nausicaa', 'anime_key', 'anime_cicada', 'anime_gacha', 'anime_fandom', 'club', 'tower', 'bench', 'lonewar', 'miya', 'ai', 'momo'];
             var script = {};
             var api = { vn: vn, engine: engine, routeChoice: routeChoice, effectChoice: effectChoice };
             var i, arc, labels, key;
