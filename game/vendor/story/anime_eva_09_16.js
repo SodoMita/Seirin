@@ -1,4 +1,4 @@
-/* anime_eva_09_16 — Evangelion episodes 09-17, 02:31-05:08. Ren keeps the marathon alive: live reactions, side comments, guilt checks, questions with no clean answers. Not a synopsis. */
+/* anime_eva_09_16 — Evangelion episodes 09-17, 02:43-05:08. Ren keeps the marathon alive: live reactions, side comments, guilt checks, questions with no clean answers. Not a synopsis. */
 (function (root) {
     'use strict';
     var registry = root.SeirinStory = root.SeirinStory || { arcs: {}, register: function (name, factory) { this.arcs[name] = factory; } };
@@ -9,7 +9,7 @@
         var effectChoice = api.effectChoice;
         return {
             AnimeEva_Ep09: [
-                vn.goTo('Квартира: Ева 09 — Исрафил — 02:31'),
+                vn.goTo('Квартира: Ева 09 — Исрафил — 02:43'),
                 'show scene workshop with fadeIn duration 1s',
                 'p Ангел Исрафил делится на две части. Две. И если не убить обе одновременно, они срастутся обратно. Я смотрю на это и думаю: у меня тоже две части, и они тоже срастаются, если я не делаю с ними что-то одновременно. Одна говорит «собери контакт», вторая говорит «ещё одну серию». Сейчас побеждает вторая.',
                 'p Мисато придумывает танец. Буквально: чтобы Синдзи и Аска двигались синхронно, она заставляет их танцевать. В зале, с падениями, с криками. И это работает. Потому что синхронность — это не про «давай дружить». Это про ритм. Про счёт. Раз-два-три-четыре.',
