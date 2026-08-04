@@ -191,7 +191,9 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             AIEndingIsolation:     'ФИНАЛ · Тишина в аквариуме',
             MomoRoute:             'Рут Момо · Арена, чёрный вход',
             MomoEndingSong:        'ФИНАЛ · Голос живого города',
-            MomoEndingEncore:      'ФИНАЛ · Бис по контракту'
+            MomoEndingEncore:      'ФИНАЛ · Бис по контракту',
+            AnimeEva_EndSleep:     'ФИНАЛ · Спать с мыслями о Евангелионе',
+            AnimeEva_EndMechaArt:  'ФИНАЛ · Искусство про меху'
         };
 
         var ARCHIVE_CONTACTS = [
