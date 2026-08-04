@@ -61,6 +61,7 @@ test('all declared story jumps target real labels', () => {
         'Start',
         'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
         'Solo1LoopEnd', 'Solo1LateRunEnd', 'Solo1Radio', 'Solo1RadioEnd', 'Solo1RepairEnd',
+        'Solo2DriftEnd', 'Solo2MuteEnd', 'Solo2CallEnd',
         'Solo5BadEnd', 'Solo5Standoff',
         'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
@@ -131,6 +132,7 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
     const titlesBlock = source.slice(start, source.indexOf('};', start));
     ['Start', 'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
         'Solo1LoopEnd', 'Solo1LateRunEnd', 'Solo1Radio', 'Solo1RadioEnd', 'Solo1RepairEnd',
+        'Solo2DriftEnd', 'Solo2MuteEnd', 'Solo2CallEnd',
         'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
         'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore']
@@ -232,7 +234,7 @@ test('every route teaches with a micro-choice before its commitment beat', () =>
     // -> escalation into the route's commitment node. Pins order per route.
     const beats = [
         ['SoloRoute1: [', 'Water: effectChoice', 'CouchMarathon: routeChoice'],
-        ['SoloRoute2: [', 'ToastStatusQuo: effectChoice', 'vn.reversible({ procrastination: 10 })'],
+        ['SoloRoute2: [', 'ToastStatusQuo: effectChoice', 'DanceAway: routeChoice'],
         ['SoloRoute3: [', 'TaskPerfect: effectChoice', 'show character kurogane'],
         ['SoloRoute4: [', 'CheckSky: effectChoice', 'за монитором'],
         ['SoloRoute5: [', 'PrepCharges: effectChoice', 'NightStrike: effectChoice'],
