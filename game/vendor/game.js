@@ -34,8 +34,9 @@
                 akatomi_alert:       FS.schema.number({ int: true, min: 0 }).default(0),
                 location:            FS.schema.string().default('Тэцуба: Улица'),
                 /* Resource variables (minutes-of-day, yen, inventory) — carried
-                 * through saves, rollback-safe via vn.reversible. */
-                time:                FS.schema.number({ int: true, min: 0, max: 1440 }).default(780),
+                 * through saves, rollback-safe via vn.reversible.
+                 * Default 1260 = 21:00: the story night starts at 21:00. */
+                time:                FS.schema.number({ int: true, min: 0, max: 1440 }).default(1260),
                 money:               FS.schema.number({ int: true, min: 0 }).default(1000),
                 items:               FS.schema.record(FS.schema.number({ int: true, min: 0 })).default({}),
                 unlocked:            FS.schema.record(FS.schema.boolean()).default({})
@@ -151,6 +152,29 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         var vn;
         var STORAGE_SCHEMA = window.SeirinGameCore.buildStorageSchema(FS);
 
+        /* Procedural clock: minutes-of-day -> "HH:MM" (normalises over/underflow). */
+        function fmtHHMM (mins) {
+            var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
+            m = ((m % 1440) + 1440) % 1440;
+            var hh = Math.floor(m / 60);
+            var mm = m % 60;
+            return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+        }
+        /* `{{player.time_hhmm}}` in story text renders the CURRENT player.time
+         * formatted — narration timestamps derive from the variable, so they can
+         * never drift from what the HUD/state shows (regression: deltas were
+         * once treated as sets and the clock read 23:07 while the text said
+         * 21:07). Everything else still goes through the engine's own
+         * replaceVariables. */
+        var _engineReplaceVars = engine.replaceVariables.bind(engine);
+        engine.replaceVariables = function (text) {
+            if (typeof text === 'string' && text.indexOf('{{player.time_hhmm}}') !== -1) {
+                var pp = engine.storage('player') || {};
+                text = text.split('{{player.time_hhmm}}').join(fmtHHMM(pp.time));
+            }
+            return _engineReplaceVars(text);
+        };
+
         var ROUTE_LABELS = {
             none:   'Начало',
             solo_1: 'Соло I — Уединение',
@@ -253,11 +277,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 var v = p[key] || 0;
                 var shown = v;
                 if (key === 'akatomi_alert') { shown = v + '%'; }
-                else if (key === 'time') {
-                    var hh2 = Math.floor(v / 60) % 24;
-                    var mm2 = v % 60;
-                    shown = (hh2 < 10 ? '0' : '') + hh2 + ':' + (mm2 < 10 ? '0' : '') + mm2;
-                }
+                else if (key === 'time') { shown = fmtHHMM(v); }
                 else if (key === 'money') { shown = '¥' + v; }
                 else if (key === 'items') {
                     var total = 0, it2 = p.items || {};
@@ -371,14 +391,10 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
 
             var current = engine.state('label') || null;
             var p = engine.storage('player') || {};
-            var gTime = p.time || 0;
-            var gHH = Math.floor(gTime / 60) % 24;
-            var gMM = gTime % 60;
-            var gTimeText = (gHH < 10 ? '0' : '') + gHH + ':' + (gMM < 10 ? '0' : '') + gMM;
             html += '<div class="graph-stats">' +
                 '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-clock"></i>' + gTimeText + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-clock"></i>' + fmtHHMM(p.time) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-coins"></i>¥' + (p.money || 0) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
                 '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
@@ -596,11 +612,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
             set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
             /* Resource strip: time of day, money, item count. */
-            var mins = p.time || 0;
-            var hh = Math.floor(mins / 60) % 24;
-            var mm = mins % 60;
-            var timeText = (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
-            set('hud-time', 'fa-clock', timeText);
+            set('hud-time', 'fa-clock', fmtHHMM(p.time));
             set('hud-money', 'fa-coins', '¥' + (p.money || 0));
             var itemCount = 0;
             var it = p.items || {};
@@ -685,7 +697,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         engine.storage({
             player: { name: 'Рэн', route: 'none', procrastination: 0, philosophical_depth: 0,
                 miya_affinity: 0, momo_affinity: 0, ai_empathy: 0, akatomi_alert: 0,
-                location: 'Тэцуба: Улица', time: 780, money: 1000, items: {}, unlocked: {} },
+                location: 'Тэцуба: Улица', time: 1260, money: 1000, items: {}, unlocked: {} },
             flags: { met_miya: false, met_splash: false, met_stella: false, met_reika: false,
                 met_saya: false, met_lumina: false, met_kurogane: false, met_momo: false,
                 ritual_started: false, magic_rejected: false, happy_ending_achieved: false }

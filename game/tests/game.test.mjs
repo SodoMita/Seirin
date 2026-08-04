@@ -95,6 +95,27 @@ test('storage schema supplies complete, safe defaults', () => {
     assert.equal(checked.value.player.momo_affinity, 0);
     assert.equal(checked.value.flags.met_momo, false);
     assert.equal(checked.value.flags.happy_ending_achieved, false);
+    // Resource variables: the night starts at 21:00 (=1260 min), with ¥1000.
+    assert.equal(checked.value.player.time, 1260, 'default time must be 21:00');
+    assert.equal(checked.value.player.money, 1000);
+    assert.deepEqual(checked.value.player.items, {});
+    assert.deepEqual(checked.value.player.unlocked, {});
+});
+
+test('time is always SET, never delta-incremented (clock drift regression)', () => {
+    // Regression: vn.reversible({ time: 1267 }) is a DELTA, so the HUD clock
+    // read 23:07 while the text said 21:07 (13:00 + 13:00 + 21:07 mod 24).
+    // Every time write must use the structural set form; item writes must use
+    // the storage form so they accumulate instead of replacing the object.
+    const badTimeDelta = storySource.match(/vn\.reversible\(\{\s*time:/g) || [];
+    assert.equal(badTimeDelta.length, 0, 'bare { time: N } would delta-apply — use { set: { time: N } }');
+    assert.match(storySource, /vn\.reversible\(\{\s*set: \{ time: /, 'at least one set-form time write');
+    assert.doesNotMatch(storySource, /vn\.reversible\(\{[^}]*items: \{/, 'items must go through storage form to accumulate');
+    assert.match(storySource, /'player\.items\.[a-z_]+'\s*:\s*\{ mode: 'delta'/,
+        'item pickups must use storage deltas');
+    // HUD + narration derive from the same variable.
+    assert.match(source, /player\.time_hhmm/, 'procedural clock token must exist');
+    assert.match(source, /fmtHHMM/, 'format helper must exist');
 });
 
 test('all declared story jumps target real labels', () => {
