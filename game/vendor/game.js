@@ -32,7 +32,13 @@
                 momo_affinity:       FS.schema.number({ int: true, min: 0 }).default(0),
                 ai_empathy:          FS.schema.number({ int: true, min: 0 }).default(0),
                 akatomi_alert:       FS.schema.number({ int: true, min: 0 }).default(0),
-                location:            FS.schema.string().default('Тэцуба: Улица')
+                location:            FS.schema.string().default('Тэцуба: Улица'),
+                /* Resource variables (minutes-of-day, yen, inventory) — carried
+                 * through saves, rollback-safe via vn.reversible. */
+                time:                FS.schema.number({ int: true, min: 0, max: 1440 }).default(780),
+                money:               FS.schema.number({ int: true, min: 0 }).default(1000),
+                items:               FS.schema.record(FS.schema.number({ int: true, min: 0 })).default({}),
+                unlocked:            FS.schema.record(FS.schema.boolean()).default({})
             }),
             flags: FS.schema.object({
                 met_miya:              FS.schema.boolean().default(false),
@@ -221,7 +227,10 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             ['miya_affinity',       'Доверие Мии'],
             ['momo_affinity',       'Доверие Момо'],
             ['ai_empathy',          'Эмпатия ИИ'],
-            ['akatomi_alert',       'Тревога Акатоми']
+            ['akatomi_alert',       'Тревога Акатоми'],
+            ['time',                'Время дня'],
+            ['money',               'Деньги'],
+            ['items',               'Инвентарь']
         ];
 
         function routeLabel (id) {
@@ -242,8 +251,20 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             for (var i = 0; i < ARCHIVE_STATS.length; i++) {
                 var key = ARCHIVE_STATS[i][0];
                 var v = p[key] || 0;
-                html += '<div class="archives-row"><span>' + ARCHIVE_STATS[i][1] + '</span><b>' +
-                    (key === 'akatomi_alert' ? v + '%' : v) + '</b></div>';
+                var shown = v;
+                if (key === 'akatomi_alert') { shown = v + '%'; }
+                else if (key === 'time') {
+                    var hh2 = Math.floor(v / 60) % 24;
+                    var mm2 = v % 60;
+                    shown = (hh2 < 10 ? '0' : '') + hh2 + ':' + (mm2 < 10 ? '0' : '') + mm2;
+                }
+                else if (key === 'money') { shown = '¥' + v; }
+                else if (key === 'items') {
+                    var total = 0, it2 = p.items || {};
+                    for (var ik2 in it2) { if (Object.prototype.hasOwnProperty.call(it2, ik2)) { total += it2[ik2]; } }
+                    shown = total;
+                }
+                html += '<div class="archives-row"><span>' + ARCHIVE_STATS[i][1] + '</span><b>' + shown + '</b></div>';
             }
             html += '</div>';
             html += '<div class="archives-section"><h3>ПЕРСОНАЖИ</h3>';
@@ -350,9 +371,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
 
             var current = engine.state('label') || null;
             var p = engine.storage('player') || {};
+            var gTime = p.time || 0;
+            var gHH = Math.floor(gTime / 60) % 24;
+            var gMM = gTime % 60;
+            var gTimeText = (gHH < 10 ? '0' : '') + gHH + ':' + (gMM < 10 ? '0' : '') + gMM;
             html += '<div class="graph-stats">' +
                 '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-clock"></i>' + gTimeText + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-coins"></i>¥' + (p.money || 0) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
                 '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
                 '</div>';
@@ -568,6 +595,17 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-location', 'fa-map-marker-alt', p.location || 'Тэцуба: Улица');
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
             set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
+            /* Resource strip: time of day, money, item count. */
+            var mins = p.time || 0;
+            var hh = Math.floor(mins / 60) % 24;
+            var mm = mins % 60;
+            var timeText = (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+            set('hud-time', 'fa-clock', timeText);
+            set('hud-money', 'fa-coins', '¥' + (p.money || 0));
+            var itemCount = 0;
+            var it = p.items || {};
+            for (var ik in it) { if (Object.prototype.hasOwnProperty.call(it, ik)) { itemCount += it[ik]; } }
+            set('hud-items', 'fa-box-open', String(itemCount));
             var alertEl = document.getElementById('hud-alert-level');
             var level = p.akatomi_alert || 0;
             if (alertEl && lastAlertLevel !== null && level > lastAlertLevel && alertEl.classList) {
@@ -647,7 +685,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         engine.storage({
             player: { name: 'Рэн', route: 'none', procrastination: 0, philosophical_depth: 0,
                 miya_affinity: 0, momo_affinity: 0, ai_empathy: 0, akatomi_alert: 0,
-                location: 'Тэцуба: Улица' },
+                location: 'Тэцуба: Улица', time: 780, money: 1000, items: {}, unlocked: {} },
             flags: { met_miya: false, met_splash: false, met_stella: false, met_reika: false,
                 met_saya: false, met_lumina: false, met_kurogane: false, met_momo: false,
                 ritual_started: false, magic_rejected: false, happy_ending_achieved: false }

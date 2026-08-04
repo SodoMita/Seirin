@@ -19,7 +19,7 @@
         'fa-arrow-left', 'fa-cog', 'fa-comments', 'fa-eye', 'fa-eye-slash',
         'fa-fast-forward', 'fa-lock', 'fa-play-circle', 'fa-save', 'fa-sort',
         'fa-stop-circle', 'fa-times', 'fa-times-circle', 'fa-undo',
-        'fa-bolt', 'fa-book', 'fa-building', 'fa-check', 'fa-coins',
+        'fa-bolt', 'fa-book', 'fa-box-open', 'fa-building', 'fa-check', 'fa-clock', 'fa-coins',
         'fa-database', 'fa-exclamation-triangle', 'fa-hand-holding-heart',
         'fa-handshake', 'fa-map-marker-alt', 'fa-microchip', 'fa-network-wired',
         'fa-question', 'fa-shield-alt', 'fa-terminal', 'fa-user-secret',

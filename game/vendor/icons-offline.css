@@ -48,7 +48,9 @@
 .fa-bolt::before                { content: "\26A1"; }   /* ⚡ */
 .fa-book::before                { content: "\1F4D6"; }  /* 📖 */
 .fa-building::before            { content: "\1F3E2"; }  /* 🏢 */
+.fa-box-open::before            { content: "\1F4E6"; }  /* 📦 */
 .fa-check::before               { content: "\2714"; }   /* ✔ */
+.fa-clock::before               { content: "\1F552"; }  /* 🕒 */
 .fa-coins::before               { content: "\1FA99"; }  /* 🪙 */
 .fa-database::before            { content: "\1F5C4"; }  /* 🗄 */
 .fa-exclamation-triangle::before{ content: "\26A0"; }   /* ⚠ */
