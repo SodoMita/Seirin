@@ -98,6 +98,7 @@ test('storage schema supplies complete, safe defaults', () => {
     // Resource variables: the night starts at 21:00 (=1260 min), with ¥1000.
     assert.equal(checked.value.player.time, 1260, 'default time must be 21:00');
     assert.equal(checked.value.player.money, 1000);
+    assert.equal(checked.value.player.locale, 'ru-RU', 'default locale must be ru-RU');
     assert.deepEqual(checked.value.player.items, {});
     assert.deepEqual(checked.value.player.unlocked, {});
 });
@@ -126,6 +127,11 @@ test('time uses dedicated set/add primitives (clock drift regression)', () => {
     assert.match(storySource, /\{\{player\.date\}\}/, 'procedural date token must exist');
     // Post-midnight anchors are absolute (day 2 = +1440), never bare 0-1440.
     assert.ok(storySource.indexOf('setTime(1635)') > -1, 'descent anchor must be absolute 03:15 day 2');
+    // Date derives from absolute time: addTime rolls it (no separate variable).
+    assert.match(source, /Math\.floor\(m \/ 1440\)/, 'date must derive from absolute minutes');
+    // i18n: locale variable + Date.toLocaleString drive date formatting.
+    assert.match(source, /locale:.*ru-RU/, 'locale variable must ship with ru-RU default');
+    assert.match(source, /toLocaleString/, 'date formatting must use Date.toLocaleString');
     // Cyclic hub breaks by time: Solo1Hub routes to the final hour past 05:20.
     assert.match(storySource, /vn\.getTime\(\)/, 'hub gate must read the clock');
     assert.match(storySource, /1440 \+ 1440\) % 1440 >= 500/, 'hub gate must trip 500 min into the night (05:20)');
