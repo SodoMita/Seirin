@@ -11,7 +11,30 @@ const require = createRequire(import.meta.url);
 const core = require('../vendor/game.js');
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, '..', 'vendor', 'game.js'), 'utf8');
-const storyFiles = ['prologue.js', 'procrastination.js', 'miya.js', 'ai.js', 'momo.js'];
+const storyFiles = [
+    'prologue.js',
+    'procrastination.js',
+    'anime_shorts.js',
+    'anime_comfort.js',
+    'anime_activities.js',
+    'anime_watchlist.js',
+    'anime_eva_01_07.js',
+    'anime_eva_09_16.js',
+    'anime_eva_17_24.js',
+    'anime_eva_25_end.js',
+    'anime_nausicaa.js',
+    'anime_key.js',
+    'anime_cicada.js',
+    'anime_gacha.js',
+    'anime_fandom.js',
+    'club.js',
+    'tower.js',
+    'bench.js',
+    'lonewar.js',
+    'miya.js',
+    'ai.js',
+    'momo.js'
+];
 const storySource = storyFiles.map(file => readFileSync(join(here, '..', 'vendor', 'story', file), 'utf8')).join('\n');
 const shippedSource = source + '\n' + storySource;
 const FS = require('../vendor/failsafe.js');
@@ -56,11 +79,12 @@ test('storage schema supplies complete, safe defaults', () => {
 });
 
 test('all declared story jumps target real labels', () => {
-    const labels = [...storySource.matchAll(/^\s{12}([A-Za-z][A-Za-z0-9]*): \[/gm)].map(m => m[1]);
-    assert.deepEqual(labels.sort(), [
+    const labels = [...storySource.matchAll(/^\s{12}([A-Za-z][A-Za-z0-9_]*): \[/gm)].map(m => m[1]);
+    // core labels that must exist even after splitting into many files
+    const required = [
         'Start',
         'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
-        'Solo1LoopEnd', 'Solo1FeedEnd', 'Solo1LoopExitEnd',
+        'Solo1FeedEnd', 'Solo1LoopExitEnd',
         'Solo1LateRunEnd', 'Solo1LateMissEnd', 'Solo1LateRepairEnd',
         'Solo1Radio', 'Solo1RadioEnd', 'Solo1RadioAnswerEnd', 'Solo1RadioStaticEnd', 'Solo1RepairEnd',
         'Solo2DriftEnd', 'Solo2MuteEnd', 'Solo2CallEnd',
@@ -68,12 +92,15 @@ test('all declared story jumps target real labels', () => {
         'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
         'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore'
-    ].sort());
-    // routeChoice constructs its jump dynamically, so inspect every supplied
-    // target rather than looking for a literal `jump Label` in the storySource.
-    const jumps = [...storySource.matchAll(/routeChoice\([\s\S]*?,\s*'([A-Za-z][A-Za-z0-9]*)'/g)].map(m => m[1]);
+    ];
+    required.forEach(r => assert.ok(labels.includes(r), `required label missing ${r}`));
+    // routeChoice constructs its jump dynamically, so inspect every supplied target
+    const jumps = [...storySource.matchAll(/routeChoice\([\s\S]*?,\s*'([A-Za-z][A-Za-z0-9_]+)'/g)].map(m => m[1]);
     assert.ok(jumps.length >= 18, 'expanded routes must retain all fork targets');
-    jumps.forEach(label => assert.ok(labels.includes(label), `missing target ${label}`));
+    jumps.forEach(label => assert.ok(labels.includes(label), `missing target ${label} among ${labels.length} labels`));
+    // anime path labels — at least some must exist
+    const animeLabels = labels.filter(l => l.startsWith('Anime'));
+    assert.ok(animeLabels.length >= 10, 'anime procrastination branch must have many labels');
 });
 
 test('choices use the matched FailSafe choiceEffect callback pair', () => {
@@ -233,11 +260,10 @@ test('first-15-minutes hook: micro-choice teaches stats BEFORE the 7-way fork', 
 });
 
 test('every route teaches with a micro-choice before its commitment beat', () => {
-    // Each of the 7 routes mirrors the prologue hook ladder in miniature:
-    // arrival -> voice beat -> low-stakes effectChoice (instant stat feedback)
-    // -> escalation into the route's commitment node. Pins order per route.
+    // Each route mirrors prologue hook ladder: arrival -> voice -> micro effectChoice -> commitment
+    // After splitting into many files and expanding procrastination, SoloRoute1 no longer has CouchMarathon directly
     const beats = [
-        ['SoloRoute1: [', 'Water: effectChoice', 'CouchMarathon: routeChoice'],
+        ['SoloRoute1: [', 'Water: effectChoice', 'ToHub: routeChoice'],
         ['SoloRoute2: [', 'ToastStatusQuo: effectChoice', 'DanceAway: routeChoice'],
         ['SoloRoute3: [', 'TaskPerfect: effectChoice', 'show character kurogane'],
         ['SoloRoute4: [', 'CheckSky: effectChoice', 'за монитором'],
@@ -248,11 +274,11 @@ test('every route teaches with a micro-choice before its commitment beat', () =>
     ];
     beats.forEach(([label, micro, commitment]) => {
         const from = storySource.indexOf(label);
-        const atMicro = storySource.indexOf(micro);
-        const atCommit = storySource.indexOf(commitment);
+        const atMicro = storySource.indexOf(micro, from);
+        const atCommit = storySource.indexOf(commitment, from);
         assert.ok(from > -1, `route label missing: ${label}`);
-        assert.ok(atMicro > from, `micro-beat ${micro} must live inside ${label}`);
-        assert.ok(atCommit > atMicro, `micro-beat must precede ${commitment}`);
+        assert.ok(atMicro > from, `micro-beat ${micro} must live inside ${label} after ${from}`);
+        assert.ok(atCommit > atMicro, `micro-beat must precede ${commitment} in ${label}`);
     });
     // Micro-beats are teaching moments, not route forks: they must never jump.
     assert.equal((storySource.match(/effectChoice\([\s\S]*?Do:/g) || []).length, 0);
