@@ -516,6 +516,26 @@
 
         /* ---- Public primitives ------------------------------------------------ */
 
+        /* Rollback-safe time-of-day writes. player.time is minutes-of-day
+         * (0..1440); the night of one day starts at 21:00 (1260).
+         *   setTime(mins) — ABSOLUTE: replaces player.time (baselines, endings)
+         *   addTime(mins) — DELTA: adds to current player.time (progression —
+         *                   the default, so inserted beats shift times naturally)
+         *   getTime()     — current minutes-of-day (0 if unset/never touched)
+         * Both writes are reversible (Apply/Revert snapshots) like vn.reversible. */
+        function setTime (minutes) {
+            return reversible({ set: { time: minutes } });
+        }
+        function addTime (minutes) {
+            return reversible({ time: minutes });
+        }
+        function getTime () {
+            try {
+                var p = engine.storage('player') || {};
+                return (typeof p.time === 'number' && isFinite(p.time)) ? p.time : 0;
+            } catch (e) { return 0; }
+        }
+
         /* Rollback-safe Function action:
          *   vn.reversible({ creds: 100, hacking: 1 })                         // deltas on player
          *   vn.reversible({ stats: {...}, flags: { met_x: true }, location }) // full form
@@ -745,6 +765,9 @@
             choiceEffect: choiceEffect,
             goTo: goTo,
             branch: branch,
+            setTime: setTime,
+            addTime: addTime,
+            getTime: getTime,
             validateStorage: validateStorage,
             lintScript: lintScript
         };
