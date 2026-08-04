@@ -60,7 +60,9 @@ test('all declared story jumps target real labels', () => {
     assert.deepEqual(labels.sort(), [
         'Start',
         'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
-        'Solo1LoopEnd', 'Solo1LateRunEnd', 'Solo1Radio', 'Solo1RadioEnd', 'Solo1RepairEnd',
+        'Solo1LoopEnd', 'Solo1FeedEnd', 'Solo1LoopExitEnd',
+        'Solo1LateRunEnd', 'Solo1LateMissEnd', 'Solo1LateRepairEnd',
+        'Solo1Radio', 'Solo1RadioEnd', 'Solo1RadioAnswerEnd', 'Solo1RadioStaticEnd', 'Solo1RepairEnd',
         'Solo2DriftEnd', 'Solo2MuteEnd', 'Solo2CallEnd',
         'Solo5BadEnd', 'Solo5Standoff',
         'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
@@ -131,7 +133,9 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
     const start = source.indexOf('var LABEL_TITLES');
     const titlesBlock = source.slice(start, source.indexOf('};', start));
     ['Start', 'SoloRoute1', 'SoloRoute2', 'SoloRoute3', 'SoloRoute4', 'SoloRoute5',
-        'Solo1LoopEnd', 'Solo1LateRunEnd', 'Solo1Radio', 'Solo1RadioEnd', 'Solo1RepairEnd',
+        'Solo1LoopEnd', 'Solo1FeedEnd', 'Solo1LoopExitEnd',
+        'Solo1LateRunEnd', 'Solo1LateMissEnd', 'Solo1LateRepairEnd',
+        'Solo1Radio', 'Solo1RadioEnd', 'Solo1RadioAnswerEnd', 'Solo1RadioStaticEnd', 'Solo1RepairEnd',
         'Solo2DriftEnd', 'Solo2MuteEnd', 'Solo2CallEnd',
         'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
