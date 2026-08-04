@@ -200,6 +200,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             AnimeFandom_DescentHentai:  'Спуск · Хентай',
             AnimeFandom_DescentVN:      'Спуск · ВН и игры',
             AnimeFandom_DescentEroguro: 'Спуск · Эро-гуро',
+            AnimeFandom_DescentGap:     'Спуск · Провал памяти',
             AnimeFandom_DescentBattle:  'ФИНАЛ · Спуск ниже дна'
         };
 
