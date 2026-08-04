@@ -1,4 +1,4 @@
-/* anime_eva_01_07 — Evangelion episodes 01-07, 00:31-02:30. Ren watches the whole thing live, alone, talking to the screen like a streamer with no chat: reactions, half-thoughts, guilt checks at the Titan, questions nobody answers. Not a synopsis. */
+/* anime_eva_01_07 — Evangelion episodes 01-08, 00:31-02:40. Ren watches the whole thing live, alone, talking to the screen like a streamer with no chat: reactions, half-thoughts, guilt checks at the Titan, questions nobody answers. Not a synopsis. */
 (function (root) {
     'use strict';
     var registry = root.SeirinStory = root.SeirinStory || { arcs: {}, register: function (name, factory) { this.arcs[name] = factory; } };

@@ -193,7 +193,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             MomoEndingSong:        'ФИНАЛ · Голос живого города',
             MomoEndingEncore:      'ФИНАЛ · Бис по контракту',
             AnimeEva_EndSleep:     'ФИНАЛ · Спать с мыслями о Евангелионе',
-            AnimeEva_EndMechaArt:  'ФИНАЛ · Искусство про меху'
+            AnimeEva_EndMechaArt:  'ФИНАЛ · Искусство про меху',
+            AnimeFandom_DescentBattle: 'ФИНАЛ · Спуск ниже дна'
         };
 
         var ARCHIVE_CONTACTS = [
