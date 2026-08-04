@@ -169,6 +169,9 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             Solo1RadioEnd:          'ФИНАЛ · Чужая песня, своя пауза',
             Solo1RepairEnd:         'ФИНАЛ · Маленький ход',
             SoloRoute2:            'Соло II · Клуб «Null-Point»',
+            Solo2DriftEnd:          'ФИНАЛ · Танец на месте',
+            Solo2MuteEnd:           'ФИНАЛ · Минута тишины',
+            Solo2CallEnd:           'ФИНАЛ · Звонок до рассвета',
             SoloRoute3:            'Соло III · 84-й этаж',
             SoloRoute4:            'Соло IV · Скамейка и зеркало',
             SoloRoute5:            'Соло V · Додзё, подготовка',
@@ -646,7 +649,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.webp' } },
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.webp' } },
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
-            radio: { name: 'МОМО · РАДИОЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
+            radio: { name: 'РАДИО · ЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' }
         });
