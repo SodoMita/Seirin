@@ -194,7 +194,13 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             MomoEndingEncore:      'ФИНАЛ · Бис по контракту',
             AnimeEva_EndSleep:     'ФИНАЛ · Спать с мыслями о Евангелионе',
             AnimeEva_EndMechaArt:  'ФИНАЛ · Искусство про меху',
-            AnimeFandom_DescentBattle: 'ФИНАЛ · Спуск ниже дна'
+            AnimeFandom_DescentEcchi:   'Спуск · Этти',
+            AnimeFandom_DescentShorts:  'Спуск · Короткие видео',
+            AnimeFandom_DescentExit:    'Спуск · Переход с платформ',
+            AnimeFandom_DescentHentai:  'Спуск · Хентай',
+            AnimeFandom_DescentVN:      'Спуск · ВН и игры',
+            AnimeFandom_DescentEroguro: 'Спуск · Эро-гуро',
+            AnimeFandom_DescentBattle:  'ФИНАЛ · Спуск ниже дна'
         };
 
         var ARCHIVE_CONTACTS = [
