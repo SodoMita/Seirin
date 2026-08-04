@@ -33,10 +33,14 @@
                 ai_empathy:          FS.schema.number({ int: true, min: 0 }).default(0),
                 akatomi_alert:       FS.schema.number({ int: true, min: 0 }).default(0),
                 location:            FS.schema.string().default('Тэцуба: Улица'),
-                /* Resource variables (minutes-of-day, yen, inventory) — carried
-                 * through saves, rollback-safe via vn.reversible.
-                 * Default 1260 = 21:00: the story night starts at 21:00. */
-                time:                FS.schema.number({ int: true, min: 0, max: 1440 }).default(1260),
+                /* Resource variables (absolute minutes since 2026-07-15 00:00,
+                 * yen, inventory) — carried through saves, rollback-safe via
+                 * vn.reversible. time-of-day = time % 1440, date = 15 июля +
+                 * floor(time/1440). Default 1260 = 21:00, 15 июля: the story
+                 * night starts 21:00 on July 15. No 1440 cap: addTime may roll
+                 * into the next day — the date tracks it, so there is no
+                 * ambiguous "time loop". */
+                time:                FS.schema.number({ int: true, min: 0 }).default(1260),
                 money:               FS.schema.number({ int: true, min: 0 }).default(1000),
                 items:               FS.schema.record(FS.schema.number({ int: true, min: 0 })).default({}),
                 unlocked:            FS.schema.record(FS.schema.boolean()).default({})
@@ -160,17 +164,44 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var mm = m % 60;
             return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
         }
-        /* `{{player.time_hhmm}}` in story text renders the CURRENT player.time
-         * formatted — narration timestamps derive from the variable, so they can
-         * never drift from what the HUD/state shows (regression: deltas were
-         * once treated as sets and the clock read 23:07 while the text said
-         * 21:07). Everything else still goes through the engine's own
-         * replaceVariables. */
+        /* Date helpers: player.time is absolute minutes since 2026-07-15 00:00,
+         * so the date derives from it — adding time rolls the date naturally. */
+        var MONTHS_RU = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+            'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        function fmtDate (mins) {
+            var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
+            var d = new Date(Date.UTC(2026, 6, 15 + Math.floor(m / 1440)));
+            return d.getUTCDate() + ' ' + MONTHS_RU[d.getUTCMonth()];
+        }
+        function fmtDateShort (mins) {
+            var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
+            var d = new Date(Date.UTC(2026, 6, 15 + Math.floor(m / 1440)));
+            var day = d.getUTCDate();
+            var mon = d.getUTCMonth() + 1;
+            return (day < 10 ? '0' : '') + day + '.' + (mon < 10 ? '0' : '') + mon;
+        }
+        function fmtDateTime (mins) {
+            return fmtDate(mins) + ' · ' + fmtHHMM(mins);
+        }
+        /* `{{player.time_hhmm}}` / `{{player.date}}` / `{{player.date_time}}`
+         * in story text render the CURRENT player.time — narration timestamps
+         * derive from the variable, so they can never drift from what the
+         * HUD/state shows (regression: deltas were once treated as sets and the
+         * clock read 23:07 while the text said 21:07). Everything else still
+         * goes through the engine's own replaceVariables. */
         var _engineReplaceVars = engine.replaceVariables.bind(engine);
         engine.replaceVariables = function (text) {
-            if (typeof text === 'string' && text.indexOf('{{player.time_hhmm}}') !== -1) {
+            if (typeof text === 'string') {
                 var pp = engine.storage('player') || {};
-                text = text.split('{{player.time_hhmm}}').join(fmtHHMM(pp.time));
+                if (text.indexOf('{{player.time_hhmm}}') !== -1) {
+                    text = text.split('{{player.time_hhmm}}').join(fmtHHMM(pp.time));
+                }
+                if (text.indexOf('{{player.date}}') !== -1) {
+                    text = text.split('{{player.date}}').join(fmtDate(pp.time));
+                }
+                if (text.indexOf('{{player.date_time}}') !== -1) {
+                    text = text.split('{{player.date_time}}').join(fmtDateTime(pp.time));
+                }
             }
             return _engineReplaceVars(text);
         };
@@ -252,7 +283,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             ['momo_affinity',       'Доверие Момо'],
             ['ai_empathy',          'Эмпатия ИИ'],
             ['akatomi_alert',       'Тревога Акатоми'],
-            ['time',                'Время дня'],
+            ['time',                'Дата и время'],
             ['money',               'Деньги'],
             ['items',               'Инвентарь']
         ];
@@ -277,7 +308,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 var v = p[key] || 0;
                 var shown = v;
                 if (key === 'akatomi_alert') { shown = v + '%'; }
-                else if (key === 'time') { shown = fmtHHMM(v); }
+                else if (key === 'time') { shown = fmtDateTime(v); }
                 else if (key === 'money') { shown = '¥' + v; }
                 else if (key === 'items') {
                     var total = 0, it2 = p.items || {};
@@ -394,7 +425,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             html += '<div class="graph-stats">' +
                 '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-clock"></i>' + fmtHHMM(p.time) + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-calendar"></i>' + fmtDateShort(p.time) + ' ' + fmtHHMM(p.time) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-coins"></i>¥' + (p.money || 0) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
                 '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
@@ -611,7 +642,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-location', 'fa-map-marker-alt', p.location || 'Тэцуба: Улица');
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
             set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
-            /* Resource strip: time of day, money, item count. */
+            /* Resource strip: date, time of day, money, item count. */
+            set('hud-date', 'fa-calendar', fmtDate(p.time));
             set('hud-time', 'fa-clock', fmtHHMM(p.time));
             set('hud-money', 'fa-coins', '¥' + (p.money || 0));
             var itemCount = 0;
