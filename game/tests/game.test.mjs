@@ -132,6 +132,9 @@ test('time uses dedicated set/add primitives (clock drift regression)', () => {
     // i18n: locale variable + Date.toLocaleString drive date formatting.
     assert.match(source, /locale:.*ru-RU/, 'locale variable must ship with ru-RU default');
     assert.match(source, /toLocaleString/, 'date formatting must use Date.toLocaleString');
+    // Every narration time must derive from the variable: no hardcoded prefixes.
+    const hardcoded = [...storySource.matchAll(/'p \d{2}:\d{2}/g)];
+    assert.equal(hardcoded.length, 0, "no hardcoded 'p HH:MM' prefixes — all must be {{player.time_hhmm}}");
     // Cyclic hub breaks by time: Solo1Hub routes to the final hour past 05:20.
     assert.match(storySource, /vn\.getTime\(\)/, 'hub gate must read the clock');
     assert.match(storySource, /1440 \+ 1440\) % 1440 >= 500/, 'hub gate must trip 500 min into the night (05:20)');
