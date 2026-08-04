@@ -26,6 +26,10 @@
             player: FS.schema.object({
                 name:                FS.schema.string().default('Рэн'),
                 route:               FS.schema.string().default('none'),
+                /* Locale for i18n (date formatting via Date.toLocaleString).
+                 * Future language selection writes this; ru-RU is the default
+                 * and the only shipped locale for now. */
+                locale:              FS.schema.string().default('ru-RU'),
                 procrastination:     FS.schema.number({ int: true, min: 0 }).default(0),
                 philosophical_depth: FS.schema.number({ int: true, min: 0 }).default(0),
                 miya_affinity:       FS.schema.number({ int: true, min: 0 }).default(0),
@@ -164,21 +168,40 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var mm = m % 60;
             return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
         }
-        /* Date helpers: player.time is absolute minutes since 2026-07-15 00:00,
-         * so the date derives from it — adding time rolls the date naturally. */
-        var MONTHS_RU = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-            'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        /* Date helpers: player.time is ABSOLUTE minutes since 2026-07-15 00:00,
+         * so the date derives from it — addTime rolls the date automatically
+         * (date = 15 июля + floor(time/1440), no separate variable). Formatting
+         * is locale-aware via Date.prototype.toLocaleString; player.locale
+         * drives it (default 'ru-RU'; future i18n/language selection writes
+         * this variable and the whole UI follows). */
+        function playerLocale () {
+            try {
+                var p = engine.storage('player') || {};
+                return (typeof p.locale === 'string' && p.locale) ? p.locale : 'ru-RU';
+            } catch (e) { return 'ru-RU'; }
+        }
         function fmtDate (mins) {
             var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
             var d = new Date(Date.UTC(2026, 6, 15 + Math.floor(m / 1440)));
-            return d.getUTCDate() + ' ' + MONTHS_RU[d.getUTCMonth()];
+            try {
+                return d.toLocaleString(playerLocale(), { day: 'numeric', month: 'long', timeZone: 'UTC' });
+            } catch (e) {
+                // invalid locale tag or no ECMA-402: fall back to ru-RU manually
+                var MONTHS_RU = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                return d.getUTCDate() + ' ' + MONTHS_RU[d.getUTCMonth()];
+            }
         }
         function fmtDateShort (mins) {
             var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
             var d = new Date(Date.UTC(2026, 6, 15 + Math.floor(m / 1440)));
-            var day = d.getUTCDate();
-            var mon = d.getUTCMonth() + 1;
-            return (day < 10 ? '0' : '') + day + '.' + (mon < 10 ? '0' : '') + mon;
+            try {
+                return d.toLocaleString(playerLocale(), { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+            } catch (e) {
+                var day = d.getUTCDate();
+                var mon = d.getUTCMonth() + 1;
+                return (day < 10 ? '0' : '') + day + '.' + (mon < 10 ? '0' : '') + mon;
+            }
         }
         function fmtDateTime (mins) {
             return fmtDate(mins) + ' · ' + fmtHHMM(mins);
@@ -727,7 +750,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         engine.preferences({ 'TextSpeed': 30, 'AutoPlaySpeed': 5,
             'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 } });
         engine.storage({
-            player: { name: 'Рэн', route: 'none', procrastination: 0, philosophical_depth: 0,
+            player: { name: 'Рэн', route: 'none', locale: 'ru-RU', procrastination: 0, philosophical_depth: 0,
                 miya_affinity: 0, momo_affinity: 0, ai_empathy: 0, akatomi_alert: 0,
                 location: 'Тэцуба: Улица', time: 1260, money: 1000, items: {}, unlocked: {} },
             flags: { met_miya: false, met_splash: false, met_stella: false, met_reika: false,
