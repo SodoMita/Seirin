@@ -516,12 +516,16 @@
 
         /* ---- Public primitives ------------------------------------------------ */
 
-        /* Rollback-safe time-of-day writes. player.time is minutes-of-day
-         * (0..1440); the night of one day starts at 21:00 (1260).
+        /* Rollback-safe time-of-day writes. player.time is ABSOLUTE minutes
+         * since the story epoch 2026-07-15 00:00; time-of-day = time % 1440,
+         * date = 15 июля + floor(time/1440). The night of one day starts at
+         * 21:00 (1260). Because the value is absolute, addTime may safely roll
+         * past midnight into the next day — the derived date tracks it, so
+         * there is no ambiguous day/loop state.
          *   setTime(mins) — ABSOLUTE: replaces player.time (baselines, endings)
          *   addTime(mins) — DELTA: adds to current player.time (progression —
          *                   the default, so inserted beats shift times naturally)
-         *   getTime()     — current minutes-of-day (0 if unset/never touched)
+         *   getTime()     — current absolute minutes (0 if unset/never touched)
          * Both writes are reversible (Apply/Revert snapshots) like vn.reversible. */
         function setTime (minutes) {
             return reversible({ set: { time: minutes } });

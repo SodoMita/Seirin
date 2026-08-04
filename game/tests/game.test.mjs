@@ -120,6 +120,12 @@ test('time uses dedicated set/add primitives (clock drift regression)', () => {
     // HUD + narration derive from the same variable.
     assert.match(source, /player\.time_hhmm/, 'procedural clock token must exist');
     assert.match(source, /fmtHHMM/, 'format helper must exist');
+    // Date derives from absolute time: 15 июля + floor(time/1440).
+    assert.match(source, /fmtDateTime/, 'date-time helper must exist');
+    assert.match(storySource, /\{\{player\.date_time\}\}/, 'procedural date+time token must exist');
+    assert.match(storySource, /\{\{player\.date\}\}/, 'procedural date token must exist');
+    // Post-midnight anchors are absolute (day 2 = +1440), never bare 0-1440.
+    assert.ok(storySource.indexOf('setTime(1635)') > -1, 'descent anchor must be absolute 03:15 day 2');
     // Cyclic hub breaks by time: Solo1Hub routes to the final hour past 05:20.
     assert.match(storySource, /vn\.getTime\(\)/, 'hub gate must read the clock');
     assert.match(storySource, /1440 \+ 1440\) % 1440 >= 500/, 'hub gate must trip 500 min into the night (05:20)');

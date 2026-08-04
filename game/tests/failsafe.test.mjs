@@ -235,6 +235,15 @@ test('vn.setTime/addTime/getTime: absolute vs delta, both rollback-safe', () => 
     const bare = fakeEngine();
     const vn2 = FS.vn(bare, { silent: true });
     assert.equal(vn2.getTime(), 0);
+    // addTime may roll past midnight: time is absolute minutes since the
+    // story epoch, the date derives from it (day = time / 1440), so adding
+    // across 00:00 is safe and unambiguous.
+    e.storage('player').time = 1435; // 23:55, 15 июля
+    const cross = vn.addTime(10);
+    cross.Function.Apply.call({});
+    assert.equal(vn.getTime(), 1445); // 00:05, 16 июля
+    cross.Function.Revert.call({});
+    assert.equal(vn.getTime(), 1435);
 });
 
 test('vn.choiceEffect: onChosen/onRevert pair restores prior state', () => {
