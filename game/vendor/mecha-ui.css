@@ -1080,7 +1080,7 @@ main-screen {
   background:
     linear-gradient(0deg, rgba(251, 191, 36, 0.05) 0 2px, transparent 2px 46px),
     linear-gradient(rgba(8, 10, 18, 0.82), rgba(6, 8, 14, 0.96)),
-    url('../assets/scenes/courtyard.png?v=20260728r11') center/cover no-repeat !important;
+    url('../assets/scenes/courtyard.webp?v=20260804r1') center/cover no-repeat !important;
   animation: none;
 }
 /* [data-screen].active is what the engine toggles (monogatari.css:
