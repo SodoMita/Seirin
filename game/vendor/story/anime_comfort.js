@@ -11,7 +11,8 @@
             AnimeComfort_Start: [
                 vn.goTo('Квартира: Аниме-вечер — старт — 22:29'),
                 'show scene workshop with fadeIn duration 1s',
-                vn.reversible({ set: { time: 1349 }, money: -40, storage: { 'player.items.ramen': { mode: 'delta', value: 1 }, 'player.items.tea': { mode: 'delta', value: 1 } } }),
+                vn.addTime(2),
+                vn.reversible({ money: -40, storage: { 'player.items.ramen': { mode: 'delta', value: 1 }, 'player.items.tea': { mode: 'delta', value: 1 } } }),
                 'p {{player.time_hhmm}} одного дня. Видео началось с простого: «Если хочется кайфануть — сделай японские снеки». И я вдруг понял, что у меня есть рис, нори, яйцо.',
                 'p Автор в видео не говорит «собери Титан». Он говорит: «Сделай онигири». Это звучит выполнимо. И я иду на кухню — впервые за вечер не чтобы отложить, а чтобы сделать, но не то.',
                 'p 22:34. Кухня. Варю рис. Рис — как пайка, только мягче. Леплю треугольник, руками, которые должны были держать отвёртку. Получается криво, но съедобно.',

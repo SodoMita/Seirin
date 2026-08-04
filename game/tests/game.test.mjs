@@ -102,20 +102,28 @@ test('storage schema supplies complete, safe defaults', () => {
     assert.deepEqual(checked.value.player.unlocked, {});
 });
 
-test('time is always SET, never delta-incremented (clock drift regression)', () => {
+test('time uses dedicated set/add primitives (clock drift regression)', () => {
     // Regression: vn.reversible({ time: 1267 }) is a DELTA, so the HUD clock
     // read 23:07 while the text said 21:07 (13:00 + 13:00 + 21:07 mod 24).
-    // Every time write must use the structural set form; item writes must use
-    // the storage form so they accumulate instead of replacing the object.
+    // Time writes now go through vn.setTime (absolute: baselines/endings) and
+    // vn.addTime (delta: progression — the default), never a bare reversible
+    // time delta. Item writes use storage deltas so they accumulate.
     const badTimeDelta = storySource.match(/vn\.reversible\(\{\s*time:/g) || [];
-    assert.equal(badTimeDelta.length, 0, 'bare { time: N } would delta-apply — use { set: { time: N } }');
-    assert.match(storySource, /vn\.reversible\(\{\s*set: \{ time: /, 'at least one set-form time write');
+    assert.equal(badTimeDelta.length, 0, 'bare { time: N } would delta-apply — use vn.addTime/vn.setTime');
+    assert.match(storySource, /vn\.setTime\(/, 'vn.setTime must be used for baselines/endings');
+    assert.match(storySource, /vn\.addTime\(/, 'vn.addTime must be used for progression');
+    assert.ok((storySource.match(/vn\.addTime\(/g) || []).length > (storySource.match(/vn\.setTime\(/g) || []).length,
+        'addTime should be the more common time write');
     assert.doesNotMatch(storySource, /vn\.reversible\(\{[^}]*items: \{/, 'items must go through storage form to accumulate');
     assert.match(storySource, /'player\.items\.[a-z_]+'\s*:\s*\{ mode: 'delta'/,
         'item pickups must use storage deltas');
     // HUD + narration derive from the same variable.
     assert.match(source, /player\.time_hhmm/, 'procedural clock token must exist');
     assert.match(source, /fmtHHMM/, 'format helper must exist');
+    // Cyclic hub breaks by time: Solo1Hub routes to the final hour past 05:20.
+    assert.match(storySource, /vn\.getTime\(\)/, 'hub gate must read the clock');
+    assert.match(storySource, /1440 \+ 1440\) % 1440 >= 500/, 'hub gate must trip 500 min into the night (05:20)');
+    assert.match(storySource, /'jump Solo1Final_Hour'/, 'hub gate must lead to the final hour');
 });
 
 test('all declared story jumps target real labels', () => {
