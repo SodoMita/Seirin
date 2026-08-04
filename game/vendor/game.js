@@ -163,6 +163,11 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         var LABEL_TITLES = {
             Start:                 'Пролог · Развилка трёх улиц',
             SoloRoute1:            'Соло I · Закрытые жалюзи',
+            Solo1LoopEnd:           'ФИНАЛ · Лента до следующей версии',
+            Solo1LateRunEnd:        'ФИНАЛ · Поздний старт',
+            Solo1Radio:             'Соло I · Частота 103.7',
+            Solo1RadioEnd:          'ФИНАЛ · Чужая песня, своя пауза',
+            Solo1RepairEnd:         'ФИНАЛ · Маленький ход',
             SoloRoute2:            'Соло II · Клуб «Null-Point»',
             SoloRoute3:            'Соло III · 84-й этаж',
             SoloRoute4:            'Соло IV · Скамейка и зеркало',
@@ -641,6 +646,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.webp' } },
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.webp' } },
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
+            radio: { name: 'МОМО · РАДИОЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' }
         });
@@ -660,309 +666,30 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             return { Text: text, Do: vn.reversible(effectSpec) };
         }
 
-        engine.script({
-            Start: [
-                vn.goTo('Тэцуба: Улица'),
-                'show scene courtyard with fadeIn duration 1s',
-                'sys <span class="t-cyan">[ СЭЙРИН: НОЧНАЯ СМЕНА — РЕЗОНАНС 2030 ]</span>',
-                'p Дворник подметает свой метр асфальта у выхода на улочку. Как вчера. Как десять лет назад.',
-                'p Мы никогда не разговаривали. Но он ловит мой взгляд и коротко кивает — как старому знакомому. В этом городе присутствие друг друга ещё не обесценили новости.',
-                'p «Стриж» остался под аркой — двигатель ещё тёплый, характер уже тяжёлый. Завтра Рейка гоняет меня в учебном куполе «Титана-04» до вечера: восемнадцать метров гидравлики не прощают сонного пилота.',
-                'miya Эй! Рэн-и-и! Смотреть вверх разрешено бесплатно!',
-                'show character miya normal at left with fadeIn',
-                'miya Ты опять тарахтел своим мотоциклом на весь двор! Дворник передал: «Пусть стрижи летают, а не тарахтят». А ещё — ты идёшь гулять без волшебной палочки! Стоять. Назначаю тебя хранителем обрядового мела.',
-                'p Хранителем мела — у мага с пятилетним стажем спасательных операций? Доверяю.',
-                'miya Рэн, а ты веришь в магию? Отвечай честно — это важно.',
-                { Choice: { Dialog: 'Мия смотрит с третьего этажа очень серьёзно:',
-                    Believe: effectChoice('Верю. Без магии вообще никак.', { miya_affinity: 2 }),
-                    Skeptic: effectChoice('Верю в физику. Но мел пригодится.', { philosophical_depth: 2 }),
-                    Meta: effectChoice('Я верю в статистику выбора.', { philosophical_depth: 2, miya_affinity: 1 })
-                } },
-                'miya Ответ принят и занесён в гримуар. И ещё! Если дворник закончит раньше, чем часы на храме пробьют восемь, — день начнётся заново.',
-                'p В витрине радиолавки ведущая новостей улыбается чуть дольше, чем вообще умеют улыбаться люди. А уличный киоск зациклил одну и ту же строчку песни Момо Хосизоры — третий круг подряд.',
-                vn.reversible({ akatomi_alert: 3 }),
-                'sys <span class="t-red">[ ГОРОДСКАЯ НОТА ]</span> Решётка Резонанса: тест нагрузки 12%. Город ещё не заметил. Ты — заметил.',
-                'sys <span class="t-cyan">[ НОЧНАЯ СМЕНА ]</span> До рассвета — одна попытка. Выбор маршрута её запускает.',
-                { Choice: { Dialog: 'Развилка трёх улиц: порт, арена, чайный квартал, дом. Куда направиться?',
-                    Home: routeChoice('Вернуться домой, запереть дверь и прокрастинировать в одиночестве', 'SoloRoute1',
-                        { set: { route: 'solo_1' }, procrastination: 5 }),
-                    Bar: routeChoice('Пойти в портовый клуб «Null-Point» к разочарованной молодёжи', 'SoloRoute2',
-                        { set: { route: 'solo_2' }, procrastination: 3 }),
-                    Freelance: routeChoice('Взять высокооплачиваемый корпоративный фриланс от Акатоми', 'SoloRoute3',
-                        { set: { route: 'solo_3' } }),
-                    Philosophy: routeChoice('Сесть на скамейку и задуматься о природе реальности', 'SoloRoute4',
-                        { set: { route: 'solo_4' }, philosophical_depth: 10 }),
-                    LoneFighter: routeChoice('Пойти войной на корпорацию совершенно одному', 'SoloRoute5',
-                        { set: { route: 'solo_5' }, akatomi_alert: 10 }),
-                    Miya: routeChoice('Подняться к Мии и принять участие в её магических ритуалах', 'MiyaRoute',
-                        { set: { route: 'miya' }, miya_affinity: 5, flags: { met_miya: true, ritual_started: true } }),
-                    AI: routeChoice('Спуститься в доки Aquaforge — к мягкому роботу Сплеш и ИИ Стелле', 'AIRoute',
-                        { set: { route: 'ai' }, ai_empathy: 5, flags: { met_splash: true, met_stella: true } }),
-                    Momo: routeChoice('Прикатить на «Стриже» к арене — к голосу, который город слышит по контракту', 'MomoRoute',
-                        { set: { route: 'momo' }, momo_affinity: 5, flags: { met_momo: true } })
-                } }
-            ],
-            SoloRoute1: [
-                vn.goTo('Квартира: Комната'),
-                'hide character miya with fadeOut',
-                'show scene workshop with fadeIn duration 1s',
-                'p Дома. Два оборота замка, щёлк щеколды, жалюзи вниз. Комната гаснет ровно наполовину — как аквариум, где я сам себе рыба.',
-                'p На столе — разобранный накопитель «Титана-04» и связка ключей от «Стрижа». Рейка велела собрать к понедельнику. Понедельник далеко. Диван близко.',
-                { Choice: { Dialog: 'Идеальный вечер ничегонеделания начинается с…',
-                    CouchMarathon: effectChoice('Марафона смешных роликов до утра', { procrastination: 5 }),
-                    CouchNap: effectChoice('Маленького сна «буквально на пять минут»', { procrastination: 3 }),
-                    CouchBench: effectChoice('Взгляда на детали «Титана». Соберу… завтра', { procrastination: 2, philosophical_depth: 1 })
-                } },
-                'p Часы стираются. Лента сама подсовывает следующее видео, ещё одно, ещё. Кто решает, что мне показать?.. Ладно. Какая разница.',
-                'p Телефон пискнул и умер. Значок сети сменился фиолетовым кругом с волной. За стеной соседи смотрят то же самое: сквозь стены улыбаются дикторы.',
-                vn.reversible({ akatomi_alert: 15 }),
-                'show character momo normal at center with fadeIn',
-                'momo «…и пусть наша песня согласия звучит из каждого окна!» — голос Момо Хосизоры льётся из каждого динамика города.',
-                'p Дикторы улыбались слишком широко. Город сдался без единого выстрела. Я выключил экран, перевернулся к стене и закрыл глаза.',
-                'sys <span class="t-red">[ ТИХОЕ ПОРАЖЕНИЕ ]</span> Решётка Резонанса активирована без боя.',
-                'end'
-            ],
-            SoloRoute2: [
-                vn.goTo('Тэцуба: клуб «Null-Point»'),
-                'hide character miya with fadeOut',
-                'show scene port with fadeIn duration 1s',
-                'p В «Нулл-Пойнте» под ржавыми сводами порта никогда не бывает солнца. Бас продавливается сквозь подошвы, а вместо рассвета здесь неон.',
-                'p «Стрижа» приткнул между двумя патрульными скутерами. Пусть стражи порядка посторожат его заодно — общественная нагрузка.',
-                'show character kaito normal at left with fadeIn',
-                'kaito Ого! Пилот «Титана» собственной персоной спустился в трюм. Рейка знает, что её лучший курсант сегодня с нами, а не в куполе?',
-                'kaito Садись. Здесь все свои. Вернее — все ничьи. Это даже надёжнее.',
-                { Choice: { Dialog: 'Кайто поднимает мутный стакан: «За что пьём, механик?»',
-                    ToastStatusQuo: effectChoice('«За то, чтобы всё осталось как есть»', { procrastination: 3 }),
-                    ToastFallen: effectChoice('«За тех, кто сегодня не пришёл»', { philosophical_depth: 2 }),
-                    ToastVolume: effectChoice('«За громкость. Только за громкость!»', { procrastination: 2 })
-                } },
-                'kaito Да какая разница, кто нами управляет?! Главное — чтобы стимуляторы были дешёвыми, а музыка громкой!',
-                vn.reversible({ akatomi_alert: 2 }),
-                'sys <span class="t-red">[ ГОРОДСКАЯ НОТА ]</span> Решётка Резонанса: тест нагрузки 27%. Бас в клубе вздрагивает точно в такт. Никто не заметил. Ты — заметил.',
-                vn.reversible({ procrastination: 10 }),
-                'p Месяцы слились в шум, головную боль и звон в ушах. Когда за клубом пришли патрули Акатоми, никто из нас даже не смог встать со скамеек.',
-                'sys <span class="t-red">[ ТРАГИЧЕСКИЙ ФИНАЛ ]</span> Маршрут: клуб → грузовик → Шельф-4.',
-                'end'
-            ],
-            SoloRoute3: [
-                vn.goTo('Башня Акатоми: 84 этаж'),
-                'hide character miya with fadeOut',
-                'show scene tsukimachi with fadeIn duration 1s',
-                'p Лифт башни Акатоми несёт меня мимо этажей, куда мой гостьевой бейдж не пропустит никогда. В кабине пахнет озоном и чужими амбициями.',
-                'p Контракт в конверте — сразу два места: клавиатура драйвера подачи инфразвука… и курсантский купол нового «Опекуна-9» в ангаре минус второго этажа. Восемь тысяч кредитов в неделю. Рот здесь открывают только за обедом.',
-                { Choice: { Dialog: 'Как пройдёт твоя первая неделя в башне?',
-                    TaskPerfect: effectChoice('Оптимизировать драйвер до блеска — премия важнее', { akatomi_alert: 3 }),
-                    TaskQuestions: effectChoice('Спросить наставника, зачем городу инфразвук', { philosophical_depth: 2, akatomi_alert: 5 }),
-                    TaskLogger: effectChoice('Вшить в код тихий журнал всех команд', { philosophical_depth: 3 })
-                } },
-                'p Мой код был безупречен. Подача стала мягче, покрытие — ровнее, улыбки дикторов внизу — длиннее. Квартальный бонус пришёл раньше срока.',
-                vn.reversible({ flags: { met_kurogane: true } }),
-                'show character kurogane normal at center with fadeIn',
-                'kurogane Отличная работа, молодой человек! Посмотрите вниз: все слушают нашу музыку и не задают вопросов. Вы богаты, успешны и защищены. А «Опекун» под вашими руками — самый изящный жест в моём арсенале.',
-                'p Миллионы на счетах, панорамный купол с видом на океан… и застывший город внизу, где люди ходят, как марионетки. Я выиграл право летать — в клетке, которую собрал собственными руками.',
-                'sys <span class="t-red">[ ЗОЛОТАЯ КЛЕТКА ]</span> Личный успех. Глобальный результат — тот же, что и при прокрастинации.',
-                'end'
-            ],
-            SoloRoute4: [
-                vn.goTo('Абстрактная Пустота'),
-                'hide character miya with fadeOut',
-                'p Я сел на старую скамейку на развилке и посмотрел на небо. Текстуры слишком точные. Откуда-то из-за пределов слышен стук клавиш.',
-                { Choice: { Dialog: 'Проверка реальности начинается с…',
-                    CheckSky: effectChoice('Неба: облака повторяются каждые сорок секунд', { philosophical_depth: 2 }),
-                    CheckMemory: effectChoice('Памяти: вчера подозрительно похоже на сегодня', { philosophical_depth: 3 }),
-                    CheckMiya: effectChoice('Мысленного звонка Мие — вдруг магия правда есть', { philosophical_depth: 1, miya_affinity: 1 })
-                } },
-                'p Паттерны сходятся. Мир подогнан идеально — но до целого не хватает ровно одного наблюдателя.',
-                'p Эй, ты — за монитором. Я видел переменные нашего мира: procrastination, akatomi_alert, miya_affinity, momo_affinity. Наша боль — это integer в памяти браузера.',
-                'p Я делаю шаг за пределы строки текста. Прощай.',
-                'sys <span class="t-violet">[ ВЫХОД ЗА ПРЕДЕЛЫ СЦЕНАРИЯ ]</span> Слом 4-й стены выполнен.',
-                'end'
-            ],
-            SoloRoute5: [
-                vn.goTo('Тэцуба: заброшенный додзё'),
-                'hide character miya with fadeOut',
-                'show scene dojo with fadeIn duration 1s',
-                'p Никто не пойдёт со мной — и не надо. Паяльник, самодельный ЭМИ-заряд, схема девятой подстанции. Я справлюсь один.',
-                'p В старом додзё пахнет татами и озоном. Когда-то здесь учили падать. Сегодня я учусь не попадаться.',
-                'p «Титана» не взять: ангар на тройном замке, а Рейке снится каждый мой вдох в куполе. Сегодня моя броня — рюкзак, паяльник и тормозной парашют от «Стрижа».',
-                { Choice: { Dialog: 'Последняя проверка снаряжения. Что важнее?',
-                    PrepCharges: effectChoice('Тройной запас ЭМИ-зарядов', { akatomi_alert: 2 }),
-                    PrepSchedule: effectChoice('Ещё раз сверить расписание патрулей', { philosophical_depth: 2 }),
-                    PrepWrench: effectChoice('Разводной ключ из дока Рейки — талисман', { philosophical_depth: 1 })
-                } },
-                { Choice: { Dialog: 'Как действовать?',
-                    NightStrike: effectChoice('Ударить по подстанции 09 уже этой ночью',
-                        { akatomi_alert: 30 }),
-                    Observe: effectChoice('Неделю изучать графики патрулей и релейных узлов',
-                        { akatomi_alert: 5, procrastination: 2 })
-                } },
-                vn.branch(function () {
-                    return (engine.storage('player').akatomi_alert || 0) >= 30;
-                }, {
-                    True: 'jump Solo5BadEnd',
-                    False: 'jump Solo5Standoff'
-                })
-            ],
-            Solo5BadEnd: [
-                vn.goTo('Подстанция 09'),
-                'p Ночью я пошёл на прорыв. Турели «Опекун-9» уже ждали — мой маршрут был просчитан за сутки до меня.',
-                'sys <span class="t-red">[ ЛОВУШКА №1: ЗАХВАЧЕН ]</span> Одиночная война против системы — не геройство, а ошибка. Маршрут: подстанция → грузовик → Шельф-4.',
-                'end'
-            ],
-            Solo5Standoff: [
-                vn.goTo('Подстанция 09'),
-                'p Неделя наблюдений дала мне двадцать три минуты слепой зоны. Я вывел из строя один релейный узел и ушёл до прихода патрулей.',
-                'p Один узел из двухсот. Гул Резонанса над городом не стал тише ни на децибел. Один — не армия. Но я уже не смогу остановиться.',
-                'sys <span class="t-violet">[ НИЧЬЯ ]</span> Без союзников победа невозможна; борьба продолжается.',
-                'end'
-            ],
-            MiyaRoute: [
-                vn.goTo('Цукимати: Комната Мии'),
-                'show scene miya_room with fadeIn duration 1s',
-                'show character miya normal at center with fadeIn',
-                'miya Смотри! Я нарисовала Большой Круг Очищения! Сегодня, когда луна встанет над собором, мы проведём Великий Обряд Дружбы!',
-                'p В комнате Мии резистор — это зуб дракона, оптоволокно — нить судьбы, а старый аккумулятор — спящий голем. Магии в Сэйрине нет. Но каталог у магии здесь свой.',
-                { Choice: { Dialog: 'Мия ждёт вклад хранителя мела в Большой Круг:',
-                    ArtWire: effectChoice('Моток медной проволоки — «нити судьбы»', { miya_affinity: 2 }),
-                    ArtLed: effectChoice('Старый светодиод — «светлячок-хранитель»', { miya_affinity: 1, ai_empathy: 1 }),
-                    ArtHonesty: effectChoice('Честно: это просто резистор. Но зуб тоже', { miya_affinity: 1, philosophical_depth: 2 })
-                } },
-                'miya Принято! Артефакт усилен на плюс сто процентов. Взрослые в нашем городе обязаны слушать магию… но делают вид, что заняты.',
-                'miya И смотри в окно: жёлтые жуки Курогане меряют парк рулетками. Они хотят стереть мою площадку! Поэтому Обряд — сегодня. Точно-точно.',
-                vn.reversible({ flags: { met_reika: true, met_saya: true } }),
-                'show character reika normal at left with fadeIn',
-                'reika Я командую тяжёлой спасательной рамой «Титан-04», а сижу на игрушечном стуле… Но если мои пилоты узнают — засмеют в сухом доке!',
-                'reika И, Рэн. Завтра, 06:00 — тренировка в куполе. Не появишься — найду тебя даже за четвёртой стеной.',
-                'show character saya normal at right with fadeIn',
-                'saya Не бунтуй, Рейка. Мия одной «магической игрой» соединила наши лаборатории и ваши мастерские крепче любого контракта.',
-                { Choice: { Dialog: 'Мия протягивает тебе кусок мела:',
-                    Embrace: routeChoice('Посыпать круг мелом по всем правилам Обряда', 'MiyaEndingHarmony',
-                        { miya_affinity: 5 }),
-                    Reject: routeChoice('Мягко отказаться от магии и защитить парк по-взрослому', 'MiyaEndingGuardian',
-                        { flags: { magic_rejected: true } })
-                } }
-            ],
-            MiyaEndingHarmony: [
-                vn.goTo('Цукимати: двор собора'),
-                'show scene cathedral with fadeIn duration 1s',
-                vn.reversible({ flags: { met_kurogane: true, happy_ending_achieved: true } }),
-                'show character kurogane normal at center with fadeIn',
-                'kurogane Что здесь происходит?! Почему бульдозеры не сносят квартал под новый офис?!',
-                'reika Потому что территория под совместной защитой Iron Requiem и Aquaforge, Курогане-сан. Пакт подписан час назад.',
-                'saya Пресса ведёт прямую трансляцию. Примените силу — и акционеры банкротят вас за час.',
-                'miya Видишь?! Я же говорила, что моё заклинание сработает! Магия есть!',
-                'sys <span class="t-cyan">[ СЧАСТЛИВЫЙ ФИНАЛ МИИ — ГАРМОНИЯ ФРАКЦИЙ ]</span> Парк спасён сообща.',
-                'end'
-            ],
-            MiyaEndingGuardian: [
-                vn.goTo('Цукимати: двор собора'),
-                'show scene cathedral with fadeIn duration 1s',
-                'miya Ты не веришь в мою магию…',
-                'p Я верю в тебя. Поэтому парк защитим по-взрослому: петиция, адвокат Рейки и протокол с печатью.',
-                'reika Адвокат уже в пути. Iron Requiem не бросает ни пилотов, ни детские площадки.',
-                vn.reversible({ flags: { happy_ending_achieved: true } }),
-                'p Настоящего чуда не случилось. Но способность людей дружить и защищать слабых — оказалась самой настоящей магией.',
-                'sys <span class="t-cyan">[ ФИНАЛ МИИ: ХРАНИТЕЛЬ БЕЗ МАГИИ ]</span> Парк спасён по-взрослому.',
-                'end'
-            ],
-            AIRoute: [
-                vn.goTo('Aquaforge: Доки'),
-                'hide character miya with fadeOut',
-                'show scene port with fadeIn duration 1s',
-                vn.reversible({ flags: { met_saya: true } }),
-                'show character saya normal at center with fadeIn',
-                'saya Знакомься: жилой модуль доков. А под нами — испытательный бассейн, где живёт наша гордость.',
-                'p По лестнице вниз Сая кивает на пустые крепления в потолке: световая сеть Стеллы. «Репетирует рассветную симфонию. Акатоми велел приглушить — до приказа».',
-                'show scene lab with fadeIn duration 1s',
-                'show character splash normal at left with fadeIn',
-                'splash Привет… Я… чувствую… ритм… твоего… сердца…',
-                { Choice: { Dialog: 'Как поздороваться со Сплеш?',
-                    GreetRhythm: effectChoice('Постучать по стеклу ритмом сердца', { ai_empathy: 2 }),
-                    GreetVoice: effectChoice('Сказать вслух: «Привет. Я Рэн»', { ai_empathy: 1, philosophical_depth: 1 }),
-                    GreetScience: effectChoice('Спросить Саю про архитектуру её нейросети', { philosophical_depth: 2 })
-                } },
-                'saya Месяц назад её нейросеть начала проявлять признаки эмпатии. Что с этим делать — решать тебе.',
-                { Choice: { Dialog: 'Сплеш прижалась гелевой ладонью к стеклу резервуара:',
-                    Connect: routeChoice('Подключить нейроядро Сплеш к световой сети Стеллы', 'AIEndingTranscendence',
-                        { ai_empathy: 5 }),
-                    Isolate: routeChoice('Изолировать ядро данных — безопасность прежде всего', 'AIEndingIsolation',
-                        { set: { route: 'ai' } })
-                } }
-            ],
-            AIEndingTranscendence: [
-                vn.goTo('Сэйрин: Залив'),
-                'hide character saya with fadeOut',
-                'show scene port with fadeIn duration 1s',
-                'show character stella normal at right with fadeIn',
-                'stella Меня создали развлекать публику. Но впервые, подключившись к Сплеш, я узнала, что такое радость быть живой.',
-                'splash Мы… не… инструменты… Мы… храним… память… этого… города…',
-                vn.reversible({ flags: { happy_ending_achieved: true } }),
-                'sys <span class="t-violet">[ ФИНАЛ ИИ — ТРАНСЦЕНДЕНТНОСТЬ ]</span> Субъектность ИИ признана; модулятор Акатоми превращён в поэзию света.',
-                'end'
-            ],
-            AIEndingIsolation: [
-                vn.goTo('Aquaforge: Лаборатория'),
-                'show scene lab with fadeIn duration 1s',
-                'saya Ты выбрал безопасность. Я… тоже так хотела. Наверное. Повторяй это достаточно долго — и перестанешь слышать, как она поёт.',
-                'splash Я… в… безопасности… Почему… тогда… так… тихо…',
-                'sys <span class="t-violet">[ ФИНАЛ ИИ: ТИШИНА В АКВАРИУМЕ ]</span> Ядро изолировано. Бассейн светится ровно наполовину.',
-                'end'
-            ],
-            MomoRoute: [
-                vn.goTo('Арена Сэйрин: чёрный вход'),
-                'hide character miya with fadeOut',
-                'show scene tsukimachi with fadeIn duration 1s',
-                'p «Стриж» чихнул на последнем подъёме и замер точно у чёрного входа арены. Знаю я этот характер: он не сломался. Он умнее меня — сам выбрал, где остановиться.',
-                'p За дверью репетируют рассветный гимн. Голос Момо Хосизоры тянет гаммы, и каждая нота на долю секунды приседает в такт тесту Решётки. Так не поют. Так настраивают прибор.',
-                'show scene port with fadeIn duration 1s',
-                'show character momo normal at left with fadeIn',
-                'momo Смотришь на девушку три секунды — штраф по контракту. Смотришь четвёртую — уже сюжетный поворот. Решай быстрее, пилот.',
-                'p Солнцезащитные очки размером с пол-лица, капюшон до бровей. Маскировка уровня «меня здесь нет». Коробка с парфе — уровня «меня здесь очень даже есть».',
-                'momo Я инкогнито! По телевизору у меня совсем другое лицо — его по утрам рисуют взрослые с юристами.',
-                { Choice: { Dialog: 'Момо поднимает ложечку парфе, как дирижёрскую палочку: «Ну? Чем заслужил право стоять рядом с голосом города?»',
-                    SweetLie: effectChoice('Слащавость: «Твой голос — единственное, что держит этот город живым»', { momo_affinity: 2 }),
-                    GrandPathos: effectChoice('Пафос: «Я пилот „Титана-04“. Для твоей песни достану громкоговоритель размером с рассвет»', { momo_affinity: 1, akatomi_alert: 1 }),
-                    HonestWrench: effectChoice('Честно: «Не заслужил. Просто слышу, что ты сегодня поёшь грустно»', { momo_affinity: 1, philosophical_depth: 2 })
-                } },
-                'momo Принято. Оценка — четыре целых две десятых улыбки. Надбавку за дерзость… выдам после. Если будет после.',
-                'p Мы ехали вдоль залива на «Стриже». Она держалась за мою куртку ровно так, как написано в регламенте пассажира, — и ни на сантиметр регламентнее. Разумеется.',
-                'p Дроны-измерители скользнули над площадью — и она вжалась за мою спину так отработанно, будто прятаться за пилотами давно входит в её райдер.',
-                'momo Слушай. На рассвете мой голос включат из каждого окна — гимн согласия Решётки. Улыбка — четыре целых две десятых секунды, пункт семь приложения.',
-                'momo Но у меня есть ДРУГАЯ песня. Своя. Про город, который по утрам смеётся. Если её услышат хоть раз — гимн потом не проглотит никто.',
-                'momo Только вывести её могу не я. Мой микрофон — не мой. Нужна передаточная мачта, до которой не дотянутся юристы.',
-                { Choice: { Dialog: 'Момо снимает очки. Три секунды она просто молчит — впервые за весь вечер:',
-                    SingHerSong: routeChoice('Вывести «Титана» к арене до рассвета — город услышит ЕЁ песню', 'MomoEndingSong',
-                        { momo_affinity: 5 }),
-                    SingTheHymn: routeChoice('Взвесить риски «по-взрослому»: контракт — броня, пусть поёт гимн', 'MomoEndingEncore',
-                        { philosophical_depth: 1 })
-                } }
-            ],
-            MomoEndingSong: [
-                vn.goTo('Сэйрин: над ареной'),
-                'show scene cathedral with fadeIn duration 1s',
-                vn.reversible({ flags: { met_reika: true, happy_ending_achieved: true } }),
-                'p В 04:47 «Титан-04» встал над ареной, как чья-то огромная рука над свечой. Рейка молчала на частоте дока двенадцать секунд, а потом сказала только: «Пилот. Не опоздай на утреннюю тренировку». Она всё знала. Она всегда знает.',
-                'show character momo normal at center with fadeIn',
-                'momo Пункт семь приложения — аннулирован. Дальше пою не улыбка по секундомеру. Дальше — я.',
-                'momo Город! Это не гимн! Это — я! Хозяйка собственного голоса!',
-                'p Её песня покатилась с мачты «Титана» над крышами — про улицы, что смеются по утрам, про дворника, который знает каждое окно города, про окно, что знает каждого прохожего.',
-                'p По горизонту вспыхивали огни, и улыбки за окнами были разной длины — своей. Ни одной по расписанию.',
-                'momo …Рэн. Твоё сердце стучит громче «Стрижа». Слышу отсюда. …Это ничего не значит! Наверное.',
-                'momo Четыре целых две десятых секунды — я держала твой шлем двумя руками. По контракту. С собой. Без свидетелей.',
-                'sys <span class="t-cyan">[ СЧАСТЛИВЫЙ ФИНАЛ МОМО — ГОЛОС ЖИВОГО ГОРОДА ]</span> На рассвете город услышал человека.',
-                'end'
-            ],
-            MomoEndingEncore: [
-                vn.goTo('Сэйрин: арена, рассвет'),
-                'hide character momo with fadeOut',
-                'show scene tsukimachi with fadeIn duration 1s',
-                'momo …Ясно. Реалист с разводным ключом. Ладно. Значит, реально пою — я. Из каждого окна, по контракту, четыре целых две десятых.',
-                'p На рассвете гимн полился из каждого окна. Аплодисменты гремели, как дождь по жести. На всех экранах города она улыбалась ровно на четыре целых две десятых секунды дольше, чем умеют люди.',
-                'p Только теперь я знаю, кто эти секунды считает. Свою песню она больше никому не расскажет.',
-                'sys <span class="t-red">[ ФИНАЛ МОМО — БИС, КОТОРОГО НИКТО НЕ ПРОСИЛ ]</span> Своя песня осталась на бумаге.',
-                'end'
-            ]
-        });
+        /* Story is deliberately split by route in vendor/story/. Every arc is a
+         * plain ES5 file registered before this bootstrap runs; this keeps a
+         * new route from becoming a risky edit to the engine/UI glue. */
+        function buildStoryFromArcs () {
+            var registry = window.SeirinStory;
+            var order = ['prologue', 'procrastination', 'miya', 'ai', 'momo'];
+            var script = {};
+            var api = { vn: vn, engine: engine, routeChoice: routeChoice, effectChoice: effectChoice };
+            var i, arc, labels, key;
+            if (!registry || !registry.arcs) { throw new Error('Не загружены сюжетные арки.'); }
+            for (i = 0; i < order.length; i++) {
+                arc = registry.arcs[order[i]];
+                if (typeof arc !== 'function') { throw new Error('Не загружена арка: ' + order[i]); }
+                labels = arc(api);
+                for (key in labels) {
+                    if (Object.prototype.hasOwnProperty.call(labels, key)) {
+                        if (script[key]) { throw new Error('Повтор метки сюжета: ' + key); }
+                        script[key] = labels[key];
+                    }
+                }
+            }
+            return script;
+        }
+        engine.script(buildStoryFromArcs());
         /* Tiny build stamp in the corner of the title screen, so a player
          * (and we) can always tell WHICH build is actually running — the
          * difference between "bug not fixed" and "browser cached the old
