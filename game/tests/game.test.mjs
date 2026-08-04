@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { findBlockScopedFunctionDeclarations, findEs6Syntax } from './es5-scan.mjs';
@@ -66,6 +67,24 @@ test('story arcs are standalone ES5 modules and are loaded before the bootstrap'
         assert.match(arc, /registry\.register\(/, file + ' does not register an arc');
     });
     assert.match(source, /buildStoryFromArcs/);
+});
+
+test('every story file parses and registers its arc (boot regression)', () => {
+    // Regression: a missing comma before an inserted 'jump' statement made
+    // the file fail to parse in the browser, the arc never registered, and
+    // boot aborted with "Не загружена арка: anime_eva_01_07" while the
+    // static ES5 scans still passed. The file must actually EVALUATE, the
+    // same way the <script> tag does — syntax errors cannot hide here.
+    storyFiles.forEach(file => {
+        const arc = readFileSync(join(here, '..', 'vendor', 'story', file), 'utf8');
+        const sandbox = { window: {} };
+        assert.doesNotThrow(() => runInNewContext(arc, sandbox, { filename: file }),
+            file + ' must parse when evaluated like a <script>');
+        const arcs = sandbox.window.SeirinStory && sandbox.window.SeirinStory.arcs;
+        const expected = file.replace(/\.js$/, '');
+        assert.ok(arcs && typeof arcs[expected] === 'function',
+            file + ' must register arc ' + expected);
+    });
 });
 
 test('storage schema supplies complete, safe defaults', () => {
