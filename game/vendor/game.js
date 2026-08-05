@@ -203,6 +203,22 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 return (day < 10 ? '0' : '') + day + '.' + (mon < 10 ? '0' : '') + mon;
             }
         }
+        /* Short weekday for the clock's date row: 'СР' (wed), 'ЧТ', 'ПТ'…
+         * Locale-aware via toLocaleString where available (ru-RU -> 'ср'). */
+        function fmtWeekday (mins) {
+            var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
+            var d = new Date(Date.UTC(2026, 6, 15 + Math.floor(m / 1440)));
+            try {
+                return d.toLocaleString(playerLocale(), { weekday: 'short', timeZone: 'UTC' });
+            } catch (e) {
+                var DAYS_RU = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+                return DAYS_RU[d.getUTCDay()];
+            }
+        }
+        /* Clock date row: "СР 15.07" — short weekday + numeric day.month. */
+        function fmtClockDate (mins) {
+            return fmtWeekday(mins) + ' ' + fmtDateShort(mins);
+        }
         function fmtDateTime (mins) {
             return fmtDate(mins) + ' · ' + fmtHHMM(mins);
         }
@@ -331,7 +347,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 var v = p[key] || 0;
                 var shown = v;
                 if (key === 'akatomi_alert') { shown = v + '%'; }
-                else if (key === 'time') { shown = fmtDateTime(v); }
+                else if (key === 'time') { shown = fmtClockDate(v) + ' · ' + fmtHHMM(v); }
                 else if (key === 'money') { shown = '¥' + v; }
                 else if (key === 'items') {
                     var total = 0, it2 = p.items || {};
@@ -448,7 +464,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             html += '<div class="graph-stats">' +
                 '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-calendar"></i>' + fmtDateShort(p.time) + ' ' + fmtHHMM(p.time) + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-calendar"></i>' + fmtClockDate(p.time) + ' ' + fmtHHMM(p.time) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-coins"></i>¥' + (p.money || 0) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
                 '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
@@ -669,7 +685,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
              * written via textContent so no <i> badge markup is injected),
              * then money and item count as badges. */
             var dateEl = document.getElementById('hud-date');
-            if (dateEl) { dateEl.textContent = String(fmtDate(p.time)).toUpperCase(); }
+            if (dateEl) { dateEl.textContent = String(fmtClockDate(p.time)).toUpperCase(); }
             var timeEl = document.getElementById('hud-time');
             if (timeEl) { timeEl.textContent = fmtHHMM(p.time); }
             set('hud-money', 'fa-coins', '¥' + (p.money || 0));

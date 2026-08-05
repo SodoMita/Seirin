@@ -665,6 +665,7 @@
    injected <i> markup can appear here. Monospace + layered text-shadows
    (bloom) + a faint mains flicker = segment readout without a font. */
 .hud-clock {
+  font-family: 'DSEG7 Classic', 'Consolas', 'Menlo', monospace;
   display: inline-flex;
   flex-direction: column;
   align-items: stretch;
@@ -678,7 +679,6 @@
     inset 0 1px 3px rgba(0, 0, 0, 0.9),
     inset 0 -1px 1px rgba(255, 190, 100, 0.08),
     0 0 10px rgba(255, 140, 30, 0.20);
-  font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', monospace;
   text-align: center;
   line-height: 1.25;
   /* a thin separator between the rows, like a segment backplane seam */
@@ -694,9 +694,10 @@
   box-shadow: 0 0 4px rgba(255, 150, 40, 0.25);
 }
 .hud-clock-date {
-  font-size: 0.60rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-family: 'DSEG7 Classic', 'Consolas', 'Menlo', monospace;
   letter-spacing: 2px;
+  font-weight: 600;
   color: rgba(255, 196, 112, 0.78);
   text-shadow:
     0 0 3px rgba(255, 170, 70, 0.55),
@@ -704,9 +705,10 @@
   white-space: nowrap;
 }
 .hud-clock-time {
-  font-size: 1.02rem;
-  font-weight: 700;
+  font-size: 1.06rem;
+  font-family: 'DSEG7 Classic', 'Consolas', 'Menlo', monospace;
   letter-spacing: 3px;
+  font-weight: 700;
   color: #ffd089;
   text-shadow:
     0 0 2px #ffe9bd,
