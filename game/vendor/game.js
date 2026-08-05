@@ -680,8 +680,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-player-name', 'fa-user-secret', p.name || 'Рэн');
             set('hud-location', 'fa-map-marker-alt', p.location || 'Тэцуба: Улица');
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
-            set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
-            /* Resource strip: date + time as a 7-segment clock (no icons —
+            set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');            /* Resource strip: date + time as a 7-segment clock (no icons —
              * written via textContent so no <i> badge markup is injected),
              * then money and item count as badges. */
             var dateEl = document.getElementById('hud-date');
@@ -692,11 +691,17 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                  * must stay steady, so the colon gets its own span. */
                 timeEl.innerHTML = fmtHHMM(p.time).replace(':', '<span class="hud-clock-colon">:</span>');
             }
-            set('hud-money', 'fa-coins', '¥' + (p.money || 0));
+            var moneyEl = document.getElementById('hud-money');
+            if (moneyEl) {
+                moneyEl.innerHTML = '<img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>¥' + (p.money || 0) + '</span>';
+            }
             var itemCount = 0;
             var it = p.items || {};
             for (var ik in it) { if (Object.prototype.hasOwnProperty.call(it, ik)) { itemCount += it[ik]; } }
-            set('hud-items', 'fa-box-open', String(itemCount));
+            var itemsEl = document.getElementById('hud-items');
+            if (itemsEl) {
+                itemsEl.innerHTML = '<img src="assets/icons/box-open.svg?v=20260804r1" class="hud-svg" alt=""><span>' + itemCount + '</span>';
+            }
             var alertEl = document.getElementById('hud-alert-level');
             var level = p.akatomi_alert || 0;
             if (alertEl && lastAlertLevel !== null && level > lastAlertLevel && alertEl.classList) {
