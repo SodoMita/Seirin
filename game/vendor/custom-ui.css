@@ -1123,3 +1123,39 @@ main-menu button {
   [data-screen="game"] text-box { min-height: 100px; padding: 14px 18px; }
   [data-screen="game"] choice-container { width: calc(100% - 24px); }
 }
+
+/* Radio transmissions: the speaker is intentionally an in-world receiver,
+   never the absent character's portrait. A soft pulse keeps dead air alive. */
+/* !important is deliberate: mecha-ui.css loads after this sheet and gives
+   every character its ordinary breathing animation. The radio needs to win. */
+game-screen [data-character="radio"], [data-character-id="radio"], .character.radio {
+    animation: seirin-radio-float 2.1s ease-in-out infinite !important;
+    filter: drop-shadow(0 0 16px rgba(34,211,238,.72)) !important;
+}
+game-screen [data-character="radio"] img, [data-character-id="radio"] img, .character.radio img {
+    animation: seirin-radio-scan 1.1s steps(2,end) infinite !important;
+}
+@keyframes seirin-radio-float {
+    0%,100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+}
+@keyframes seirin-radio-scan {
+    0%,100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.23) saturate(1.35); }
+}
+.radio-line {
+    color:#c7f9ff;
+    text-shadow:0 0 7px rgba(34,211,238,.95), 1px 0 rgba(251,191,36,.5);
+    letter-spacing:.025em;
+    animation: seirin-radio-text .75s steps(2,end) infinite;
+}
+@keyframes seirin-radio-text {
+    0%,100% { opacity:1; } 50% { opacity:.82; }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-character="radio"], [data-character-id="radio"], .character.radio,
+    [data-character="radio"] img, [data-character-id="radio"] img, .character.radio img,
+    .radio-line { animation:none !important; }
+}
+/* Receiver is an object, not a person-sized portrait. */
+game-screen [data-character="radio"] { max-height: 54vh; }
