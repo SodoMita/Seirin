@@ -312,6 +312,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             AnimeActivities_LLMVN: 'Аниме · Своя ВН на LLM',
             AnimeActivities_LLMVN2: 'Аниме · Своя ВН — дизайн',
             AnimeActivities_LLMVN3: 'Аниме · Своя ВН — персонажи',
+            AnimeActivities_LLMVN4: 'Аниме · Своя ВН — порочный круг',
             AnimeLLMVN_End: 'ФИНАЛ · Игра про игру'
         };
 
