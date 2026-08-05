@@ -309,7 +309,10 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             Solo1Dating:         'Соло I · Сайты знакомств',
             Solo1DrugsEnd:       'ФИНАЛ · Больница',
             Solo1WindowJumpEnd:  'ФИНАЛ · Прыжок из зоны комфорта',
-            AnimeActivities_LLMVN: 'Аниме · Своя ВН на LLM'
+            AnimeActivities_LLMVN: 'Аниме · Своя ВН на LLM',
+            AnimeActivities_LLMVN2: 'Аниме · Своя ВН — дизайн',
+            AnimeActivities_LLMVN3: 'Аниме · Своя ВН — персонажи',
+            AnimeLLMVN_End: 'ФИНАЛ · Игра про игру'
         };
 
         var ARCHIVE_CONTACTS = [
