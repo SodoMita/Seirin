@@ -74,3 +74,33 @@ at the street far below — tiny cars, bus stop, truck, sidewalk, dizzying drop.
 Own hands in t-shirt sleeves grip the window frame at the bottom corners, wind
 moving the sleeve. Night city: port lights, tower with violet haze, drones.
 Vertigo composition, deep blue.
+
+## Последовательность падения (прыжок из окна) — 4 кадра-цепочка
+
+Каждый следующий кадр — редактирование предыдущего (передаётся генератору),
+чтобы фон и персонаж совпадали.
+
+### cg_fall1 — комната у открытого окна (оригинальный фон)
+First-person POV standing at a wide-open ninth-floor apartment window at night.
+Own hands in dark-grey t-shirt sleeves grip the window frame at the bottom
+corners, hint of dark track pants. The room is visible at the edges: workbench
+with disassembled mecha accumulator, scattered screws, screwdriver, cold tea,
+glowing smartphone, desk lamp. Beyond: night city far below — dark streets,
+port lights, tower with violet haze, drones with red lights. Deep blue palette.
+
+### cg_fall2 — сразу после прыжка
+Edit of cg_fall1: just jumped, falling past the building facade. First-person
+POV down along own body — arms in the same t-shirt sleeves spread, legs in the
+same track pants — the open window and lit room receding above, windows and
+balconies rushing past, night street below getting closer. Same palette.
+
+### cg_fall3 — ближе к земле
+Edit of cg_fall2: much closer to the ground, wind-blown sleeves, facade filling
+one side of the frame, street with a parked truck and sidewalk rushing up, the
+open window tiny and high above with its warm lamp glow. Same palette.
+
+### cg_fall4 — после приземления
+Edit of cg_fall3: lying on the ground looking up at the night sky and the dark
+facade with the tiny open window high above, own arm in the same t-shirt sleeve
+resting on asphalt, parked truck nearby, street lights, drones. Quiet, final,
+ominous. Same palette.
