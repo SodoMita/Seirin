@@ -348,7 +348,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 var shown = v;
                 if (key === 'akatomi_alert') { shown = v + '%'; }
                 else if (key === 'time') { shown = fmtClockDate(v) + ' · ' + fmtHHMM(v); }
-                else if (key === 'money') { shown = '¥' + v; }
+                else if (key === 'money') { shown = v; }
                 else if (key === 'items') {
                     var total = 0, it2 = p.items || {};
                     for (var ik2 in it2) { if (Object.prototype.hasOwnProperty.call(it2, ik2)) { total += it2[ik2]; } }
@@ -465,7 +465,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-calendar"></i>' + fmtClockDate(p.time) + ' ' + fmtHHMM(p.time) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-coins"></i>¥' + (p.money || 0) + '</span>' +
+                '<span class="graph-chip"><i class="fas fa-coins"></i>' + (p.money || 0) + '</span>' +
                 '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
                 '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
                 '</div>';
@@ -693,7 +693,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             }
             var moneyEl = document.getElementById('hud-money');
             if (moneyEl) {
-                moneyEl.innerHTML = '<img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>¥' + (p.money || 0) + '</span>';
+                moneyEl.innerHTML = '<img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>' + (p.money || 0) + '</span>';
             }
             var itemCount = 0;
             var it = p.items || {};
