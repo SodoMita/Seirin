@@ -657,6 +657,31 @@
 .hud-badge.pink::before  { animation-delay: -1.1s; }
 .hud-badge.red::before   { animation-delay: -1.7s; }
 
+/* Money & inventory read-outs float on a transparent background — no badge
+   plate, no LED, no bevel, no drop-shadow. Just the glyph + value, so the
+   resource strip reads as bare instruments next to the clock. game.js
+   rewrites these badges' innerHTML, so only element-level overrides here. */
+#hud-money,
+#hud-items {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+  filter: none !important;
+  padding: 6px 8px !important;
+}
+#hud-money::before,
+#hud-items::before,
+#hud-money::after,
+#hud-items::after {
+  display: none !important;
+}
+#hud-items { color: #7fe9ff; }
+#hud-money > .fas,
+#hud-items > .fas {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
 /* --- 7-segment electronic clock (date + time) ---------------------------
    The date and time are NOT badges/buttons: they live in a single recessed
    LCD-style screen (.hud-clock) with the date on a dim amber row and the
