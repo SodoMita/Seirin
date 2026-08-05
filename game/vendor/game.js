@@ -794,16 +794,14 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         engine.assets('scenes', { courtyard: 'courtyard.webp', miya_room: 'miya_room.webp',
             workshop: 'workshop.webp', tsukimachi: 'tsukimachi.webp', lab: 'lab.webp',
             cathedral: 'cathedral.webp', port: 'port.webp', dojo: 'dojo.webp' });
-        /* Procrastination CGs — first-person POV, shown via 'show image'.
-         * Source PNGs live in cg/ (with prompts in cg/prompts_procrastination.md),
-         * runtime WebP in assets/images/. */
-        engine.assets('images', {
+        /* Procrastination CGs as SCENES (shown via 'show scene') — first-person
+         * POV. Source PNGs live in cg/ (prompts in cg/prompts_procrastination.md),
+         * runtime WebP in assets/scenes/. */
+        engine.assets('scenes', {
             cg_pc: 'cg_pc.webp', cg_phone: 'cg_phone.webp', cg_radio: 'cg_radio.webp',
             cg_balcony: 'cg_balcony.webp', cg_kitchen: 'cg_kitchen.webp',
             cg_stare: 'cg_stare.webp', cg_dawn_stare: 'cg_dawn_stare.webp',
             cg_fantasy: 'cg_fantasy.webp', cg_hospital: 'cg_hospital.webp',
-            cg_window: 'cg_window.webp',
-            /* Window-jump fall sequence: room -> falling -> closer -> landing */
             cg_fall1: 'cg_fall1.webp', cg_fall2: 'cg_fall2.webp',
             cg_fall3: 'cg_fall3.webp', cg_fall4: 'cg_fall4.webp'
         });
