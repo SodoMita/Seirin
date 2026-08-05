@@ -315,6 +315,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             AnimeActivities_LLMVN4: 'Аниме · Своя ВН — порочный круг',
             AnimeActivities_LLMVN5: 'Аниме · Своя ВН — баги',
             AnimeActivities_LLMVN6: 'Аниме · Своя ВН — враньё и своеволие',
+            AnimeActivities_LLMVN7: 'Аниме · Своя ВН — проверка свежей',
             AnimeLLMVN_End: 'ФИНАЛ · Игра про игру'
         };
 
