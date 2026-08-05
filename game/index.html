@@ -13,7 +13,7 @@
     <!-- 2.5D skeuomorphic mecha armour skin. MUST stay last: it repaints the
          flat reskin in vendor/custom-ui.css and relies on winning the cascade
          at equal specificity. Layer markup is injected by vendor/mecha-ui.js. -->
-    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260804r13" />
+    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260804r14" />
 </head>
 <body>
 
@@ -32,7 +32,7 @@
         <div class="hud-group hud-resources">
             <div class="hud-clock" role="timer" aria-label="Дата и время">
                 <span id="hud-date" class="hud-clock-date">СР 15.07</span>
-                <span id="hud-time" class="hud-clock-time">21:00</span>
+                <span id="hud-time" class="hud-clock-time">21<span class="hud-clock-colon">:</span>00</span>
             </div>
             <span id="hud-money" class="hud-badge amber"><i class="fas fa-coins"></i><span>¥1000</span></span>
             <span id="hud-items" class="hud-badge"><i class="fas fa-box-open"></i><span>0</span></span>
@@ -131,7 +131,7 @@
     <script src="vendor/story/miya.js?v=20260804r4"></script>
     <script src="vendor/story/ai.js?v=20260804r4"></script>
     <script src="vendor/story/momo.js?v=20260804r4"></script>
-    <script src="vendor/game.js?v=20260804r15"></script>
+    <script src="vendor/game.js?v=20260804r16"></script>
     <!-- Mecha skin driver: bakes metal/wear textures on a canvas, injects the
          armour layer stack, builds the HUD instrument rail + telemetry strip,
          and drives the indicators from engine storage. Read-only w.r.t. game

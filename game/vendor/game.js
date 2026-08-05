@@ -687,7 +687,11 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             var dateEl = document.getElementById('hud-date');
             if (dateEl) { dateEl.textContent = String(fmtClockDate(p.time)).toUpperCase(); }
             var timeEl = document.getElementById('hud-time');
-            if (timeEl) { timeEl.textContent = fmtHHMM(p.time); }
+            if (timeEl) {
+                /* Only the colon blinks (see .hud-clock-colon) — the digits
+                 * must stay steady, so the colon gets its own span. */
+                timeEl.innerHTML = fmtHHMM(p.time).replace(':', '<span class="hud-clock-colon">:</span>');
+            }
             set('hud-money', 'fa-coins', '¥' + (p.money || 0));
             var itemCount = 0;
             var it = p.items || {};
