@@ -717,8 +717,14 @@
     0 0 18px rgba(0, 200, 255, 0.85),
     0 0 34px rgba(0, 170, 255, 0.55);
   filter: drop-shadow(0 0 6px rgba(0, 200, 255, 0.35));
-  /* cyan second-blinking colon: dims 1s, on 1s, with a soft fade */
-  animation: segFlicker 1s steps(1, end) infinite, colonBlink 1s ease-in-out infinite;
+  /* digits stay steady; only the colon blinks (see .hud-clock-colon) */
+  animation: segFlicker 7s infinite steps(1, end);
+}
+/* the blinking colon: 1s on / 1s off — the digits do NOT blink */
+.hud-clock-colon {
+  animation: colonBlink 1s ease-in-out infinite;
+  color: inherit;
+  text-shadow: inherit;
 }
 @keyframes segFlicker {
   0%, 96.8%, 100% { opacity: 1; }
