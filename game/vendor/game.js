@@ -827,7 +827,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
             radio: { name: 'РАДИО · ЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
-            p: { name: 'Рэн', color: '#facc15' }
+            p: { name: 'Рэн', color: '#facc15' },
+            llm: { name: 'LLM · ЧАТ', color: '#38bdf8' }
         });
 
         function routeChoice (text, target, effectSpec) {
