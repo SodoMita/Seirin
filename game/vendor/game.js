@@ -802,7 +802,10 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             cg_balcony: 'cg_balcony.webp', cg_kitchen: 'cg_kitchen.webp',
             cg_stare: 'cg_stare.webp', cg_dawn_stare: 'cg_dawn_stare.webp',
             cg_fantasy: 'cg_fantasy.webp', cg_hospital: 'cg_hospital.webp',
-            cg_window: 'cg_window.webp'
+            cg_window: 'cg_window.webp',
+            /* Window-jump fall sequence: room -> falling -> closer -> landing */
+            cg_fall1: 'cg_fall1.webp', cg_fall2: 'cg_fall2.webp',
+            cg_fall3: 'cg_fall3.webp', cg_fall4: 'cg_fall4.webp'
         });
         engine.characters({
             ren: { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal.webp' } },
