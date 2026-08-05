@@ -102,10 +102,13 @@ one side, street with a parked truck and sidewalk rushing up, the open window
 tiny and high above with its warm lamp glow. Same palette. (Kept as-is.)
 
 ### cg_fall4 — после приземления, ОТ ТРЕТЬЕГО ЛИЦА
-Edit of cg_fall3, now a THIRD-PERSON shot: a teenage boy lies on the asphalt of
-a Japanese night street near the port, beside a parked delivery truck, low side
-angle. He wears the same dark-grey t-shirt and dark track pants, one arm
-outstretched, face hidden by dark hair. Behind him the dark apartment facade
-with the tiny open window high above. Street lamps, utility poles, gantry
-cranes and container stacks in the distance, drones, wet asphalt reflecting
-lights. Quiet, final, ominous. Same palette.
+Wide elevated shot from across the street (the close-up injury versions
+are refused by the generator's safety filter): a small human figure lies
+on its back on the wet asphalt beside a parked delivery truck at the
+base of a tall dark apartment building with a single tiny open window
+glowing warmly high up near the ninth floor. Seen from a distance, limbs
+at unnatural angles — the pose and scale make the tragedy readable
+without close-up detail. Japanese night port district: street lamps,
+utility poles, distant gantry cranes and container stacks, drones,
+wet asphalt reflecting lights. Quiet, somber, final. Deep blue palette.
+
