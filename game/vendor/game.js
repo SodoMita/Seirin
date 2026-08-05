@@ -794,6 +794,16 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         engine.assets('scenes', { courtyard: 'courtyard.webp', miya_room: 'miya_room.webp',
             workshop: 'workshop.webp', tsukimachi: 'tsukimachi.webp', lab: 'lab.webp',
             cathedral: 'cathedral.webp', port: 'port.webp', dojo: 'dojo.webp' });
+        /* Procrastination CGs — first-person POV, shown via 'show image'.
+         * Source PNGs live in cg/ (with prompts in cg/prompts_procrastination.md),
+         * runtime WebP in assets/images/. */
+        engine.assets('images', {
+            cg_pc: 'cg_pc.webp', cg_phone: 'cg_phone.webp', cg_radio: 'cg_radio.webp',
+            cg_balcony: 'cg_balcony.webp', cg_kitchen: 'cg_kitchen.webp',
+            cg_stare: 'cg_stare.webp', cg_dawn_stare: 'cg_dawn_stare.webp',
+            cg_fantasy: 'cg_fantasy.webp', cg_hospital: 'cg_hospital.webp',
+            cg_window: 'cg_window.webp'
+        });
         engine.characters({
             ren: { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal.webp' } },
             miya: { name: 'Мия Кагэцуки', color: '#f472b6', directory: '', sprites: { normal: 'miya_normal.webp' } },
