@@ -68,4 +68,5 @@ test-results/
 # Git (they now weigh 3.4 MB as JPEG). Capture with
 # `node design/tools/shrink-shots.mjs` after taking new ones, which converts
 # and deletes the PNGs. Concept boards are JPEG for the same reason.
-*.png
+design/preview/shots/*.png
+design/concepts/*.png
