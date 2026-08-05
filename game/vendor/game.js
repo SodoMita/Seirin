@@ -301,7 +301,12 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             AnimeFandom_DescentVN:      'Спуск · ВН и игры',
             AnimeFandom_DescentEroguro: 'Спуск · Эро-гуро',
             AnimeFandom_DescentGap:     'Спуск · Провал памяти',
-            AnimeFandom_DescentBattle:  'ФИНАЛ · Спуск ниже дна'
+            AnimeFandom_DescentBattle:  'ФИНАЛ · Спуск ниже дна',
+            Solo1StarePoint:     'Соло I · Точка на стене',
+            Solo1StareDawnEnd:   'ФИНАЛ · Точка до рассвета',
+            Solo1Fantasy:        'Соло I · Фантазии',
+            Solo1DrugsEnd:       'ФИНАЛ · Больница',
+            Solo1WindowJumpEnd:  'ФИНАЛ · Окно'
         };
 
         var ARCHIVE_CONTACTS = [
