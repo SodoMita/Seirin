@@ -720,9 +720,9 @@
   /* digits stay steady; only the colon blinks (see .hud-clock-colon) */
   animation: segFlicker 7s infinite steps(1, end);
 }
-/* the blinking colon: 1s on / 1s off — the digits do NOT blink */
+/* the blinking colon: 1s on / 1s off, hard steps (no interpolation) */
 .hud-clock-colon {
-  animation: colonBlink 1s ease-in-out infinite;
+  animation: colonBlink 1s steps(1, end) infinite;
   color: inherit;
   text-shadow: inherit;
 }
@@ -734,7 +734,7 @@
 }
 @keyframes colonBlink {
   0%, 49.9% { opacity: 1; }
-  50%, 100% { opacity: 0.18; }
+  50%, 100% { opacity: 0; }
 }
 @media (max-width: 560px) {
   .hud-clock { min-width: 0; padding: 2px 8px 4px; }
