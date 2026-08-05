@@ -657,24 +657,57 @@
 .hud-badge.pink::before  { animation-delay: -1.1s; }
 .hud-badge.red::before   { animation-delay: -1.7s; }
 
-/* --- 7-segment clock with bloom ----------------------------------------
-   #hud-time is rewritten by game.js on every state change, so the digits
-   arrive inside <span>; the clock icon is hidden — the digits ARE the
-   display. Monospace + layered text-shadows (bloom) + a recessed screen
-   + a faint mains flicker = segment readout without a custom font. */
-#hud-time {
-  color: #ffd089 !important;
+/* --- 7-segment electronic clock (date + time) ---------------------------
+   The date and time are NOT badges/buttons: they live in a single recessed
+   LCD-style screen (.hud-clock) with the date on a dim amber row and the
+   time on a bright bloom row. No icons — the digits ARE the display.
+   game.js writes both rows via textContent on every state change, so no
+   injected <i> markup can appear here. Monospace + layered text-shadows
+   (bloom) + a faint mains flicker = segment readout without a font. */
+.hud-clock {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 108px;
+  padding: 3px 12px 5px;
   background:
-    linear-gradient(180deg, #04060b 0%, #0a0e16 55%, #060910 100%) !important;
-  border: 1px solid rgba(255, 170, 60, 0.30) !important;
+    linear-gradient(180deg, #04060b 0%, #0a0e16 55%, #060910 100%);
+  border: 1px solid rgba(255, 170, 60, 0.28);
   box-shadow:
-    inset 0 0 12px rgba(255, 140, 30, 0.20),
-    inset 0 1px 2px rgba(0, 0, 0, 0.9),
-    0 0 10px rgba(255, 140, 30, 0.22) !important;
-  font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', monospace !important;
-  font-size: 0.95rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 3px !important;
+    inset 0 0 14px rgba(255, 140, 30, 0.18),
+    inset 0 1px 3px rgba(0, 0, 0, 0.9),
+    inset 0 -1px 1px rgba(255, 190, 100, 0.08),
+    0 0 10px rgba(255, 140, 30, 0.20);
+  font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', monospace;
+  text-align: center;
+  line-height: 1.25;
+  /* a thin separator between the rows, like a segment backplane seam */
+  border-top: 0;
+  border-bottom: 0;
+}
+.hud-clock::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 2px 4px 1px;
+  background: rgba(255, 170, 60, 0.14);
+  box-shadow: 0 0 4px rgba(255, 150, 40, 0.25);
+}
+.hud-clock-date {
+  font-size: 0.60rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(255, 196, 112, 0.78);
+  text-shadow:
+    0 0 3px rgba(255, 170, 70, 0.55),
+    0 0 8px rgba(255, 140, 30, 0.30);
+  white-space: nowrap;
+}
+.hud-clock-time {
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #ffd089;
   text-shadow:
     0 0 2px #ffe9bd,
     0 0 5px #ffc56a,
@@ -684,7 +717,6 @@
   filter: drop-shadow(0 0 6px rgba(255, 150, 40, 0.35));
   animation: segFlicker 7s infinite steps(1, end);
 }
-#hud-time .fas { display: none !important; }
 @keyframes segFlicker {
   0%, 96.8%, 100% { opacity: 1; }
   97%   { opacity: 0.80; }
@@ -692,7 +724,9 @@
   99%   { opacity: 0.90; }
 }
 @media (max-width: 560px) {
-  #hud-time { font-size: 0.78rem !important; letter-spacing: 2px !important; padding: 3px 8px 3px 14px !important; }
+  .hud-clock { min-width: 0; padding: 2px 8px 4px; }
+  .hud-clock-time { font-size: 0.82rem !important; letter-spacing: 2px !important; }
+  .hud-clock-date { font-size: 0.52rem !important; letter-spacing: 1px !important; }
 }
 
 /* The alert badge doubles as a filling gauge: --mech-alert drives the wash. */
