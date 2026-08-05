@@ -665,9 +665,13 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             set('hud-location', 'fa-map-marker-alt', p.location || 'Тэцуба: Улица');
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
             set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
-            /* Resource strip: date, time of day, money, item count. */
-            set('hud-date', 'fa-calendar', fmtDate(p.time));
-            set('hud-time', 'fa-clock', fmtHHMM(p.time));
+            /* Resource strip: date + time as a 7-segment clock (no icons —
+             * written via textContent so no <i> badge markup is injected),
+             * then money and item count as badges. */
+            var dateEl = document.getElementById('hud-date');
+            if (dateEl) { dateEl.textContent = String(fmtDate(p.time)).toUpperCase(); }
+            var timeEl = document.getElementById('hud-time');
+            if (timeEl) { timeEl.textContent = fmtHHMM(p.time); }
             set('hud-money', 'fa-coins', '¥' + (p.money || 0));
             var itemCount = 0;
             var it = p.items || {};
