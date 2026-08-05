@@ -78,29 +78,34 @@ Vertigo composition, deep blue.
 ## Последовательность падения (прыжок из окна) — 4 кадра-цепочка
 
 Каждый следующий кадр — редактирование предыдущего (передаётся генератору),
-чтобы фон и персонаж совпадали.
+чтобы фон и персонаж совпадали. Место действия — ЯПОНИЯ, ночной портовый
+район: портальные краны, контейнеры, огни порта, столбы с проводами.
 
 ### cg_fall1 — комната у открытого окна (оригинальный фон)
 First-person POV standing at a wide-open ninth-floor apartment window at night.
-Own hands in dark-grey t-shirt sleeves grip the window frame at the bottom
-corners, hint of dark track pants. The room is visible at the edges: workbench
-with disassembled mecha accumulator, scattered screws, screwdriver, cold tea,
-glowing smartphone, desk lamp. Beyond: night city far below — dark streets,
-port lights, tower with violet haze, drones with red lights. Deep blue palette.
+Only the forearms and hands are visible at the bottom corners, gripping the
+window frame, dark-grey t-shirt sleeves — NO pants, no lower body. Room at the
+edges: workbench with disassembled mecha accumulator, screws, screwdriver, cold
+green tea, glowing smartphone, warm desk lamp. Beyond the window: Japanese port
+district at night — gantry cranes, container stacks, port lights, tower with
+violet haze, drones. Deep blue palette.
 
 ### cg_fall2 — сразу после прыжка
 Edit of cg_fall1: just jumped, falling past the building facade. First-person
-POV down along own body — arms in the same t-shirt sleeves spread, legs in the
-same track pants — the open window and lit room receding above, windows and
-balconies rushing past, night street below getting closer. Same palette.
+POV down along own body — arms in the same t-shirt sleeves spread wide, legs in
+dark track pants kicking — open window and warm room receding above, facades and
+balconies rushing past, the Japanese port district below. Same palette.
 
 ### cg_fall3 — ближе к земле
 Edit of cg_fall2: much closer to the ground, wind-blown sleeves, facade filling
-one side of the frame, street with a parked truck and sidewalk rushing up, the
-open window tiny and high above with its warm lamp glow. Same palette.
+one side, street with a parked truck and sidewalk rushing up, the open window
+tiny and high above with its warm lamp glow. Same palette. (Kept as-is.)
 
-### cg_fall4 — после приземления
-Edit of cg_fall3: lying on the ground looking up at the night sky and the dark
-facade with the tiny open window high above, own arm in the same t-shirt sleeve
-resting on asphalt, parked truck nearby, street lights, drones. Quiet, final,
-ominous. Same palette.
+### cg_fall4 — после приземления, ОТ ТРЕТЬЕГО ЛИЦА
+Edit of cg_fall3, now a THIRD-PERSON shot: a teenage boy lies on the asphalt of
+a Japanese night street near the port, beside a parked delivery truck, low side
+angle. He wears the same dark-grey t-shirt and dark track pants, one arm
+outstretched, face hidden by dark hair. Behind him the dark apartment facade
+with the tiny open window high above. Street lamps, utility poles, gantry
+cranes and container stacks in the distance, drones, wet asphalt reflecting
+lights. Quiet, final, ominous. Same palette.
