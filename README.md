@@ -4,8 +4,9 @@ Visual-novel project assets and design documents for **Seirin: Night Shift — R
 
 ## Directories
 - **`game/` — the shipping visual novel.** Double-click `game/index.html`; runs
-  with no server, no CDN and no runtime fetch. 17 story labels (8-way fork,
-  five solo routes, Miya / AI / Momo routes), a runtime-generated route atlas
+  with no server, no CDN and no runtime fetch. Story arcs live in `game/vendor/story/`
+  (prologue, procrastination, Miya, AI and Momo) and are assembled by the small
+  engine/UI bootstrap in `game/vendor/game.js`. The route atlas is runtime-generated
   with jump-to-node, an archives codex, and a 2.5D skeuomorphic mecha UI
   (`vendor/mecha-ui.css` + `mecha-ui.js`). UI design notes, engine traps and
   session history: [`design/MECHA_UI.md`](design/MECHA_UI.md).

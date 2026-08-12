@@ -55,7 +55,7 @@ visual-novel, main-screen, game-screen, text-box, main-menu, quick-menu, dialog-
 main-screen {
   background:
     linear-gradient(rgba(8, 10, 18, 0.85), rgba(8, 10, 18, 0.95)),
-    url('../assets/scenes/courtyard.png') center/cover no-repeat;
+    url('../assets/scenes/courtyard.webp') center/cover no-repeat;
 }
 
 /* Engine system screens (main menu, settings, save/load, help, credits,
@@ -850,7 +850,7 @@ main-screen {
   background:
     repeating-linear-gradient(45deg, rgba(251, 191, 36, 0.03) 0 2px, transparent 2px 32px),
     linear-gradient(rgba(8, 10, 18, 0.85), rgba(8, 10, 18, 0.95)),
-    url('../assets/scenes/courtyard.png?v=20260728r11') center/cover no-repeat !important;
+    url('../assets/scenes/courtyard.webp?v=20260804r1') center/cover no-repeat !important;
   animation: mechAmbient 14s linear infinite;
 }
 

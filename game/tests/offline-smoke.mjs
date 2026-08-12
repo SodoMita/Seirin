@@ -115,7 +115,7 @@ if (microChoice) {
 }
 // Route first-minutes beats: every micro-choice must apply and rewind exactly.
 const routeBeats = [
-    ['SoloRoute1', 'CouchMarathon', 'procrastination', 5],
+    ['SoloRoute1', 'Water', 'philosophical_depth', 1],
     ['SoloRoute2', 'ToastStatusQuo', 'procrastination', 3],
     ['SoloRoute3', 'TaskQuestions', 'philosophical_depth', 2],
     ['SoloRoute4', 'CheckMemory', 'philosophical_depth', 3],
@@ -238,7 +238,7 @@ if (graphMenuBtn) {
     const overlay = w.document.getElementById('graph-overlay');
     check('debug route atlas opens mid-game too', overlay && overlay.hidden === false);
     const nodes = w.document.querySelectorAll('.graph-node');
-    check('route atlas auto-renders all 17 shipped labels', nodes.length === 17, String(nodes.length));
+    check('route atlas auto-renders all 31 shipped labels', nodes.length === 31, String(nodes.length));
     const branchCard = w.document.getElementById('graph-node-SoloRoute5');
     check('atlas shows the vn.branch forks of Solo 5',
         !!(branchCard && branchCard.querySelector('[data-graph-goto="Solo5BadEnd"]') &&
