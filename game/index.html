@@ -6,14 +6,14 @@
     <title>Сэйрин: Ночная смена — Резонанс 2030 | Visual Novel</title>
     <meta name="description" content="Visual Novel: Seirin: Night Shift — Resonance 2030. Runs 100% offline." />
 
-    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260728r11" />
+    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260804r12" />
     <link rel="stylesheet" href="vendor/monogatari.css?v=20260728r11" />
-    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260804r12" />
     <link rel="stylesheet" href="vendor/custom-ui.css?v=20260728r11" />
     <!-- 2.5D skeuomorphic mecha armour skin. MUST stay last: it repaints the
          flat reskin in vendor/custom-ui.css and relies on winning the cascade
          at equal specificity. Layer markup is injected by vendor/mecha-ui.js. -->
-    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260728r11" />
+    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260804r18" />
 </head>
 <body>
 
@@ -28,6 +28,14 @@
             <span id="hud-player-name" class="hud-badge amber"><i class="fas fa-user-secret"></i><span>Рэн</span></span>
             <span id="hud-route" class="hud-badge pink"><i class="fas fa-terminal"></i><span>Начало</span></span>
             <span id="hud-alert-level" class="hud-badge red"><i class="fas fa-shield-alt"></i><span>0%</span></span>
+        </div>
+        <div class="hud-group hud-resources">
+            <div class="hud-clock" role="timer" aria-label="Дата и время">
+                <span id="hud-date" class="hud-clock-date">СР 15.07</span>
+                <span id="hud-time" class="hud-clock-time">21<span class="hud-clock-colon">:</span>00</span>
+            </div>
+            <span id="hud-money" class="hud-badge amber"><img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>1000</span></span>
+            <span id="hud-items" class="hud-badge"><img src="assets/icons/box-open.svg?v=20260804r1" class="hud-svg" alt=""><span>0</span></span>
         </div>
 
         <div class="hud-group">
@@ -97,10 +105,33 @@
         </div>
     </div>
 
-    <script src="vendor/failsafe.js?v=20260728r11"></script>
+    <script src="vendor/failsafe.js?v=20260804r11"></script>
     <script src="vendor/monogatari.js?v=20260728r11"></script>
-    <script src="vendor/icons-offline.js?v=20260728r11"></script>
-    <script src="vendor/game.js?v=20260728r11"></script>
+    <script src="vendor/icons-offline.js?v=20260804r12"></script>
+    <!-- Story arcs are standalone ES5 modules; game.js only wires the engine/UI. -->
+    <script src="vendor/story/prologue.js?v=20260804r20"></script>
+    <script src="vendor/story/procrastination.js?v=20260804r25"></script>
+    <script src="vendor/story/anime_shorts.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_comfort.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_activities.js?v=20260804r26"></script>
+    <script src="vendor/story/anime_watchlist.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_eva_01_07.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_eva_09_16.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_eva_17_24.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_eva_25_end.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_nausicaa.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_key.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_cicada.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_gacha.js?v=20260804r20"></script>
+    <script src="vendor/story/anime_fandom.js?v=20260804r20"></script>
+    <script src="vendor/story/club.js?v=20260804r4"></script>
+    <script src="vendor/story/tower.js?v=20260804r4"></script>
+    <script src="vendor/story/bench.js?v=20260804r4"></script>
+    <script src="vendor/story/lonewar.js?v=20260804r4"></script>
+    <script src="vendor/story/miya.js?v=20260804r4"></script>
+    <script src="vendor/story/ai.js?v=20260804r4"></script>
+    <script src="vendor/story/momo.js?v=20260804r4"></script>
+    <script src="vendor/game.js?v=20260804r29"></script>
     <!-- Mecha skin driver: bakes metal/wear textures on a canvas, injects the
          armour layer stack, builds the HUD instrument rail + telemetry strip,
          and drives the indicators from engine storage. Read-only w.r.t. game
