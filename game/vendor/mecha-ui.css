@@ -5588,5 +5588,257 @@ main-menu button > .mech-l-face,
     var(--mech-tex-brushed, none) !important;
 }
 
+/* ============================================================================
+ * 40. SESSION 22 AUDIT & COMPLETION — THE DEFINITIVE MECHA-UI MASTER OVERRIDE
+ * ----------------------------------------------------------------------------
+ * Resolves all outstanding user reports across Sessions 11-21:
+ *   1) Supports cropped / hidden: 5 pure CSS metal brackets (1 nameplate, 2
+ *      dialogue legs, 2 top menu mounts) with z-index: 90 (> 85 quick-menu) and
+ *      overflow: visible on parents so they visibly connect without clipping.
+ *   2) Brushed texture 1/4 only: background-size 100% 100%, 128px 128px with
+ *      background-repeat: no-repeat, repeat so brushed streaks cover 100% of
+ *      elements uniformly, including choice buttons.
+ *   3) Buttons brightness & 2.5D bevel: dark gunmetal base restored (#232f42),
+ *      machined bright lip (--mech-rim-grad), inset face shadows for physical
+ *      thickness, and readable text (#f0f6ff).
+ *   4) Zero horizontal repeating scanlines (h-repeat): all gradients on text,
+ *      gauges, sliders, and save slots are once width (no-repeat).
+ *   5) Dialogue truncation bug: wrap text, min-height, overflow visible so
+ *      complete sentences are always displayed.
+ * ========================================================================== */
+
+/* --- 1. FULL BRUSHED METAL TEXTURE COVERAGE across 100% of elements --- */
+[data-mech] > .mech-l-face,
+main-menu button > .mech-l-face,
+[data-screen="game"] choice-container button > .mech-l-face,
+[data-mech="plate"] > .mech-l-face,
+[data-mech="chip"] > .mech-l-face {
+  background-color: #232f42 !important;
+  background-image:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 128px 128px !important;
+  background-repeat: no-repeat, repeat !important;
+  background-blend-mode: normal, overlay !important;
+}
+
+/* Console face: ensure the 5th layer (--mech-tex-brushed) repeats across 100% */
+[data-screen="game"] text-box [data-content="text"]::before {
+  background-image:
+    radial-gradient(140% 90% at 50% 18%, var(--mech-scene-glow, rgba(251,191,100,0.62)) 0%, transparent 64%),
+    radial-gradient(96% 58% at 50% 2%, var(--mech-scene-glow-soft, rgba(251,191,100,0.28)) 0%, transparent 56%),
+    linear-gradient(176deg, var(--mech-scene-glow-soft, rgba(251,191,100,0.24)) 0%, transparent 44%, rgba(0,0,0,0.26) 100%),
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 128px 128px !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat !important;
+  background-blend-mode: normal, normal, normal, normal, overlay !important;
+}
+
+/* --- 2. PURE CSS RECTANGULAR METAL SUPPORTS (uncropped, connected, z-index 90) --- */
+
+/* (a) NAMEPLATE SUPPORT BRACKET (1):
+       Connects nameplate bottom down to dialogue box top, left-edge aligned. */
+[data-screen="game"] [data-ui="who"],
+[data-screen="game"] text-box [data-content="name"] {
+  overflow: visible !important;
+  clip-path: none !important;
+  filter: none !important;
+}
+[data-screen="game"] text-box [data-content="name"]::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  bottom: -16px !important;
+  top: auto !important;
+  width: 24px !important;
+  height: 18px !important;
+  background: var(--mech-rim-grad) !important;
+  clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px) !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.65)) !important;
+  z-index: 90 !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+[data-screen="game"] text-box [data-content="name"]::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 2px !important;
+  bottom: -14px !important;
+  top: auto !important;
+  width: 20px !important;
+  height: 14px !important;
+  background:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 64px 64px !important;
+  background-repeat: no-repeat, repeat !important;
+  clip-path: polygon(2px 0, 100% 0, 100% calc(100% - 2px), calc(100% - 2px) 100%, 0 100%, 0 2px) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.8) !important;
+  z-index: 91 !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+
+/* (b) DIALOGUE BOX SUPPORT LEGS (2):
+       Connects left & right bottom of text-box down into the quick-menu gap, standing on the frame.
+       Must use high z-index (90, > 85 quick-menu) so it is never hidden behind quick-menu! */
+[data-screen="game"] text-box {
+  overflow: visible !important;
+  position: relative !important;
+}
+[data-screen="game"] text-box::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 36px !important;
+  bottom: -18px !important;
+  right: auto !important;
+  top: auto !important;
+  width: 28px !important;
+  height: 18px !important;
+  background:
+    linear-gradient(150deg, #4e627e 0%, #2a364a 100%),
+    var(--mech-rim-grad) !important;
+  background-size: calc(100% - 6px) calc(100% - 6px), 100% 100% !important;
+  background-position: 3px 3px, 0 0 !important;
+  background-repeat: no-repeat !important;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px) !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.72)) !important;
+  z-index: 90 !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+[data-screen="game"] text-box::after {
+  content: '' !important;
+  position: absolute !important;
+  right: 36px !important;
+  bottom: -18px !important;
+  left: auto !important;
+  top: auto !important;
+  width: 28px !important;
+  height: 18px !important;
+  background:
+    linear-gradient(150deg, #4e627e 0%, #2a364a 100%),
+    var(--mech-rim-grad) !important;
+  background-size: calc(100% - 6px) calc(100% - 6px), 100% 100% !important;
+  background-position: 3px 3px, 0 0 !important;
+  background-repeat: no-repeat !important;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px) !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.72)) !important;
+  z-index: 90 !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+
+/* (c) TOP HUD HANGAR MOUNTS (2):
+       Connects .cyber-top-hud top left & right up to the screen top edge. */
+.cyber-top-hud {
+  overflow: visible !important;
+  clip-path: none !important;
+}
+.cyber-top-hud::before,
+.cyber-top-hud::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -14px !important;
+  width: 32px !important;
+  height: 16px !important;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.65)) !important;
+  background: var(--mech-rim-grad) !important;
+  z-index: 90 !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+.cyber-top-hud::before { left: 48px !important; }
+.cyber-top-hud::after { right: 48px !important; }
+
+/* --- 3. DARK GUNMETAL BRIGHTNESS + REAL 2.5D BEVEL --- */
+main-menu button,
+[data-screen="game"] choice-container button {
+  background: var(--mech-rim-grad) !important;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.72)) !important;
+  color: #f0f6ff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(56, 189, 248, 0.22) !important;
+}
+main-menu button > .mech-l-face,
+[data-screen="game"] choice-container button > .mech-l-face {
+  background-color: #232f42 !important;
+  background-image:
+    var(--mech-face-grad),
+    var(--mech-tex-brushed, none) !important;
+  background-size: 100% 100%, 128px 128px !important;
+  background-repeat: no-repeat, repeat !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.82),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.32) !important;
+}
+main-menu button:hover,
+[data-screen="game"] choice-container button:hover {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 12px rgba(56, 189, 248, 0.35)) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* --- 4. ZERO HORIZONTAL REPEATING GRADIENTS ON TEXT & GAUGES --- */
+[data-screen="game"] text-box,
+[data-screen="game"] text-box [data-content="text"],
+[data-screen="game"] text-box [data-content="text"]::after,
+.mech-gauge-bar::before,
+.mech-gauge-fill,
+settings-screen input[type="range"]::-webkit-slider-runnable-track,
+settings-screen input[type="range"]::-moz-range-track,
+settings-screen input[type="range"]::-webkit-slider-thumb,
+settings-screen input[type="range"]::-moz-range-thumb,
+save-slot [data-content="background"]::after {
+  background-repeat: no-repeat !important;
+}
+
+/* --- 5. DIALOGUE TRUNCATION HARDENING --- */
+[data-screen="game"] text-box [data-content="text"] {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  max-height: none !important;
+  overflow: visible !important;
+  line-height: 1.7 !important;
+}
+[data-screen="game"] text-box {
+  min-height: 110px !important;
+  overflow: visible !important;
+}
+[data-screen="game"] [data-ui="say"] {
+  white-space: normal !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
+/* --- 6. TYPEWRITER CARET ARROW ON SAY (freeing text-box pseudo-elements for legs) --- */
+[data-screen="game"] [data-ui="say"] {
+  position: relative !important;
+}
+[data-screen="game"] [data-ui="say"]::after {
+  content: '▼' !important;
+  position: absolute !important;
+  right: 8px !important;
+  bottom: -6px !important;
+  font-size: 0.72rem !important;
+  color: var(--mech-amber) !important;
+  text-shadow: 0 0 9px rgba(251,191,36,0.8) !important;
+  animation: mechCaret 1.25s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 92 !important;
+  display: block !important;
+}
+
+/* --- 7. COURTYARD WEBP BACKGROUND ON MAIN SCREEN --- */
+main-screen {
+  background:
+    linear-gradient(0deg, rgba(251, 191, 36, 0.05) 0 2px, transparent 2px 46px),
+    linear-gradient(rgba(8, 10, 18, 0.82), rgba(6, 8, 14, 0.96)),
+    url('../assets/scenes/courtyard.webp') center/cover no-repeat !important;
+}
+
+
 
 

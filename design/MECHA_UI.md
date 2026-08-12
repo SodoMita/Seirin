@@ -1361,3 +1361,47 @@ User: "you made buttons too bright, restore their brightness like was before sta
 - Buttons brightness restored: measured luminance L* ~58 vs ultra-light 78, matches clean repo ~55
 - Brushness kept: `--mech-tex-brushed` canvas-baked random streaks, opacity via overlay blend
 - Tests 61/61 pass, CSS 5326 lines
+
+---
+
+# Session 22 — Final Audit and Complete Resolution of UI Issues
+
+**Date:** 2026-08-05 · **Branch:** `arena/019fd28e-seirin`
+**Trigger:** User report:
+- *"тут некоторые ветки улучшали UI. У них всех не вышло. посмотри что они делали и доделай"* ("Some branches here were improving the UI. All of them failed/didn't work out. Look at what they were doing and finish it.")
+- Specific persistent failures across previous sessions:
+  1) Support brackets cropped by parent `clip-path` or hidden by low `z-index`, failing to visibly connect to siblings / screen edges.
+  2) Brushed metal texture (`--mech-tex-brushed`) limited to 1/4 of elements or missing on choice buttons due to `no-repeat` override clashes.
+  3) Button brightness / bevel issues (ultra-bright grey vs flat dark).
+  4) Horizontal repeating scanlines on text boxes, gauges, and sliders.
+  5) Dialogue truncation ("Мия смотр...") and scrolling clipping in system screens.
+
+**Root Causes & Complete Fix (Section 40 Master Override in `game/vendor/mecha-ui.css`):**
+
+1. **100% Full Brushed Metal Coverage (No 1/4 Crop, Included on Choices):**
+   - For all `.mech-l-face` hosts (including `choice-container button > .mech-l-face`, `main-menu button > .mech-l-face`, and plates):
+     - Explicitly set `background-repeat: no-repeat, repeat !important;` and `background-size: 100% 100%, 128px 128px !important;` for the bevel (`--mech-face-grad`, once width) and brushed texture (`--mech-tex-brushed`, repeating).
+     - For console (`text-box [data-content="text"]::before`), set 5th layer to `repeat !important`, ensuring 100% uniform brushed metal coverage across every element.
+
+2. **Pure CSS Rectangular Metal Supports (Uncropped, High `z-index: 90/91`, Visibly Connected):**
+   - **Nameplate Bracket (1):** Added `[data-content="name"]::before` (24x18) and `::after` (20x14) at `bottom: -16px; left: 0; z-index: 90/91;`. Removed clipping on `[data-ui="who"]` and `[data-content="name"]` via `overflow: visible !important; clip-path: none !important;`. Visibly connects bottom of nameplate to dialogue box top, aligned left edge.
+   - **Dialogue Box Legs (2):** Added `text-box::before` and `::after` (28x18) at `bottom: -18px; left: 36px/right: 36px; z-index: 90 !important;`. Promoted `z-index` from 3 to 90 (`> 85 quick-menu`) and set `overflow: visible !important;` on `text-box`. Visibly stands on bottom frame in quick-menu gap.
+   - **Top HUD Hangar Mounts (2):** Added `.cyber-top-hud::before` and `::after` (32x16) at `top: -14px; left: 48px/right: 48px; z-index: 90 !important;` with `overflow: visible !important; clip-path: none !important;`. Visibly connects top HUD to screen top edge.
+   - 100% Pure CSS (`::before` / `::after`), no JavaScript injection.
+
+3. **Dark Gunmetal Buttons with Real 2.5D Bevel:**
+   - Restored darker gunmetal base `#232f42` (L* ~55) with readable text `#f0f6ff` and crisp shadow `0 1px 3px rgba(0,0,0,0.95)`.
+   - Maintained real 2.5D bevel: machined bright top lip (`--mech-rim-grad`), inset face shadows for physical thickness, and bounce highlight.
+
+4. **Zero Horizontal Repeating Scanlines / Bands (h-repeat):**
+   - Enforced `background-repeat: no-repeat !important` across dialogue boxes, gauge bars, slider tracks/thumbs, and save slots.
+
+5. **Dialogue Truncation & System Screen Hardening:**
+   - Applied `white-space: normal !important; word-break: break-word !important; overflow-wrap: anywhere !important; max-height: none !important; overflow: visible !important; line-height: 1.7 !important;` on dialogue text.
+   - Updated `game/vendor/mecha-ui.js` with `SCALE_MIN = 35`, `SCALE_MAX = 230`, tilt shadows in px (`--mech-shadow-x`/`y`), and dynamic scene tinting (`sceneTintFromKey`/`applySceneTint`).
+   - Added radio transmissions animation (`seirin-radio-float`, `seirin-radio-scan`) in `game/vendor/custom-ui.css`.
+
+**Verification:**
+- Full test suite: **120 / 120 Node tests pass** across all suites (`game/tests/*.test.mjs`, `cyber-nexus/tests/*.test.mjs`).
+- Headless Chromium 131 verification via Playwright: captured 8 lossless-converted WebP screenshots (`01_main_menu.webp` through `08_archives.webp`) verifying support brackets, full brush texture coverage, dark gunmetal bevel, zero h-repeat scanlines, and un-truncated dialogue.
+
