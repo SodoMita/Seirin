@@ -238,7 +238,7 @@ if (graphMenuBtn) {
     const overlay = w.document.getElementById('graph-overlay');
     check('debug route atlas opens mid-game too', overlay && overlay.hidden === false);
     const nodes = w.document.querySelectorAll('.graph-node');
-    check('route atlas auto-renders all 31 shipped labels', nodes.length === 31, String(nodes.length));
+    check('route atlas auto-renders all 205 shipped labels', nodes.length === 205, String(nodes.length));
     const branchCard = w.document.getElementById('graph-node-SoloRoute5');
     check('atlas shows the vn.branch forks of Solo 5',
         !!(branchCard && branchCard.querySelector('[data-graph-goto="Solo5BadEnd"]') &&
