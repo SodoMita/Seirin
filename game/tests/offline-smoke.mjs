@@ -263,7 +263,7 @@ check('no unmapped icons', Object.keys((w.IconsOffline && w.IconsOffline.missing
 // notice the engine logs when a route's leading hide runs after the atlas
 // teleport wiped presentation state (organic play always has the sprite up).
 const relevant = errors.filter(error =>
-    !/settings saved|first time|Cannot convert undefined|null to object|localStorage|Attempted to hide a character|Unhandled promise rejection/i.test(error));
+    !/settings saved|first time|Cannot convert undefined|null to object|localStorage|Attempted to hide a character/i.test(error));
 check('no unexpected console errors', relevant.length === 0, relevant.join(' | '));
 dom.window.close();
 if (failures.length) { console.error('SMOKE FAILED: ' + failures.join(', ')); process.exit(1); }
