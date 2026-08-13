@@ -4,18 +4,27 @@ A visual layer for `game/` that reskins the Monogatari VN as a piece of
 battle-machinery: shaded metal plates, decorative wear ("bruises"), live
 indicators, and animated illumination.
 
-Ships as exactly two new files, both loaded last so they win the cascade:
+> **2026-08-13 — the JS half is retired.** `game/vendor/mecha-ui.js` (texture
+> bakery + layer injection + instrument builder + parallax) is gone. The whole
+> skin is now pure CSS: `game/vendor/mecha-ui.css` paints bevels/chamfers with
+> gradients + borders + `clip-path`, the 2.5D tilt is a CSS 3D transform, the
+> HUD instrument rail / telemetry ticker / title block are static markup in
+> `index.html`, and the alert state is wired from `game.js` (which sets
+> `html.mech-caution` / `html.mech-alarm` from `akatomi_alert`). The history
+> below documents the layer system it replaced — keep it for reference on the
+> engine traps, but the layer model is no longer shipped.
+
+Ships as one new file, loaded last so it wins the cascade:
 
 | File | Role |
 |---|---|
 | `game/vendor/mecha-ui.css` | all paint: bevels, chamfers, indicators, keyframes, responsive ladder |
-| `game/vendor/mecha-ui.js` | bakes textures, injects layer markup, drives indicators from game state |
 
-Nothing else in the game changed except four `<link>`/`<script>` lines in
-`game/index.html`. The previous flat reskin in `vendor/custom-ui.css` is left
-untouched on purpose — it carries geometry regression pins (panel positions,
-the sprite world-scale table, mobile breakpoints) that this layer repaints
-rather than replaces.
+The previous flat reskin in `vendor/custom-ui.css` is left untouched on
+purpose — it carries geometry regression pins (panel positions, the sprite
+world-scale table, mobile breakpoints) that this layer repaints rather than
+replaces. Where `custom-ui.css` already overrides with `!important`, the skin
+answers with its own `!important` (later in source order, so it wins).
 
 ---
 

@@ -10,10 +10,11 @@
     <link rel="stylesheet" href="vendor/monogatari.css?v=20260728r11" />
     <link rel="stylesheet" href="vendor/icons-offline.css?v=20260804r12" />
     <link rel="stylesheet" href="vendor/custom-ui.css?v=20260728r11" />
-    <!-- 2.5D skeuomorphic mecha armour skin. MUST stay last: it repaints the
-         flat reskin in vendor/custom-ui.css and relies on winning the cascade
-         at equal specificity. Layer markup is injected by vendor/mecha-ui.js. -->
-    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260804r18" />
+    <!-- 2.5D skeuomorphic mecha armour skin (pure CSS). MUST stay last: it
+         repaints the flat reskin in vendor/custom-ui.css and relies on winning
+         the cascade at equal specificity. No JS driver — buttons, HUD and
+         instruments are all styled here; markup is static in this file. -->
+    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260813r19" />
 </head>
 <body>
 
@@ -46,7 +47,34 @@
                 <i class="fas fa-book"></i><span>АРХИВ</span>
             </button>
         </div>
+
+        <!-- Instrument rail: decorative telemetry, now pure static markup +
+             CSS (was injected by the retired mecha-ui.js). The ALR LED and
+             HEAT gauge react to html.mech-caution / html.mech-alarm, which
+             game.js sets from akatomi_alert. -->
+        <div class="hud-instruments" aria-hidden="true">
+            <div class="mech-leds">
+                <span class="mech-led" data-state="ready">RDY</span>
+                <span class="mech-led" data-state="active">ACT</span>
+                <span class="mech-led" data-state="alert">ALR</span>
+            </div>
+            <div class="mech-gauges">
+                <div class="mech-gauge" data-k="res"><span class="mech-gauge-k">RES</span><span class="mech-gauge-bar"><span class="mech-gauge-fill"></span></span><span class="mech-gauge-v">28</span></div>
+                <div class="mech-gauge" data-k="pwr"><span class="mech-gauge-k">PWR</span><span class="mech-gauge-bar"><span class="mech-gauge-fill"></span></span><span class="mech-gauge-v">62</span></div>
+                <div class="mech-gauge" data-k="heat"><span class="mech-gauge-k">HEAT</span><span class="mech-gauge-bar"><span class="mech-gauge-fill"></span></span><span class="mech-gauge-v">0</span></div>
+            </div>
+            <div class="mech-radar"></div>
+            <div class="mech-serial">UNIT RGC-08</div>
+        </div>
     </header>
+
+    <!-- Telemetry ticker: pure CSS marquee under the dashboard. -->
+    <div class="mech-strip" aria-hidden="true">
+        <div class="mech-strip-track">
+            <span><b>SEIRIN NET</b> · RESONANCE GRID NOMINAL</span><span>СЕТЬ ЦУКИМАТИ · <i>УЗЕЛ 04 СТАБИЛЕН</i></span><span><b>SCRAP-TITAN 04</b> · HYDRAULICS 98%</span><span>АКАТОМИ · ПАТРУЛЬНЫЙ КОНТУР · <i>СЛУШАЕТ</i></span><span><b>AQUAFORGE</b> · COLLOID CORE SYNC 1.00</span><span>МОТОЦИКЛ «СТРИЖ» · ДВИГАТЕЛЬ ХОЛОДНЫЙ</span>
+            <span><b>SEIRIN NET</b> · RESONANCE GRID NOMINAL</span><span>СЕТЬ ЦУКИМАТИ · <i>УЗЕЛ 04 СТАБИЛЕН</i></span><span><b>SCRAP-TITAN 04</b> · HYDRAULICS 98%</span><span>АКАТОМИ · ПАТРУЛЬНЫЙ КОНТУР · <i>СЛУШАЕТ</i></span><span><b>AQUAFORGE</b> · COLLOID CORE SYNC 1.00</span><span>МОТОЦИКЛ «СТРИЖ» · ДВИГАТЕЛЬ ХОЛОДНЫЙ</span>
+        </div>
+    </div>
 
     <!-- MONOGATARI CONTAINER — engine markup skeleton.
          NOTE 1: the container id is "vn-root", NOT "monogatari" (an element
@@ -61,6 +89,13 @@
             <language-selection-screen></language-selection-screen>
             <loading-screen></loading-screen>
             <main-screen>
+                <!-- Title block is static markup now (was injected by the
+                     retired mecha-ui.js). It is the flex column's first row,
+                     main-menu takes the rest, so the two can never overlap. -->
+                <div class="mech-title-block" aria-hidden="true">
+                    <span class="mech-title">СЭЙРИН</span>
+                    <span class="mech-sub">НОЧНАЯ СМЕНА · РЕЗОНАНС 2030</span>
+                </div>
                 <main-menu></main-menu>
             </main-screen>
             <game-screen>
@@ -132,11 +167,10 @@
     <script src="vendor/story/ai.js?v=20260804r4"></script>
     <script src="vendor/story/momo.js?v=20260804r4"></script>
     <script src="vendor/game.js?v=20260804r29"></script>
-    <!-- Mecha skin driver: bakes metal/wear textures on a canvas, injects the
-         armour layer stack, builds the HUD instrument rail + telemetry strip,
-         and drives the indicators from engine storage. Read-only w.r.t. game
-         state; loads after game.js so window.engine already exists. -->
-    <script src="vendor/mecha-ui.js?v=20260728r11"></script>
+
+    <!-- Global illumination: static layers, animated purely in CSS. -->
+    <div class="mech-ambient" aria-hidden="true"></div>
+    <div class="mech-beacon" aria-hidden="true"></div>
 
 </body>
 </html>
