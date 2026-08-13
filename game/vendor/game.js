@@ -724,6 +724,14 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 setTimeout(function () { alertEl.classList.remove('alert-pulse'); }, 700);
             }
             lastAlertLevel = level;
+            /* Drive the pure-CSS mecha skin's caution/alarm states. Thresholds
+             * mirror the retired mecha-ui.js (caution 15–39, alarm 40+). */
+            var docEl = document.documentElement;
+            if (docEl && docEl.classList) {
+                docEl.classList.remove('mech-caution', 'mech-alarm');
+                if (level >= 40) { docEl.classList.add('mech-alarm'); }
+                else if (level >= 15) { docEl.classList.add('mech-caution'); }
+            }
             syncArchives();
             syncGraph();
             syncSkipButton();
