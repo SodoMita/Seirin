@@ -60,6 +60,21 @@
       var(--mech-c-d2) 78%,
       var(--mech-c-l3) 100%);
 
+  /* Chamfer + bevel geometry. The bevel is a RING painted on the plate element
+     itself (a 135deg light->dark ramp), with the face inset by --mech-bevel and
+     re-chamfered on a ::before. Because the face is inset and parallel, the
+     bevel ring follows the DIAGONAL cut corners as well as the straight edges
+     — lit on the top-left chamfer, shaded on the bottom-right one. */
+  --mech-cut: 12px;      /* top-left chamfer size */
+  --mech-cut-br: 9px;    /* bottom-right chamfer size */
+  --mech-bevel: 2px;     /* bevel ring thickness */
+  --mech-bevel-grad: linear-gradient(135deg,
+      var(--mech-c-l4) 0%, var(--mech-c-l2) 30%,
+      var(--mech-c-d2) 70%, var(--mech-c-d4) 100%);
+  --mech-bevel-grad-in: linear-gradient(135deg,
+      var(--mech-c-d4) 0%, var(--mech-c-d2) 30%,
+      var(--mech-c-l2) 70%, var(--mech-c-l4) 100%);
+
   /* Hazard chevrons. */
   --mech-hazard: repeating-linear-gradient(-45deg,
       var(--mech-amber) 0 6px, var(--mech-c-d3) 6px 12px);
@@ -157,29 +172,56 @@
 /* ============================================================================
  * 3. SHARED PLATE LANGUAGE — chamfer + bevel + lighting
  * ========================================================================== */
-/* Every interactive plate gets the same machined treatment. */
+/* Every interactive plate gets the same machined treatment.
+   Two layers, no border:
+     - the plate element paints the BEVEL ring (135deg light->dark ramp);
+     - an inset ::before paints the steel FACE.
+   The inset face carries the same chamfer polygon, so the bevel ring runs
+   along the DIAGONAL cut corners as well as the straight edges. */
 main-menu button,
 [data-screen="game"] choice-container button,
 .hud-btn,
 [data-screen]:not([data-screen="game"]) [data-action="back"] {
   position: relative;
-  border: 1px solid !important;
-  border-color: var(--mech-c-l3) var(--mech-c-d3) var(--mech-c-d4) var(--mech-c-l4) !important;
+  isolation: isolate;          /* contain the z-index:-1 face below the text */
+  border: none !important;
   border-radius: 0 !important;
-  background: var(--mech-face) !important;
+  background: var(--mech-bevel-grad) !important;
   color: #e8f0fa !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),   /* lit top lip */
-    inset 1px 0 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.55),         /* dark bottom lip */
-    inset -1px 0 0 rgba(0, 0, 0, 0.35) !important;
+  box-shadow: none !important;
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55)) !important;
-  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 9px),
-      calc(100% - 9px) 100%, 0 100%, 0 12px) !important;
+  clip-path: polygon(var(--mech-cut) 0, 100% 0,
+      100% calc(100% - var(--mech-cut-br)),
+      calc(100% - var(--mech-cut-br)) 100%,
+      0 100%, 0 var(--mech-cut)) !important;
   transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
       filter 0.18s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.18s ease;
+      background 0.18s ease;
   cursor: pointer;
+}
+
+/* The face: inset one bevel-width, re-chamfered with the same polygon. It
+   paints ABOVE the plate's bevel background but BELOW the text (z-index:-1
+   inside the plate's isolation stacking context), so the bevel ring stays
+   visible all the way around — including the corner chamfers. */
+main-menu button::before,
+[data-screen="game"] choice-container button::before,
+.hud-btn::before,
+[data-screen]:not([data-screen="game"]) [data-action="back"]::before {
+  content: '' !important;
+  position: absolute;
+  inset: var(--mech-bevel);
+  z-index: -1;
+  background: var(--mech-face) !important;
+  border-radius: 0 !important;
+  counter-increment: none !important;
+  clip-path: polygon(var(--mech-cut) 0, 100% 0,
+      100% calc(100% - var(--mech-cut-br)),
+      calc(100% - var(--mech-cut-br)) 100%,
+      0 100%, 0 var(--mech-cut));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),   /* lit top lip */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55) !important;  /* dark bottom lip */
 }
 
 /* Hover: lift toward the light with a small 3D tilt (pure CSS perspective). */
@@ -187,23 +229,19 @@ main-menu button:hover,
 [data-screen="game"] choice-container button:hover,
 .hud-btn:hover,
 [data-screen]:not([data-screen="game"]) [data-action="back"]:hover {
-  border-color: var(--mech-c-l4) var(--mech-c-d4) var(--mech-c-d4) var(--mech-c-l4) !important;
   transform: perspective(700px) rotateX(-2deg) rotateY(2deg) translateY(-2px) !important;
   filter:
     drop-shadow(0 0 16px rgba(56, 189, 248, 0.35))
     drop-shadow(0 10px 18px rgba(0, 0, 0, 0.6)) !important;
 }
 
-/* Press: sink INTO the panel — invert the bevel, drop the lift. */
+/* Press: sink INTO the panel — invert the bevel ramp, drop the lift. */
 main-menu button:active,
 [data-screen="game"] choice-container button:active,
 .hud-btn:active,
 [data-screen]:not([data-screen="game"]) [data-action="back"]:active {
   transform: perspective(700px) rotateX(1deg) scale(0.985) !important;
-  border-color: var(--mech-c-d3) var(--mech-c-l2) var(--mech-c-l2) var(--mech-c-d3) !important;
-  box-shadow:
-    inset 0 2px 6px rgba(0, 0, 0, 0.55),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+  background: var(--mech-bevel-grad-in) !important;
   filter: brightness(0.92) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) !important;
 }
 
@@ -315,16 +353,18 @@ main-menu button:active,
 }
 #hud-alert-level.alert-pulse { animation: mechStrobe 0.5s steps(1, end) infinite; }
 
-/* HUD buttons: small chamfered chips. */
+/* HUD buttons: small chamfered chips (narrower chamfer than the big plates).
+   The chamfer size lives in the --mech-cut tokens so the shared face ::before
+   follows the SAME cuts automatically. */
 .hud-btn {
+  --mech-cut: 8px;
+  --mech-cut-br: 8px;
   padding: 6px 13px;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #cbd5e1;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px),
-      calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 .hud-btn:hover { color: #eaf4ff; }
 .hud-btn .fas { margin-right: 4px; }
@@ -570,19 +610,35 @@ html.mech-alarm .mech-gauge[data-k="heat"] .mech-gauge-fill { width: 62%; }
   max-width: 1100px;
   min-height: 120px;
   padding: 18px 32px 18px !important;
-  background: var(--mech-face) !important;
-  border: 1px solid !important;
-  border-color: var(--mech-c-l3) var(--mech-c-d3) var(--mech-c-d4) var(--mech-c-l4) !important;
+  /* Console is a chamfered plate too: bevel ring on the element, face on
+     ::before, so the bevel follows the big corner cuts. */
+  --mech-cut: 30px;
+  --mech-cut-br: 16px;
+  --mech-bevel: 2px;
+  isolation: isolate;
+  background: var(--mech-bevel-grad) !important;
+  border: none !important;
   border-radius: 0 !important;
-  clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 16px),
-      calc(100% - 16px) 100%, 0 100%, 0 30px) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.6) !important;
+  clip-path: polygon(var(--mech-cut) 0, 100% 0, 100% calc(100% - var(--mech-cut-br)),
+      calc(100% - var(--mech-cut-br)) 100%, 0 100%, 0 var(--mech-cut)) !important;
+  box-shadow: none !important;
   overflow: hidden;
   z-index: 50;
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
   animation: textboxIn 0.45s ease both;
+}
+/* Face: inset one bevel-width, re-chamfered (follows the 30px/16px cuts). */
+[data-screen="game"] text-box::before {
+  content: '';
+  position: absolute;
+  inset: var(--mech-bevel);
+  z-index: -1;
+  background: var(--mech-face) !important;
+  clip-path: polygon(var(--mech-cut) 0, 100% 0, 100% calc(100% - var(--mech-cut-br)),
+      calc(100% - var(--mech-cut-br)) 100%, 0 100%, 0 var(--mech-cut));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6) !important;
 }
 /* Subtle scanlines — no repeating texture, a 4px cycle reads as CRT glass. */
 [data-screen="game"] text-box::after {
@@ -636,23 +692,27 @@ html.mech-alarm .mech-gauge[data-k="heat"] .mech-gauge-fill { width: 62%; }
   font-weight: 600 !important;
   animation: fadeSlideUp 0.32s both;
 }
-/* Index stencil: 01, 02, ... */
+/* Index stencil: 01, 02, ... (::after — ::before is the bevel face). */
 [data-screen="game"] choice-container {
   counter-reset: mechChoice;
 }
-[data-screen="game"] choice-container button::before {
+[data-screen="game"] choice-container button::after {
   counter-increment: mechChoice;
-  content: '0' counter(mechChoice);
+  content: '0' counter(mechChoice) !important;
   position: absolute;
   left: 14px;
   top: 50%;
-  transform: translateY(-50%);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.9rem;
-  color: rgba(56, 189, 248, 0.75);
-  letter-spacing: 0.08em;
+  transform: translateY(-50%) !important;
+  width: auto !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.9rem !important;
+  color: rgba(56, 189, 248, 0.75) !important;
+  letter-spacing: 0.08em !important;
+  background: none !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
 }
-[data-screen="game"] choice-container button:hover::before { color: var(--mech-amber); }
+[data-screen="game"] choice-container button:hover::after { color: var(--mech-amber) !important; }
 [data-screen="game"] choice-container button:nth-child(1) { animation-delay: 0.04s; }
 [data-screen="game"] choice-container button:nth-child(2) { animation-delay: 0.10s; }
 [data-screen="game"] choice-container button:nth-child(3) { animation-delay: 0.16s; }
@@ -746,9 +806,9 @@ main-menu button {
   line-height: 1.3 !important;
   height: auto !important;
 }
-/* Status LED, seated on the left bevel. */
-main-menu button::before {
-  content: '';
+/* Status LED, seated on the left bevel (::after — ::before is the face). */
+main-menu button::after {
+  content: '' !important;
   position: absolute;
   left: 16px;
   top: 50%;
@@ -756,12 +816,15 @@ main-menu button::before {
   height: 8px;
   margin-top: -4px;
   border-radius: 50%;
-  background: var(--mech-cyan);
-  box-shadow: 0 0 9px var(--mech-cyan), inset 0 0 2px rgba(255, 255, 255, 0.9);
-  animation: mechPulse 2.4s ease-in-out infinite;
+  background: var(--mech-cyan) !important;
+  box-shadow: 0 0 9px var(--mech-cyan), inset 0 0 2px rgba(255, 255, 255, 0.9) !important;
+  animation: mechPulse 2.4s ease-in-out infinite !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: none !important;
   z-index: 1;
 }
-main-menu button:hover::before { background: var(--mech-amber); box-shadow: 0 0 9px var(--mech-amber), inset 0 0 2px rgba(255,255,255,0.9); }
+main-menu button:hover::after { background: var(--mech-amber) !important; box-shadow: 0 0 9px var(--mech-amber), inset 0 0 2px rgba(255,255,255,0.9) !important; }
 
 /* ============================================================================
  * 9. QUICK MENU + SYSTEM SCREENS
@@ -951,7 +1014,7 @@ html.mech-alarm   .mech-strip-track { color: rgba(255, 190, 190, 0.85); }
   .mech-strip-track,
   .mech-ambient,
   .mech-beacon,
-  main-menu button::before,
+  main-menu button::after,
   .hud-btn.active::after,
   .hud-clock-colon,
   [data-screen="game"] choice-container button,
