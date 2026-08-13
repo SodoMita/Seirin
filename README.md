@@ -21,6 +21,7 @@ Visual-novel project assets and design documents for **Seirin: Night Shift — R
 - `archives/` — small asset archives, checksums and portable Git bundle
 - `tools/` — local asset storage scripts
 - `ai_agent_docs/` — design doc, image prompts, agent-skill research, and loadable Agent Skills (`skills/`)
+  - `SEIRIN_World_Systems.md` — worldbuilding reference (рус.): как город связан с миром — экономика по всем отраслям (JSIC), полная схема государственной системы, внешние связи, статистика-2032 и открытые вопросы к автору
   - `skills/seirin-character-art/` — character design + sprite production skill:
     hard limits (`LEGAL.md`, `OPERATIONS.md`, indexed by `CONSTRAINTS.md`),
     the cast registry (`assets/cast.json`),
