@@ -41,7 +41,7 @@ project follows: [`ai_agent_docs/AGENT_SKILLS_RESEARCH.md`](ai_agent_docs/AGENT_
 
 ## Quick checks
 ```bash
-# The shipping game (game/) — 61 tests, zero dependencies
+# The shipping game (game/) — 66 tests, zero dependencies
 node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs
 cd game && npm i jsdom --prefix . --no-save --silent && REQUIRE_JSDOM=1 node tests/offline-smoke.mjs
 
