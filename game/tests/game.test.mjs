@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -441,4 +441,38 @@ test('world-scale table keeps sense: child smallest, CEO tallest of the roster',
     assert.ok(heights.momo < heights.yuki, 'Momo 152cm must be shorter than Yuki 167cm');
     assert.ok(heights.kurogane >= Math.max.apply(null, Object.values(heights)),
         'Kurogane is the tallest');
+});
+
+test('every declared sprite and scene file ships on disk (missing-sprite regression)', () => {
+    // Regression: the mecha-UI merge carried an older engine.characters table
+    // pointing at ren/reika/saya/kaito/momo_normal.webp while the shipped
+    // files are the versioned _v3/_v4 restyles. The engine builds the <img>
+    // src as assets/characters/<file> with no existence check, so five of
+    // nine sprite-bearing characters were silent 404s — the scene plays on
+    // with the speaker invisible and nothing in the console says why.
+    const block = source.slice(source.indexOf('engine.characters({'), source.indexOf('function routeChoice'));
+    const declared = [];
+    for (const m of block.matchAll(/(\w+):\s*\{\s*name:[^}]*?sprites:\s*\{([^}]*)\}/g)) {
+        for (const s of m[2].matchAll(/(\w+):\s*'([^']+)'/g)) { declared.push([m[1], s[1], s[2]]); }
+    }
+    assert.ok(declared.length >= 10, 'expected the full sprite table, got ' + declared.length);
+    const missing = declared.filter(([, , file]) => !existsSync(join(here, '..', 'assets', 'characters', file)));
+    assert.deepEqual(missing, [], 'sprite files missing from game/assets/characters');
+    // Every character a story arc SHOWS must have that expression declared.
+    const seen = new Set(declared.map(([id, expr]) => id + '.' + expr));
+    for (const m of storySource.matchAll(/'show character (\w+) (\w+)/g)) {
+        assert.ok(seen.has(m[1] + '.' + m[2]), `story shows undeclared sprite ${m[1]} ${m[2]}`);
+    }
+    // Same discipline for backgrounds: every declared scene file must exist,
+    // and every scene a story arc shows must be declared.
+    const scenes = new Map();
+    for (const call of source.matchAll(/engine\.assets\('scenes',\s*\{([\s\S]*?)\}\)/g)) {
+        for (const s of call[1].matchAll(/(\w+):\s*'([^']+)'/g)) { scenes.set(s[1], s[2]); }
+    }
+    assert.ok(scenes.size >= 8, 'expected the full scene table, got ' + scenes.size);
+    const missingScenes = [...scenes].filter(([, file]) => !existsSync(join(here, '..', 'assets', 'scenes', file)));
+    assert.deepEqual(missingScenes, [], 'scene files missing from game/assets/scenes');
+    for (const m of storySource.matchAll(/'show scene (\w+)/g)) {
+        assert.ok(scenes.has(m[1]), `story shows undeclared scene ${m[1]}`);
+    }
 });

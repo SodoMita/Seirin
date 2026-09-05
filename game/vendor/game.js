@@ -815,16 +815,26 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             cg_fall1: 'cg_fall1.webp', cg_fall2: 'cg_fall2.webp',
             cg_fall3: 'cg_fall3.webp', cg_fall4: 'cg_fall4.webp'
         });
+        /* Sprite files are VERSIONED on disk (assets/characters/<id>_<expr>_vN
+         * .webp — the restyle pipeline never overwrites, it adds a new
+         * version; see ai_agent_docs/skills/seirin-character-art/HANDOFF_*).
+         * The engine builds the <img src> as AssetsPath.root/characters/
+         * <sprites[expr]> with NO existence check, so an unversioned name
+         * here is a silent 404: the scene plays on with the character
+         * missing and nothing in the console says why. Regression: the
+         * mecha-UI merge (879d577) carried an older character table whose
+         * ren/reika/saya/kaito/momo entries pointed at files that were never
+         * shipped. tests/game.test.mjs now checks every sprite path resolves. */
         engine.characters({
-            ren: { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal.webp' } },
+            ren: { name: 'Рэн Акацуки', color: '#facc15', directory: '', sprites: { normal: 'ren_normal_v3.webp', happy: 'ren_happy_v3.webp', sad: 'ren_sad_v3.webp' } },
             miya: { name: 'Мия Кагэцуки', color: '#f472b6', directory: '', sprites: { normal: 'miya_normal.webp' } },
             splash: { name: 'S.P.L.A.S.H.', color: '#38bdf8', directory: '', sprites: { normal: 'splash_normal.webp' } },
             stella: { name: 'Стелла', color: '#e879f9', directory: '', sprites: { normal: 'stella_normal.webp' } },
-            reika: { name: 'Рейка Такасиро', color: '#f87171', directory: '', sprites: { normal: 'reika_normal.webp' } },
-            saya: { name: 'Сая Мизуки', color: '#38bdf8', directory: '', sprites: { normal: 'saya_normal.webp' } },
+            reika: { name: 'Рейка Такасиро', color: '#f87171', directory: '', sprites: { normal: 'reika_normal_v4.webp' } },
+            saya: { name: 'Сая Мизуки', color: '#38bdf8', directory: '', sprites: { normal: 'saya_normal_v3.webp' } },
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.webp' } },
-            kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.webp' } },
-            momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
+            kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal_v3.webp', happy: 'kaito_happy_v3.webp', sad: 'kaito_sad_v3.webp' } },
+            momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal_v3.webp' } },
             radio: { name: 'РАДИО · ЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' },
