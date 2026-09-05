@@ -36,6 +36,7 @@ docs. If you are changing the UI, skim this table before you start.
 | **`file://` blocks `cssRules`** | A probe reporting "0 rules in the stylesheet" is a CORS false negative, not a CSS error. | Verify with `getComputedStyle`, not by reading `document.styleSheets`. |
 | **Pixel-diffing lies about motion** | A 0.001/s zoom changes nearly every pixel by 1–2 levels; a differ reports "88% moving" while the eye sees nothing. | Measure **amplitude per second**. Rough floor for noticing drift: ~3px/s. |
 | **Bad merges delete silently** | `904fa18` resolved conflicts toward a stale side and dropped 1,292 lines (17 labels, route atlas, codex) while reporting success. | After any merge touching `game/`: `wc -l game/vendor/game.js` (expect ~1000) and run the suite (expect 61). Good state is `aba98eb` on `arena/019fa60e-seirin`. |
+| **Missing sprites fail silently** | The engine builds `<img src>` as `assets/characters/<sprites[expr]>` with no existence check. The `879d577` merge kept the mecha-UI side's *older* `engine.characters` table (`reika_normal.webp`…) while the art side had shipped `_v3`/`_v4` files — five of nine sprite characters (ren, reika, saya, kaito, momo) were `ERR_FILE_NOT_FOUND` for five weeks; the scene just played on with the speaker invisible. | Sprite files are versioned and never overwritten, so the table must name the exact file. `game.test.mjs` now resolves every declared sprite/scene path on disk and every `show character` / `show scene` in the story against the table; keep it green. |
 
 ## Architecture in one page
 
