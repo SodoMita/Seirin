@@ -716,6 +716,8 @@
                 'p Воздух холодный. Он честный — не обещает ничего на завтра. Он просто есть сейчас.',
                 { Choice: { Dialog: '',
                     BalconyDrones: routeChoice('Посчитать дроны над портом — отвлечься', 'Solo1Home_BalconyDrones', { procrastination: 1, philosophical_depth: 1 }),
+                    /* Easter egg: the balcony cat (vendor/story/nyan.js). */
+                    BalconyCat: routeChoice('Скрежет когтей по жести слева — обернуться', 'Solo1Home_BalconyCat', { philosophical_depth: 1 }),
                     BalconyBack: routeChoice('Вернуться — холодно, 22:06', 'Solo1Hub', { philosophical_depth: 1 })
                 } }
             ],

@@ -237,8 +237,13 @@ if (graphMenuBtn) {
     graphMenuBtn.click(); await new Promise(resolve => setTimeout(resolve, 250));
     const overlay = w.document.getElementById('graph-overlay');
     check('debug route atlas opens mid-game too', overlay && overlay.hidden === false);
+    // One card per shipped label — measured against the live script rather
+    // than a hand-maintained census (which silently went stale on every new
+    // label: 205 was the count before the balcony-cat easter egg).
     const nodes = w.document.querySelectorAll('.graph-node');
-    check('route atlas auto-renders all 205 shipped labels', nodes.length === 205, String(nodes.length));
+    const labelCount = Object.keys(w.engine.script()).length;
+    check('route atlas auto-renders all ' + labelCount + ' shipped labels',
+        labelCount >= 205 && nodes.length === labelCount, String(nodes.length));
     const branchCard = w.document.getElementById('graph-node-SoloRoute5');
     check('atlas shows the vn.branch forks of Solo 5',
         !!(branchCard && branchCard.querySelector('[data-graph-goto="Solo5BadEnd"]') &&
