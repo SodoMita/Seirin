@@ -60,16 +60,22 @@ most often cause a wasted turn:
   on every boot and reports violations as console errors.
 - Keep `id="vn-root"` on the container (never `id="monogatari"` — the DOM
   global hijacks the engine object).
+- **A sprite that leaves mid-scene needs the exit override in
+  `custom-ui.css`** (`[data-visibility="invisible"].animated`). The mecha skin
+  pins `animation: none` on sprites, which also cancels the engine's exit
+  animation — without the override `hide character X with fadeOut` leaves a
+  ghost `<img>` until the next `show scene`. Measured in Chromium; the balcony
+  cat (`story/nyan.js`) is the regression case.
 
 ## Commands
 
 ```bash
-# The shipping game lives in game/. Expect 61 passing tests.
+# The shipping game lives in game/. Expect 67 passing tests.
 node game/tests/es5-scan.mjs game/vendor/game.js        # ES5 shape of shipped JS
 node game/tests/es5-scan.mjs game/vendor/mecha-ui.js
 node --test game/tests/game.test.mjs \
              game/tests/failsafe.test.mjs \
-             game/tests/icons-offline.test.mjs          # -> 61 pass, 0 fail
+             game/tests/icons-offline.test.mjs          # -> 67 pass, 0 fail
 
 # Offline smoke test of the real page over file:// (dev-only jsdom)
 cd game && npm i jsdom --prefix . --no-save --silent

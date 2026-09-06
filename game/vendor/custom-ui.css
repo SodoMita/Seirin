@@ -1159,3 +1159,50 @@ game-screen [data-character="radio"] img, [data-character-id="radio"] img, .char
 }
 /* Receiver is an object, not a person-sized portrait. */
 game-screen [data-character="radio"] { max-height: 54vh; }
+
+/* === Nyan, the balcony cat (easter egg; vendor/story/nyan.js) ===========
+ * A prop sprite like `radio`, not a cast member, so it is deliberately
+ * absent from the world-scale table above. The paws must sit ON the railing
+ * painted in cg_balcony, and that rail moves with the backdrop's
+ * `background-size: cover` crop, so both numbers follow the same maths
+ * (measured in Chromium at 1280x720, 800x360 and 412x915):
+ *   cover scale      = max(vw / 1280, boxH / 720)       (16:9 source CG)
+ *   rail top (CG px) = 455 of 720                       -> 63.2% of the CG
+ *   landscape: rail y = boxH/2 + vw*(455/720 - 1/2)*9/16 = boxH/2 + 7.43vw
+ *   portrait : rail y = 0.632 * boxH
+ * `bottom` percentages resolve against the sprite's containing block (the
+ * visuals layer = the backdrop box), so the min() picks the right regime by
+ * itself. Sprite height tracks the cover scale the same way (245px at
+ * 1280x720). `bottom` is the one property the sprite rules in
+ * mecha-ui.css leave alone. */
+game-screen [data-character="nyan"] {
+  max-height: max(34vh, 19.1vw);
+  bottom: min(calc(50% - 7.43vw), 36.8%);
+}
+
+/* === Sprite exit animations (ghost-sprite fix) ============================
+ * The engine removes a hidden sprite on the `animationend` of its exit
+ * animation: `hide character X with fadeOut` sets data-visibility="invisible"
+ * and the animate.css classes `animated fadeOut`. mecha-ui.css later pins
+ * `game-screen [data-character] { animation: none !important }` (its
+ * "remove breathing" pass), which cancels THAT animation too: animationend
+ * never fires and the <img> stays on stage at full opacity until the next
+ * `show scene` wipes the layer. Reproduced on an unmodified build with the
+ * radio sprite. Every shipped fadeOut hide happened to be followed by a
+ * scene change, which is why it went unseen — the balcony cat is the first
+ * character to leave mid-scene. Specificity (0,3,1) beats every sprite rule
+ * in mecha-ui.css regardless of load order, and the engine's own state
+ * attribute keys it, so a sprite that is merely standing there is untouched.
+ * All shipped hides use fadeOut; other animate.css exits would still be
+ * removed, just via a plain fade. */
+game-screen [data-character][data-visibility="invisible"].animated {
+  animation-name: fadeOut !important;
+  animation-duration: 0.6s !important;
+  animation-fill-mode: both !important;
+  animation-iteration-count: 1 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  game-screen [data-character][data-visibility="invisible"].animated {
+    animation-duration: 1ms !important;
+  }
+}

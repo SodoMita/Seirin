@@ -28,6 +28,7 @@ const storyFiles = [
     'anime_cicada.js',
     'anime_gacha.js',
     'anime_fandom.js',
+    'nyan.js',
     'club.js',
     'tower.js',
     'bench.js',
@@ -441,4 +442,41 @@ test('world-scale table keeps sense: child smallest, CEO tallest of the roster',
     assert.ok(heights.momo < heights.yuki, 'Momo 152cm must be shorter than Yuki 167cm');
     assert.ok(heights.kurogane >= Math.max.apply(null, Object.values(heights)),
         'Kurogane is the tallest');
+});
+
+test('balcony cat easter egg: hidden node, prop sprite, reversible unlock, codex row', () => {
+    const nyan = readFileSync(join(here, '..', 'vendor', 'story', 'nyan.js'), 'utf8');
+    // Reachable from the balcony only — no atlas-visible route fork, no ending.
+    const balcony = storySource.slice(storySource.indexOf('Solo1Home_Balcony: ['), storySource.indexOf('Solo1Home_BalconyDrones: ['));
+    assert.match(balcony, /BalconyCat: routeChoice\([^)]*'Solo1Home_BalconyCat'/, 'balcony must offer the cat option');
+    assert.match(nyan, /Solo1Home_BalconyCat: \[/);
+    assert.doesNotMatch(nyan, /'end'/, 'the cat is a beat, not an ending');
+    assert.match(nyan, /'jump Solo1Hub'|'Solo1Hub'/, 'the beat must return to the procrastination hub');
+    // The sprite enters and LEAVES mid-scene (first character to do so).
+    assert.match(nyan, /show character nyan normal/);
+    assert.match(nyan, /hide character nyan with fadeOut/);
+    // Unlock is a reversible storage set, read by the codex only once true.
+    assert.match(nyan, /'player\.unlocked\.met_nyan': \{ mode: 'set', value: true \}/);
+    assert.match(source, /p\.unlocked\.met_nyan === true/, 'archives must gate the row on the unlock');
+    assert.match(source, /nyan: \{ name: 'НЯН'[^}]*sprites: \{ normal: 'nyan_normal\.svg' \}/, 'nyan is a prop character like radio');
+    assert.ok(source.indexOf("'nyan', 'club'") > -1, 'nyan arc must be in the load order');
+    assert.ok(source.slice(source.indexOf('var LABEL_TITLES')).includes('Solo1Home_BalconyCat:'), 'atlas title missing');
+    // Offline: the sprite is a local hand-written SVG with no external refs.
+    const svg = readFileSync(join(here, '..', 'assets', 'characters', 'nyan_normal.svg'), 'utf8');
+    assert.doesNotMatch(svg.replace(/xmlns="http:\/\/www\.w3\.org\/2000\/svg"/, ''), /https?:\/\//);
+    assert.match(svg, /<animate /, 'blink is SMIL inside the SVG (no JS)');
+});
+
+test('sprites hidden with an exit animation are actually removed (ghost-sprite regression)', () => {
+    // The engine removes a hidden sprite on `animationend`, but mecha-ui.css
+    // pins `animation: none !important` on every sprite, so the exit
+    // animation never ran and the <img> stayed at full opacity until the
+    // next `show scene`. custom-ui.css must re-arm the exit keyed on the
+    // engine's own data-visibility="invisible" state.
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    const rule = css.match(/game-screen \[data-character\]\[data-visibility="invisible"\]\.animated\s*\{([^}]*)\}/);
+    assert.ok(rule, 'exit-animation override missing');
+    assert.match(rule[1], /animation-name:\s*fadeOut\s*!important/);
+    assert.match(rule[1], /animation-iteration-count:\s*1\s*!important/);
+    assert.match(rule[1], /animation-fill-mode:\s*both\s*!important/);
 });

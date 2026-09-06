@@ -316,7 +316,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             AnimeActivities_LLMVN5: 'Аниме · Своя ВН — баги',
             AnimeActivities_LLMVN6: 'Аниме · Своя ВН — враньё и своеволие',
             AnimeActivities_LLMVN7: 'Аниме · Своя ВН — проверка свежей',
-            AnimeLLMVN_End: 'ФИНАЛ · Игра про игру'
+            AnimeLLMVN_End: 'ФИНАЛ · Игра про игру',
+            Solo1Home_BalconyCat: 'Соло I · Кошка на перилах'
         };
 
         var ARCHIVE_CONTACTS = [
@@ -378,6 +379,11 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 html += '<div class="archives-row ' + (met ? 'met' : 'unknown') + '"><span>' +
                     (met ? ARCHIVE_CONTACTS[j][1] : '???') + '</span><b>' +
                     (met ? 'встречен' : 'нет данных') + '</b></div>';
+            }
+            /* Easter egg row: only rendered once the balcony cat was met
+             * (player.unlocked.met_nyan) — the codex must not hint at it. */
+            if (p.unlocked && p.unlocked.met_nyan === true) {
+                html += '<div class="archives-row met"><span>Нян — кошка со двора</span><b>сидела рядом</b></div>';
             }
             html += '</div>';
             html += '<div class="archives-section"><h3>ФИНАЛЫ</h3><div class=\"archives-route\">' +
@@ -826,6 +832,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.webp' } },
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
             radio: { name: 'РАДИО · ЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
+            /* Balcony cat easter egg (story/nyan.js). A prop like `radio`, not a cast member. */
+            nyan: { name: 'НЯН', color: '#fbbf24', directory: '', sprites: { normal: 'nyan_normal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' },
             llm: { name: 'LLM · ЧАТ', color: '#38bdf8' }
@@ -851,7 +859,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
          * new route from becoming a risky edit to the engine/UI glue. */
         function buildStoryFromArcs () {
             var registry = window.SeirinStory;
-            var order = ['prologue', 'procrastination', 'anime_shorts', 'anime_comfort', 'anime_activities', 'anime_watchlist', 'anime_eva_01_07', 'anime_eva_09_16', 'anime_eva_17_24', 'anime_eva_25_end', 'anime_nausicaa', 'anime_key', 'anime_cicada', 'anime_gacha', 'anime_fandom', 'club', 'tower', 'bench', 'lonewar', 'miya', 'ai', 'momo'];
+            var order = ['prologue', 'procrastination', 'anime_shorts', 'anime_comfort', 'anime_activities', 'anime_watchlist', 'anime_eva_01_07', 'anime_eva_09_16', 'anime_eva_17_24', 'anime_eva_25_end', 'anime_nausicaa', 'anime_key', 'anime_cicada', 'anime_gacha', 'anime_fandom', 'nyan', 'club', 'tower', 'bench', 'lonewar', 'miya', 'ai', 'momo'];
             var script = {};
             var api = { vn: vn, engine: engine, routeChoice: routeChoice, effectChoice: effectChoice };
             var i, arc, labels, key;
