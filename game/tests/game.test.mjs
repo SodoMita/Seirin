@@ -464,7 +464,7 @@ test('balcony cat easter egg: hidden node, prop sprite, reversible unlock, codex
     // Offline: the sprite is a local hand-written SVG with no external refs.
     const svg = readFileSync(join(here, '..', 'assets', 'characters', 'nyan_normal.svg'), 'utf8');
     assert.doesNotMatch(svg.replace(/xmlns="http:\/\/www\.w3\.org\/2000\/svg"/, ''), /https?:\/\//);
-    assert.match(svg, /<animate /, 'blink is SMIL inside the SVG (no JS)');
+    assert.doesNotMatch(svg, /<animate |<script/, 'the sprite is static markup: no SMIL, no script');
 });
 
 test('sprites hidden with an exit animation are actually removed (ghost-sprite regression)', () => {
