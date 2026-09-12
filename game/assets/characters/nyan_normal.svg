@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="520" height="530" viewBox="0 0 520 530" role="img" aria-label="Nyan, the neighbours' calico bobtail cat, sitting and looking at the city">
  <!-- Original vector prop for the balcony easter egg (vendor/story/nyan.js).
       Backlit calico bobtail against the city glow: dark fur, cyan rim light,
-      happy squint (raised lower lids, round pupils), a small :3 smile — static, no SMIL.
+      big round wide-open amber eyes (👀), a small :3 smile — static, no SMIL.
       No railing in the sprite: custom-ui.css lifts the whole sprite
       so the paws land on the cg_balcony railing. Hand-written, like
       radio_signal.svg — not a cast member, so it has no cast.json entry. -->
@@ -55,27 +55,25 @@
  <path d="M168 250l-18 8 16 6-14 10 18 2" fill="none" stroke="#0e1522" stroke-width="6" stroke-linejoin="round"/>
  <path d="M332 250l18 8-16 6 14 10-18 2" fill="none" stroke="#0e1522" stroke-width="6" stroke-linejoin="round"/>
 
- <!-- eyes: happy cat (Duchenne squint) — the LOWER lid rises because the
-      cheeks push up, the upper lid stays open: a bright crescent of amber
-      with a round pupil above the lid line. That is what reads as pleased;
-      a heavy upper lid reads as sleepy/annoyed. Matte, static, no glow. -->
+ <!-- eyes: 👀 — big, round, wide open. Large amber irises with big round
+      pupils and two catchlights each; no lids covering anything. Reads as
+      alert and curious at any size. Matte, static, no glow filter. -->
  <g>
-  <!-- open eye: almond, amber iris -->
-  <path d="M199 246Q218 226 237 246Q218 258 199 246Z" fill="#e6b33a"/>
-  <path d="M263 246Q282 226 301 246Q282 258 263 246Z" fill="#e6b33a"/>
-  <!-- ROUND relaxed pupils (slits = tense/hunting), glancing slightly right -->
-  <circle cx="221" cy="243" r="5.2" fill="#0b0a06"/>
-  <circle cx="285" cy="243" r="5.2" fill="#0b0a06"/>
-  <circle cx="218" cy="240" r="1.7" fill="#fff8dc" opacity=".9"/>
-  <circle cx="282" cy="240" r="1.7" fill="#fff8dc" opacity=".9"/>
-  <!-- raised LOWER lids (cheek push): cover the bottom third of each eye -->
-  <path d="M197 247Q218 260 239 247Q218 252 197 247Z" fill="#151d2b"/>
-  <path d="M261 247Q282 260 303 247Q282 252 261 247Z" fill="#151d2b"/>
-  <path d="M199 247Q218 253 237 247" fill="none" stroke="#0e1522" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M263 247Q282 253 301 247" fill="none" stroke="#0e1522" stroke-width="2.5" stroke-linecap="round"/>
-  <!-- thin upper lash line so the almond has an edge against dark fur -->
-  <path d="M199 246Q218 227 237 246" fill="none" stroke="#0e1522" stroke-width="2" stroke-linecap="round"/>
-  <path d="M263 246Q282 227 301 246" fill="none" stroke="#0e1522" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="216" cy="244" r="19" fill="#0e1522"/>
+  <circle cx="284" cy="244" r="19" fill="#0e1522"/>
+  <circle cx="216" cy="244" r="16.5" fill="#f2b93b"/>
+  <circle cx="284" cy="244" r="16.5" fill="#f2b93b"/>
+  <!-- inner iris ring, slightly darker, for depth -->
+  <circle cx="216" cy="244" r="11.5" fill="#d99a22"/>
+  <circle cx="284" cy="244" r="11.5" fill="#d99a22"/>
+  <!-- big round pupils, glancing a touch up-right toward the tower -->
+  <circle cx="218" cy="242" r="8.5" fill="#0b0a06"/>
+  <circle cx="286" cy="242" r="8.5" fill="#0b0a06"/>
+  <!-- catchlights: one big, one small -->
+  <circle cx="211" cy="237" r="3.6" fill="#fffaf0"/>
+  <circle cx="279" cy="237" r="3.6" fill="#fffaf0"/>
+  <circle cx="222" cy="249" r="1.8" fill="#fffaf0" opacity=".85"/>
+  <circle cx="290" cy="249" r="1.8" fill="#fffaf0" opacity=".85"/>
  </g>
  <!-- pink nose and a small :3 smile -->
  <path d="M243 268h14l-7 8Z" fill="#d9a3ab" opacity=".85"/>
