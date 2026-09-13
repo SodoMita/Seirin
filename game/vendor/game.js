@@ -754,6 +754,11 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         var menuConfig = engine.configuration('main-menu');
         if (menuConfig && menuConfig.buttons) {
             menuConfig.buttons.push({ string: 'GraphAtlas', data: { action: 'open-graph' } });
+            /* CityMap is a read-only vector atlas. Its listener is registered by
+             * vendor/city-map.js, which loads immediately after this bootstrap;
+             * keeping the menu entry here means the action survives even when
+             * the atlas is opened before a story run starts. */
+            menuConfig.buttons.push({ string: 'CityMap', data: { action: 'open-city-map' } });
         }
         if (typeof engine.translation === 'function') {
             /* The game ships Russian-only, but the engine boots the 'English'
@@ -764,6 +769,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                in a language-selection screen we do not want. */
             engine.translation('English', {
                 GraphAtlas: 'ГРАФ МАРШРУТОВ · ОТЛАДКА',
+                CityMap: 'КАРТА ГОРОДА · СЭЙРИН',
                 /* main menu */
                 Start: 'НАЧАТЬ', Load: 'ЗАГРУЗИТЬ', Settings: 'НАСТРОЙКИ',
                 Help: 'СПРАВКА', Gallery: 'ГАЛЕРЕЯ', Credits: 'АВТОРЫ',

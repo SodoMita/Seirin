@@ -82,6 +82,20 @@ if (menuEl) {
         if (closeBtn) { closeBtn.click(); await new Promise(resolve => setTimeout(resolve, 120)); }
         check('atlas closes again', overlay && overlay.hidden === true);
     }
+    const cityMenu = menuEl.querySelector('[data-action="open-city-map"]');
+    if (cityMenu) {
+        cityMenu.click(); await new Promise(resolve => setTimeout(resolve, 220));
+        const cityOverlay = w.document.getElementById('city-map-overlay');
+        check('city atlas opens from the main menu', cityOverlay && cityOverlay.hidden === false);
+        check('city atlas generates vector districts and buildings',
+            w.document.querySelectorAll('#city-map-svg .city-district').length === 7 &&
+            w.document.querySelectorAll('#city-map-svg .city-building').length >= 150,
+            'districts=' + w.document.querySelectorAll('#city-map-svg .city-district').length +
+            ', buildings=' + w.document.querySelectorAll('#city-map-svg .city-building').length);
+        const cityClose = w.document.querySelector('[data-city-close]');
+        if (cityClose) { cityClose.click(); await new Promise(resolve => setTimeout(resolve, 120)); }
+        check('city atlas closes again', cityOverlay && cityOverlay.hidden === true);
+    }
 }
 check('runtime makes no network calls', network.length === 0, network.join(', '));
 const lint = w.engine ? w.eval('(() => window.FailSafe.vn(window.engine, { silent: true }).lintScript({ silent: true }))()') : { ok: false, issues: ['engine did not boot'] };

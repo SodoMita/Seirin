@@ -1549,7 +1549,7 @@
     function syncModalFlag () {
         var open = false;
         var i, el2, ov;
-        var overlays = ['#graph-overlay', '#archives-overlay'];
+        var overlays = ['#graph-overlay', '#archives-overlay', '#city-map-overlay'];
         for (i = 0; i < overlays.length; i++) {
             ov = doc.querySelector(overlays[i]);
             if (ov && !ov.hidden) { open = true; break; }

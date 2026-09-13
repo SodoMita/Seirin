@@ -7,9 +7,12 @@ Visual-novel project assets and design documents for **Seirin: Night Shift — R
   with no server, no CDN and no runtime fetch. Story arcs live in `game/vendor/story/`
   (prologue, procrastination, Miya, AI and Momo) and are assembled by the small
   engine/UI bootstrap in `game/vendor/game.js`. The route atlas is runtime-generated
-  with jump-to-node, an archives codex, and a 2.5D skeuomorphic mecha UI
-  (`vendor/mecha-ui.css` + `mecha-ui.js`). UI design notes, engine traps and
-  session history: [`design/MECHA_UI.md`](design/MECHA_UI.md).
+  with jump-to-node, an archives codex, a deterministic SVG city atlas with
+  2D/axonometric views and read-only social/economy signals, and a 2.5D
+  skeuomorphic mecha UI (`vendor/city-map.{css,js}` + `vendor/mecha-ui.{css,js}`).
+  UI design notes, engine traps and session history:
+  [`design/MECHA_UI.md`](design/MECHA_UI.md); map pipeline notes:
+  [`design/CITY_MAP.md`](design/CITY_MAP.md).
 - `design/` — UI art direction (`concepts/`), reference screenshots
   (`preview/shots/`, JPEG only) and `tools/shrink-shots.mjs`.
 - `cyber-nexus/` — older runnable Monogatari example VN, kept for reference ("Cyber-Nexus: The Static Singularity"). **Runs with no server, no CDN and no runtime fetch**: double-click `index.html`. Game code lives in `vendor/game.js` (story script, HUD, codex, mini-game); guarded by `vendor/failsafe.js` (schema validation, rollback-safe mutations, state machine, lint, no-fetch guard) and `vendor/icons-offline.*` (local icon glyphs — no font CDN).
