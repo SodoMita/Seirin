@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru" data-alert-tier="nominal" data-screen="title">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Сэйрин — three-ui prototype | design preview harness</title>
+    <meta name="description" content="Dev-only prototype: AI-generated plates + three.js 3D parts + GLSL shaders over a responsive CSS layout. Not part of the shipped game." />
+
+    <!-- The shipping game's vendored fonts, reused so the prototype is judged
+         in the product's own typeface. Relative path: still file://-safe. -->
+    <link rel="stylesheet" href="../../game/assets/fonts/fonts.css?v=20260804r12" />
+    <link rel="stylesheet" href="three-ui.css?v=20260913r1" />
+</head>
+<body>
+
+    <!-- WebGL layer 1: shader background field, motes, title reactor. -->
+    <canvas id="ui3d-bg" aria-hidden="true"></canvas>
+
+    <div class="stage">
+
+        <!-- ================================================== TITLE ===== -->
+        <section id="scr-title" class="screen scr-title is-on" aria-label="Титульный экран">
+            <div class="title-art" aria-hidden="true"></div>
+            <div class="title-glow" aria-hidden="true"></div>
+            <div class="reactor-anchor" data-reactor aria-hidden="true"></div>
+
+            <header class="title-head">
+                <div class="title-emblem" data-3d="emblem">
+                    <img src="assets/ui/ui_emblem_resonance.webp" alt="" />
+                </div>
+                <div>
+                    <h1>Сэйрин<em>Резонанс 2030</em></h1>
+                    <p class="title-tagline">Ночная смена. Курьер, голос в рации и город, который резонирует
+                        на частоте, которой нет ни в одном справочнике.</p>
+                </div>
+            </header>
+
+            <nav class="title-menu" aria-label="Главное меню">
+                <button type="button" class="key key--primary" data-3d="rim" data-goto="game">
+                    <span class="k-ico" aria-hidden="true"></span>Начать смену</button>
+                <button type="button" class="key" data-3d="rim" data-goto="save">Продолжить</button>
+                <button type="button" class="key" data-3d="rim" data-goto="settings">Настройки</button>
+                <button type="button" class="key" data-3d="rim" disabled>Галерея</button>
+            </nav>
+
+            <footer class="title-foot">
+                <span>three-ui prototype · 2026-09-13</span>
+                <span>design/preview/three-ui-demo.html · не входит в игру</span>
+            </footer>
+        </section>
+
+        <!-- =================================================== GAME ===== -->
+        <section id="scr-game" class="screen scr-game" aria-hidden="true" aria-label="Игровой экран">
+            <div class="scene-art" aria-hidden="true"></div>
+            <img class="sprite" src="../../characters/miya/miya_normal.webp" alt="" />
+
+            <header class="hud panel" data-3d-brackets>
+                <div class="hud-group">
+                    <span class="hud-brand">
+                        <span class="hud-emblem" data-3d="emblem"><img src="assets/ui/ui_emblem_resonance.webp" alt="" /></span>
+                        <span>Сэйрин Резонанс</span>
+                    </span>
+                    <span class="badge"><span class="cap">Локация</span> <b>Тэцуба: Порт</b></span>
+                </div>
+                <div class="hud-group">
+                    <span class="badge badge--amber"><span class="cap">Курьер</span> <b>Рэн</b></span>
+                    <span class="badge"><span class="cap">Маршрут</span> <b>Начало</b></span>
+                    <span class="badge badge--alert" id="hud-alert"><span class="cap">Тревога</span> <b>12%</b></span>
+                </div>
+                <div class="hud-group hud-group--right">
+                    <div class="hud-clock" role="timer" aria-label="Дата и время">
+                        <span class="hud-clock-date">СР 15.07</span>
+                        <span class="hud-clock-time" id="hud-time">21:00</span>
+                    </div>
+                    <span class="badge badge--amber">¥ <b>1000</b></span>
+                    <span class="badge"><span class="cap">Предметы</span> <b>0</b></span>
+                </div>
+
+                <div class="hud-bay" data-3d-brackets>
+                    <div class="leds" aria-hidden="true">
+                        <span class="led on"><i></i><span>RDY</span></span>
+                        <span class="led on"><i></i><span>ACT</span></span>
+                        <span class="led" id="led-alr"><i></i><span>ALR</span></span>
+                    </div>
+                    <div class="gauge" data-3d="gauge" data-val="30" role="img" aria-label="Резонанс 30%"><b>30</b><span>RES</span></div>
+                    <div class="gauge" data-3d="gauge" data-val="62" role="img" aria-label="Готовность 62%"><b>62</b><span>PWR</span></div>
+                    <div class="gauge" data-3d="gauge" data-val="12" role="img" aria-label="Тревога 12%"><b>12%</b><span>HEAT</span></div>
+                    <div class="radar" data-3d="radar" role="img" aria-label="Радар резонанса"></div>
+                </div>
+
+                <div class="hud-group">
+                    <button type="button" class="key" data-3d="rim" data-press aria-pressed="false">Перемотка</button>
+                    <button type="button" class="key" data-3d="rim" data-goto="save">Архив</button>
+                </div>
+            </header>
+
+            <div class="console panel" id="console" data-3d-brackets role="button" tabindex="0"
+                 aria-label="Продолжить диалог (пробел)">
+                <span class="console-name" id="d-name">СЭЙРИН</span>
+                <p class="console-text" id="d-text">Дождь над Тэцубой не заканчивается третью ночь подряд.
+                    Порт гудит, как трансформатор на грани.</p>
+                <span class="console-caret" aria-hidden="true"></span>
+            </div>
+
+            <div class="choices" id="choices" hidden>
+                <button type="button" class="key" data-3d="rim" data-choice="radio"><span class="idx">01</span>Ответить по рации</button>
+                <button type="button" class="key" data-3d="rim" data-choice="silent"><span class="idx">02</span>Промолчать и ускориться</button>
+                <button type="button" class="key" data-3d="rim" data-choice="who"><span class="idx">03</span>Спросить, кто на связи</button>
+            </div>
+
+            <nav class="quickmenu" aria-label="Быстрое меню">
+                <button type="button" class="key" data-3d="rim">Назад</button>
+                <button type="button" class="key" data-3d="rim">Скрыть</button>
+                <button type="button" class="key" data-3d="rim">Журнал</button>
+                <button type="button" class="key" data-3d="rim" data-press aria-pressed="false">Авто</button>
+                <button type="button" class="key" data-3d="rim" data-goto="save">Сохранить</button>
+                <button type="button" class="key key--danger" data-3d="rim" data-goto="title">Выход</button>
+            </nav>
+        </section>
+
+        <!-- =============================================== SETTINGS ===== -->
+        <section id="scr-settings" class="screen scr-system" aria-hidden="true" aria-label="Настройки">
+            <h2>Настройки</h2>
+            <div class="sys-grid">
+                <div class="sys-card panel" data-3d-brackets>
+                    <h3>Аудио</h3>
+                    <div class="row"><label for="v-mus">Музыка</label><input id="v-mus" type="range" min="0" max="100" value="70" /><output>70</output></div>
+                    <div class="row"><label for="v-voi">Голоса</label><input id="v-voi" type="range" min="0" max="100" value="85" /><output>85</output></div>
+                    <div class="row"><label for="v-sfx">Эффекты</label><input id="v-sfx" type="range" min="0" max="100" value="60" /><output>60</output></div>
+                    <p class="note">Аудиофайлы ещё не добавлены: ползунки уже готовы принять шины движка.</p>
+                </div>
+                <div class="sys-card panel" data-3d-brackets>
+                    <h3>Текст и сцена</h3>
+                    <div class="row"><label for="v-spd">Скорость</label><input id="v-spd" type="range" min="1" max="10" value="6" /><output>6</output></div>
+                    <div class="row"><label for="v-aut">Авто-переход</label><input id="v-aut" type="range" min="0" max="30" value="0" /><output>0</output></div>
+                    <div class="row"><span>Сканлайны</span><button type="button" class="key" data-3d="rim" data-press aria-pressed="true">вкл</button><span></span></div>
+                    <div class="row"><span>Полный экран</span><button type="button" class="key" data-3d="rim" data-press aria-pressed="false">выкл</button><span></span></div>
+                </div>
+                <div class="sys-card panel" data-3d-brackets>
+                    <h3>Доступность</h3>
+                    <div class="row"><span>Меньше движения</span><button type="button" class="key" data-3d="rim" data-press aria-pressed="false">выкл</button><span></span></div>
+                    <div class="row"><span>Контраст AAA</span><button type="button" class="key" data-3d="rim" data-press aria-pressed="true">вкл</button><span></span></div>
+                    <p class="note">Системный prefers-reduced-motion останавливает и CSS-петли, и WebGL-цикл:
+                        слой рендерит кадр по требованию, материал остаётся.</p>
+                </div>
+            </div>
+            <div class="sys-foot">
+                <button type="button" class="key" data-3d="rim" data-goto="title">Назад</button>
+                <button type="button" class="key key--primary" data-3d="rim" data-goto="game">К игре</button>
+            </div>
+        </section>
+
+        <!-- =================================================== SAVE ===== -->
+        <section id="scr-save" class="screen scr-system" aria-hidden="true" aria-label="Архив смен">
+            <h2>Архив смен</h2>
+            <div class="slots">
+                <button type="button" class="slot panel" data-3d="rim" style="--shot:url('../../backgrounds/seirin_port_night.webp')">
+                    <span class="slot-shot" aria-hidden="true"></span><b>Слот 01 · Порт</b><small>СР 15.07 · 21:40 · Рэн · тревога 12%</small></button>
+                <button type="button" class="slot panel" data-3d="rim" style="--shot:url('../../backgrounds/miya_bedroom_night.webp')">
+                    <span class="slot-shot" aria-hidden="true"></span><b>Слот 02 · Комната Мии</b><small>ЧТ 16.07 · 02:15 · Мия · тревога 41%</small></button>
+                <button type="button" class="slot panel" data-3d="rim" style="--shot:url('../../backgrounds/seirin_tsukimachi_rain.webp')">
+                    <span class="slot-shot" aria-hidden="true"></span><b>Слот 03 · Цукимати</b><small>ПТ 17.07 · 23:05 · дождь · тревога 7%</small></button>
+                <button type="button" class="slot panel" data-3d="rim">
+                    <span class="slot-shot" aria-hidden="true"></span><b>Слот 04 · пусто</b><small>записать текущую смену</small></button>
+            </div>
+            <div class="sys-foot">
+                <button type="button" class="key" data-3d="rim" data-goto="title">Назад</button>
+                <button type="button" class="key key--primary" data-3d="rim" data-goto="game">К игре</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- WebGL layer 2: instruments, key rims, brackets, emblem rings.
+         Above the plates, below nothing; pointer-transparent by design. -->
+    <canvas id="ui3d-fg" aria-hidden="true"></canvas>
+
+    <!-- ================================================ DIAGNOSTICS ===== -->
+    <aside class="diag" id="diag" aria-label="Диагностика прототипа">
+        <h4>Диагностика <button type="button" class="key" id="diag-close" aria-label="Свернуть диагностику">×</button></h4>
+        <div class="nums" id="diag-nums"></div>
+        <label>Тревога (Акатомі) <output id="diag-alert-out">12%</output>
+            <input type="range" id="diag-alert" min="0" max="100" value="12" />
+        </label>
+        <label><input type="checkbox" id="diag-brackets" /> скрыть 3D-скобы панелей</label>
+    </aside>
+    <button type="button" class="key diag-toggle" id="diag-toggle" aria-expanded="true" aria-controls="diag" hidden>Диаг</button>
+
+    <script src="vendor/three.min.js"></script>
+    <script src="three-ui.js?v=20260913r1"></script>
+    <script src="three-ui-demo.js?v=20260913r1"></script>
+</body>
+</html>

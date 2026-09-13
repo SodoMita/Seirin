@@ -93,10 +93,28 @@ Three reference boards for the build checklist:
 
 ---
 
+## 2bis. Session 11 — three-ui prototype (AI plates + three.js + shaders)
+
+Built `design/preview/three-ui-demo.html`: a dev-only harness where the UI is
+AI-generated plates (`preview/assets/ui/`, 8 webp, prompts committed) plus a
+two-canvas three.js r149 layer (vendored in `preview/vendor/`, MIT, **never
+referenced by `game/`**) whose 3D parts anchor to live DOM rects — CSS owns
+layout, WebGL reads it. Verified in headless Chromium: 0 console errors, 0
+network calls, 9/9 keys hit-testable at 1440×900 / 390×844 / 880×400, 13 draw
+calls, `?nowebgl` fallback ladder intact. Architecture, the new trap-table
+rows (blend isolation by filter/z-index, border-image slice semantics, stale
+instance matrices) and the port plan into `game/`:
+[`design/THREE_UI.md`](THREE_UI.md). Shots: `preview/shots/11_*`.
+
+`game/` was not touched: suite 65/65, es5-scan clean, `game.js` 909 lines.
+
 ## 3. Open items / suggested next steps
 
 Ranked by likely value:
 
+0. **Port the three-ui prototype into `game/`** — plan and ordering in
+   `design/THREE_UI.md` §Port plan; needs an explicit decision on raw WebGL2
+   vs vendoring three there (AGENTS.md invariants).
 1. **Verify on a real device.** Everything was measured in headless Chromium.
    The user plays on Android/Brave; real-device screenshots have repeatedly
    caught things the sandbox cannot.

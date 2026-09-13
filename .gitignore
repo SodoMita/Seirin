@@ -70,3 +70,8 @@ test-results/
 # and deletes the PNGs. Concept boards are JPEG for the same reason.
 design/preview/shots/
 design/concepts/*.png
+
+# Render scratch space of the design preview harness (JPEGs land in shots/)
+design/preview/_shots/
+# Throwaway generation sources; the approved webp + prompt doc are committed
+design/preview/assets/ui/_wip/

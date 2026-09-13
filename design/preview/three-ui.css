@@ -1,0 +1,777 @@
+/* ============================================================================
+ * Seirin — three-ui prototype skin (DESIGN PREVIEW HARNESS ONLY)
+ * ----------------------------------------------------------------------------
+ * Pairs with three-ui-demo.html + three-ui.js. The rules of the house:
+ *
+ *   · CSS OWNS LAYOUT. Every 3D part in three-ui.js is anchored to a measured
+ *     DOM rect; nothing here is positioned to match a canvas.
+ *   · AI plates are surfaces, not sprites: opaque art is background/border
+ *     image, "on black" art is mix-blend-mode: screen (the generator has no
+ *     alpha channel; black is our transparency).
+ *   · Text is real text. Contrast on the console is ≥ 12:1; nothing critical
+ *     is an image.
+ *   · Responsive by ladder, not by breakpoint bingo: fluid clamp() sizes, a
+ *     360 → 1920 media ladder that drops decoration before it drops read-outs,
+ *     dvh with vh fallback, safe-area insets.
+ *   · prefers-reduced-motion freezes CSS motion; three-ui.js then renders on
+ *     demand instead of looping (the material design survives).
+ *   · html.no-webgl gets static CSS stand-ins for every 3D part, so the page
+ *     is fully usable with WebGL off.
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------- tokens -- */
+:root {
+    --ink:        #eaf7ff;
+    --ink-dim:    #a8c6d6;
+    --ink-faint:  #6d8a99;
+
+    --cy:         #3ae6ff;
+    --cy-deep:    #0b9ec4;
+    --amber:      #ffb454;
+    --red:        #ff4d5e;
+
+    --steel-0:    #04070b;
+    --steel-1:    #0a1118;
+    --steel-2:    #14202b;
+
+    /* One accent drives the whole escalation ladder. JS mirrors it into the
+       WebGL uniforms; CSS never has to know the alert number, only the tier. */
+    --accent:     var(--cy);
+    --accent-soft: rgba(58, 230, 255, 0.35);
+
+    --fs-xs:   clamp(0.62rem, 0.58rem + 0.2vw, 0.75rem);
+    --fs-sm:   clamp(0.75rem, 0.7rem + 0.28vw, 0.9rem);
+    --fs-body: clamp(0.95rem, 0.87rem + 0.42vw, 1.16rem);
+    --fs-hud:  clamp(0.8rem, 0.72rem + 0.4vw, 1.05rem);
+    --fs-h1:   clamp(2.1rem, 1.2rem + 5.2vw, 5.4rem);
+    --fs-h2:   clamp(1.15rem, 1rem + 0.9vw, 1.7rem);
+
+    --gap:     clamp(0.5rem, 0.35rem + 0.6vw, 1.1rem);
+    --chamfer: clamp(6px, 0.4vw + 4px, 14px);
+    --pad-x:   clamp(0.7rem, 0.5rem + 1vw, 1.6rem);
+
+    --plate:   url("assets/ui/ui_plate_armour.webp");
+    --wear:    url("assets/ui/ui_plate_wear.webp");
+    --key:     url("assets/ui/ui_button_plate.webp");
+    --console: url("assets/ui/ui_console_plate.webp");
+    --bay:     url("assets/ui/ui_hud_instruments.webp");
+}
+
+html[data-alert-tier="caution"] { --accent: var(--amber); --accent-soft: rgba(255, 180, 84, 0.38); }
+html[data-alert-tier="alarm"]   { --accent: var(--red);   --accent-soft: rgba(255, 77, 94, 0.42); }
+
+/* ------------------------------------------------------------------ base -- */
+* { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--steel-0);
+    color: var(--ink);
+    font: 400 var(--fs-body)/1.55 "Rajdhani", "Segoe UI", system-ui, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    overflow: hidden;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: 0.06em; font-family: "Orbitron", "Rajdhani", system-ui, sans-serif; }
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* ------------------------------------------------------- canvas layers --- */
+#ui3d-bg, #ui3d-fg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+#ui3d-bg { z-index: 0; }
+/* The foreground layer floats ABOVE panel surfaces but below nothing: it is
+   pointer-transparent and its geometry only ever occupies rims, wells and
+   corners, so DOM text underneath stays crisp and clickable. */
+#ui3d-fg { z-index: 40; pointer-events: none; }
+
+.stage {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+}
+
+[hidden] { display: none !important; }
+
+.screen { display: none; min-height: 0; position: relative; }
+.screen.is-on { display: grid; }
+
+/* ============================================================ TITLE ====== */
+.scr-title {
+    grid-template-rows: 1fr auto auto;
+    align-content: stretch;
+    padding: calc(env(safe-area-inset-top, 0px) + var(--gap)) var(--pad-x)
+             calc(env(safe-area-inset-bottom, 0px) + var(--gap));
+}
+
+.title-art {
+    position: absolute;
+    inset: 0;
+    background: url("assets/ui/ui_title_art.webp") center 38% / cover no-repeat;
+    opacity: 0.82;
+}
+/* Scrim keeps the wordmark and the menu on a measured dark floor. */
+.title-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(100deg, rgba(3, 6, 10, 0.92) 0%, rgba(3, 6, 10, 0.55) 38%, rgba(3, 6, 10, 0.15) 62%),
+        linear-gradient(0deg, rgba(3, 6, 10, 0.95) 0%, rgba(3, 6, 10, 0) 45%);
+}
+
+/* The reactor aura. With WebGL on, the 3D plasma core renders into this
+   anchor's rect and the static art steps aside; with WebGL off the art IS the
+   reactor. One anchor, two bodies — no duplicated geometry in the layout. */
+.reactor-anchor {
+    position: absolute;
+    left: 76%;
+    top: 42%;
+    width: min(78vmin, 900px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+.title-glow {
+    position: absolute;
+    inset: 0;
+    background: url("assets/ui/ui_reactor_core.webp") 76% 42% / min(78vmin, 900px) no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.75;
+    pointer-events: none;
+    animation: tuBreathe 7s ease-in-out infinite;
+}
+html:not(.no-webgl) .title-glow { display: none; }
+
+.title-head {
+    position: relative;
+    align-self: center;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(0.8rem, 2vw, 2.2rem);
+    align-items: center;
+    max-width: 62ch;
+}
+
+.title-emblem {
+    position: relative;
+    align-self: center;
+    width: clamp(72px, 12vmin, 150px);
+    aspect-ratio: 1;
+    flex: none;
+}
+/* The emblem art is white-on-black, so screen blending IS its alpha. Careful:
+   a filter or a transform ON THE BLENDING ELEMENT isolates it in Chromium and
+   the black plate comes back — the glow therefore lives on a pseudo-element
+   and the spin lives on the 3D holo rings behind it. */
+.title-emblem::before,
+.hud-emblem::before {
+    content: "";
+    position: absolute;
+    inset: -16%;
+    background: radial-gradient(circle, var(--accent-soft), transparent 62%);
+    opacity: 0.8;
+}
+.title-emblem img,
+.hud-emblem img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: screen;
+}
+
+.title-head h1 {
+    font-size: var(--fs-h1);
+    line-height: 0.98;
+    text-transform: uppercase;
+    text-shadow: 0 0 24px rgba(58, 230, 255, 0.35), 0 2px 0 rgba(0, 0, 0, 0.8);
+}
+.title-head h1 em {
+    display: block;
+    font-style: normal;
+    font-size: 0.34em;
+    letter-spacing: 0.42em;
+    color: var(--accent);
+}
+.title-tagline {
+    margin: 0.6em 0 0;
+    max-width: 46ch;
+    color: var(--ink-dim);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.08em;
+}
+
+.title-menu {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 70ch;
+}
+
+.title-foot {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.4rem;
+    justify-content: space-between;
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* ======================================================== PLATES/KEYS ==== */
+/* The armour plate: opaque AI surface + chamfer + screen-blended wear + a
+   running edge light. Decoration lives on pseudo-elements so the host keeps
+   its own text and hit box untouched. */
+.panel {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(180deg, rgba(10, 17, 24, 0.88), rgba(4, 7, 11, 0.94));
+    clip-path: polygon(
+        var(--chamfer) 0, calc(100% - var(--chamfer)) 0, 100% var(--chamfer),
+        100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%,
+        var(--chamfer) 100%, 0 calc(100% - var(--chamfer)), 0 var(--chamfer));
+}
+.panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--plate) 0 0 / 512px repeat;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+}
+.panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--wear) center / cover no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.14;
+    pointer-events: none;
+}
+
+/* Machined key cap: one AI plate, 9-sliced, so the bevel never stretches. */
+.key {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    padding: clamp(0.5rem, 0.4rem + 0.5vw, 0.85rem) clamp(0.9rem, 0.7rem + 1vw, 1.9rem);
+    border: 0;
+    background: transparent;
+    /* 9-slice off the TRIMMED plate (black surround cropped away at ingest,
+       see assets/ui/prompts/ui-plates-01.md §07): the slice lines sit inside
+       the machined bevel, so the border region is bevel — never black foam.
+       That is what keeps a 26px key and a 90px key looking equally machined. */
+    border-image: var(--key) 14% fill / clamp(7px, 1.1vh, 13px) clamp(12px, 1.7vw, 22px) / 0 stretch;
+    font-size: var(--fs-hud);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+    transition: filter 120ms ease, transform 90ms ease;
+}
+.key:hover { filter: brightness(1.28) drop-shadow(0 0 10px var(--accent-soft)); }
+.key:active { filter: brightness(0.9); transform: translateY(1px); }
+.key[aria-pressed="true"] {
+    filter: brightness(1.35) saturate(1.2) drop-shadow(0 0 12px var(--accent-soft));
+}
+.key .k-ico {
+    width: 1.1em;
+    height: 1.1em;
+    flex: none;
+    border: 1px solid var(--accent-soft);
+    border-radius: 50%;
+    box-shadow: inset 0 0 6px var(--accent-soft);
+}
+.key--primary { font-size: clamp(1rem, 0.9rem + 0.7vw, 1.35rem); }
+.key:disabled { opacity: 0.45; cursor: not-allowed; filter: saturate(0.3); }
+.key--danger:hover { filter: brightness(1.3) saturate(1.6) drop-shadow(0 0 12px rgba(255, 77, 94, 0.5)); }
+
+/* ============================================================= GAME ====== */
+.scr-game {
+    grid-template-rows: auto 1fr auto auto auto;
+    gap: var(--gap);
+    padding: calc(env(safe-area-inset-top, 0px) + var(--gap)) var(--pad-x)
+             calc(env(safe-area-inset-bottom, 0px) + var(--gap));
+}
+
+.scene-art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: url("../../backgrounds/seirin_port_night.webp") center 42% / cover no-repeat;
+    opacity: 0.9;
+    animation: tuKenBurns 34s ease-in-out infinite alternate;
+}
+.scene-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(3, 6, 10, 0.88) 0%, rgba(3, 6, 10, 0.1) 55%, rgba(3, 6, 10, 0.55) 100%);
+}
+
+.sprite {
+    position: absolute;
+    left: 50%;
+    bottom: 24vh;
+    height: min(72vh, 780px);
+    transform: translateX(-50%);
+    image-rendering: auto;
+    filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.6));
+    animation: tuBreathe 5.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* ------------------------------------------------------------- top HUD -- */
+.hud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem var(--gap);
+    padding: 0.55rem 0.9rem;
+}
+
+.hud-group { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.hud-group--right { margin-left: auto; }
+
+.hud-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    font-size: var(--fs-hud);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.hud-emblem {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: clamp(28px, 3.4vmin, 44px);
+    aspect-ratio: 1;
+    flex: none;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0.28em 0.75em;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink-dim);
+    background: rgba(6, 11, 16, 0.72);
+    border: 1px solid rgba(58, 230, 255, 0.22);
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.badge b { color: var(--ink); font-weight: 700; }
+.badge--amber { border-color: rgba(255, 180, 84, 0.4); color: #ffd9a3; }
+.badge--alert { border-color: var(--accent-soft); color: var(--accent); }
+html[data-alert-tier="alarm"] .badge--alert { animation: tuStrobe 0.9s steps(2, end) infinite; }
+
+.hud-clock {
+    display: grid;
+    line-height: 1.05;
+    text-align: center;
+    padding: 0.2em 0.7em;
+    background: rgba(4, 8, 12, 0.8);
+    border: 1px solid rgba(58, 230, 255, 0.22);
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.hud-clock-date { font-size: var(--fs-xs); letter-spacing: 0.2em; color: var(--ink-faint); }
+.hud-clock-time { font-size: var(--fs-hud); font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+/* Instrument bay: the AI face plate sits UNDER the live 3D gauges at low
+   opacity — its etched wells read as machining, the 3D reads as signal. */
+.hud-bay {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(0.6rem, 1.4vw, 1.6rem);
+    padding: 0.5rem clamp(0.7rem, 1.6vw, 1.5rem);
+}
+.hud-bay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bay) center / 100% 100% no-repeat;
+    opacity: 0.42;
+    mix-blend-mode: lighten;
+}
+
+.gauge {
+    position: relative;
+    width: clamp(52px, 6.4vmin, 84px);
+    aspect-ratio: 1;
+    display: grid;
+    place-content: center;
+    text-align: center;
+}
+.gauge b { display: block; font-size: var(--fs-hud); font-variant-numeric: tabular-nums; line-height: 1; }
+.gauge span { display: block; font-size: var(--fs-xs); letter-spacing: 0.22em; color: var(--ink-faint); }
+
+.radar {
+    position: relative;
+    width: clamp(56px, 7vmin, 92px);
+    aspect-ratio: 1;
+}
+
+.leds { display: grid; gap: 0.35rem; }
+.led {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+}
+.led i {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #22313c;
+    box-shadow: inset 0 0 3px #000;
+}
+.led.on i { background: var(--accent); box-shadow: 0 0 8px var(--accent-soft), inset 0 0 2px #fff; }
+.led.on { color: var(--ink-dim); }
+
+/* --------------------------------------------------------- dialogue ----- */
+.console {
+    position: relative;
+    grid-row: 3;
+    align-self: end;
+    padding: clamp(0.7rem, 0.5rem + 1vw, 1.3rem) var(--pad-x) clamp(0.8rem, 0.6rem + 1vw, 1.4rem);
+    background: var(--console) center / 100% 100% no-repeat;
+    background-color: rgba(4, 8, 12, 0.86);
+    min-height: clamp(96px, 16vh, 190px);
+    cursor: pointer;
+}
+.console::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--wear) 30% 60% / cover no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.1;
+    pointer-events: none;
+}
+.console-name {
+    position: absolute;
+    top: calc(-1 * clamp(10px, 1.6vh, 18px));
+    left: var(--pad-x);
+    padding: 0.3em 1.1em;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: linear-gradient(180deg, #101c26, #060b10);
+    border: 1px solid var(--accent-soft);
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.console-text {
+    margin: 0;
+    max-width: 74ch;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.console-caret {
+    position: absolute;
+    right: var(--pad-x);
+    bottom: 0.6rem;
+    width: 0.7em; height: 0.7em;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(45deg);
+    animation: tuCaret 1.1s ease-in-out infinite;
+}
+
+.choices {
+    grid-row: 4;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    max-width: 1100px;
+    width: 100%;
+    margin-inline: auto;
+}
+.choices .key { justify-content: flex-start; width: 100%; }
+.choices .key .idx {
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    padding: 0.1em 0.5em;
+    letter-spacing: 0.1em;
+}
+
+.quickmenu {
+    grid-row: 5;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
+    padding-bottom: 0.2rem;
+}
+.quickmenu .key { padding: 0.35rem 0.8rem; font-size: var(--fs-xs); }
+
+/* ============================================== SETTINGS / SAVE ========== */
+.scr-system {
+    grid-template-rows: auto 1fr auto;
+    gap: var(--gap);
+    padding: calc(env(safe-area-inset-top, 0px) + var(--gap)) var(--pad-x)
+             calc(env(safe-area-inset-bottom, 0px) + var(--gap));
+}
+.scr-system h2 {
+    font-size: var(--fs-h2);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+.sys-grid {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    align-content: start;
+    overflow: auto;
+    padding: 0.2rem;
+}
+.sys-card { padding: clamp(0.8rem, 1.4vw, 1.4rem); }
+.sys-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    justify-content: flex-end;
+}
+.note {
+    margin: 0.8rem 0 0;
+    padding: 0.55rem 0.8rem;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.08em;
+    color: #ffd9a3;
+    border: 1px dashed rgba(255, 180, 84, 0.45);
+    background: rgba(255, 180, 84, 0.06);
+}
+.sys-card h3 {
+    font-size: var(--fs-sm);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 0.9rem;
+}
+.row {
+    display: grid;
+    grid-template-columns: minmax(7ch, 10ch) 1fr auto;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.45rem 0;
+    font-size: var(--fs-sm);
+}
+.row output { font-variant-numeric: tabular-nums; color: var(--accent); min-width: 4ch; text-align: right; }
+
+/* Machined slider: channel from background layers only (WebKit tracks ignore
+   border; clip-path eats the thumb — both learned the hard way in game/). */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background:
+        linear-gradient(90deg, var(--accent) 0 var(--fill, 50%), rgba(20, 32, 43, 0.9) var(--fill, 50%) 100%)
+            center / 100% 6px no-repeat,
+        repeating-linear-gradient(90deg, rgba(58, 230, 255, 0.25) 0 1px, transparent 1px 12px)
+            center / 100% 12px no-repeat;
+    cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 22px;
+    background: linear-gradient(180deg, #2c3f4e, #101a22 60%, #060b10);
+    border: 1px solid var(--accent-soft);
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 50%, calc(100% - 4px) 100%, 4px 100%, 0 50%);
+    box-shadow: 0 0 8px var(--accent-soft);
+}
+input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 22px;
+    background: linear-gradient(180deg, #2c3f4e, #101a22 60%, #060b10);
+    border: 1px solid var(--accent-soft);
+    box-shadow: 0 0 8px var(--accent-soft);
+}
+
+.slots {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+    align-content: start;
+    overflow: auto;
+}
+.slot {
+    position: relative;
+    width: 100%;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    padding: 0.8rem;
+    display: grid;
+    gap: 0.5rem;
+    text-align: left;
+    cursor: pointer;
+}
+.slot-shot {
+    height: clamp(90px, 14vh, 150px);
+    background: var(--shot, var(--plate)) center / cover no-repeat;
+    border: 1px solid rgba(58, 230, 255, 0.25);
+    box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.75);
+    position: relative;
+}
+.slot-shot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(58, 230, 255, 0.06) 0 1px, transparent 1px 3px);
+}
+.slot b { font-size: var(--fs-sm); letter-spacing: 0.16em; text-transform: uppercase; }
+.slot small { color: var(--ink-faint); font-size: var(--fs-xs); letter-spacing: 0.12em; }
+
+/* ======================================================= DIAGNOSTICS ===== */
+.diag {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    z-index: 60;
+    width: min(260px, 78vw);
+    padding: 0.7rem 0.8rem;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    background: rgba(4, 8, 12, 0.86);
+    border: 1px solid rgba(58, 230, 255, 0.25);
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    display: grid;
+    gap: 0.35rem;
+}
+.diag[hidden] { display: none; }
+.diag h4 {
+    margin: 0;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.24em;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.diag .nums { display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.6rem; font-variant-numeric: tabular-nums; }
+.diag .nums b { color: var(--ink); font-weight: 600; text-align: right; }
+.diag label { display: grid; gap: 0.2rem; }
+.diag .key { padding: 0.1rem 0.5rem; font-size: var(--fs-xs); }
+.diag input[type="checkbox"] { accent-color: var(--accent); }
+
+.diag-toggle {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    z-index: 61;
+    padding: 0.3rem 0.7rem;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.18em;
+}
+
+/* =================================================== RESPONSIVE LADDER === */
+/* Drop decoration, never read-outs. The bay sheds its radar first, then LED
+   captions; the HUD sheds badge captions before it sheds the clock. */
+@media (max-width: 900px) {
+    .hud-bay .radar { display: none; }
+    .title-menu { max-width: 100%; }
+}
+@media (max-width: 620px) {
+    .hud { padding: 0.45rem 0.6rem; }
+    .hud-brand span { display: none; }          /* emblem carries the brand */
+    .badge .cap { display: none; }
+    .leds .led span { display: none; }
+    .hud-bay { gap: 0.55rem; padding: 0.4rem 0.6rem; }
+    .sprite { height: min(52vh, 560px); bottom: 20vh; }
+    .console-text { font-size: var(--fs-sm); }
+    .choices { grid-template-columns: 1fr; }
+}
+@media (max-height: 520px) {
+    /* landscape phone: the console must not eat the scene */
+    .scr-game { grid-template-rows: auto 1fr auto auto; }
+    .console { min-height: 84px; }
+    .sprite { height: min(64vh, 420px); bottom: 26vh; }
+    .title-glow { background-size: min(60vmin, 420px); }
+    .reactor-anchor { width: min(60vmin, 420px); }
+}
+@media (min-width: 1500px) {
+    .hud { padding-inline: 1.4rem; }
+    .console-text { max-width: 82ch; }
+}
+
+/* =================================================== MOTION / FALLBACK === */
+@keyframes tuBreathe   { 0%, 100% { transform: scale(1); opacity: 0.75; } 50% { transform: scale(1.035); opacity: 0.95; } }
+@keyframes tuSpinBack  { to { transform: rotate(-360deg); } }
+@keyframes tuKenBurns  { from { transform: scale(1.02) translateY(0); } to { transform: scale(1.12) translateY(-2%); } }
+@keyframes tuCaret     { 0%, 100% { transform: rotate(45deg) translate(0, 0); opacity: 1; } 50% { transform: rotate(45deg) translate(4px, 4px); opacity: 0.35; } }
+@keyframes tuStrobe    { 50% { opacity: 0.35; } }
+@keyframes tuPulseRing { from { box-shadow: 0 0 0 0 var(--accent-soft); } to { box-shadow: 0 0 0 14px transparent; } }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* No WebGL: static CSS stand-ins so gauges/radar/keys still read as
+   instruments. The material design survives; only the motion is gone. */
+html.no-webgl .gauge::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+        conic-gradient(from 220deg, var(--accent) calc(var(--val, 0) * 1%), rgba(20, 32, 43, 0.9) 0) ,
+        radial-gradient(circle, transparent 58%, rgba(4, 8, 12, 0.9) 60%);
+    -webkit-mask: radial-gradient(circle, transparent 56%, #000 58%, #000 74%, transparent 76%);
+    mask: radial-gradient(circle, transparent 56%, #000 58%, #000 74%, transparent 76%);
+}
+html.no-webgl .radar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--accent-soft);
+    background:
+        repeating-radial-gradient(circle, rgba(58, 230, 255, 0.18) 0 1px, transparent 1px 22%),
+        conic-gradient(from 0deg, var(--accent-soft), transparent 25%);
+}
+html.no-webgl .title-glow { opacity: 0.95; }
+
+@media (forced-colors: active) {
+    .panel, .key, .badge, .console { border: 1px solid CanvasText; clip-path: none; background: Canvas; }
+    .key { color: CanvasText; }
+}
