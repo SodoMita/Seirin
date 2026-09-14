@@ -121,10 +121,14 @@ removes the black surround (measured plate bounds x 27.6–71.5%, y 7.3–90.1%)
 The committed webp is the trimmed plate; the untrimmed source stays in `_wip/`.
 Reason: `border-image` slice regions start at the image edge, so any surround
 inside the slice is drawn as a black foam frame around every key. Used through
-`border-image: … 64 fill` with ONE uniform `border-image-width`
-(`--key-b`): the square corner patches scale uniformly and the edge patches
-stretch along their own axis only — a correct corner/edge/middle split, so a
-26px key and a 90px key wear the same machined bevel. On `file://` the black surround is trimmed by
+`border-image: … 64 78 64 78 fill` with ONE uniform `border-image-width`
+(`--key-b`). The 78px side slice is measured: it puts the plate's two hex
+bolts inside the side EDGE patches, leaving a plain brushed face as the
+middle patch — with a 64px side slice the bolts sat in the middle and any
+tiling repeated them like a frieze. Corners scale uniformly, edges stretch
+along their own axis, the middle stretches (a downscale at every shipped key
+size): a correct corner/edge/middle split, so a 26px key and a 90px key wear
+the same machined bevel. On `file://` the black surround is trimmed by
 the slice; over http it could also be screen-blended.
 
 ## 08 · `ui_hud_instruments.webp` — instrument bay face plate
@@ -139,7 +143,9 @@ the slice; over http it could also be screen-blended.
 > steel with cyan glow accents. No text, no letters, no numbers, no logos, no
 > watermark. Game UI asset, high detail, flat material study.
 
-**Result:** accepted with a caveat: its wells are painted at fixed positions,
-so it cannot anchor the *live* instruments (those are 3D and follow the DOM).
-Used as an unblended texture under the bay at 55% opacity — the etched ticks
-read as machining under the real 3D gauges instead of competing with them.
+**Result:** accepted, then **retired from the bay** in session 12: its wells
+are painted at fixed positions, so any sizing either stretches the plate or
+misaligns the wells under the live 3D gauges — and `100% 100%` was exactly the
+stretch this prototype exists to avoid. The bay now wears the HUD panel's
+tiled armour; the instruments are the 3D layer. The plate stays in the set as
+the reference for what the 3D bay replaces.

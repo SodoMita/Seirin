@@ -130,6 +130,20 @@ Re-verified after the recomposition: ALL CLEAN (0 console errors, 0 network,
 9/9 keys hit-testable at 1440×900 / 390×844 / 880×400), shots refreshed in
 `shots/11_*`.
 
+### 9-slice, corrected twice (user review #2)
+
+The corner/edge/middle split was still wrong after the first pass, in three
+places a stretched texture can hide:
+
+| Surface | Was | Now |
+|---|---|---|
+| `.key` plate | side slice 64px left the plate's hex bolts inside the *middle* patch, so a tiled middle repeated them like a frieze; a stretched middle smeared them instead | slice `64 78 64 78`: bolts live in the side **edge** patches, the middle is a plain brushed face; uniform `--key-b` width; middle stretches — a downscale at every shipped key size, so nothing smears |
+| `.console` plate | `background: 100% 100%` — 768px of art crushed into a 150px band | real 9-slice: `48 64 110 64 fill / 12px 18px 26px 18px`, the amber inlay stays a crisp ~1.5px line inside the top edge patch |
+| `.hud-bay` face plate | `100% 100%` stretch of art whose wells are painted at fixed positions | retired: the bay wears the HUD panel's tiled armour; the instruments are the 3D layer (see prompts §08) |
+
+Proof crops: `/tmp`-side comparison of a 360px and a 90px key shows one
+continuous plate with identical bevel thickness at both sizes.
+
 ## Port plan into `game/` (not started, by decision)
 
 1. **Keep the contract, drop the dependency.** `game/` ships zero deps and

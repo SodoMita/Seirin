@@ -239,7 +239,16 @@ html:not(.no-webgl) .title-glow { display: none; }
     padding: clamp(0.5rem, 0.4rem + 0.5vw, 0.85rem) clamp(0.9rem, 0.7rem + 1vw, 1.9rem);
     border: 0;
     background: transparent;
-    border-image: var(--key) 64 fill / var(--key-b) / 0 stretch;
+    /* 9-slice, corner/edge/middle split as the technique demands:
+         · slice 64 top/bottom, 78 left/right — measured so the plate's two
+           hex bolts fall INSIDE the side edge patches, leaving a plain
+           brushed face as the middle patch (a 64px side slice put the bolts
+           in the middle and tiling repeated them like a frieze);
+         · ONE uniform border-image-width (--key-b): corner patches scale
+           uniformly, edge patches stretch along their own axis only;
+         · middle stretches: on every shipped key size that is a DOWNSCALE of
+           the 475px-wide face patch, so the grain never smears. */
+    border-image: var(--key) 64 78 64 78 fill / var(--key-b) / 0 stretch;
     font-size: var(--fs-hud);
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -358,15 +367,10 @@ html[data-alert-tier="alarm"] .badge--alert { animation: tuStrobe 0.9s steps(2, 
     gap: clamp(0.6rem, 1.4vw, 1.6rem);
     padding: 0.45rem clamp(0.7rem, 1.6vw, 1.5rem);
 }
-.hud-bay::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--bay) center / 100% 100% no-repeat;
-    opacity: 0.42;
-    mix-blend-mode: lighten;
-}
+/* The bay face plate art was retired here: its wells are painted at fixed
+   positions, so any sizing either stretches it or misaligns the wells under
+   the live 3D gauges. The bay wears the HUD panel's tiled armour instead;
+   the instruments themselves are the 3D layer. (prompts/ui-plates-01.md §08) */
 
 .gauge { position: relative; width: clamp(52px, 6.4vmin, 84px); aspect-ratio: 1; display: grid; place-content: center; text-align: center; }
 .gauge b { display: block; font-size: var(--fs-hud); font-variant-numeric: tabular-nums; line-height: 1; }
@@ -410,7 +414,10 @@ html[data-alert-tier="alarm"] .badge--alert { animation: tuStrobe 0.9s steps(2, 
     width: min(var(--measure), 100%);
     justify-self: center;
     padding: clamp(0.7rem, 0.5rem + 1vw, 1.3rem) var(--pad-x, clamp(0.7rem, 0.5rem + 1vw, 1.6rem)) clamp(0.8rem, 0.6rem + 1vw, 1.4rem);
-    background: var(--console) center / 100% 100% no-repeat;
+    /* the console plate is 9-sliced too: the amber inlay lives in the top
+       edge patch (slice 48px -> 12px, so the line stays a crisp ~1.5px), the
+       body tiles instead of stretching 768px of art into a 150px band */
+    border-image: var(--console) 48 64 110 64 fill / 12px 18px 26px 18px / 0 round;
     background-color: rgba(4, 8, 12, 0.86);
     min-height: clamp(96px, 15vh, 180px);
     cursor: pointer;
