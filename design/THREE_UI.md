@@ -173,11 +173,67 @@ global gradient.
 
 ---
 
+## Session 13 — native-scale nine-patch keys + the full-trash pass
+
+Fourth rejection: the keys still read *stretched, deformed*, and the whole UI
+was called tasteless — with the directive to turn that into an advantage:
+**full trash**, more scrap and damage as intentional art direction. Two fixes
+landed together.
+
+### 1. border-image is gone; the plate is composed from nine native-scale patches
+
+Root cause measured on the old `border-image` key: the side edge patch carries
+520px of bolt/bevel detail that a 40px-tall key compresses ~26x vertically —
+that smear is exactly the "deformed" verdict. `border-image` cannot express
+"tile the edges at native size", so the key surface is now a stack of nine
+background layers cut from the plate at UI scale (`assets/ui/k_*.webp`, cut
+recipe in `assets/ui/prompts/ui-trash-01.md`):
+
+- corners 20x16 placed, never repeated, never scaled;
+- top/bottom edges 118x16 `repeat-x`, left/right edges 20x130 `repeat-y`;
+- the flat face fills the inner rectangle (`calc(100% - 40px)` x
+  `calc(100% - 32px)`) — the single stretch a 9-slice is allowed, and the only
+  way to keep the plate's global sheen continuous (tiling the face, tried
+  first, prints hard seams on wide keys; see `shots/12_keys_9slice_compare.jpg`).
+
+The stack lives in one custom property, `--nine`, shared by `.key::before` and
+`.console` (the console loses its border-image too and gains the amber inlay
+as a 3px top gradient). `.key` gets `min-height: 34px` so the two 16px corner
+rows can never collide on tiny keys, and `isolation: isolate` so the pseudo
+surface sits under the label without escaping the key's stacking context.
+
+### 2. The trash pass (scrap, rust, tape, mismatched salvage)
+
+- `ui_trash_rust.webp` (rust on white) multiply-blends into every `.panel`
+  background and into a `.stage::after` grime veil (radial keeps the centre
+  clear so sprites stay clean, rust collects at the edges);
+- `ui_trash_tape.webp` (tape/welded patch/mesh/strap on black) screen-blends as
+  `.tape` scrap clusters pinned to hud, console and one sys-card corner;
+- `ui_trash_decals.webp` (stencil chevrons/marks on black) screen-blends over
+  the console and as a stencil smear above the HUD strip;
+- wear overlay opacity 0.12 -> 0.2 on panels, plus a per-key scratch layer;
+- mismatched salvage: `:nth-child` hue/brightness offsets so no two sys-cards
+  or slots look like the same batch.
+
+Prompts for the three sheets: `assets/ui/prompts/ui-trash-01.md`.
+
+### Verification
+
+- Harness `tools/shot-three-ui.mjs`: **ALL CLEAN** (12 shots, desktop/phone/
+  land + alarm/settings/save/nowebgl).
+- Key crop stack at 360/620/90px: `shots/12_keys_9slice_compare.jpg` — one
+  continuous plate at every size, teeth tiling natively, corners intact.
+- `game/` untouched; its suite still 65 pass / 0 fail.
+- House rule: four pre-invariant `.webp` screenshots removed from `shots/`
+  (JPEG-only); every generation prompt saved under `assets/ui/prompts/`.
+
+---
+
 ## Screenshot index (`shots/11_*`, JPEG per house rule)
 
 | File | Shows |
 |---|---|
-| `11_three_ui_title_{desktop,phone,phone_land}` | key visual + wordmark, blended emblem with 3D holo-rings, plasma reactor over the mecha, 9-sliced keys |
+| `11_three_ui_title_{desktop,phone,phone_land}` | key visual + wordmark, blended emblem with 3D holo-rings, plasma reactor over the mecha, native nine-patch keys |
 | `11_three_ui_game_{desktop,phone,phone_land}` | HUD with live 3D gauges/radar, sprite, console band, quick menu; phone drops the radar per ladder |
 | `11_three_ui_choices_desktop` | choice plates with rims |
 | `11_three_ui_alarm_{desktop,phone,phone_land}` | 65% escalation: every surface and shader goes red from one write |

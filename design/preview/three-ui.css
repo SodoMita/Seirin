@@ -56,8 +56,25 @@
     --key-b:   clamp(9px, 0.8vh + 0.4vw, 18px);   /* uniform 9-slice border */
 
     --plate:   url("assets/ui/ui_plate_armour.webp");
+    --rust:    url("assets/ui/ui_trash_rust.webp");
+    --tape:    url("assets/ui/ui_trash_tape.webp");
+    --decals:  url("assets/ui/ui_trash_decals.webp");
     --wear:    url("assets/ui/ui_plate_wear.webp");
-    --key:     url("assets/ui/ui_button_plate.webp");
+    /* The plate cut into nine patches at UI scale (assets/ui/k_*.webp, cut
+       from a 25% downscale of the trimmed plate). Corners are placed, edges
+       tile along their own axis, the face tiles: NOTHING is scaled, so
+       nothing deforms — the failure mode border-image kept falling into. */
+    --nine:
+        url("assets/ui/k_tl.webp") left top / 20px 16px no-repeat,
+        url("assets/ui/k_tr.webp") right top / 20px 16px no-repeat,
+        url("assets/ui/k_bl.webp") left bottom / 20px 16px no-repeat,
+        url("assets/ui/k_br.webp") right bottom / 20px 16px no-repeat,
+        url("assets/ui/k_t.webp") left top / 20px 16px repeat-x,
+        url("assets/ui/k_b.webp") left bottom / 20px 16px repeat-x,
+        url("assets/ui/k_l.webp") left top / 20px 130px repeat-y,
+        url("assets/ui/k_r.webp") right top / 20px 130px repeat-y,
+        url("assets/ui/k_face.webp") 20px 16px /
+            max(8px, calc(100% - 40px)) max(4px, calc(100% - 32px)) no-repeat;
     --console: url("assets/ui/ui_console_plate.webp");
     --bay:     url("assets/ui/ui_hud_instruments.webp");
 }
@@ -202,7 +219,10 @@ html:not(.no-webgl) .title-glow { display: none; }
 .panel {
     position: relative;
     isolation: isolate;
-    background: linear-gradient(180deg, rgba(10, 17, 24, 0.88), rgba(4, 7, 11, 0.94));
+    background:
+        var(--rust) center / cover no-repeat,
+        linear-gradient(180deg, rgba(10, 17, 24, 0.88), rgba(4, 7, 11, 0.94));
+    background-blend-mode: multiply, normal;
     border: 1px solid var(--line);
 }
 .panel::before {
@@ -222,7 +242,7 @@ html:not(.no-webgl) .title-glow { display: none; }
     z-index: -1;
     background: var(--wear) center / cover no-repeat;
     mix-blend-mode: screen;
-    opacity: 0.12;
+    opacity: 0.2;
     pointer-events: none;
 }
 
@@ -239,20 +259,11 @@ html:not(.no-webgl) .title-glow { display: none; }
     padding: clamp(0.5rem, 0.4rem + 0.5vw, 0.85rem) clamp(0.9rem, 0.7rem + 1vw, 1.9rem);
     border: 0;
     background: transparent;
-    /* 9-slice, corner/edge/middle split as the technique demands:
-         · slice 64 top/bottom, 78 left/right — measured so the plate's two
-           hex bolts fall INSIDE the side edge patches, leaving a plain
-           brushed face as the middle patch (a 64px side slice put the bolts
-           in the middle and tiling repeated them like a frieze);
-         · ONE uniform border-image-width (--key-b): corner patches scale
-           uniformly, edge patches stretch along their own axis only;
-         · middle stretches ON PURPOSE here: the face patch carries one
-           global sheen gradient (measured: dark run x110-255, light run
-           x256-529), so tiling it (border-image-repeat: round) repeats the
-           sheen as visible segments — verified by crop. Stretching a global
-           gradient is what 9-slice middles are for; at every shipped key
-           width it is a <=1.25x scale of the 475px patch, never a smear. */
-    border-image: var(--key) 64 78 64 78 fill / var(--key-b) / 0 stretch;
+    isolation: isolate;
+    min-height: 34px;   /* 2x16px corner rows must not collide */
+    /* nine-patch surface, native scale (see --nine): corners placed, edges
+       tiled along their own axis at native size; only the flat face fills
+       the inner rectangle (the one stretch a 9-slice is allowed). */
     font-size: var(--fs-hud);
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -260,6 +271,24 @@ html:not(.no-webgl) .title-glow { display: none; }
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
     cursor: pointer;
     transition: filter 120ms ease, transform 90ms ease;
+}
+.key::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--nine);
+}
+/* every key carries its own scratches: trash is worn, not printed */
+.key::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--wear) 30% 40% / cover no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.16;
+    pointer-events: none;
 }
 .key:hover { filter: brightness(1.28) drop-shadow(0 0 10px var(--accent-soft)); }
 .key:active { filter: brightness(0.9); transform: translateY(1px); }
@@ -418,10 +447,9 @@ html[data-alert-tier="alarm"] .badge--alert { animation: tuStrobe 0.9s steps(2, 
     width: min(var(--measure), 100%);
     justify-self: center;
     padding: clamp(0.7rem, 0.5rem + 1vw, 1.3rem) var(--pad-x, clamp(0.7rem, 0.5rem + 1vw, 1.6rem)) clamp(0.8rem, 0.6rem + 1vw, 1.4rem);
-    /* the console plate is 9-sliced too: the amber inlay lives in the top
-       edge patch (slice 48px -> 12px, so the line stays a crisp ~1.5px), the
-       body tiles instead of stretching 768px of art into a 150px band */
-    border-image: var(--console) 48 64 110 64 fill / 12px 18px 26px 18px / 0 round;
+    background:
+        linear-gradient(180deg, rgba(255, 180, 84, 0.75), rgba(255, 180, 84, 0) 3px),
+        var(--nine);
     background-color: rgba(4, 8, 12, 0.86);
     min-height: clamp(96px, 15vh, 180px);
     cursor: pointer;
@@ -430,9 +458,12 @@ html[data-alert-tier="alarm"] .badge--alert { animation: tuStrobe 0.9s steps(2, 
     content: "";
     position: absolute;
     inset: 0;
-    background: var(--wear) 30% 60% / cover no-repeat;
+    background:
+        var(--decals) 78% 62% / cover no-repeat,
+        var(--wear) 30% 60% / cover no-repeat;
+    background-blend-mode: screen;
     mix-blend-mode: screen;
-    opacity: 0.1;
+    opacity: 0.16;
     pointer-events: none;
 }
 .console-name {
@@ -577,6 +608,58 @@ input[type="range"]::-moz-range-thumb {
 .slot small { color: var(--ink-faint); font-size: var(--fs-xs); letter-spacing: 0.12em; }
 
 .sys-foot { display: flex; flex-wrap: wrap; gap: var(--gap); justify-content: space-between; }
+
+/* ------------------------------------------------------- THE TRASH PASS --
+   Scavenger repairs: scrap clusters (tape, welded patch, mesh, strap) screen-
+   blended onto corners, a rust-and-grime veil over the whole stage, and
+   plates that never quite match because they were never made together. */
+.tape {
+    position: absolute;
+    width: clamp(90px, 12vw, 160px);
+    aspect-ratio: 1408 / 768;
+    background: var(--tape) center / cover no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+}
+.tape--a { top: -14px; right: 4%; transform: rotate(-5deg); opacity: 0.62; }
+.tape--b { bottom: -18px; left: 6%; transform: rotate(3deg) scaleX(-1); opacity: 0.55; }
+.tape--c { top: -10px; left: 38%; transform: rotate(2deg); opacity: 0.46; width: clamp(70px, 9vw, 120px); }
+
+.stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 35;
+    pointer-events: none;
+    background:
+        var(--rust) center / cover no-repeat,
+        radial-gradient(120% 95% at 50% 42%, transparent 64%, rgba(24, 10, 3, 0.55) 100%);
+    mix-blend-mode: multiply;
+    opacity: 0.42;
+}
+
+.hud-strip { position: relative; }
+.hud-strip::before {
+    content: "";
+    position: absolute;
+    left: 22%;
+    top: -8px;
+    width: 150px;
+    height: 24px;
+    background: var(--decals) 30% 45% / auto 320% no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.4;
+    transform: rotate(-1.5deg);
+    pointer-events: none;
+}
+
+/* mismatched salvage: no two panels from the same batch */
+.sys-card:nth-child(2) { filter: hue-rotate(-10deg) brightness(1.06); }
+.sys-card:nth-child(3) { filter: hue-rotate(7deg) brightness(0.93); }
+.slot:nth-child(2) { filter: brightness(1.06) saturate(1.12); }
+.slot:nth-child(3) { filter: hue-rotate(-6deg) brightness(0.95); }
 
 /* ======================================================= DIAGNOSTICS ===== */
 .diag {

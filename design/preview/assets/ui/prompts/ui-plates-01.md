@@ -149,3 +149,13 @@ misaligns the wells under the live 3D gauges — and `100% 100%` was exactly the
 stretch this prototype exists to avoid. The bay now wears the HUD panel's
 tiled armour; the instruments are the 3D layer. The plate stays in the set as
 the reference for what the 3D bay replaces.
+
+## 09 · nine-patch cut of `ui_button_plate.webp` (session 13)
+
+Not a generation — a cut. `ui_button_plate.webp` (trimmed 631x648) is downscaled
+to 25% (158x162) and sliced with ImageMagick into `k_tl/k_tr/k_bl/k_br` (20x16),
+`k_t/k_b` (118x16), `k_l/k_r` (20x130) and `k_face` (118x130). CSS composes them
+via `--nine` at exactly these pixel sizes: corners placed, edges repeated along
+their own axis, face stretched once into the inner rectangle. Nothing else in
+the plate pipeline scales, which is what finally killed the "stretched,
+deformed" verdict on keys.
