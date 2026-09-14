@@ -141,8 +141,17 @@ places a stretched texture can hide:
 | `.console` plate | `background: 100% 100%` — 768px of art crushed into a 150px band | real 9-slice: `48 64 110 64 fill / 12px 18px 26px 18px`, the amber inlay stays a crisp ~1.5px line inside the top edge patch |
 | `.hud-bay` face plate | `100% 100%` stretch of art whose wells are painted at fixed positions | retired: the bay wears the HUD panel's tiled armour; the instruments are the 3D layer (see prompts §08) |
 
-Proof crops: `/tmp`-side comparison of a 360px and a 90px key shows one
-continuous plate with identical bevel thickness at both sizes.
+Proof: `shots/12_keys_9slice_compare.jpg` — the same plate at 360px, 620px
+and 90px: one continuous surface, identical bevel thickness, bolts at the
+ends, no seams at any size.
+
+One experiment settled on the way: `border-image-repeat: round` (tiled
+middle, zero stretch anywhere) was tried and **rejected by crop** — the face
+patch carries a single global sheen gradient (measured dark run x110-255,
+light run x256-529 of the trimmed plate), so tiling repeats the sheen as
+visible segments. Corner/edge/middle with a stretching middle is exactly the
+split the technique prescribes; tiling is for repeatable grain, not for a
+global gradient.
 
 ## Port plan into `game/` (not started, by decision)
 

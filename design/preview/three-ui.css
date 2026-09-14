@@ -246,8 +246,12 @@ html:not(.no-webgl) .title-glow { display: none; }
            in the middle and tiling repeated them like a frieze);
          · ONE uniform border-image-width (--key-b): corner patches scale
            uniformly, edge patches stretch along their own axis only;
-         · middle stretches: on every shipped key size that is a DOWNSCALE of
-           the 475px-wide face patch, so the grain never smears. */
+         · middle stretches ON PURPOSE here: the face patch carries one
+           global sheen gradient (measured: dark run x110-255, light run
+           x256-529), so tiling it (border-image-repeat: round) repeats the
+           sheen as visible segments — verified by crop. Stretching a global
+           gradient is what 9-slice middles are for; at every shipped key
+           width it is a <=1.25x scale of the 475px patch, never a smear. */
     border-image: var(--key) 64 78 64 78 fill / var(--key-b) / 0 stretch;
     font-size: var(--fs-hud);
     font-weight: 700;
