@@ -1,240 +1,287 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="2000" height="1037.2" viewBox="-245.81 115.47 2036.2 813.03" preserveAspectRatio="xMidYMid meet">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="2000" height="1979.8" viewBox="-330.17 -370 3324.35 3333.98" preserveAspectRatio="xMidYMid meet">
 <title>Seirin — transit diagram</title>
-<rect x="-245.8" y="115.5" width="2036.2" height="813" fill="#0b1014"/>
+<rect x="-330.2" y="-370" width="3324.4" height="3334" fill="#0b1014"/>
 <g id="base">
 </g>
 <g id="lines">
-<line x1="-65.806" y1="626.642" x2="53.141" y2="626.642" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="53.141" y1="626.642" x2="190.465" y2="763.966" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="190.465" y1="763.966" x2="388.485" y2="763.966" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="388.485" y1="763.966" x2="491.44" y2="661.011" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="491.44" y1="661.011" x2="679.908" y2="661.011" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="679.908" y1="661.011" x2="755.831" y2="736.934" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="755.831" y1="736.934" x2="755.831" y2="671.864" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="755.831" y1="671.864" x2="968.111" y2="459.584" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="968.111" y1="459.584" x2="1023.678" y2="459.584" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1023.678" y1="459.584" x2="1035.554" y2="447.709" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1035.554" y1="447.709" x2="1006.258" y2="447.709" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1006.258" y1="447.709" x2="934.864" y2="519.103" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="934.864" y1="519.103" x2="960.813" y2="519.103" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="960.813" y1="519.103" x2="961.614" y2="519.904" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="961.614" y1="519.904" x2="961.614" y2="531.797" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="961.614" y1="531.797" x2="946.089" y2="547.322" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="946.089" y1="547.322" x2="997.699" y2="547.322" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="997.699" y1="547.322" x2="1260.938" y2="284.083" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1260.938" y1="284.083" x2="1298.9" y2="284.083" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1298.9" y1="284.083" x2="1326.518" y2="311.701" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="-65.806" y1="626.642" x2="53.141" y2="626.642" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="53.141" y1="626.642" x2="190.465" y2="763.966" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="190.465" y1="763.966" x2="388.485" y2="763.966" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="388.485" y1="763.966" x2="491.44" y2="661.011" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="491.44" y1="661.011" x2="679.908" y2="661.011" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="679.908" y1="661.011" x2="755.831" y2="736.934" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="755.831" y1="736.934" x2="755.831" y2="671.864" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="755.831" y1="671.864" x2="968.111" y2="459.584" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="968.111" y1="459.584" x2="1023.678" y2="459.584" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="1023.678" y1="459.584" x2="1035.554" y2="447.709" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="1035.554" y1="447.709" x2="1006.258" y2="447.709" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="1006.258" y1="447.709" x2="934.864" y2="519.103" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="934.864" y1="519.103" x2="960.813" y2="519.103" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="960.813" y1="519.103" x2="961.614" y2="519.904" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="961.614" y1="519.904" x2="961.614" y2="531.797" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="961.614" y1="531.797" x2="946.089" y2="547.322" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="946.089" y1="547.322" x2="997.699" y2="547.322" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="997.699" y1="547.322" x2="1260.938" y2="284.083" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="1260.938" y1="284.083" x2="1298.9" y2="284.083" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="1298.9" y1="284.083" x2="1326.518" y2="311.701" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
-<line x1="755.831" y1="736.934" x2="816.265" y2="736.934" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="816.265" y1="736.934" x2="1017.43" y2="535.77" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1017.43" y1="535.77" x2="1017.43" y2="508.269" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1017.43" y1="508.269" x2="965.27" y2="456.109" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="965.27" y1="456.109" x2="965.27" y2="465.005" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="965.27" y1="465.005" x2="948.772" y2="481.503" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="948.772" y1="481.503" x2="948.772" y2="507.062" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="948.772" y1="507.062" x2="961.614" y2="519.904" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="961.614" y1="519.904" x2="961.614" y2="512.06" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="961.614" y1="512.06" x2="1016.389" y2="457.284" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1016.389" y1="457.284" x2="1016.389" y2="519.32" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1016.389" y1="519.32" x2="1029.034" y2="531.965" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1029.034" y1="531.965" x2="1038.96" y2="531.965" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1038.96" y1="531.965" x2="1252.388" y2="318.536" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1252.388" y1="318.536" x2="1299.848" y2="318.536" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1299.848" y1="318.536" x2="1301.538" y2="316.845" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1301.538" y1="316.845" x2="1265.89" y2="316.845" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1265.89" y1="316.845" x2="1260.253" y2="311.208" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1260.253" y1="311.208" x2="1310.892" y2="311.208" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1310.892" y1="311.208" x2="1336.092" y2="286.008" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="755.831" y1="736.934" x2="816.265" y2="736.934" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="816.265" y1="736.934" x2="1017.43" y2="535.77" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1017.43" y1="535.77" x2="1017.43" y2="508.269" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1017.43" y1="508.269" x2="965.27" y2="456.109" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="965.27" y1="456.109" x2="965.27" y2="465.005" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="965.27" y1="465.005" x2="948.772" y2="481.503" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="948.772" y1="481.503" x2="948.772" y2="507.062" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="948.772" y1="507.062" x2="961.614" y2="519.904" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="961.614" y1="519.904" x2="961.614" y2="512.06" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="961.614" y1="512.06" x2="1016.389" y2="457.284" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1016.389" y1="457.284" x2="1016.389" y2="519.32" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1016.389" y1="519.32" x2="1029.034" y2="531.965" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1029.034" y1="531.965" x2="1038.96" y2="531.965" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1038.96" y1="531.965" x2="1252.388" y2="318.536" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1252.388" y1="318.536" x2="1299.848" y2="318.536" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1299.848" y1="318.536" x2="1301.538" y2="316.845" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1301.538" y1="316.845" x2="1265.89" y2="316.845" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1265.89" y1="316.845" x2="1260.253" y2="311.208" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1260.253" y1="311.208" x2="1310.892" y2="311.208" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1310.892" y1="311.208" x2="1336.092" y2="286.008" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
-<line x1="1032.044" y1="475.158" x2="1032.044" y2="472.939" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1032.044" y1="472.939" x2="1016.389" y2="457.284" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1016.389" y1="457.284" x2="1016.389" y2="540.354" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1016.389" y1="540.354" x2="1016.411" y2="540.375" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1016.411" y1="540.375" x2="1016.411" y2="527.835" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1016.411" y1="527.835" x2="948.428" y2="459.853" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="948.428" y1="459.853" x2="948.641" y2="459.853" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="948.641" y1="459.853" x2="1025.583" y2="536.795" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1032.044" y1="475.158" x2="1032.044" y2="472.939" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="1032.044" y1="472.939" x2="1016.389" y2="457.284" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="1016.389" y1="457.284" x2="1016.389" y2="540.354" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="1016.389" y1="540.354" x2="1016.411" y2="540.375" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="1016.411" y1="540.375" x2="1016.411" y2="527.835" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="1016.411" y1="527.835" x2="948.428" y2="459.853" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="948.428" y1="459.853" x2="948.641" y2="459.853" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="948.641" y1="459.853" x2="1025.583" y2="536.795" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
-<line x1="1032.044" y1="475.158" x2="1032.044" y2="527.383" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1032.044" y1="527.383" x2="1035.742" y2="531.08" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1035.742" y1="531.08" x2="946.841" y2="531.08" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="946.841" y1="531.08" x2="934.864" y2="519.103" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="934.864" y1="519.103" x2="934.864" y2="487.787" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="934.864" y1="487.787" x2="962.094" y2="460.558" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="962.094" y1="460.558" x2="936.678" y2="460.558" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="936.678" y1="460.558" x2="932.086" y2="455.966" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="932.086" y1="455.966" x2="932.086" y2="473.496" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="932.086" y1="473.496" x2="966.534" y2="507.944" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="966.534" y1="507.944" x2="966.534" y2="490.414" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="966.534" y1="490.414" x2="932.086" y2="455.966" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="932.086" y1="455.966" x2="957.502" y2="455.966" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="957.502" y1="455.966" x2="962.094" y2="460.558" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="962.094" y1="460.558" x2="962.094" y2="491.873" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="962.094" y1="491.873" x2="934.864" y2="519.103" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="934.864" y1="519.103" x2="934.864" y2="535.453" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="934.864" y1="535.453" x2="948.21" y2="548.799" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="948.21" y1="548.799" x2="996.222" y2="548.799" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="996.222" y1="548.799" x2="1260.938" y2="284.083" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1260.938" y1="284.083" x2="1202.985" y2="284.083" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1202.985" y1="284.083" x2="961.995" y2="525.072" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="961.995" y1="525.072" x2="1045.852" y2="525.072" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1045.852" y1="525.072" x2="1252.388" y2="318.536" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1252.388" y1="318.536" x2="1283.95" y2="318.536" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1283.95" y1="318.536" x2="1327.019" y2="275.467" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1327.019" y1="275.467" x2="1354.671" y2="275.467" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1354.671" y1="275.467" x2="1364.592" y2="285.387" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
-<line x1="1032.044" y1="475.158" x2="1032.044" y2="527.383" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1032.044" y1="527.383" x2="1035.742" y2="531.08" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1035.742" y1="531.08" x2="946.841" y2="531.08" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="946.841" y1="531.08" x2="934.864" y2="519.103" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="934.864" y1="519.103" x2="934.864" y2="487.787" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="934.864" y1="487.787" x2="962.094" y2="460.558" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="962.094" y1="460.558" x2="936.678" y2="460.558" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="936.678" y1="460.558" x2="932.086" y2="455.966" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="932.086" y1="455.966" x2="932.086" y2="473.496" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="932.086" y1="473.496" x2="966.534" y2="507.944" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="966.534" y1="507.944" x2="966.534" y2="490.414" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="966.534" y1="490.414" x2="932.086" y2="455.966" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="932.086" y1="455.966" x2="957.502" y2="455.966" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="957.502" y1="455.966" x2="962.094" y2="460.558" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="962.094" y1="460.558" x2="962.094" y2="491.873" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="962.094" y1="491.873" x2="934.864" y2="519.103" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="934.864" y1="519.103" x2="934.864" y2="535.453" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="934.864" y1="535.453" x2="948.21" y2="548.799" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="948.21" y1="548.799" x2="996.222" y2="548.799" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="996.222" y1="548.799" x2="1260.938" y2="284.083" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1260.938" y1="284.083" x2="1202.985" y2="284.083" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1202.985" y1="284.083" x2="961.995" y2="525.072" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="961.995" y1="525.072" x2="1045.852" y2="525.072" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1045.852" y1="525.072" x2="1252.388" y2="318.536" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1252.388" y1="318.536" x2="1283.95" y2="318.536" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1283.95" y1="318.536" x2="1327.019" y2="275.467" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1327.019" y1="275.467" x2="1354.671" y2="275.467" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
-<line x1="1354.671" y1="275.467" x2="1364.592" y2="285.387" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="-70.174" y1="853.232" x2="44.109" y2="853.232" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="44.109" y1="853.232" x2="189.376" y2="998.499" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="189.376" y1="998.499" x2="364.215" y2="998.499" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="364.215" y1="998.499" x2="468.826" y2="893.888" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="468.826" y1="893.888" x2="468.826" y2="977.13" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="468.826" y1="977.13" x2="633.237" y2="1141.541" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="633.237" y1="1141.541" x2="633.237" y2="929.833" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="633.237" y1="929.833" x2="743.181" y2="819.89" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="743.181" y1="819.89" x2="743.181" y2="681.364" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="743.181" y1="681.364" x2="904.185" y2="520.36" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="904.185" y1="520.36" x2="904.185" y2="496.919" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="904.185" y1="496.919" x2="1115.324" y2="285.78" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1115.324" y1="285.78" x2="1115.324" y2="328.987" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1115.324" y1="328.987" x2="1581.53" y2="795.193" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1581.53" y1="795.193" x2="1581.53" y2="688.907" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1581.53" y1="688.907" x2="1753.357" y2="517.08" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1753.357" y1="517.08" x2="1753.357" y2="213.905" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1753.357" y1="213.905" x2="1691.104" y2="151.652" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1691.104" y1="151.652" x2="1634.659" y2="151.652" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1634.659" y1="151.652" x2="1465.415" y2="-17.591" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="-70.174" y1="853.232" x2="44.109" y2="853.232" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="44.109" y1="853.232" x2="189.376" y2="998.499" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="189.376" y1="998.499" x2="364.215" y2="998.499" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="364.215" y1="998.499" x2="468.826" y2="893.888" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="468.826" y1="893.888" x2="468.826" y2="977.13" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="468.826" y1="977.13" x2="633.237" y2="1141.541" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="633.237" y1="1141.541" x2="633.237" y2="929.833" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="633.237" y1="929.833" x2="743.181" y2="819.89" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="743.181" y1="819.89" x2="743.181" y2="681.364" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="743.181" y1="681.364" x2="904.185" y2="520.36" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="904.185" y1="520.36" x2="904.185" y2="496.919" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="904.185" y1="496.919" x2="1115.324" y2="285.78" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1115.324" y1="285.78" x2="1115.324" y2="328.987" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1115.324" y1="328.987" x2="1581.53" y2="795.193" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1581.53" y1="795.193" x2="1581.53" y2="688.907" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1581.53" y1="688.907" x2="1753.357" y2="517.08" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1753.357" y1="517.08" x2="1753.357" y2="213.905" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1753.357" y1="213.905" x2="1691.104" y2="151.652" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1691.104" y1="151.652" x2="1634.659" y2="151.652" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="1634.659" y1="151.652" x2="1465.415" y2="-17.591" stroke="#d94f3d" stroke-width="30" stroke-linecap="round"/>
+<line x1="633.237" y1="1141.541" x2="810.612" y2="1141.541" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="810.612" y1="1141.541" x2="912.356" y2="1039.797" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="912.356" y1="1039.797" x2="912.356" y2="806.288" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="912.356" y1="806.288" x2="967.029" y2="751.615" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="967.029" y1="751.615" x2="998.814" y2="751.615" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="998.814" y1="751.615" x2="1171.573" y2="924.373" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1171.573" y1="924.373" x2="1452.35" y2="924.373" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1452.35" y1="924.373" x2="1581.53" y2="795.193" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1581.53" y1="795.193" x2="1581.53" y2="1013.609" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1581.53" y1="1013.609" x2="1698.274" y2="1130.353" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1698.274" y1="1130.353" x2="1698.274" y2="831.129" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1698.274" y1="831.129" x2="1797.001" y2="732.402" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1797.001" y1="732.402" x2="1797.001" y2="384.73" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1797.001" y1="384.73" x2="1872.328" y2="309.402" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1872.328" y1="309.402" x2="1872.328" y2="52.317" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1872.328" y1="52.317" x2="1898.655" y2="25.989" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1898.655" y1="25.989" x2="2081.428" y2="25.989" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="2081.428" y1="25.989" x2="2178.589" y2="123.15" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="2178.589" y1="123.15" x2="2210.852" y2="123.15" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="2210.852" y1="123.15" x2="2404.007" y2="-70.005" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="633.237" y1="1141.541" x2="810.612" y2="1141.541" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="810.612" y1="1141.541" x2="912.356" y2="1039.797" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="912.356" y1="1039.797" x2="912.356" y2="806.288" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="912.356" y1="806.288" x2="967.029" y2="751.615" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="967.029" y1="751.615" x2="998.814" y2="751.615" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="998.814" y1="751.615" x2="1171.573" y2="924.373" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1171.573" y1="924.373" x2="1452.35" y2="924.373" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1452.35" y1="924.373" x2="1581.53" y2="795.193" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1581.53" y1="795.193" x2="1581.53" y2="1013.609" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1581.53" y1="1013.609" x2="1698.274" y2="1130.353" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1698.274" y1="1130.353" x2="1698.274" y2="831.129" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1698.274" y1="831.129" x2="1797.001" y2="732.402" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1797.001" y1="732.402" x2="1797.001" y2="384.73" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1797.001" y1="384.73" x2="1872.328" y2="309.402" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1872.328" y1="309.402" x2="1872.328" y2="52.317" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1872.328" y1="52.317" x2="1898.655" y2="25.989" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1898.655" y1="25.989" x2="2081.428" y2="25.989" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="2081.428" y1="25.989" x2="2178.589" y2="123.15" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="2178.589" y1="123.15" x2="2210.852" y2="123.15" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="2210.852" y1="123.15" x2="2404.007" y2="-70.005" stroke="#3f8fd0" stroke-width="30" stroke-linecap="round"/>
+<line x1="1455.078" y1="980.791" x2="1548.712" y2="980.791" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1548.712" y1="980.791" x2="1698.274" y2="1130.353" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1698.274" y1="1130.353" x2="1981.34" y2="1130.353" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1981.34" y1="1130.353" x2="1990.672" y2="1121.022" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1990.672" y1="1121.022" x2="1990.672" y2="1241.225" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1990.672" y1="1241.225" x2="1846.592" y2="1385.305" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1846.592" y1="1385.305" x2="1846.592" y2="1510.683" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1846.592" y1="1510.683" x2="1985.876" y2="1649.967" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1455.078" y1="980.791" x2="1548.712" y2="980.791" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1548.712" y1="980.791" x2="1698.274" y2="1130.353" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1698.274" y1="1130.353" x2="1981.34" y2="1130.353" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1981.34" y1="1130.353" x2="1990.672" y2="1121.022" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1990.672" y1="1121.022" x2="1990.672" y2="1241.225" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1990.672" y1="1241.225" x2="1846.592" y2="1385.305" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1846.592" y1="1385.305" x2="1846.592" y2="1510.683" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1846.592" y1="1510.683" x2="1985.876" y2="1649.967" stroke="#5cb85c" stroke-width="30" stroke-linecap="round"/>
+<line x1="1455.078" y1="980.791" x2="1455.078" y2="641.986" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1455.078" y1="641.986" x2="1371.053" y2="557.961" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1371.053" y1="557.961" x2="1371.053" y2="541.509" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1371.053" y1="541.509" x2="1115.324" y2="285.78" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1115.324" y1="285.78" x2="1115.324" y2="566.336" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1115.324" y1="566.336" x2="1130.685" y2="581.697" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1130.685" y1="581.697" x2="1145.213" y2="581.697" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1145.213" y1="581.697" x2="1360.86" y2="797.344" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1360.86" y1="797.344" x2="1360.86" y2="1064.813" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1360.86" y1="1064.813" x2="1280.717" y2="1144.957" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1280.717" y1="1144.957" x2="1280.717" y2="877.488" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1280.717" y1="877.488" x2="1360.86" y2="797.344" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1360.86" y1="797.344" x2="1346.332" y2="797.344" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1346.332" y1="797.344" x2="1130.685" y2="581.697" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1130.685" y1="581.697" x2="1130.685" y2="301.14" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1130.685" y1="301.14" x2="1115.324" y2="285.78" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1115.324" y1="285.78" x2="1340.149" y2="285.78" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1340.149" y1="285.78" x2="1398.413" y2="227.516" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1398.413" y1="227.516" x2="1615.24" y2="227.516" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1615.24" y1="227.516" x2="1691.104" y2="151.652" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1691.104" y1="151.652" x2="1691.104" y2="273.402" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1691.104" y1="273.402" x2="1556.131" y2="408.375" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1556.131" y1="408.375" x2="1773.355" y2="408.375" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1773.355" y1="408.375" x2="1872.328" y2="309.402" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1872.328" y1="309.402" x2="1872.328" y2="369.535" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1872.328" y1="369.535" x2="2054.215" y2="551.422" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="2054.215" y1="551.422" x2="2061.551" y2="551.422" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="2061.551" y1="551.422" x2="2268.453" y2="344.52" stroke="#0b1014" stroke-width="54" stroke-linecap="round"/>
+<line x1="1455.078" y1="980.791" x2="1455.078" y2="641.986" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1455.078" y1="641.986" x2="1371.053" y2="557.961" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1371.053" y1="557.961" x2="1371.053" y2="541.509" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1371.053" y1="541.509" x2="1115.324" y2="285.78" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1115.324" y1="285.78" x2="1115.324" y2="566.336" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1115.324" y1="566.336" x2="1130.685" y2="581.697" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1130.685" y1="581.697" x2="1145.213" y2="581.697" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1145.213" y1="581.697" x2="1360.86" y2="797.344" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1360.86" y1="797.344" x2="1360.86" y2="1064.813" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1360.86" y1="1064.813" x2="1280.717" y2="1144.957" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1280.717" y1="1144.957" x2="1280.717" y2="877.488" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1280.717" y1="877.488" x2="1360.86" y2="797.344" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1360.86" y1="797.344" x2="1346.332" y2="797.344" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1346.332" y1="797.344" x2="1130.685" y2="581.697" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1130.685" y1="581.697" x2="1130.685" y2="301.14" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1130.685" y1="301.14" x2="1115.324" y2="285.78" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1115.324" y1="285.78" x2="1340.149" y2="285.78" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1340.149" y1="285.78" x2="1398.413" y2="227.516" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1398.413" y1="227.516" x2="1615.24" y2="227.516" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1615.24" y1="227.516" x2="1691.104" y2="151.652" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1691.104" y1="151.652" x2="1691.104" y2="273.402" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1691.104" y1="273.402" x2="1556.131" y2="408.375" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1556.131" y1="408.375" x2="1773.355" y2="408.375" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1773.355" y1="408.375" x2="1872.328" y2="309.402" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1872.328" y1="309.402" x2="1872.328" y2="369.535" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="1872.328" y1="369.535" x2="2054.215" y2="551.422" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="2054.215" y1="551.422" x2="2061.551" y2="551.422" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
+<line x1="2061.551" y1="551.422" x2="2268.453" y2="344.52" stroke="#e0a03f" stroke-width="30" stroke-linecap="round"/>
 </g>
 <g id="stations">
-<circle cx="962.09" cy="460.56" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="962.09" cy="460.56" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<text x="962.09" y="385.64" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Yū-AoShin-eki</text>
-<text x="962.09" y="438.96" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">夕青新駅 · 17,673</text>
-<circle cx="948.21" cy="548.8" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<text x="948.21" y="473.88" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Asa-ShiroKumo-eki</text>
-<text x="948.21" y="527.2" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">朝白雲駅 · 15,545</text>
-<circle cx="1035.74" cy="531.08" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<text x="1035.74" y="656.16" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Minami-SakuraAo-eki</text>
-<text x="1035.74" y="709.48" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">南桜青駅 · 12,816</text>
-<circle cx="1035.55" cy="447.71" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<text x="1035.55" y="272.79" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Asa-TaniYama-eki</text>
-<text x="1035.55" y="326.11" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">朝谷山駅 · 12,765</text>
-<circle cx="934.86" cy="519.1" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="934.86" cy="519.1" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<text x="934.86" y="744.18" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Soto-TakaHikari-eki</text>
-<text x="934.86" y="797.5" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">外高光駅 · 12,017</text>
-<circle cx="932.09" cy="455.97" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="932.09" cy="455.97" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<circle cx="968.11" cy="459.58" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="948.77" cy="481.5" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1260.94" cy="284.08" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1260.94" cy="284.08" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<circle cx="961.61" cy="519.9" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="961.61" cy="519.9" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<circle cx="966.53" cy="507.94" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="966.53" cy="507.94" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<line x1="966.534" y1="507.944" x2="706.534" y2="547.944" stroke="#41505c" stroke-width="4" stroke-linecap="round" stroke-dasharray="14 12"/>
-<text x="706.53" y="569.02" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Shin-AshiNaka-eki</text>
-<text x="706.53" y="622.34" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">新葦中駅 · 8,812</text>
-<circle cx="962" cy="525.07" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="965.27" cy="456.11" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1364.59" cy="285.39" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="946.09" cy="547.32" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1032.04" cy="475.16" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1032.04" cy="475.16" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<circle cx="1326.52" cy="311.7" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="755.83" cy="736.93" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="755.83" cy="736.93" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<text x="755.83" y="862.01" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="62" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="13.64" paint-order="stroke fill">Asa-WaYoi-eki</text>
-<text x="755.83" y="915.33" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="43.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="9.55" paint-order="stroke fill">朝輪宵駅 · 6,453</text>
-<circle cx="1260.25" cy="311.21" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1029.03" cy="531.96" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1016.39" cy="457.28" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1016.39" cy="457.28" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<circle cx="1301.54" cy="316.85" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1327.02" cy="275.47" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1252.39" cy="318.54" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1252.39" cy="318.54" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
-<circle cx="190.46" cy="763.97" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<text x="190.46" y="685.65" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="52" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="11.44" paint-order="stroke fill">Shimo-TakeTsuki-eki</text>
-<text x="190.46" y="730.37" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="36.4" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="8.01" paint-order="stroke fill">下竹月駅 · 3,743</text>
-<circle cx="948.43" cy="459.85" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1025.58" cy="536.79" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="491.44" cy="661.01" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="-65.81" cy="626.64" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1016.41" cy="540.37" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1336.09" cy="286.01" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
-<circle cx="1017.43" cy="535.77" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1130.68" cy="581.7" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1130.68" cy="581.7" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1130.68" y="502.02" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Yū-AoShin-eki</text>
+<text x="1130.68" y="543.3" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">夕青新駅 · 17,673</text>
+<circle cx="1398.41" cy="227.52" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1398.41" y="147.84" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Asa-ShiroKumo-eki</text>
+<text x="1398.41" y="189.12" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">朝白雲駅 · 15,545</text>
+<circle cx="1371.05" cy="557.96" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1371.05" y="678.28" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Minami-SakuraAo-eki</text>
+<text x="1371.05" y="719.56" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">南桜青駅 · 12,816</text>
+<circle cx="904.19" cy="520.36" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="904.19" y="340.68" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Asa-TaniYama-eki</text>
+<text x="904.19" y="381.96" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">朝谷山駅 · 12,765</text>
+<circle cx="1115.32" cy="285.78" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1115.32" cy="285.78" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1115.32" y="406.1" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Soto-TakaHikari-eki</text>
+<text x="1115.32" y="447.38" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">外高光駅 · 12,017</text>
+<circle cx="1360.86" cy="797.34" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1360.86" cy="797.34" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1360.86" y="917.66" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Ō-SakaHara-eki</text>
+<text x="1360.86" y="958.94" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">大坂原駅 · 11,625</text>
+<circle cx="743.18" cy="819.89" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="743.18" y="740.21" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Soto-AkebonoShin-eki</text>
+<text x="743.18" y="781.49" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">外曙新駅 · 10,246</text>
+<circle cx="1171.57" cy="924.37" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1171.57" y="844.69" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Kurenai-NagaIkari-eki</text>
+<text x="1171.57" y="885.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">紅長錨駅 · 9,490</text>
+<circle cx="1691.1" cy="151.65" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1691.1" cy="151.65" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1691.1" y="71.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Minami-ShimaMinami-eki</text>
+<text x="1691.1" y="113.25" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">南島南駅 · 9,364</text>
+<circle cx="1581.53" cy="795.19" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1581.53" cy="795.19" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1581.53" y="1015.51" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Soto-YamaNaka-eki</text>
+<text x="1581.53" y="1056.79" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">外山中駅 · 9,279</text>
+<circle cx="1280.72" cy="1144.96" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1280.72" cy="1144.96" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1280.72" y="1265.28" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Shin-AshiNaka-eki</text>
+<text x="1280.72" y="1306.56" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">新葦中駅 · 8,812</text>
+<circle cx="1556.13" cy="408.37" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1556.13" y="328.69" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Naka-TsukiTetsu-eki</text>
+<text x="1556.13" y="369.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">中月鉄駅 · 8,170</text>
+<circle cx="967.03" cy="751.61" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="967.03" y="571.93" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Shin-KamiBashi-eki</text>
+<text x="967.03" y="613.21" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">新神橋駅 · 8,030</text>
+<circle cx="2268.45" cy="344.52" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="2268.45" y="264.84" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Hon-NakaYama-eki</text>
+<text x="2268.45" y="306.12" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">本中山駅 · 8,005</text>
+<circle cx="1753.36" cy="517.08" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1753.36" y="437.4" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Kurenai-KiSuzu-eki</text>
+<text x="1753.36" y="478.68" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">紅機鈴駅 · 7,797</text>
+<circle cx="1455.08" cy="980.79" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1455.08" cy="980.79" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1455.08" y="1101.11" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Ao-WaAka-eki</text>
+<text x="1455.08" y="1142.39" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">青輪銅駅 · 7,121</text>
+<circle cx="1465.42" cy="-17.59" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1465.42" y="-97.27" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Ko-ShinNami-eki</text>
+<text x="1465.42" y="-55.99" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">小新波駅 · 6,630</text>
+<circle cx="633.24" cy="1141.54" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="633.24" cy="1141.54" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="633.24" y="1061.86" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Asa-WaYoi-eki</text>
+<text x="633.24" y="1103.14" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">朝輪宵駅 · 6,453</text>
+<circle cx="2178.59" cy="123.15" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="2178.59" y="-56.53" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Naka-KiMatsu-eki</text>
+<text x="2178.59" y="-15.25" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">中木松駅 · 6,321</text>
+<circle cx="1797" cy="732.4" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1797" y="852.72" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Minami-WaTake-eki</text>
+<text x="1797" y="894" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">南輪竹駅 · 6,073</text>
+<circle cx="1698.27" cy="1130.35" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1698.27" cy="1130.35" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1698.27" y="1350.67" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Shin-TeraSuzu-eki</text>
+<text x="1698.27" y="1391.95" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">新寺鈴駅 · 5,914</text>
+<circle cx="1898.66" cy="25.99" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1898.66" y="143.59" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Shiro-IshiAshi-eki</text>
+<text x="1898.66" y="177.99" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">白石葦駅 · 5,694</text>
+<circle cx="2054.22" cy="551.42" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="2054.22" y="669.02" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Haru-UmiShiro-eki</text>
+<text x="2054.22" y="703.42" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">春海白駅 · 5,622</text>
+<circle cx="1872.33" cy="309.4" r="40" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<circle cx="1872.33" cy="309.4" r="22" fill="none" stroke="#0b1014" stroke-width="10"/>
+<text x="1872.33" y="529.72" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="48" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="10.56" paint-order="stroke fill">Kita-NamiKawa-eki</text>
+<text x="1872.33" y="571" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="33.6" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="7.39" paint-order="stroke fill">北波川駅 · 4,319</text>
+<circle cx="189.38" cy="998.5" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="189.38" y="916.1" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Shimo-TakeTsuki-eki</text>
+<text x="189.38" y="950.5" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">下竹月駅 · 3,743</text>
+<circle cx="1846.59" cy="1385.31" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1846.59" y="1502.91" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Ō-TsukiIkari-eki</text>
+<text x="1846.59" y="1537.31" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">大月錨駅 · 3,583</text>
+<circle cx="1985.88" cy="1649.97" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1985.88" y="1567.57" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Haru-IshiUmi-eki</text>
+<text x="1985.88" y="1601.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">春石海駅 · 3,356</text>
+<circle cx="468.83" cy="893.89" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="468.83" y="811.49" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Kita-NakaGin-eki</text>
+<text x="468.83" y="845.89" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">北中銀駅 · 3,264</text>
+<circle cx="-70.17" cy="853.23" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="-70.17" y="770.83" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Naka-NagaTake-eki</text>
+<text x="-70.17" y="805.23" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">中長竹駅 · 3,049</text>
+<circle cx="1990.67" cy="1121.02" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="1990.67" y="1238.62" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Higashi-KitaMatsu-eki</text>
+<text x="1990.67" y="1273.02" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">東北松駅 · 2,342</text>
+<circle cx="2404.01" cy="-70" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="2404.01" y="-152.4" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Naka-KuraKita-eki</text>
+<text x="2404.01" y="-118" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">中倉鍛駅 · 2,177</text>
+<circle cx="912.36" cy="1039.8" r="26" fill="#f2ead8" stroke="#0b1014" stroke-width="12"/>
+<text x="912.36" y="957.4" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="40" fill="#e9eef3" text-anchor="middle" font-weight="500" stroke="#0b1014" stroke-width="8.8" paint-order="stroke fill">Aki-ShiroTera-eki</text>
+<text x="912.36" y="991.8" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28" fill="#9fb0be" text-anchor="middle" stroke="#0b1014" stroke-width="6.16" paint-order="stroke fill">秋白寺駅 · 1,713</text>
 </g>
 <g id="key">
-<rect x="-155.81" y="205.47" width="900" height="472" fill="#0e1418" rx="18" stroke="#2a3540" stroke-width="4"/>
-<text x="-115.81" y="279.47" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="52" fill="#e9eef3" text-anchor="start" font-weight="700" letter-spacing="6">LINES</text>
-<line x1="-109.806" y1="355.467" x2="54.194" y2="355.467" stroke="#d94f3d" stroke-width="28" stroke-linecap="round"/>
-<text x="94.19" y="373.47" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Seirin Main Line 青凛本線 · 16.7 km · 84,607/day</text>
-<line x1="-109.806" y1="441.467" x2="54.194" y2="441.467" stroke="#3f8fd0" stroke-width="28" stroke-linecap="round"/>
-<text x="94.19" y="459.47" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Kaigan Coastal Line 海岸線 · 17 km · 65,463/day</text>
-<line x1="-109.806" y1="527.467" x2="54.194" y2="527.467" stroke="#5cb85c" stroke-width="28" stroke-linecap="round"/>
-<text x="94.19" y="545.47" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Sanson Mountain Line 山村線 · 13.5 km · 22,316/day</text>
-<line x1="-109.806" y1="613.467" x2="54.194" y2="613.467" stroke="#e0a03f" stroke-width="28" stroke-linecap="round"/>
-<text x="94.19" y="631.47" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Minato Metro 港メトロ · 13.3 km · 121,089/day</text>
+<rect x="-270.29" y="1821.97" width="900" height="472" fill="#0e1418" rx="18" stroke="#2a3540" stroke-width="4"/>
+<text x="-230.29" y="1895.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="52" fill="#e9eef3" text-anchor="start" font-weight="700" letter-spacing="6">LINES</text>
+<line x1="-224.29" y1="1971.967" x2="-60.29" y2="1971.967" stroke="#d94f3d" stroke-width="28" stroke-linecap="round"/>
+<text x="-20.29" y="1989.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Seirin Main Line 青凛本線 · 16.7 km · 84,607/day</text>
+<line x1="-224.29" y1="2057.967" x2="-60.29" y2="2057.967" stroke="#3f8fd0" stroke-width="28" stroke-linecap="round"/>
+<text x="-20.29" y="2075.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Kaigan Coastal Line 海岸線 · 17 km · 65,463/day</text>
+<line x1="-224.29" y1="2143.967" x2="-60.29" y2="2143.967" stroke="#5cb85c" stroke-width="28" stroke-linecap="round"/>
+<text x="-20.29" y="2161.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Sanson Mountain Line 山村線 · 13.5 km · 22,316/day</text>
+<line x1="-224.29" y1="2229.967" x2="-60.29" y2="2229.967" stroke="#e0a03f" stroke-width="28" stroke-linecap="round"/>
+<text x="-20.29" y="2247.97" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="46" fill="#c9d6e0" text-anchor="start">Minato Metro 港メトロ · 13.3 km · 121,089/day</text>
 </g>
 <g id="title">
-<text x="-174.54" y="816.51" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="52.94" fill="#e9eef3" text-anchor="start" font-weight="700" letter-spacing="3.67">SEIRIN — TRANSIT DIAGRAM</text>
-<text x="-174.54" y="855.2" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="25.45" fill="#9fb0be" text-anchor="start">Stations in line order on straightened tracks; ringed circles are interchanges. Diagram positions are schematic — the network is not.</text>
-<text x="1729.31" y="186.73" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="17.31" fill="#9fb0be" text-anchor="end">Seirin city generator · vector geometry, no raster data</text>
+<text x="-213.82" y="2781.13" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="86.43" fill="#e9eef3" text-anchor="start" font-weight="700" letter-spacing="5.98">SEIRIN — TRANSIT DIAGRAM</text>
+<text x="-213.82" y="2844.29" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="41.55" fill="#9fb0be" text-anchor="start">Stations in line order on straightened tracks; ringed circles are interchanges. Diagram positions are schematic — the network is not.</text>
+<text x="2894.45" y="-253.65" font-family="'Hiragino Sans','Yu Gothic','Noto Sans JP','Source Han Sans JP','MS Gothic',sans-serif" font-size="28.26" fill="#9fb0be" text-anchor="end">Seirin city generator · vector geometry, no raster data</text>
 </g>
 <desc>Seirin transit diagram.</desc>
 </svg>

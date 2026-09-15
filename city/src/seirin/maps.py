@@ -943,10 +943,12 @@ class Atlas:
         pos = self._schematic_layout(lines, by_id, on_map)
         xs = [p[0] for p in pos.values()]
         ys = [p[1] for p in pos.values()]
-        mx = max(180.0, 0.10 * (max(xs) - min(xs)))
-        my = max(160.0, 0.12 * (max(ys) - min(ys)))
-        view = (min(xs) - mx, min(ys) - my, max(xs) - min(xs) + 2 * mx,
-                max(ys) - min(ys) + 2 * my + 120.0)
+        # Margins are not symmetric: the title block needs the top, the line key
+        # needs the bottom-right corner, and labels need room on every side.
+        left, right = 260.0, 260.0
+        top, bottom = 300.0, 560.0 + 96.0 * len(lines)
+        view = (min(xs) - left, min(ys) - top, max(xs) - min(xs) + left + right,
+                max(ys) - min(ys) + top + bottom)
         height_px = size_px * view[3] / max(1.0, view[2])
         doc = SvgDoc(size_px, height_px, view, bg="#0b1014",
                      title="Seirin — transit diagram", font=FONT)
@@ -984,7 +986,7 @@ class Atlas:
             else:
                 doc.circle(x, y, 26.0, fill="#f2ead8", stroke="#0b1014", sw=12.0)
             label = st.romaji
-            size = 62.0 if (inter or st.daily_boardings > 6000) else 52.0
+            size = 48.0 if (inter or st.daily_boardings > 6000) else 40.0
             pos_lab = placer.place(
                 x - view[0], y - view[1], label, size=size,
                 priority=9 if inter else 6,
@@ -1003,8 +1005,10 @@ class Atlas:
 
         # -- key
         doc.open_layer("key")
-        kx, ky = view[0] + 90.0, view[1] + 90.0
+        kx = view[0] + view[2] * 0.02
+        ky = view[1] + view[3] - 300.0 - (128.0 + 86.0 * len(lines))
         kw, kh = 900.0, 128.0 + 86.0 * len(lines)
+        placer.reserve(kx - view[0] + kw / 2, ky - view[1] + kh / 2, kw + 60.0, kh + 40.0)
         doc.rect(kx, ky, kw, kh, fill="#0e1418", stroke="#2a3540", sw=4.0, rx=18.0)
         doc.text(kx + 40.0, ky + 74.0, "LINES", size=52.0, fill="#e9eef3",
                  anchor="start", weight="700", letter_spacing=6.0)
@@ -1023,56 +1027,55 @@ class Atlas:
                           "Seirin city generator · vector geometry, no raster data")
         return doc.write(path, "Seirin transit diagram.")
 
-    def _schematic_layout(self, lines, by_id, on_map, iterations: int = 320):
-        """Deterministic spring layout for the transit diagram.
+    def _schematic_layout(self, lines, by_id, on_map, iterations: int = 220):
+        """Deterministic relaxation for the transit diagram.
 
-        Returns a dict station id -> (x, y) in diagram units. Pure numpy, no RNG:
-        the same network always produces the same diagram.
+        Returns a dict station id -> (x, y) in diagram units. No RNG: the same
+        network always produces the same diagram.
+
+        The relaxation is Gauss-Seidel rather than a simultaneous update: pairs
+        of stations that are too close are pushed apart one after another, in
+        order of how close they are, so the corrections do not cancel each other
+        (a simultaneous update on 32 stations crowds them into a frozen cluster).
+        Line spacing is then enforced as a soft spring, and the real geography
+        acts as a weak anchor so the diagram still reads as this city.
         """
         ids = [st.id for st in on_map]
         idx = {sid: i for i, sid in enumerate(ids)}
-        n = len(ids)
-        P = np.zeros((n, 2))
-        real = np.zeros((n, 2))
-        for i, st in enumerate(on_map):
-            real[i] = (st.x, st.y)
-        # normalise the real geography into the drawing box
+        real = np.array([[st.x, st.y] for st in on_map])
         span = np.maximum(real.max(axis=0) - real.min(axis=0), 1.0)
-        P = (real - real.min(axis=0)) / span * np.array([1_600.0, 1_200.0])
+        P = (real - real.min(axis=0)) / span * np.array([2_300.0, 1_600.0])
         anchor = P.copy()
-        # target spacing: enough room for a label between two stations
         edges = []
         for line in lines:
             seq = [idx[s] for s in line.stations if s in idx]
             for a, b in zip(seq, seq[1:]):
                 edges.append((a, b))
         edges = np.array(edges) if edges else np.zeros((0, 2), int)
-        target = 300.0
-        min_sep = 250.0
-        step = np.zeros_like(P)
-        for it in range(iterations):
-            # 1. springs: equal spacing along the lines
-            step[:] = 0.0
+        spacing_target, min_sep = 300.0, 240.0
+        for _ in range(iterations):
+            # springs: equal spacing along each line
             if len(edges):
                 d = P[edges[:, 1]] - P[edges[:, 0]]
                 dist = np.maximum(np.hypot(d[:, 0], d[:, 1]), 1e-6)
-                f = ((dist - target) / dist)[:, None] * d * 0.55
-                np.add.at(step, edges[:, 0], f)
-                np.add.at(step, edges[:, 1], -f)
-            # 2. repulsion: keep stations, and therefore labels, apart
+                f = ((dist - spacing_target) / dist)[:, None] * d * 0.30
+                P[edges[:, 0]] += f
+                P[edges[:, 1]] -= f
+            # repulsion, sequentially, closest pairs first
             dd = P[:, None, :] - P[None, :, :]
             dist = np.hypot(dd[:, :, 0], dd[:, :, 1])
-            np.fill_diagonal(dist, 1e6)
-            close = dist < min_sep
-            if close.any():
-                ii, jj = np.nonzero(close)
-                push = ((min_sep - dist[ii, jj]) / np.maximum(dist[ii, jj], 1e-6))
-                v = dd[ii, jj] * push[:, None] * 0.30
-                np.add.at(step, ii, -v)
-                np.add.at(step, jj, v)
-            # 3. weak anchor to the real geography, and to the 45°-grid
-            step += (anchor - P) * 0.012
-            P += np.clip(step, -60.0, 60.0)
+            np.fill_diagonal(dist, 1e9)
+            for i, j in np.argwhere(np.triu(dist < min_sep, 1)):
+                diff = P[j] - P[i]
+                length = float(np.hypot(diff[0], diff[1]))
+                if length < 1e-6:
+                    diff = np.array([1.0, 0.0])
+                    length = 1.0
+                push = (min_sep - length) / length * 0.5
+                P[i] -= diff * push
+                P[j] += diff * push
+            # weak pull back toward the real geography
+            P += (anchor - P) * 0.010
         return {sid: (float(P[idx[sid], 0]), float(P[idx[sid], 1])) for sid in ids}
 
     # ------------------------------------------------------------------
