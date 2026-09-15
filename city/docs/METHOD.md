@@ -207,7 +207,7 @@ same drawing.
 
 * 25 sheets: regional setting, city plan (dark and print plate), zoning, five
   thematic choropleths, the transit diagram, hydrology, the night plate, the
-  isometric extrusion, the port, and one detail sheet per urban district.
+  axonometric extrusion, the port, and one detail sheet per urban district.
 * Labels are placed by `LabelPlacer`, a deterministic first-fit placer with a
   priority order and per-map candidate offsets, so the same city always
   produces the same sheet and no label overlaps another.

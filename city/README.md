@@ -33,7 +33,7 @@ That writes three trees under `city/generated/`:
 
 | Directory | What it is |
 |---|---|
-| `atlas/*.svg` | 25 vector maps: regional setting, city plan (dark and print), zoning, five thematic choropleths, transit diagram, hydrology, night plate, isometric extrusion, port plan, and one detail sheet per district |
+| `atlas/*.svg` | 25 vector maps: regional setting, city plan (dark and print), zoning, five thematic choropleths, transit diagram, hydrology, night plate, axonometric extrusion, port plan, and one detail sheet per district |
 | `data/*.csv`, `*.geojson`, `*.json` | every number behind the maps: 173 663 buildings, 25 266 streets, 111 machi, the OD matrix, the economy, and the whole geometry in WGS84 |
 | `3d/*.glb`, `*.obj` + `.mtl`, `import_seirin.py` | the same city as a 3-D model, plus a Blender import script (`import_seirin.py` recreates the materials and scales metres to Blender units) |
 

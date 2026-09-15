@@ -1083,28 +1083,28 @@ class Atlas:
 
     # ------------------------------------------------------------------
     def map_isometric(self, path: str, view: Optional[Tuple[float, float, float, float]] = None,
-                      size_px: int = 2000) -> str:
-        """An isometric axonometric of the built volume.
+                      size_px: int = 2400, exaggeration: float = 1.8) -> str:
+        """An axonometric of the built volume, drawn as projected polygons.
 
-        Buildings are extruded by *drawing their real footprints as the top face*
-        and the two visible side faces as polygons at the projected height. The
-        result is a genuine 2.5-D vector drawing of the city, not a perspective
-        render: every polygon is a projected building, so it scales, prints and
-        edits like the rest of the atlas.
+        Not a render: every building contributes its roof plan and its two
+        visible walls as vector polygons, so the sheet scales, prints and edits
+        like the rest of the atlas — and a viewer can measure it.
+
+        Heights are exaggerated about 1.8x. Without that a 10 m house is two
+        pixels wide at a readable view scale and the city looks like a plan with
+        noise on it; with it the massing, the ridge of towers and the terraces
+        are legible, which is the whole point of the sheet. The default view is
+        a 2.6 km window on the core, where individual buildings are buildings.
         """
         pal = DARK
-        view = view or (1_050.0 - 3_100.0, 1_150.0 - 2_600.0,
-                        1_050.0 + 3_100.0, 1_150.0 + 3_200.0)
-        span = view[2] - view[0]
-        # Projection: x' = x - y*cos(30°), y' = (x + y)*sin(30°) - z, centred.
+        view = view or (1_050.0 - 1_300.0, 1_150.0 - 1_300.0,
+                        1_050.0 + 1_300.0, 1_150.0 + 1_100.0)
         kx, ky = 0.866, 0.5
+        kz = 1.25 * exaggeration
 
         def P(x, y, z=0.0):
-            return (x - y * kx, (x + y) * ky * 0.5 - z * 1.25)
+            return (x - y * kx, (x + y) * ky - z * kz)
 
-        # Project the view corners to get a tight viewBox, then keep the inline
-        # image size tied to size_px (an SVG whose pixel size equals its world
-        # size renders at the wrong scale in browsers and in print).
         corners = [P(*c) for c in ((view[0], view[1]), (view[2], view[1]),
                                    (view[2], view[3]), (view[0], view[3]))]
         px0 = min(c[0] for c in corners)
@@ -1113,14 +1113,11 @@ class Atlas:
         py1 = max(c[1] for c in corners)
         vw, vh = px1 - px0, py1 - py0
         doc = SvgDoc(size_px, size_px * vh / vw, (px0, py0, px0 + vw, py0 + vh),
-                     bg=pal["bg"], title="Seirin — isometric", font=FONT)
+                     bg=pal["bg"], title="Seirin — axonometric", font=FONT)
         doc.open_layer("ground")
-        ground = [P(view[0], view[1]), P(view[2], view[1]),
-                  P(view[2], view[3]), P(view[0], view[3])]
-        doc.poly(Polygon(ground), fill="#161d1a")
+        doc.poly(Polygon([P(view[0], view[1]), P(view[2], view[1]),
+                          P(view[2], view[3]), P(view[0], view[3])]), fill="#161d1a")
         doc.open_layer("water")
-        # Clip the water to the view before projecting: filtering vertices alone
-        # would cut bays into straight chords.
         view_box = box(view[0] - 400, view[1] - 400, view[2] + 400, view[3] + 400)
         water = self._water.intersection(view_box).buffer(0)
         for g in ([water] if water.geom_type == "Polygon"
@@ -1130,16 +1127,29 @@ class Atlas:
             ring = [P(x, y) for (x, y) in g.exterior.coords]
             if len(ring) > 2:
                 doc.poly(Polygon(ring), fill="#0c1c28")
+
+        # Far to near: the camera looks from +x +y, so painter order is x + y.
         items = []
         for b in self.city.buildings:
             cx, cy = b.centre
-            if not (view[0] <= cx <= view[2] and view[1] <= cy <= view[3]):
+            if not (view[0] - 60 <= cx <= view[2] + 60 and
+                    view[1] - 60 <= cy <= view[3] + 60):
                 continue
             items.append((cx + cy, b))
-        items.sort(key=lambda t: t[0])       # far to near in this projection
+        items.sort(key=lambda t: t[0])
         doc.open_layer("buildings")
-        light = np.array([-0.62, -0.78])     # light from the upper left, in plan
-        tops: List[str] = []
+        light = np.array([-0.62, -0.78])       # light from the upper left, in plan
+        # Roofs carry the use: timber houses, concrete apartments, steel offices.
+        # Without this the sheet is a uniform grey texture; with it the CBD, the
+        # industrial belt and the residential fabric are distinguishable at a
+        # glance, which is what a shaded 2.5-D drawing is for.
+        roof_colours = {
+            "house": "#a08d74", "barn": "#7d6f5a", "apart": "#9a9086",
+            "shop": "#8f8a80", "office": "#8794a4", "tower": "#9db0c4",
+            "hotel": "#9c9080", "factory": "#82867c", "warehouse": "#7e8c8c",
+            "plant": "#7a8078", "tank": "#8d9590",
+        }
+        tops: Dict[str, List[str]] = {}
         walls: Dict[str, List[str]] = {}
         for _, b in items:
             base = max(0.0, b.elevation)
@@ -1149,9 +1159,9 @@ class Atlas:
                 continue
             hi = [P(x, y, top) for (x, y) in ring]
             lo = [P(x, y, base) for (x, y) in ring]
-            tops.append(path_d_compact(Polygon(hi), precision=0))
-            # Walls: keep the faces turned toward the viewer (both plan axes
-            # increase toward the camera) and shade them by their real normal.
+            shade = max(0.62, 1.0 - min(0.34, b.height_m / 130.0 * 0.34))
+            colour = _darken(roof_colours.get(b.kind, "#8d9298"), shade)
+            tops.setdefault(colour, []).append(path_d(Polygon(hi), precision=1))
             n = len(ring)
             for i in range(n):
                 j = (i + 1) % n
@@ -1161,20 +1171,20 @@ class Atlas:
                 if length < 1e-6:
                     continue
                 nx, ny = ey / length, -ex / length
-                inward = (nx * (ring[0][0] - x1) + ny * (ring[0][1] - y1)) < 0.0
-                if inward:
+                if (nx * (ring[0][0] - x1) + ny * (ring[0][1] - y1)) < 0.0:
                     nx, ny = -nx, -ny
-                if nx + ny <= 0.02:          # turned away from the viewer
+                if nx + ny <= 0.02:            # turned away from the camera
                     continue
                 shade = float(np.dot((nx, ny), light))
-                fill = ("#20282e" if shade > 0.25 else "#171d22" if shade > -0.2
-                        else "#131920")
+                fill = ("#4a5763" if shade > 0.25 else "#39434d" if shade > -0.2
+                        else "#2b333b")
                 walls.setdefault(fill, []).append(
-                    path_d_compact(Polygon([hi[i], hi[j], lo[j], lo[i]]),
-                                   precision=0))
-        doc.path_multi(tops, fill="#2f3941", stroke="#0e1315", sw=1.0)
-        for fill, ds in walls.items():
+                    path_d(Polygon([hi[i], hi[j], lo[j], lo[i]]), precision=1))
+        for fill, ds in walls.items():          # walls first, roofs over them
             doc.path_multi(ds, fill=fill)
+        for colour, ds in tops.items():
+            doc.path_multi(ds, fill=colour, stroke="#161b20", sw=1.0)
+
         doc.open_layer("crowns")
         crown_paths = []
         for _, b in items:
@@ -1183,28 +1193,37 @@ class Atlas:
             base = max(0.0, b.elevation)
             ring = [P(x, y, base + b.height_m) for (x, y) in b.polygon.exterior.coords[:-1]]
             if len(ring) > 2:
-                crown_paths.append(path_d_compact(Polygon(ring), precision=0))
+                crown_paths.append(path_d(Polygon(ring), precision=1))
         doc.path_multi(crown_paths, fill="#e7d9a8", stroke="#ffd479", sw=2.0)
+
         doc.open_layer("labels")
         placer = LabelPlacer(vw, vh)
+        for poi in self.landmarks.canon:
+            if not (view[0] <= poi.x <= view[2] and view[1] <= poi.y <= view[3]):
+                continue
+            p = P(poi.x, poi.y, 0.0)
+            pos = placer.place(p[0] - px0, p[1] - py0, poi.romaji, 46.0, priority=8)
+            if pos is None:
+                continue
+            doc.text(pos[0] + px0, pos[1] + py0, poi.romaji, size=46.0,
+                     fill="#f2e7c4", weight="600", halo="#0a1016")
         for d in self.districts.districts:
             cx, cy = d["centre"]
             if not (view[0] <= cx <= view[2] and view[1] <= cy <= view[3]):
                 continue
             p = P(cx, cy, 0.0)
-            pos = placer.place(p[0] - px0, p[1] - py0, d["romaji"], 60.0, priority=8)
+            pos = placer.place(p[0] - px0, p[1] - py0, d["romaji"], 40.0, priority=5)
             if pos is None:
                 continue
-            doc.text(pos[0] + px0, pos[1] + py0, d["romaji"], size=60.0,
-                     fill="#e9eef3", weight="600", halo="#0a1016")
-        doc.text(px0 + vw * 0.03, py0 + vh * 0.06,
-                 "SEIRIN — ISOMETRIC EXTRUSION", size=vw * 0.028,
-                 fill="#e9eef3", anchor="start", weight="700")
-        doc.text(px0 + vw * 0.03, py0 + vh * 0.095,
-                 "Every polygon is a projected building footprint extruded to its "
-                 "simulated height.", size=vw * 0.0115,
-                 fill="#9fb0be", anchor="start")
-        return doc.write(path, "Seirin isometric extrusion.")
+            doc.text(pos[0] + px0, pos[1] + py0, d["romaji"], size=40.0,
+                     fill="#9fb0be", weight="500", halo="#0a1016")
+        self._compass(doc, view, pal, scale_bar_km=0.5)
+        self._title_block(doc, view, pal, "SEIRIN — AXONOMETRIC",
+                          f"Roofs and walls of {len(items):,} buildings, heights "
+                          f"exaggerated x{exaggeration:g}. Axonometric, not "
+                          "perspective: every polygon is a real footprint.",
+                          "Seirin city generator · vector geometry, no raster data")
+        return doc.write(path, "Seirin axonometric extrusion.")
 
     # ------------------------------------------------------------------
     # Map 11 — port detail
@@ -1301,7 +1320,7 @@ class Atlas:
             os.path.join(out_dir, "11_transit_diagram.svg"))
         written["hydrology"] = self.map_hydrology(os.path.join(out_dir, "12_hydrology.svg"))
         written["night"] = self.map_night(os.path.join(out_dir, "13_night_plate.svg"))
-        written["isometric"] = self.map_isometric(os.path.join(out_dir, "14_isometric.svg"))
+        written["axonometric"] = self.map_isometric(os.path.join(out_dir, "14_axonometric.svg"))
         written["port"] = self.map_port(os.path.join(out_dir, "15_port.svg"))
         for d in self.districts.districts:
             if d["id"] in ("rural_north", "rural_west", "rural_east", "rural_south"):
