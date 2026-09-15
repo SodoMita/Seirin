@@ -15,9 +15,9 @@ responsive ladder, accessibility).
 open index.html
 
 # or serve the REPO ROOT (the mockup references game/assets + backgrounds by
-# relative path for its scene photos):
-cd <repo> && python3 -m http.server 8124
-#   -> http://localhost:8124/design/preview/three-ui/index.html
+# relative path for its scene photos); serve.py also redirects / to the mockup:
+python3 design/preview/three-ui/serve.py 8124
+#   -> http://localhost:8124/  (302 -> /design/preview/three-ui/index.html)
 ```
 
 Screens: **ТИТУЛ · ДИАЛОГ · НАСТРОЙКИ · ПАМЯТЬ · МАТЕРИАЛЫ** (top-right nav).
