@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+  Seirin "Holoframe" — UI mockup: AI-baked textures + three.js plates & shaders
+  ----------------------------------------------------------------------------
+  DEV-ONLY harness, like design/preview/mecha-ui-preview.html: the shipping game
+  never loads this file. Open by double-click (all scripts are classic tags and
+  every texture is an inlined data URI, so file:// works), or serve the folder.
+
+  Layer contract:
+    .hf-stage   CSS night scene (background-size: cover — browser-native fit)
+    #hf-canvas  three.js: env shaders + nine-slice 3D plates anchored to DOM rects
+    .hf-ui      real HTML/CSS: layout, type, focus, flow — the accessible truth
+  Armour follows the DOM, never the other way round. No WebGL? html.no-webgl
+  repaints every [data-plate] with the same slices in pure CSS.
+============================================================================= -->
+<html lang="ru" data-alert="nominal">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Сэйрин // Голограмма — макет интерфейса</title>
+<meta name="description" content="Seirin Holoframe UI mockup: nine-slice 3D plates, shader materials, runtime procedural textures. Offline, no fetch." />
+<link rel="stylesheet" href="../../../game/assets/fonts/fonts.css" />
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/layout.css" />
+<link rel="stylesheet" href="css/components.css" />
+<style>
+  /* harness-only: scene photo for the CSS layer (cover, never stretched) */
+  .hf-stage { --hf-scene: url("../../../backgrounds/beijing_rooftop_network.webp"); }
+  body[data-screen="screen-game"] .hf-stage { --hf-scene: url("../../../game/assets/scenes/courtyard.webp"); }
+</style>
+</head>
+<body data-screen="screen-title">
+
+<div class="hf-stage" aria-hidden="true"></div>
+<canvas id="hf-canvas" aria-hidden="true"></canvas>
+
+<div class="hf-ui">
+
+  <!-- ══ TOP RAIL ═══════════════════════════════════════════════════════ -->
+  <header class="hf-hud">
+    <span class="hf-brand">СЭЙРИН · РЕЗОНАНС 2030</span>
+    <div class="hf-badges">
+      <span class="hf-badge">ТЭЦУБА: УЛИЦА</span>
+      <span class="hf-badge">РЭН</span>
+      <span class="hf-badge" data-sig>ТРЕВОГА <span id="hud-alert">8</span>%</span>
+    </div>
+    <div class="hf-bay" aria-hidden="false">
+      <div class="hf-holo-slot" data-holo="radar" title="Радар резонанса"></div>
+      <div class="hf-gauges">
+        <span class="hf-gauge">RES<i style="--v:64%"></i></span>
+        <span class="hf-gauge">PWR<i style="--v:81%"></i></span>
+        <span class="hf-gauge">HEAT<i style="--v:22%"></i></span>
+      </div>
+    </div>
+    <span class="hf-spacer"></span>
+    <nav id="hf-nav" aria-label="Экраны макета">
+      <button type="button" data-screen="screen-title" aria-pressed="true">ТИТУЛ</button>
+      <button type="button" data-screen="screen-game" aria-pressed="false">ДИАЛОГ</button>
+      <button type="button" data-screen="screen-settings" aria-pressed="false">НАСТРОЙКИ</button>
+      <button type="button" data-screen="screen-saves" aria-pressed="false">ПАМЯТЬ</button>
+      <button type="button" data-screen="screen-lab" aria-pressed="false">МАТЕРИАЛЫ</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ══ TITLE ════════════════════════════════════════════════════════ -->
+    <section id="screen-title" aria-current="page">
+      <div class="hf-titlebox" data-plate="auto">
+        <p class="hf-sub">НОЧНАЯ СМЕНА · ВИЗУАЛЬНАЯ НОВЕЛЛА</p>
+        <h1 class="hf-title">СЭЙРИН</h1>
+        <p class="hf-sub">РЕЗОНАНС 2030</p>
+        <div class="hf-menu">
+          <button type="button" class="hf-chip" data-plate="auto">НАЧАТЬ СМЕНУ</button>
+          <button type="button" class="hf-chip" data-plate="auto">ПРОДОЛЖИТЬ</button>
+          <button type="button" class="hf-chip" data-plate="auto">АРХИВ СЭЙРИН</button>
+          <button type="button" class="hf-chip" data-plate="auto">НАСТРОЙКИ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ DIALOGUE ═════════════════════════════════════════════════════ -->
+    <section id="screen-game" hidden>
+      <div class="hf-choices" role="group" aria-label="Выбор">
+        <button type="button" class="hf-choice" data-i="01" data-plate="auto">Подняться к Мие и помочь с обрядом дружбы</button>
+        <button type="button" class="hf-choice" data-i="02" data-plate="auto">Отправиться в Aquaforge к Сплеш и Стелле</button>
+        <button type="button" class="hf-choice" data-i="03" data-plate="auto">Остаться и подумать о природе резонанса</button>
+      </div>
+      <div class="hf-console-wrap">
+        <div class="hf-speaker" data-plate="auto" data-plate-z="14">МИЯ КАГЭЦУКИ</div>
+        <div class="hf-console" data-plate="auto" role="dialog" aria-label="Реплика">
+          <p>Сегодня Обряд Дружбы! Поможешь мне? Резонанс держится, но Акатоми уже слушает город — решать надо быстро.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SETTINGS ═════════════════════════════════════════════════════ -->
+    <section id="screen-settings" hidden>
+      <div>
+        <p class="hf-sub">ПАНЕЛЬ УПРАВЛЕНИЯ</p>
+        <h2 class="hf-title">НАСТРОЙКИ</h2>
+      </div>
+      <div class="hf-settings">
+        <div class="hf-panel" data-plate="auto">
+          <h3>ЗВУК</h3>
+          <div id="dial-volume" role="slider" tabindex="0" aria-label="Громкость"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="62"></div>
+          <div class="hf-row">
+            <label for="set-volume">Громкость</label>
+            <input id="set-volume" type="range" min="0" max="100" value="62" />
+            <output id="set-volume-out">62</output>
+          </div>
+          <div class="hf-row">
+            <label for="set-voice">Голоса</label>
+            <input id="set-voice" type="range" min="0" max="100" value="80" />
+            <output id="set-voice-out">80</output>
+          </div>
+        </div>
+        <div class="hf-panel" data-plate="auto">
+          <h3>СИСТЕМА</h3>
+          <div class="hf-row">
+            <label for="set-text">Текст</label>
+            <input id="set-text" type="range" min="10" max="100" value="45" />
+            <output id="set-text-out">45</output>
+          </div>
+          <div class="hf-row">
+            <label for="set-alert">Акатоми</label>
+            <input id="set-alert" type="range" min="0" max="100" value="8" />
+            <output id="set-alert-out">8</output>
+          </div>
+          <button type="button" class="hf-chip" id="btn-alarm-demo" data-plate="auto">ПРОВЕРКА ТРЕВОГИ</button>
+          <p class="hf-caption">Рычаг «Акатоми» переключает состояние освещения:
+             номинал → осторожность → тревога. GPU-кромки и CSS-переменные
+             читают один и тот же атрибут <code>html[data-alert]</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SAVES ════════════════════════════════════════════════════════ -->
+    <section id="screen-saves" hidden>
+      <div>
+        <p class="hf-sub">КАРТРИДЖИ ПАМЯТИ</p>
+        <h2 class="hf-title">СОХРАНЕНИЯ</h2>
+      </div>
+      <div class="hf-holo-card-slot" data-holo="card" title="Голограмма последнего кадра"></div>
+      <div class="hf-saves">
+        <button type="button" class="hf-save" data-plate="auto">
+          <span class="hf-thumb" style="background: url('../../../game/assets/scenes/miya_room.webp') center/cover no-repeat"></span>
+          <span>СЛОТ 01 — КОМНАТА МИИ</span>
+          <span class="hf-meta">15.07 · 21:40 · RES 64%</span>
+        </button>
+        <button type="button" class="hf-save" data-plate="auto">
+          <span class="hf-thumb" style="background: url('../../../game/assets/scenes/port.webp') center/cover no-repeat"></span>
+          <span>СЛОТ 02 — ПОРТ</span>
+          <span class="hf-meta">16.07 · 02:12 · RES 71%</span>
+        </button>
+        <button type="button" class="hf-save" data-plate="auto">
+          <span class="hf-thumb" style="background: url('../../../game/assets/scenes/lab.webp') center/cover no-repeat"></span>
+          <span>СЛОТ 03 — ЛАБОРАТОРИЯ</span>
+          <span class="hf-meta">16.07 · 05:03 · RES 58%</span>
+        </button>
+        <button type="button" class="hf-save" data-plate="auto">
+          <span class="hf-thumb"></span>
+          <span>ПУСТОЙ СЛОТ</span>
+          <span class="hf-meta">— · — · —</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ══ MATERIALS LAB ════════════════════════════════════════════════ -->
+    <section id="screen-lab" hidden class="hf-lab">
+      <div>
+        <p class="hf-sub">ПРОВЕРКА МАТЕРИАЛОВ</p>
+        <h2 class="hf-title">ЛАБОРАТОРИЯ</h2>
+        <p class="hf-caption">Девять срезов: углы никогда не масштабируются, кромки повторяются
+           только вдоль своей оси, центр процедурный. Плотность текселей одинакова
+           на любом размере — поэтому нет ни швов, ни растяжения.</p>
+      </div>
+
+      <div class="hf-lab-grid">
+        <div>
+          <p class="hf-caption">GPU-плита (three.js) — три размера, одно зерно</p>
+          <div class="hf-ladder">
+            <div data-plate="auto" style="height:72px"></div>
+            <div data-plate="auto" style="height:150px"></div>
+            <div data-plate="auto" style="height:230px"></div>
+          </div>
+        </div>
+        <div>
+          <p class="hf-caption">Та же плита в чистом CSS (border-образ из 9 срезов)</p>
+          <div class="hf-ladder">
+            <div class="hf-css9" data-v="btn" style="height:72px"></div>
+            <div class="hf-css9" data-v="chip" style="height:150px"></div>
+            <div class="hf-css9" data-v="plate" style="height:230px"></div>
+          </div>
+        </div>
+        <div>
+          <p class="hf-caption">Антипример: фон, растянутый на 100%×100% (так не делаем)</p>
+          <div class="hf-ladder">
+            <div class="hf-stretch-bad" style="height:72px">БОЛТЫ РАЗЪЕХАЛИСЬ</div>
+            <div class="hf-stretch-bad" style="height:150px">БОЛТЫ РАЗЪЕХАЛИСЬ</div>
+            <div class="hf-stretch-bad" style="height:230px">БОЛТЫ РАЗЪЕХАЛИСЬ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hf-lab-grid">
+        <div>
+          <p class="hf-caption">Бесшовная плитка металла 2×2 (после seamlessize)</p>
+          <div id="lab-tile" style="height:220px; background: repeat center/256px 256px"></div>
+        </div>
+        <div>
+          <p class="hf-caption">Голограмма кадра: шейдерный cover — меняй окно, кадр не тянется</p>
+          <div class="hf-holo-card-slot" data-holo="card"></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="hf-caption">Манифест текстур: размеры, режим wrap, метрика шва (seam/base ≈ 1 — шва нет)</p>
+        <table>
+          <thead><tr><th>текстура</th><th>размер</th><th>wrap</th><th>шов</th><th>вес</th></tr></thead>
+          <tbody id="lab-table"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- quick menu owns the bottom edge, like in the shipping game -->
+<div class="hf-quick" role="toolbar" aria-label="Быстрое меню">
+  <button type="button" class="hf-chip" data-plate="auto">НАЗАД</button>
+  <button type="button" class="hf-chip" data-plate="auto">СОХРАНИТЬ</button>
+  <button type="button" class="hf-chip" data-plate="auto">ЖУРНАЛ</button>
+  <button type="button" class="hf-chip" data-plate="auto">СКРЫТЬ</button>
+</div>
+
+<div id="hf-nowebgl" hidden>WebGL недоступен — интерфейс переключился на CSS-девять-срезов (те же срезы, без 3D).</div>
+
+<script src="vendor/three.iife.min.js"></script>
+<script src="js/tex-data.js"></script>
+<script src="js/shaders.js"></script>
+<script src="js/plates.js"></script>
+<script src="js/textures.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

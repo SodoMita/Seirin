@@ -1,0 +1,211 @@
+/* ============================================================================
+ * Seirin "Holoframe" mockup — layout & the CSS/GPU plate contract (DEV ONLY).
+ * ---------------------------------------------------------------------------
+ * Layer stack (bottom → top):
+ *   0  .hf-stage      CSS night scene: gradients + photo, background-size:cover
+ *                     (the browser's own aspect-correct fit — never stretched)
+ *   1  #hf-canvas     three.js: environment + 3D nine-slice plates + holos
+ *   2  .hf-ui         real HTML: text, buttons, focus rings, flow layout
+ *
+ * The DOM boxes that get armour are transparent: the GPU draws the material
+ * behind them, CSS keeps the box model. If WebGL is missing, html.no-webgl
+ * repaints the same boxes with a pure-CSS nine-slice (.hf-css9) built from the
+ * identical measured slices — same art, same metrics, zero stretch either way.
+ * ========================================================================= */
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--hf-void);
+  color: var(--hf-ink);
+  font-family: var(--hf-sans);
+  font-size: var(--hf-fs-m);
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ------------------------------------------------------------- layer 0 */
+.hf-stage {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(120% 90% at 70% 8%, rgba(56, 189, 248, .10), transparent 60%),
+    radial-gradient(90% 70% at 20% 100%, rgba(168, 85, 247, .10), transparent 62%),
+    linear-gradient(rgba(5, 7, 12, .82), rgba(5, 7, 12, .94)),
+    var(--hf-scene, linear-gradient(#0a1020, #05070c)) center / cover no-repeat;
+}
+.hf-stage::after {           /* vignette + scan sheen, pure CSS */
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 3px),
+    radial-gradient(130% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------- layer 1 */
+#hf-canvas {
+  position: fixed; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  display: block; pointer-events: none;
+}
+
+/* ------------------------------------------------------------- layer 2 */
+.hf-ui {
+  position: relative; z-index: 2;
+  height: 100dvh;                       /* mobile-correct viewport */
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* top HUD rail ---------------------------------------------------------- */
+.hf-hud {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--hf-gap-2);
+  min-height: var(--hf-hud-h);
+  padding: var(--hf-gap-1) var(--hf-gap-3);
+}
+.hf-hud > * { min-width: 0; }
+.hf-hud .hf-spacer { flex: 1 1 0; }
+.hf-brand {
+  font-family: var(--hf-disp);
+  font-size: var(--hf-fs-s);
+  letter-spacing: .22em;
+  color: var(--hf-cyan-hi);
+  text-shadow: 0 0 14px rgba(56, 189, 248, .45);
+  white-space: nowrap;
+}
+.hf-badges { display: flex; gap: var(--hf-gap-1); flex-wrap: wrap; }
+.hf-badge {
+  font-family: var(--hf-mono);
+  font-size: var(--hf-fs-xs);
+  letter-spacing: .08em;
+  color: var(--hf-ink-dim);
+  padding: .28em .7em;
+  border: 1px solid rgba(159, 176, 198, .25);
+  background: rgba(11, 15, 22, .55);
+  white-space: nowrap;
+}
+.hf-badge[data-sig] { color: var(--hf-sig); border-color: var(--hf-sig-dim); }
+
+/* nav ------------------------------------------------------------------ */
+#hf-nav { display: flex; gap: var(--hf-gap-1); flex-wrap: wrap; }
+#hf-nav button {
+  font: 600 var(--hf-fs-xs) var(--hf-sans);
+  letter-spacing: .18em;
+  color: var(--hf-ink-dim);
+  background: transparent;
+  border: 1px solid rgba(159, 176, 198, .28);
+  padding: .5em 1em;
+  cursor: pointer;
+  transition: color .18s, border-color .18s, background-color .18s;
+}
+#hf-nav button[aria-pressed="true"] {
+  color: var(--hf-cyan-hi);
+  border-color: var(--hf-sig-dim);
+  background: rgba(56, 189, 248, .10);
+}
+#hf-nav button:hover { color: var(--hf-ink); border-color: var(--hf-sig); }
+
+/* screens -------------------------------------------------------------- */
+main { min-height: 0; overflow: hidden auto; scrollbar-width: thin; }
+main > section {
+  min-height: 100%;
+  display: grid;
+  gap: var(--hf-gap-3);
+  padding: var(--hf-gap-3);
+  padding-bottom: calc(var(--hf-gap-3) + 68px);   /* clear the fixed quick menu */
+  align-content: start;
+  justify-items: stretch;
+}
+main > section[hidden] { display: none; }
+
+.hf-title {
+  font-family: var(--hf-disp);
+  font-size: var(--hf-fs-xl);
+  letter-spacing: .14em;
+  margin: 0;
+  color: var(--hf-ink);
+}
+.hf-sub {
+  font-family: var(--hf-mono);
+  font-size: var(--hf-fs-xs);
+  letter-spacing: .3em;
+  color: var(--hf-sig);
+  margin: 0;
+}
+
+/* ============================================ the CSS nine-slice plate ===
+ * Same contract as the GPU plate: corners fixed, edges repeat along their own
+ * axis only, centre is a flat fill. Nothing is ever background-size:100% 100%.
+ * ======================================================================== */
+.hf-css9 {
+  --c: var(--hf9-plate-c); --e: var(--hf9-plate-e);
+  --tc: var(--hf9-plate-corner); --th: var(--hf9-plate-edgeh); --tv: var(--hf9-plate-edgev);
+  background-color: var(--hf9-plate-center, #0b0f16);
+  background-image:
+    var(--tc), var(--tc), var(--tc), var(--tc),      /* TL TR BL BR */
+    var(--th), var(--th),                             /* top bottom  */
+    var(--tv), var(--tv);                             /* left right  */
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat,
+                     repeat-x, repeat-x, repeat-y, repeat-y;
+  background-size:
+    var(--c) var(--c), var(--c) var(--c), var(--c) var(--c), var(--c) var(--c),
+    auto var(--c), auto var(--c),
+    var(--c) auto, var(--c) auto;
+  background-position:
+    left top, right top, left bottom, right bottom,
+    var(--c) top, var(--c) bottom,
+    left var(--c), right var(--c);
+}
+.hf-css9[data-v="chip"] {
+  --c: var(--hf9-chip-c); --e: var(--hf9-chip-e);
+  --tc: var(--hf9-chip-corner); --th: var(--hf9-chip-edgeh); --tv: var(--hf9-chip-edgev);
+  background-color: var(--hf9-chip-center, #0b0f16);
+}
+.hf-css9[data-v="btn"] {
+  --c: var(--hf9-btn-c); --e: var(--hf9-btn-e);
+  --tc: var(--hf9-btn-corner); --th: var(--hf9-btn-edgeh); --tv: var(--hf9-btn-edgev);
+  background-color: var(--hf9-btn-center, #0b0f16);
+}
+/* boxes smaller than the smallest nine-slice minimum get a machined flat
+   frame instead: a stretched corner would be worse than a simpler material */
+.hf-plate-flat {
+  background: linear-gradient(160deg, rgba(125,141,165,.5), rgba(35,44,60,.9)) border-box;
+  border: 1px solid rgba(125, 141, 165, .45);
+}
+/* below the nine-slice minimum the CSS plate drops to the chip variant,
+   exactly like the GPU path — it never scales the corners */
+@media (max-width: 420px) {
+  .hf-css9[data-v="auto"] { --c: var(--hf9-chip-c); --tc: var(--hf9-chip-corner); --th: var(--hf9-chip-edgeh); --tv: var(--hf9-chip-edgev); }
+}
+
+/* transparent-by-default plate hosts: the armour lives on the GPU */
+[data-plate] { position: relative; isolation: isolate; }
+html:not(.no-webgl) [data-plate] { background: transparent; }
+
+/* focus & motion hygiene ------------------------------------------------ */
+:focus-visible {
+  outline: 2px solid var(--hf-sig);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001s !important;
+  }
+}
+
+/* notice bar when WebGL is unavailable --------------------------------- */
+#hf-nowebgl {
+  position: fixed; left: 50%; translate: -50% 0; bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 9;
+  font: 500 var(--hf-fs-xs) var(--hf-mono);
+  color: var(--hf-amber);
+  background: rgba(11, 15, 22, .9);
+  border: 1px solid rgba(251, 191, 36, .4);
+  padding: .6em 1em;
+}

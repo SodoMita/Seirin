@@ -1,0 +1,55 @@
+/* ============================================================================
+ * Seirin "Holoframe" mockup — design tokens (DEV ONLY).
+ * Colour language inherited from game/vendor/mecha-ui.css so a future merge
+ * reads as one product, not a fork.
+ * ========================================================================= */
+:root {
+  /* steel ramp */
+  --hf-void:      #05070c;
+  --hf-deep:      #0b0f16;
+  --hf-steel-low: #232c3c;
+  --hf-steel-mid: #46536a;
+  --hf-steel-lit: #7d8da5;
+  --hf-steel-hi:  #b8c6d8;
+  --hf-ink:       #e6edf6;
+  --hf-ink-dim:   #9fb0c6;
+
+  /* signal */
+  --hf-cyan:   #38bdf8;
+  --hf-cyan-hi:#7dd3fc;
+  --hf-amber:  #fbbf24;
+  --hf-red:    #f87171;
+  --hf-green:  #34d399;
+  --hf-violet: #a855f7;
+
+  /* type: fluid ladder, no breakpoint jumps */
+  --hf-fs-xs:  clamp(0.64rem, 0.60rem + 0.20vw, 0.72rem);
+  --hf-fs-s:   clamp(0.75rem, 0.70rem + 0.25vw, 0.85rem);
+  --hf-fs-m:   clamp(0.90rem, 0.84rem + 0.35vw, 1.05rem);
+  --hf-fs-l:   clamp(1.10rem, 1.00rem + 0.60vw, 1.45rem);
+  --hf-fs-xl:  clamp(1.50rem, 1.20rem + 1.60vw, 2.30rem);
+  --hf-fs-xxl: clamp(2.10rem, 1.40rem + 3.60vw, 4.20rem);
+  --hf-mono: 'Share Tech Mono', ui-monospace, monospace;
+  --hf-sans: 'Rajdhani', system-ui, sans-serif;
+  --hf-disp: 'Orbitron', var(--hf-sans);
+
+  /* space */
+  --hf-gap-1: clamp(4px, 0.5vw, 8px);
+  --hf-gap-2: clamp(8px, 1.1vw, 16px);
+  --hf-gap-3: clamp(14px, 2.0vw, 28px);
+  --hf-pad:   clamp(10px, 1.6vw, 22px);
+  --hf-hud-h: clamp(44px, 6vh, 64px);
+
+  /* nine-slice metrics are published by js/ui.js from the measured manifest:
+     --hf9-{plate,chip}-{c,e,corner,edgeh,edgev,center} */
+  --hf9-plate-c: 105px; --hf9-plate-e: 168px;
+  --hf9-chip-c: 40px;   --hf9-chip-e: 67px;
+  --hf9-btn-c: 20px;    --hf9-btn-e: 34px;
+
+  color-scheme: dark;
+}
+
+/* alert states: one attribute on <html>, everything downstream is a var */
+:root, :root[data-alert="nominal"] { --hf-sig: var(--hf-cyan); --hf-sig-dim: rgba(56, 189, 248, .45); }
+:root[data-alert="caution"]        { --hf-sig: var(--hf-amber); --hf-sig-dim: rgba(251, 191, 36, .45); }
+:root[data-alert="critical"]       { --hf-sig: var(--hf-red);  --hf-sig-dim: rgba(248, 113, 113, .5); }

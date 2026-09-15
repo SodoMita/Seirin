@@ -1,0 +1,270 @@
+/* ============================================================================
+ * Seirin "Holoframe" mockup — components (DEV ONLY).
+ * Every armoured surface is a [data-plate] box: HTML/CSS decides its size and
+ * flow, the GPU (or .hf-css9 in fallback) decides its material.
+ * ========================================================================= */
+
+/* ------------------------------------------------------------- HUD chips */
+.hf-chip {
+  display: inline-flex; align-items: center; gap: .5em;
+  font: 600 var(--hf-fs-xs) var(--hf-sans);
+  letter-spacing: .16em;
+  color: var(--hf-ink);
+  background: transparent;
+  border: 0;
+  padding: .85em 1.5em;
+  min-height: 44px;                 /* tap target, never sacrificed */
+  cursor: pointer;
+  transition: color .18s;
+}
+button.hf-chip:hover { color: var(--hf-cyan-hi); }
+.hf-chip[data-sig] { color: var(--hf-sig); }
+
+/* ------------------------------------------------------- dialogue console */
+.hf-console-wrap {
+  margin-top: auto;                 /* pinned to the flow bottom of the screen */
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 0 var(--hf-gap-3) calc(var(--hf-gap-3) + 56px);
+}
+.hf-speaker {
+  justify-self: start;
+  margin: 0 0 -14px var(--hf-gap-3);
+  padding: .5em 1.6em .55em;
+  font-family: var(--hf-disp);
+  font-size: var(--hf-fs-s);
+  letter-spacing: .2em;
+  color: var(--hf-cyan-hi);
+  z-index: 1;
+}
+.hf-console {
+  width: min(72rem, 100%);
+  padding: calc(var(--hf-pad) + 8px) var(--hf-pad) var(--hf-pad);
+  min-height: 9.5rem;
+}
+.hf-console p {
+  margin: 0;
+  font-size: var(--hf-fs-l);
+  line-height: 1.55;
+  color: var(--hf-ink);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+}
+.hf-console p::after {           /* advance caret */
+  content: "▾";
+  margin-left: .6em;
+  color: var(--hf-sig);
+  animation: hf-caret 1.1s ease-in-out infinite;
+}
+@keyframes hf-caret { 50% { opacity: .15; } }
+
+#screen-title { align-content: center; }
+#screen-game { grid-template-rows: 1fr auto; min-height: 100%; }
+#screen-game .hf-choices { align-self: center; }
+
+/* --------------------------------------------------------------- choices */
+.hf-choices {
+  display: grid;
+  gap: var(--hf-gap-2);
+  justify-items: center;
+  padding: var(--hf-gap-3);
+}
+.hf-choice {
+  width: min(46rem, 100%);
+  text-align: left;
+  font-size: var(--hf-fs-m);
+  color: var(--hf-ink);
+  padding: .9em 1.6em;
+  position: relative;
+}
+.hf-choice::before {             /* index numeral, CSS-only */
+  content: attr(data-i);
+  font-family: var(--hf-mono);
+  color: var(--hf-sig);
+  margin-right: .9em;
+}
+.hf-choice:hover { color: var(--hf-cyan-hi); }
+
+/* ------------------------------------------------------------ quick menu */
+.hf-quick {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  z-index: 3;
+  display: flex; justify-content: center; gap: var(--hf-gap-1);
+  padding: calc(6px + env(safe-area-inset-bottom)) var(--hf-gap-2) 8px;
+  background: linear-gradient(transparent, rgba(5, 7, 12, .88) 40%);
+}
+
+/* ----------------------------------------------------------- title screen */
+.hf-titlebox {
+  display: grid;
+  gap: var(--hf-gap-2);
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+  min-height: 60vh;
+  padding: var(--hf-gap-3);
+}
+.hf-titlebox .hf-title { font-size: var(--hf-fs-xxl); letter-spacing: .2em; }
+.hf-menu { display: grid; gap: var(--hf-gap-2); width: min(26rem, 100%); }
+.hf-menu .hf-chip { justify-content: center; text-align: center; }
+
+/* -------------------------------------------------------------- settings */
+.hf-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+  gap: var(--hf-gap-3);
+  align-items: start;
+}
+.hf-panel { padding: var(--hf-pad); display: grid; gap: var(--hf-gap-2); }
+.hf-panel h3 {
+  margin: 0;
+  font: 600 var(--hf-fs-s) var(--hf-disp);
+  letter-spacing: .24em;
+  color: var(--hf-sig);
+}
+.hf-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 10rem) 1fr auto;
+  align-items: center;
+  gap: var(--hf-gap-2);
+  font-size: var(--hf-fs-s);
+}
+.hf-row output { font-family: var(--hf-mono); color: var(--hf-cyan-hi); min-width: 3ch; text-align: right; }
+
+/* sliders: channel drawn with backgrounds only (WebKit-safe, no clip-path) */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 26px; background: transparent; margin: 0;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background:
+    linear-gradient(var(--hf-sig), var(--hf-sig)) 0 / var(--fill, 50%) 100% no-repeat,
+    linear-gradient(rgba(159,176,198,.22), rgba(159,176,198,.22));
+  border: 1px solid rgba(159, 176, 198, .3);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 22px; margin-top: -8px;
+  background: linear-gradient(180deg, var(--hf-steel-hi), var(--hf-steel-mid));
+  border: 1px solid #0b0f16;
+  box-shadow: 0 0 8px var(--hf-sig-dim);
+}
+input[type="range"]::-moz-range-track {
+  height: 8px; background: rgba(159, 176, 198, .22); border: 1px solid rgba(159,176,198,.3);
+}
+input[type="range"]::-moz-range-progress { height: 8px; background: var(--hf-sig); }
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 22px; border-radius: 0;
+  background: linear-gradient(180deg, var(--hf-steel-hi), var(--hf-steel-mid));
+  border: 1px solid #0b0f16;
+}
+
+/* rotary dial: 3D-looking from CSS, value/rotation owned by JS ------------- */
+#dial-volume {
+  --dial-a: 0deg;
+  width: clamp(96px, 12vw, 148px); aspect-ratio: 1;
+  justify-self: center;
+  border-radius: 50%;
+  cursor: grab; touch-action: none;
+  background:
+    var(--dial-face, none) center / 100% 100% no-repeat,
+    radial-gradient(circle at 34% 30%, rgba(184, 198, 216, .30), transparent 58%),
+    conic-gradient(from 210deg, #2a3446, #141a26 30%, #2a3446 55%, #10151f 80%, #2a3446),
+    #10151f;
+  box-shadow:
+    inset 0 2px 3px rgba(184, 198, 216, .28),
+    inset 0 -6px 12px rgba(0, 0, 0, .7),
+    0 6px 18px rgba(0, 0, 0, .6);
+  position: relative;
+}
+#dial-volume::after {          /* pointer notch, rotates with the value */
+  content: "";
+  position: absolute; inset: 12%;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--hf-sig), var(--hf-sig)) 50% 4% / 3px 26% no-repeat;
+  rotate: var(--dial-a);
+  box-shadow: inset 0 0 0 1px rgba(11, 15, 22, .6);
+  transition: rotate .06s linear;
+}
+#dial-volume.is-drag { cursor: grabbing; }
+#dial-volume:focus-visible { outline-offset: 6px; }
+
+/* --------------------------------------------------------------- saves */
+.hf-saves {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+  gap: var(--hf-gap-3);
+}
+.hf-save {
+  padding: var(--hf-pad);
+  display: grid;
+  gap: var(--hf-gap-1);
+  text-align: left;
+  color: var(--hf-ink);
+  cursor: pointer;
+  border: 0;
+  font: inherit;
+}
+.hf-save .hf-thumb {
+  aspect-ratio: 16 / 9;          /* box keeps aspect; shader keeps the photo's */
+  background: rgba(11, 15, 22, .6);
+  border: 1px solid rgba(56, 189, 248, .25);
+}
+.hf-save .hf-meta { font-family: var(--hf-mono); font-size: var(--hf-fs-xs); color: var(--hf-ink-dim); }
+.hf-save:hover .hf-meta { color: var(--hf-cyan-hi); }
+
+/* ------------------------------------------------------------ lab / QA */
+.hf-lab { display: grid; gap: var(--hf-gap-3); }
+.hf-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: var(--hf-gap-3);
+  align-items: start;
+}
+.hf-ladder { display: grid; gap: var(--hf-gap-2); justify-items: start; }
+.hf-ladder > * { width: 100%; }
+.hf-lab table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--hf-mono);
+  font-size: var(--hf-fs-xs);
+  color: var(--hf-ink-dim);
+}
+.hf-lab th, .hf-lab td {
+  text-align: left;
+  padding: .45em .6em;
+  border-bottom: 1px solid rgba(159, 176, 198, .14);
+  vertical-align: top;
+}
+.hf-lab th { color: var(--hf-sig); letter-spacing: .12em; }
+.hf-lab b { color: var(--hf-green); }
+.hf-stretch-bad {
+  background: var(--hf9-plate-corner, none) center / 100% 100% no-repeat, #0b0f16;
+  color: var(--hf-red);
+  display: grid; place-items: center;
+  font: 600 var(--hf-fs-xs) var(--hf-mono);
+  text-align: center;
+  padding: 1em;
+}
+.hf-caption { font: 500 var(--hf-fs-xs) var(--hf-mono); color: var(--hf-ink-dim); margin: 0; }
+.hf-holo-slot { aspect-ratio: 1; width: clamp(54px, 6.5vw, 88px); }
+.hf-holo-card-slot { aspect-ratio: 16/9; width: min(28rem, 100%); }
+
+/* instrument bay in the HUD (radar + gauges) ------------------------------ */
+.hf-bay { display: flex; align-items: center; gap: var(--hf-gap-2); }
+.hf-gauges { display: grid; gap: 3px; }
+.hf-gauge {
+  display: grid; grid-template-columns: 3.2ch 1fr;
+  gap: .5em; align-items: center;
+  font: 500 var(--hf-fs-xs) var(--hf-mono);
+  color: var(--hf-ink-dim);
+}
+.hf-gauge i {
+  height: 6px; display: block;
+  background:
+    repeating-linear-gradient(90deg, var(--hf-sig) 0 4px, transparent 4px 6px)
+    0 / var(--v, 50%) 100% no-repeat,
+    rgba(159, 176, 198, .16);
+}
