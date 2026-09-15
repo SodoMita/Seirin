@@ -1,0 +1,28 @@
+{
+  "generated": "Seirin city generator",
+  "population": 559555,
+  "dwellings": 291097,
+  "buildings": 173662,
+  "parcels": 263429,
+  "blocks": 8602,
+  "street_segments": 25265,
+  "street_km": 1889.0,
+  "bridges": 39,
+  "stations": 35,
+  "transit_lines": 5,
+  "landmarks": 22,
+  "pois": 610,
+  "firms": 27738,
+  "land_km2": 421.8,
+  "water_km2": 114.1,
+  "model_frame_km": "23 x 23",
+  "population_density_per_km2": 1326.6,
+  "mode_split": {
+    "walk": 0.05037115166857874,
+    "bicycle": 0.10943631727977714,
+    "rail": 0.10869494939284226,
+    "car": 0.6803110817118821,
+    "bus": 0.051186499946919706
+  },
+  "mean_commute_km": 4.93
+}

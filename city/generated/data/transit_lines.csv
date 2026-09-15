@@ -1,0 +1,6 @@
+line_id,name,name_ja,kind,stations,length_km,daily_riders,headway_s,opened
+seirin_main,Seirin Main Line,青凛本線,rail,11,16.7,84607,720,1901
+kaigan,Kaigan Coastal Line,海岸線,rail,12,17.0,65463,720,1932
+sanson,Sanson Mountain Line,山村線,rail,5,13.5,22316,720,1954
+minato_metro,Minato Metro,港メトロ,metro,16,13.3,121089,420,1978
+bay_ferry,Bay Ferry,湾フェリー,ferry,3,10.9,20494,4200,1961

@@ -1,0 +1,14 @@
+# Seirin city generator — runtime requirements.
+#
+# The generator is pure Python plus four scientific libraries; there is no
+# renderer, no font stack and no GPU dependency, because every product is
+# vector geometry (SVG, OBJ/MTL, glTF/GLB). No raster image is ever produced
+# or consumed.
+#
+#   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+#   PYTHONPATH=src .venv/bin/python -m seirin all
+#
+numpy>=1.26
+scipy>=1.11
+shapely>=2.0
+networkx>=3.0

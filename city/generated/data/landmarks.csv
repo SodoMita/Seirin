@@ -1,0 +1,23 @@
+id,name,name_ja,kind,canon,x,y,lon,lat,floors,footprint_m2,jobs,district,machi,note
+akatomi_hq,Akatomi Dynamics HQ,晶富ダイナミクス本社,corporate,True,420.0,980.0,138.4465,34.816,34,78000.0,4200,hikari,hikari-07,Штаб-квартира Akatomi Dynamics: стеклянная башня над деловым кварталом.
+stardome,Stardome,スター・ドーム,arena,True,1980.0,1520.0,138.4636,34.8209,6,42000.0,380,tetsuba,tetsuba-02,"Концертный зал на 14 000 мест, площадка фестиваля света."
+seirin_station,Seirin Station,青凛駅,rail_station,True,1450.0,1900.0,138.4578,34.8243,3,26000.0,260,naka,naka-05,"Главный вокзал: четыре платформы, северный и южный выходы."
+kogare_inu,Kogare-no-Inu (tea house),焦れの犬,teahouse,True,-3180.0,3290.0,138.407,34.8369,2,420.0,6,tsukimachi,tsukimachi-01,Чайный дом семьи Юбикири в Цукимати.
+tsukimachi_archives,Tsukimachi Community Archives,月町文書館,archive,True,-3620.0,2880.0,138.4022,34.8332,2,1100.0,4,tsukimachi,tsukimachi-01,"Общинные архивы, которыми заведует Юки Тэнро."
+tenro_shrine,Tenro Shrine,天露神社,shrine,True,1050.0,10250.0,138.4534,34.8996,1,2600.0,2,rural_north,rural_north-02,Горное святилище Тэнро над водосбором Камикуры.
+kamikura_spring,Kamikura Spring,上倉水源,water,True,1900.0,9050.0,138.4628,34.8888,0,900.0,2,tenro,tenro-05,"Источник, питающий город; охраняемая зона водосбора."
+shelf4_works,Shelf-4 Works,棚四工区,construction,True,-2400.0,11200.0,138.4156,34.9081,2,34000.0,140,shelf4,shelf4-02,Площадка проекта «Шельф-4»: отсыпка и склады.
+csr_lab,CSR Laboratory,CSR研究所,lab,True,3180.0,3040.0,138.4768,34.8346,4,9400.0,210,tetsuba,tetsuba-05,Лаборатория коллоидной мягкой робототехники в Тэцубе.
+goliath_yard,Goliath Works Yard,ゴリアテ作業場,mecha_yard,True,2150.0,1850.0,138.4655,34.8239,2,16000.0,210,,,Площадка промышленных экзо-тягачей «Голиаф-V».
+ren_workshop,Ren's Workshop,錬の工房,workshop,True,2940.0,2240.0,138.4742,34.8274,2,680.0,3,tetsuba,tetsuba-02,Частная мастерская в переулке Тэцубы.
+port_terminal_2,Container Terminal 2,第二埠頭,port,True,6150.0,-2250.0,138.5094,34.7869,1,180000.0,640,port,port-01,"Контейнерный терминал: четыре крана, причал 320 м."
+port_drydock,Dry Dock,乾ドック,drydock,True,5100.0,-1480.0,138.4979,34.7939,1,46000.0,320,port,port-01,"Ремонтный сухой док, заходит «Кракен-М»."
+customs,Customs Terminal,税関,customs,True,6900.0,-1050.0,138.5176,34.7977,3,5200.0,120,port,port-01,Таможенный терминал и диспетчерская порта.
+seirin_hospital,Seirin Citizens' Hospital,青凛市民病院,hospital,True,780.0,2620.0,138.4505,34.8308,7,13000.0,940,hikari,hikari-10,"Центральная больница: приёмное отделение, вертолётная площадка."
+seirin_police,Seirin Police Station,青凛警察署,police,True,1320.0,1380.0,138.4564,34.8196,5,4600.0,180,hikari,hikari-07,Городское управление полиции и центр управления.
+city_hall,Seirin City Hall,青凛市役所,civic,True,980.0,1760.0,138.4527,34.8231,9,17000.0,620,naka,naka-05,"Мэрия: залы слушаний, где идёт спор о «Шельфе-4»."
+stella_studio,Stella Studio,ステラ・スタジオ,studio,True,2420.0,760.0,138.4685,34.8141,3,3400.0,12,hikari,hikari-06,Мастерская сетевого художественного проекта «Стелла».
+obsidian_hangar,Obsidian Hangar,黒曜格納庫,hangar,True,4050.0,3180.0,138.4864,34.8359,3,12500.0,90,tetsuba,tetsuba-01,Закрытый полигон Akatomi; здесь стоит Obsidian-01.
+tetsuba_baths,Tetsuba Baths,鉄場湯,bath,True,2120.0,3420.0,138.4652,34.838,2,1300.0,9,naka,naka-03,Общественная баня промышленного пояса.
+minato_market,Harbour Market,港市場,market,True,3320.0,-950.0,138.4783,34.7986,2,7800.0,240,,,Рыбный и овощной рынок у Северного порта.
+hikari_theatre,Hikari-za Theatre,光座,theatre,True,1620.0,640.0,138.4597,34.813,4,4100.0,22,hikari,hikari-06,"Старый кинотеатр, теперь площадка техно-паломников."

@@ -1,0 +1,10 @@
+# The generated world cache: minutes to rebuild, no reason to carry it in git.
+.cache/
+# The 3-D model is regenerated with `python -m seirin 3d`; it is 70 MB+ per run.
+generated/3d/*.obj
+generated/3d/*.mtl
+generated/3d/*.glb
+generated/3d/districts/
+# Python
+__pycache__/
+*.pyc
