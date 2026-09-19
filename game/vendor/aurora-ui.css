@@ -456,25 +456,87 @@ settings-screen select {
 .aurora-scale-row .button { min-height: 34px; padding: 6px 10px; font-size: 11px; }
 .aurora-scale-row .icon-button { width: 34px; height: 34px; min-height: 34px; }
 
-/* Range sliders — glass track with a transparent handle (engine's inputs
-   and ours share the look). */
-input[type="range"], .range {
+/* Range sliders — faithful to mockup: transparent glass handle, track visible through it,
+   glow via border-image that moves with the thumb without JS. */
+.control-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+label:has(> .control-input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 4px; }
+.button:has(input:checked), .quick-action:has(input:checked) { color: var(--accent); background: var(--glass-selected); }
+.radio, .range { --handle-mark: rgb(var(--accent-rgb) / .92); --handle-face: linear-gradient(90deg, transparent 46%, var(--handle-mark) 46% 54%, transparent 54%) center/100% 44% no-repeat, var(--handle-glass); }
+.radio { --handle-mark: rgb(var(--glint-rgb) / .20); appearance: none; flex: 0 0 22px; width: 22px; height: 26px; margin: 0; padding: 0; border: 0; border-radius: 0; clip-path: var(--handle-shape); background: var(--handle-face); box-shadow: var(--handle-bevel); cursor: pointer; }
+.radio:checked { --handle-mark: var(--accent); box-shadow: var(--handle-bevel), inset 0 0 8px rgb(var(--accent-rgb) / .22); }
+.radio:hover { --handle-mark: rgb(var(--glint-rgb) / .60); }
+.radio:checked:hover { --handle-mark: rgb(var(--glint-rgb)); }
+label:has(> .radio:focus-visible) { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.range-scale { display: block; }
+.range, input[type="range"].range { appearance: none; -webkit-appearance: none; display: block; width: 100%; height: 40px; padding: 0; margin: 0; border: 0; background: transparent; overflow: hidden; cursor: pointer; }
+.range::-webkit-slider-runnable-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
+.range::-moz-range-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
+.range::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 25px; height: 29px; margin-top: -6.5px; padding: 0; border: 0 solid transparent; border-radius: 0; clip-path: var(--range-shape); background: var(--handle-face); box-shadow: var(--handle-bevel); border-image: var(--range-light) 0 0 0 1 / 0 0 0 100vw / 0 0 0 100vw; }
+.range::-moz-range-thumb { width: 25px; height: 29px; padding: 0; border: 0 solid transparent; border-radius: 0; clip-path: var(--range-shape); background: var(--handle-face); box-shadow: var(--handle-bevel); border-image: var(--range-light) 0 0 0 1 / 0 0 0 100vw / 0 0 0 100vw; }
+.range::-moz-range-progress { height: 0; border: 0; background: transparent; }
+.range:is(:hover, :focus-visible) { --handle-mark: rgb(var(--glint-rgb)); }
+.range:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 5px; }
+.range-ends { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) 0; margin: 5px 12.5px 0; color: var(--muted); font: 8px/1.5 var(--mono); font-variant-numeric: tabular-nums; }
+.range-ends > span { width: max-content; transform: translateX(-50%); }
+.scale-captions { display: flex; justify-content: space-between; gap: 12px; margin-top: 7px; color: var(--muted); font-size: 9px; }
+.transparency-range { display: none; margin-top: 20px; }
+.text-size-range { display: none; }
+.transparency-value, .text-size-value { color: var(--accent); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.transparency-value { counter-reset: glass-value calc(var(--ui-transparency) * 100); }
+.transparency-value::after { content: counter(glass-value) "%"; }
+.text-size-value { counter-reset: reading-value calc(var(--reading-scale) * 100); }
+.text-size-value::after { content: counter(reading-value) "%"; }
+.text-size-preview { margin: 12px 0 6px; font: 400 var(--text-size)/1.45 var(--dialogue-font); }
+
+/* Legacy input[type=range] outside .range class: keep visual parity */
+input[type="range"]:not(.range) {
   -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 40px; margin: 0; padding: 0; border: 0;
   background: transparent; overflow: hidden; cursor: pointer; outline: none;
 }
-input[type="range"]::-webkit-slider-runnable-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
-input[type="range"]::-moz-range-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 25px; height: 29px; margin-top: -6.5px; padding: 0; border: 0; border-radius: 3px;
-  background: var(--handle-face); box-shadow: var(--handle-bevel), 0 0 0 1px rgb(var(--accent-rgb) / .25);
+input[type="range"]:not(.range)::-webkit-slider-runnable-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
+input[type="range"]:not(.range)::-moz-range-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
+input[type="range"]:not(.range)::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 25px; height: 29px; margin-top: -6.5px; padding: 0; border: 0 solid transparent; border-radius: 0; clip-path: var(--range-shape); background: var(--handle-face); box-shadow: var(--handle-bevel); border-image: var(--range-light) 0 0 0 1 / 0 0 0 100vw / 0 0 0 100vw;
 }
-input[type="range"]::-moz-range-thumb {
-  width: 25px; height: 29px; padding: 0; border: 0; border-radius: 3px;
-  background: var(--handle-face); box-shadow: var(--handle-bevel), 0 0 0 1px rgb(var(--accent-rgb) / .25);
+input[type="range"]:not(.range)::-moz-range-thumb {
+  width: 25px; height: 29px; padding: 0; border: 0 solid transparent; border-radius: 0; clip-path: var(--range-shape); background: var(--handle-face); box-shadow: var(--handle-bevel); border-image: var(--range-light) 0 0 0 1 / 0 0 0 100vw / 0 0 0 100vw;
 }
-input[type="range"]::-moz-range-progress { height: 0; border: 0; background: transparent; }
-input[type="range"]:hover, input[type="range"]:focus-visible { --handle-mark: rgb(var(--glint-rgb)); }
-input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 5px; }
+input[type="range"]:not(.range)::-moz-range-progress { height: 0; border: 0; background: transparent; }
+input[type="range"]:not(.range):hover, input[type="range"]:not(.range):focus-visible { --handle-mark: rgb(var(--glint-rgb)); }
+input[type="range"]:not(.range):focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 5px; }
+
+/* Appearance panel: mockup-faithful layout for presets + sliders */
+.appearance { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--divider); }
+.theme-picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(94px, 100%), 1fr)); gap: 8px; margin-bottom: 18px; }
+.theme-option { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 9px 8px; border: 0; border-radius: 9px; background: var(--glass); box-shadow: var(--glass-shadow); font-size: 10px; cursor: pointer; }
+.theme-option:hover, .theme-option:has(input:checked) { background: var(--glass-selected); }
+.appearance-note { margin-top: 12px; }
+.preferences { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.preferences legend, .appearance legend { margin-bottom: 18px; color: var(--accent); font: 500 10px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+.setting { display: block; margin-bottom: 21px; }
+.setting-name { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-size: 12px; }
+.setting-name small { color: var(--muted); font-size: 9px; }
+.options { display: flex; flex-wrap: wrap; gap: 8px 19px; }
+.option { display: inline-flex; align-items: center; gap: 9px; min-height: 32px; cursor: pointer; font-size: 11px; }
+/* Fallback preset handling: when CSS view-timeline not supported, show radios */
+:root:has(#transparency-opaque:checked) { --ui-transparency: 0; }
+:root:has(#transparency-balanced:checked) { --ui-transparency: .50; }
+:root:has(#transparency-clear:checked) { --ui-transparency: .95; }
+:root:has(#text-smallest:checked) { --reading-scale: .1; }
+:root:has(#text-standard:checked) { --reading-scale: 1; }
+:root:has(#text-large:checked) { --reading-scale: 2; }
+:root:has(#text-largest:checked) { --reading-scale: 3; }
+@supports (timeline-scope: --glass-control) and (animation-timeline: --glass-control) and (animation-range: entry 100% exit 0%) and (view-timeline: --glass-control inline) and selector(::-webkit-slider-thumb) {
+  :root { timeline-scope: --glass-control, --text-size-control; animation: glass-transparency linear both, reading-size linear both; animation-timeline: --glass-control, --text-size-control; animation-range: entry 100% exit 0%, entry 100% exit 0%; }
+  #transparency::-webkit-slider-thumb { view-timeline: --glass-control inline; }
+  #text-size::-webkit-slider-thumb { view-timeline: --text-size-control inline; }
+  .transparency-range, .text-size-range { display: block; }
+  .transparency-fallback, .text-size-fallback { display: none; }
+  settings-screen { display: block; visibility: visible; pointer-events: auto; }
+  settings-screen.active { visibility: visible; pointer-events: auto; }
+}
+@keyframes glass-transparency { from { --ui-transparency: 1; } to { --ui-transparency: 0; } }
+@keyframes reading-size { from { --reading-scale: 3; } to { --reading-scale: .1; } }
 
 /* Save / load screens */
 save-screen .horizontal, save-screen .horizontal--center { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin: 0 0 20px; }
