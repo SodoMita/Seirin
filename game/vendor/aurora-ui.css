@@ -602,8 +602,21 @@ dialog-log button[data-action="dialog-log"] { width: auto; align-self: flex-end;
 .archives-panel, .graph-panel { max-width: none; border: 0; box-shadow: var(--glass-shadow); font-family: var(--sans); }
 /* The route atlas is a map, not a dialog: it takes the window. The old
    min(1100px, 100%) cap left ~170 px per side of a 1440 px landscape empty
-   while the map scrolled sideways inside it. */
-.graph-panel { width: 100%; }
+   while the map scrolled sideways inside it.
+
+   PERF — the atlas is the one panel that must NOT be glass. It holds ~2 000
+   nodes over a ~21 000 px tall page at full window size, and a backdrop-filter
+   over that area is re-blurred by the compositor every single frame (the panel's
+   own entrance animation, scrolling, and anything still animating behind it:
+   the title glow, the HUD brand, the clock colon). That is what made it crawl.
+   Opaque surface, no blur, no transform animation — the panel keeps a hair of
+   the user's transparency preference, which costs nothing without the blur. */
+.graph-panel {
+  width: 100%;
+  background: rgb(var(--surface-rgb) / calc(.94 + var(--density, .05) * .06));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  animation: none;
+}
 .archives-head, .graph-head { background: none; border: 0; }
 .archives-head > span, .graph-head > span { color: inherit; font: inherit; letter-spacing: inherit; }
 .archives-body, .graph-body { padding: 0; max-height: none; overflow: visible; }
@@ -629,6 +642,12 @@ dialog-log button[data-action="dialog-log"] { width: auto; align-self: flex-end;
 .graph-node:hover { background: var(--glass-hover); border: 0; box-shadow: var(--glass-shadow); }
 .graph-node.current { background: var(--glass-selected); box-shadow: var(--glass-shadow), inset 0 0 0 1px rgb(var(--accent-rgb) / .5); }
 .graph-node.ending { box-shadow: var(--glass-shadow), inset 0 0 0 1px rgb(var(--accent-rgb) / .25); }
+/* Layout/paint containment: a column that is scrolled out of the panel is
+   skipped entirely (no layout, no paint, no raster of its up-to-6 cards with
+   their soft shadows). The remembered size (`auto`) keeps the scrollbar and the
+   row heights stable after the first paint of each row. */
+.graph-col { content-visibility: auto; contain-intrinsic-size: auto 1100px; }
+
 /* Depth badge / stack marker above every column, and the off-route section:
    same glass language as the chips inside the cards. */
 .graph-col-depth { background: var(--glass); color: var(--accent); border: 0; box-shadow: var(--glass-shadow); }
@@ -658,8 +677,14 @@ game-screen img { -webkit-user-drag: none; user-select: none; }
 [data-screen="game"] text-box { animation: aurora-fade-in .35s ease both; }
 @keyframes aurora-fade-in { from { opacity: 0; } to { opacity: 1; } }
 /* Pause decorative motion while a heavy overlay is open (aurora-ui.js sets
-   html.aurora-modal-open when the graph / archives / log is up). */
-html.aurora-modal-open .hud-clock-colon, html.aurora-modal-open game-screen [data-character] { animation-play-state: paused; }
+   html.aurora-modal-open when the graph / archives / log is up). The overlay
+   covers the whole window, so anything still animating behind it is invisible
+   frames — and every change behind a translucent surface costs a repaint. */
+html.aurora-modal-open .hud-clock-colon,
+html.aurora-modal-open game-screen [data-character],
+html.aurora-modal-open main-screen::before,
+html.aurora-modal-open .hud-brand,
+html.aurora-modal-open #hud-time { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
   .shell-header, .shell-footer, [data-screen], .panel, .modal .modal__content, choice-container, text-box, main-screen,
   .hud-clock-colon, .resource.alert-pulse, [data-screen="game"] text-box, [data-screen="game"] choice-container button { animation: none !important; transition: none !important; }

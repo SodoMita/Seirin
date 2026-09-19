@@ -64,12 +64,12 @@ most often cause a wasted turn:
 ## Commands
 
 ```bash
-# The shipping game lives in game/. Expect 67 passing tests.
+# The shipping game lives in game/. Expect 70 passing tests.
 node game/tests/es5-scan.mjs game/vendor/game.js        # ES5 shape of shipped JS
 node game/tests/es5-scan.mjs game/vendor/aurora-ui.js
 node --test game/tests/game.test.mjs \
              game/tests/failsafe.test.mjs \
-             game/tests/icons-offline.test.mjs          # -> 67 pass, 0 fail
+             game/tests/icons-offline.test.mjs          # -> 70 pass, 0 fail
 
 # Offline smoke test of the real page over file:// (dev-only jsdom)
 cd game && npm i jsdom --prefix . --no-save --silent
@@ -84,7 +84,7 @@ reverted** — a bad merge once deleted 1,292 lines while reporting success:
 
 ```bash
 wc -l game/vendor/game.js     # expect ~1000, NOT ~170
-node --test game/tests/game.test.mjs   # expect 32 pass
+node --test game/tests/game.test.mjs   # expect 35 pass
 ```
 
 There is no build step. Do not add npm/bundler tooling to the game folder;

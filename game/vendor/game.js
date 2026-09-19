@@ -556,14 +556,51 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
 
         /* The map is taller than any window, so the chip with the current
          * label doubles as "scroll to me": it reuses the edge-chip delegation
-         * (data-graph-goto → scrollIntoView + flash). */
-        function graphCurrentChip (current, infos) {
-            var known = !!(current && infos[current]);
+         * (data-graph-goto → scrollIntoView + flash). It stays a plain span
+         * until there is a label to scroll to, and patchGraph() swaps the node
+         * when that changes (never rebuilds the map for it). */
+        function graphCurrentChipHtml (current, known) {
             return (known
-                ? '<button type="button" class="graph-chip graph-chip-action" data-graph-goto="' + current + '" title="Прокрутить к текущему узлу">'
-                : '<span class="graph-chip">') +
-                '<i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + (known ? ' ↓' : '') +
+                ? '<button type="button" class="graph-chip graph-chip-action" data-graph-stat="current" data-graph-goto="' + current + '" title="Прокрутить к текущему узлу">'
+                : '<span class="graph-chip" data-graph-stat="current">') +
+                '<i class="fas fa-terminal"></i><span data-graph-stat-text="current">' + graphCurrentChipText(current, known) + '</span>' +
                 (known ? '</button>' : '</span>');
+        }
+        function graphCurrentChipText (current, known) {
+            return truncateText(current || '—', 22) + (known ? ' ↓' : '');
+        }
+        /* Chip text lives in its own node so a state update can rewrite a text
+         * node instead of re-parsing markup (which would also re-run the icon
+         * shim on the <i> inside). */
+        function graphStatChipHtml (name, icon, text, cls) {
+            return '<span class="graph-chip' + (cls ? ' ' + cls : '') + '" data-graph-stat="' + name + '">' +
+                /* no icon => no <i> at all: an empty .fas span would be an
+                   unmapped glyph for the offline icon shim */
+                (icon ? '<i class="fas ' + icon + '"></i>' : '') +
+                '<span data-graph-stat-text="' + name + '">' + text + '</span></span>';
+        }
+        function setGraphStatText (body, name, text) {
+            var slot = body.querySelector('[data-graph-stat="' + name + '"] [data-graph-stat-text]');
+            if (slot && slot.textContent !== text) { slot.textContent = text; }
+        }
+
+        /* renderGraph() is called from updateHUD() on every vn.* state change
+         * (and from openGraph). Rebuilding 205 cards / ~2 000 nodes through
+         * innerHTML each time was the second half of "the atlas renders
+         * slowly", so:
+         *   - the STRUCTURE is built once and kept in #graph-body (also while
+         *     the overlay is closed), keyed by the label set;
+         *   - every call computes a cheap state signature first and returns
+         *     without touching the DOM when nothing the atlas shows changed;
+         *   - when only the state changed (current label, location, clock,
+         *     money, alert) it patches those few nodes instead of rebuilding. */
+        var graphStructureKey = null;
+        var graphSignature = null;
+        var graphBuilding = false;
+
+        function graphStateSignature (structureKey, current, p) {
+            return structureKey + '|' + (current || '') + '|' + (p.location || '') + '|' +
+                (p.time || 0) + '|' + (p.money || 0) + '|' + (p.akatomi_alert || 0);
         }
 
         function renderGraph () {
@@ -571,6 +608,16 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             if (!body || !engine.script()) { return; }
             var script = engine.script();
             var labels = Object.keys(script);
+            var current = engine.state('label') || null;
+            var p = engine.storage('player') || {};
+            var structureKey = labels.length + ':' + labels[0] + ':' + labels[labels.length - 1];
+            var signature = graphStateSignature(structureKey, current, p);
+            if (signature === graphSignature && body.firstChild) { return; }
+            if (structureKey === graphStructureKey && body.querySelector('.graph-grid')) {
+                patchGraphState(body, current, p);
+                graphSignature = signature;
+                return;
+            }
             var infos = {}, depths, html = '', i;
             labels.forEach(function (label) { infos[label] = collectLabelInfo(label); });
             depths = computeLabelDepths(infos, labels);
@@ -590,16 +637,14 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 stacks = stacks.concat(splitDepthIntoStacks(byDepth[depthKeys[i]], depthKeys[i]));
             }
 
-            var current = engine.state('label') || null;
-            var p = engine.storage('player') || {};
             html += '<div class="graph-stats">' +
-                graphCurrentChip(current, infos) +
-                '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-calendar"></i>' + fmtClockDate(p.time) + ' ' + fmtHHMM(p.time) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-coins"></i>' + (p.money || 0) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
-                '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
-                '<span class="graph-chip dim">столбцов: ' + stacks.length + '</span>' +
+                graphCurrentChipHtml(current, !!(current && infos[current])) +
+                graphStatChipHtml('location', 'fa-map-marker-alt', truncateText(p.location || '—', 24)) +
+                graphStatChipHtml('clock', 'fa-calendar', fmtClockDate(p.time) + ' ' + fmtHHMM(p.time)) +
+                graphStatChipHtml('money', 'fa-coins', String(p.money || 0)) +
+                graphStatChipHtml('alert', 'fa-shield-alt', (p.akatomi_alert || 0) + '%') +
+                graphStatChipHtml('nodes', '', 'узлов: ' + labels.length, 'dim') +
+                graphStatChipHtml('columns', '', 'столбцов: ' + stacks.length, 'dim') +
                 '</div>';
             html += '<div class="graph-hint">Столбцы = расстояние от пролога (бейдж над столбцом), внутри столбца — параллельные маршруты. ' +
                 'Карточка показывает все выходы · клик по цели прокручивает к ней · «ПЕРЕЙТИ» телепортирует игру в этот узел.</div>';
@@ -622,6 +667,46 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             }
             html += '</div>';
             body.innerHTML = html;
+            graphStructureKey = structureKey;
+            graphSignature = signature;
+        }
+
+        /* State-only update: chips + the "you are here" marker. Touches ~8
+         * nodes instead of re-parsing 130 KB of markup. */
+        function patchGraphState (body, current, p) {
+            var node = (current && document.getElementById('graph-node-' + current)) || null;
+            var chip = body.querySelector('[data-graph-stat="current"]');
+            var chipIsButton = !!(chip && chip.tagName === 'BUTTON');
+            if (chip && chipIsButton !== !!node) {
+                var fresh = document.createElement('div');
+                fresh.innerHTML = graphCurrentChipHtml(current, !!node);
+                chip.parentNode.replaceChild(fresh.firstChild, chip);
+                chip = body.querySelector('[data-graph-stat="current"]');
+            }
+            if (chip && node) { chip.setAttribute('data-graph-goto', current); }
+            setGraphStatText(body, 'current', graphCurrentChipText(current, !!node));
+            setGraphStatText(body, 'location', truncateText(p.location || '—', 24));
+            setGraphStatText(body, 'clock', fmtClockDate(p.time) + ' ' + fmtHHMM(p.time));
+            setGraphStatText(body, 'money', String(p.money || 0));
+            setGraphStatText(body, 'alert', (p.akatomi_alert || 0) + '%');
+            paintGraphCurrentMarker(node);
+        }
+
+        function paintGraphCurrentMarker (node) {
+            var marked = document.querySelectorAll('.graph-node.current');
+            var i, badge;
+            for (i = 0; i < marked.length; i++) {
+                if (marked[i] === node) { continue; }
+                marked[i].classList.remove('current');
+                badge = marked[i].querySelector('.graph-node-here');
+                if (badge) { marked[i].removeChild(badge); }
+            }
+            if (!node || node.classList.contains('current')) { return; }
+            node.classList.add('current');
+            badge = document.createElement('div');
+            badge.className = 'graph-node-here';
+            badge.textContent = 'ВЫ ЗДЕСЬ';
+            node.insertBefore(badge, node.querySelector('.graph-edges') || node.querySelector('.graph-jump'));
         }
 
         function syncGraph () {
@@ -704,9 +789,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         }
 
         function openGraph () {
-            renderGraph();
             var overlay = document.getElementById('graph-overlay');
+            /* Show the panel FIRST: the atlas shell (header, stats slots) is
+             * static markup, so the overlay appears on the next paint even if
+             * the very first build has to parse ~130 KB of cards. Any later
+             * open reuses the built structure and patching is microseconds. */
             if (overlay) { overlay.hidden = false; }
+            if (graphStructureKey || graphBuilding) { renderGraph(); return; }
+            graphBuilding = true;
+            setTimeout(function () { graphBuilding = false; renderGraph(); }, 0);
         }
 
         function wireGraph () {

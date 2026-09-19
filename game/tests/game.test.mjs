@@ -279,6 +279,74 @@ test('atlas stacks wide depths by distance and keeps the full option text', () =
     assert.match(source, /Вне маршрута/);
 });
 
+test('route atlas paints once, then patches state (no per-change rebuild)', () => {
+    // renderGraph() runs from updateHUD() on every vn.* change; it used to
+    // rebuild 205 cards / ~2 000 nodes through innerHTML each time. Now the
+    // structure is built once (kept even while the overlay is closed), and a
+    // state-only change patches chips + the current marker.
+    assert.match(source, /var graphStructureKey = null;/);
+    assert.match(source, /var graphSignature = null;/);
+    assert.match(source, /function graphStateSignature \(structureKey, current, p\)/);
+    assert.match(source, /function patchGraphState \(body, current, p\)/);
+    assert.match(source, /function paintGraphCurrentMarker \(node\)/);
+    assert.match(source, /function setGraphStatText \(body, name, text\)/);
+    assert.match(source, /data-graph-stat-text/);
+    // The cheap signature check must come BEFORE the expensive script walk.
+    const renderStart = source.indexOf('function renderGraph ()');
+    const renderFn = source.slice(renderStart, source.indexOf('function patchGraphState'));
+    assert.ok(renderFn.indexOf('signature === graphSignature') < renderFn.indexOf('collectLabelInfo'),
+        'signature guard must run before collectLabelInfo/computeLabelDepths');
+    assert.match(renderFn, /if \(structureKey === graphStructureKey && body\.querySelector\('\.graph-grid'\)\)/);
+    assert.match(renderFn, /graphStructureKey = structureKey;/);
+    // First open shows the panel before the build task runs.
+    assert.match(source, /var graphBuilding = false;/);
+    assert.match(source, /setTimeout\(function \(\) \{ graphBuilding = false; renderGraph\(\); \}, 0\)/);
+    // The chips are patched as text nodes, never re-parsed as markup (markup
+    // would re-run the offline icon shim on the <i> inside every chip).
+    assert.doesNotMatch(source, /graph-stat[^']*'\)\.innerHTML/);
+    assert.match(source, /node\.insertBefore\(badge, node\.querySelector\('\.graph-edges'\)/);
+});
+
+test('the atlas is neither blurred nor animated (perf: blur over ~2 000 nodes)', () => {
+    // A full-window backdrop-filter is re-blurred by the compositor every
+    // frame: the panel's own entrance animation, scrolling, and anything still
+    // animating behind it (title glow, HUD brand, clock colon). Over the atlas
+    // that was the difference between unusable and instant.
+    const skin = readFileSync(join(here, '..', 'vendor', 'aurora-ui.css'), 'utf8');
+    const panelStart = skin.indexOf('.graph-panel {');
+    const panel = skin.slice(panelStart, skin.indexOf('.archives-head', panelStart));
+    assert.match(panel, /-webkit-backdrop-filter: none; backdrop-filter: none;/);
+    assert.match(panel, /animation: none;/);
+    assert.match(panel, /background: rgb\(var\(--surface-rgb\)/);
+    // Scrolled-out columns are not laid out or painted at all.
+    assert.match(skin, /\.graph-col \{ content-visibility: auto; contain-intrinsic-size: auto \d+px; \}/);
+    // Decorative motion behind a full-screen overlay is paused, not just the
+    // sprites: an animating layer behind a translucent surface repaints.
+    assert.match(skin, /html\.aurora-modal-open main-screen::before/);
+    assert.match(skin, /html\.aurora-modal-open \.hud-brand/);
+});
+
+test('aurora driver: idempotent writes, no observer feedback loop', () => {
+    // Regression: a no-op class write still queues a MutationObserver record,
+    // and the driver observes the subtree it decorates — so an unconditional
+    // classList.add made every pass schedule the next one (60 fps of ~50
+    // querySelectors + a forced style recalculation).
+    const js = readFileSync(join(here, '..', 'vendor', 'aurora-ui.js'), 'utf8');
+    const toggle = js.slice(js.indexOf('function toggleClass'), js.indexOf('function closest'));
+    assert.match(toggle, /node\.classList\.contains\(cls\)/);
+    assert.doesNotMatch(toggle, /if \(on\) \{ node\.classList\.add/);
+    // Buttons carry an idempotence marker instead of being re-decorated blindly.
+    assert.match(js, /data-aurora-decorated/);
+    assert.match(js, /if \(button\.getAttribute\('data-aurora-decorated'\) === '1'\)/);
+    // Heavy overlay open => the decorative half of the pass is skipped.
+    assert.match(js, /function heavyOverlayOpen \(\)/);
+    const passFn = js.slice(js.indexOf('function pass ()'), js.indexOf('function schedule ()'));
+    assert.ok(passFn.indexOf('heavyOverlayOpen()') < passFn.indexOf('decorate()'),
+        'the overlay guard must run before the decorative work');
+    // No forced style recalculation per pass: read the engine's inline scene.
+    assert.match(js, /var img = \(bg\.style && bg\.style\.backgroundImage\) \|\| '';/);
+});
+
 test('stat-only choices carry a real engine action (rollback regression)', () => {
     // Regression: callback-only choices (onChosen, no Do) broke the Back
     // command — engine.revert(undefined) rejected, stats stayed applied and

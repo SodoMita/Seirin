@@ -121,6 +121,27 @@ Nothing in the atlas talks to the network or writes story state: it reads
 teleports through `jumpToLabel()` (which wipes presentation + history first —
 see the teleport regression test).
 
+### Making it render fast (2026-09-19)
+
+The first version of this map was visibly slow. Three independent causes, all
+measured before and after (jsdom probes counting `requestAnimationFrame`
+callbacks named `pass`, `getComputedStyle` calls and MutationObserver records):
+
+| Cause | Measured symptom | Fix |
+|---|---|---|
+| `aurora-ui.js` observes the DOM it decorates (`MutationObserver` on `#vn-root` with `attributeFilter: ['class', …]`), and it wrote classes unconditionally | **a self-sustaining rAF loop**: a no-op `classList.add()` still queues a mutation record, so every pass scheduled the next one — 225 class writes / 3 s on the decorated buttons, 71 on `main-screen`, ~20 passes/s idle in jsdom (60/s in a browser), each with ~50 querySelectors **and a forced style recalculation** | `toggleClass()` writes only on change; buttons carry a `data-aurora-decorated` marker instead of being re-decorated; while a full-screen overlay is open the pass runs only `syncModalFlag` + `syncScreens`; `syncBackdrop()` reads the engine's inline `background-image` before falling back to `getComputedStyle()` |
+| The panel is `.panel`, i.e. a full-window `backdrop-filter: blur(14px)` holder, and it animated its own transform on open | the compositor re-blurs the whole viewport every frame: during the entrance animation, while scrolling, and any time something behind it moves (title glow, HUD brand, clock colon) | `.graph-panel` gets an opaque surface (`rgb(var(--surface-rgb) / calc(.94 + var(--density) * .06))`), `backdrop-filter: none`, `animation: none`; decorative motion behind any open overlay is paused (`.aurora-modal-open`) |
+| `renderGraph()` ran from `updateHUD()` on every `vn.*` change and did `body.innerHTML = <130 KB>` | ~2 000 nodes re-parsed and replaced per change | structure is built once and kept (keyed by the label set); each call first compares a cheap state signature and returns without touching the DOM; a state-only change patches the 5 chips (text nodes) and moves the "you are here" marker (~4 mutation records) |
+
+Plus `content-visibility: auto` + `contain-intrinsic-size: auto 1100px` on
+`.graph-col`, so scrolled-out columns are not laid out or painted at all.
+
+Idle with the atlas open now costs **zero** rAF passes, zero class writes and
+zero forced style recalcs (pinned by an assertion in `tests/offline-smoke.mjs`:
+the skin must write nothing while idle, and the map must be patched, not
+rebuilt). The first open shows the panel shell immediately and defers the one
+initial build by a task, so the overlay never waits for 130 KB of markup.
+
 ## Engine traps (measured, not assumed)
 
 | Trap | Symptom | Rule |
@@ -135,12 +156,14 @@ see the teleport regression test).
 | animate.css `.animated` pins `animation-duration: 1s` | long loops on engine-managed elements run in 1 s | pin duration with `!important` on anything the engine tags `.animated` |
 | `main-menu` rules in `custom-ui.css` use `!important` | skin styles silently lost | the skin's main-menu block also uses `!important`; do not add more |
 | `cssRules` is unreadable over `file://` | probes reporting "0 rules" | verify with `getComputedStyle` |
+| `classList.add('x')` on an element that already has `x` **still queues a MutationObserver record** (same for `setAttribute` with an equal value) | the driver observed `class` on `#vn-root` and wrote classes unconditionally → it scheduled itself: 60 fps of decoration + forced style recalcs, worst with the atlas open | every skin write must be write-on-change (`toggleClass` checks `classList.contains`); never add a blind `classList.add`/`remove` to `aurora-ui.js` |
+| `getComputedStyle()` in a rAF pass | flushes pending style changes → a full recalculation per frame | read the engine's inline style (`bg.style.backgroundImage`) first; only fall back to computed |
 | Bad merges delete silently | `904fa18` once dropped 1,292 lines while reporting success | after any merge touching `game/`: `wc -l game/vendor/game.js` (~1000+) and run the suite |
 
 ## Verification
 
 ```bash
-node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs   # 67 pass
+node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs   # 70 pass
 node game/tests/es5-scan.mjs game/vendor/aurora-ui.js game/vendor/game.js                        # no output
 cd game && npm i jsdom@25 --prefix . --no-save --silent && REQUIRE_JSDOM=1 node tests/offline-smoke.mjs  # SMOKE PASSED
 ```

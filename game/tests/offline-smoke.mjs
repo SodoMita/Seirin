@@ -30,6 +30,16 @@ const dom = await JSDOM.fromFile(page, {
     pretendToBeVisual: true, virtualConsole: vc,
     beforeParse (window) {
         window.addEventListener('error', event => errors.push(String(event.error || event.message)));
+        // Dev-only instrumentation for the "no per-frame work" regression below:
+        // aurora-ui.js schedules its DOM pass via requestAnimationFrame(pass).
+        window.__passCount = 0;
+        if (window.requestAnimationFrame) {
+            const requestFrame = window.requestAnimationFrame.bind(window);
+            window.requestAnimationFrame = function (callback) {
+                if (callback && callback.name === 'pass') { window.__passCount++; }
+                return requestFrame(callback);
+            };
+        }
         window.fetch = url => { network.push('fetch:' + url); return Promise.reject(new Error('offline')); };
         window.XMLHttpRequest = class { open (method, url) { network.push('xhr:' + url); } send () {} };
         window.WebSocket = class { constructor (url) { network.push('ws:' + url); } };
@@ -272,6 +282,69 @@ if (graphMenuBtn) {
         check('atlas edge chips flash their target card',
             !!(targetCard && targetCard.classList.contains('flash')));
     }
+    // PERF REGRESSION — "the route atlas renders super slowly".
+    // aurora-ui.js observes the DOM it decorates, and a no-op class write still
+    // queues a MutationObserver record, so an unconditional classList.add made
+    // every pass schedule the next one: a self-sustaining rAF loop that
+    // re-decorated buttons and forced a style recalculation every frame
+    // (measured before the fix: 225 class writes / 3 s on the decorated
+    // buttons, 71 on main-screen). The engine typing dialogue into <p> nodes is
+    // legitimate churn, so this watches what the SKIN writes: nothing.
+    const graphBody = w.document.getElementById('graph-body');
+    const skinOwned = node => !!(node && node.nodeType === 1 && node.getAttribute &&
+        (node.hasAttribute('data-aurora-decorated') || node.tagName === 'MAIN-SCREEN' ||
+            node.tagName === 'QUICK-MENU' || node.tagName === 'HTML'));
+    const skinWrites = [];
+    const skinObserver = new w.MutationObserver(records => {
+        records.forEach(record => {
+            if (record.type === 'attributes' && record.attributeName === 'class' && skinOwned(record.target)) {
+                skinWrites.push((record.target.tagName || '?').toLowerCase());
+            }
+        });
+    });
+    skinObserver.observe(w.document.getElementById('vn-root'), { attributes: true, subtree: true });
+    skinObserver.observe(w.document.documentElement, { attributes: true });
+    let atlasWrites = 0;
+    const atlasObserver = new w.MutationObserver(records => { atlasWrites += records.length; });
+    atlasObserver.observe(graphBody, { childList: true, subtree: true, attributes: true, characterData: true });
+    await new Promise(resolve => setTimeout(resolve, 900));
+    skinObserver.disconnect();
+    atlasObserver.disconnect();
+    check('idle with the atlas open: the skin writes nothing, the map is untouched',
+        skinWrites.length === 0 && atlasWrites === 0,
+        'skin class writes=' + skinWrites.length +
+        (skinWrites.length ? ' e.g. ' + skinWrites.slice(0, 3).join(',') : '') +
+        ', atlas writes=' + atlasWrites);
+
+    // PERF REGRESSION — a state change used to re-parse ~130 KB of markup and
+    // replace ~2 000 nodes. It must patch the few chips it displays instead.
+    const chipsText = () => ['location', 'clock', 'money', 'alert']
+        .map(name => (graphBody.querySelector('[data-graph-stat="' + name + '"]') || {}).textContent)
+        .join(' | ');
+    const chipsBefore = chipsText();
+    const nodesBeforePatch = graphBody.querySelectorAll('.graph-node').length;
+    let rebuilds = 0, patchRecords = 0;
+    const patchObserver = new w.MutationObserver(records => {
+        patchRecords += records.length;
+        records.forEach(record => {
+            if (record.target === graphBody && record.addedNodes.length) { rebuilds++; }
+        });
+    });
+    patchObserver.observe(graphBody, { childList: true, subtree: true, attributes: true, characterData: true });
+    let applied = 0;
+    (w.engine.script().SoloRoute1 || []).forEach(step => {
+        const fn = (step && step.Function) || (step && step.Reversible && step.Reversible.Function);
+        if (fn && typeof fn.Apply === 'function') { fn.Apply(); applied++; }
+    });
+    await new Promise(resolve => setTimeout(resolve, 300));
+    patchObserver.disconnect();
+    check('atlas patches state in place instead of rebuilding the map',
+        applied > 0 && rebuilds === 0 && patchRecords <= 12 &&
+        graphBody.querySelectorAll('.graph-node').length === nodesBeforePatch &&
+        chipsText() !== chipsBefore,
+        'applied=' + applied + ', rebuilds=' + rebuilds + ', records=' + patchRecords +
+        ', chips: ' + chipsBefore + ' -> ' + chipsText());
+
     const jumpBtn = w.document.querySelector('[data-graph-jump="SoloRoute4"]');
     if (jumpBtn) {
         jumpBtn.click(); await new Promise(resolve => setTimeout(resolve, 1500));

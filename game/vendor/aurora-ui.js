@@ -93,7 +93,17 @@
     }
     function toggleClass (node, cls, on) {
         if (!node || !node.classList) { return; }
-        if (on) { node.classList.add(cls); } else { node.classList.remove(cls); }
+        /* Write ONLY on change. A no-op class write still queues a
+         * MutationObserver record (measured: classList.add('x') on an element
+         * that already has 'x' produces one record per call), and this driver
+         * observes the same subtree it decorates — so an unconditional write
+         * made every pass schedule the next one: a self-sustaining rAF loop at
+         * 60 fps (~24/s even in jsdom) that re-ran ~50 querySelectors + a
+         * forced style recalculation per frame, and made the 2 000-node route
+         * atlas crawl. Never reintroduce a blind add/remove here. */
+        var has = node.classList.contains(cls);
+        if (on && !has) { node.classList.add(cls); }
+        else if (!on && has) { node.classList.remove(cls); }
     }
     function closest (node, selector) {
         var n = node;
@@ -284,12 +294,20 @@
     }
     function decorateButton (button, name) {
         if (!button || !name) { return null; }
-        var svg = button.querySelector(':scope > .aurora-ico');
+        /* Idempotence marker, not a DOM lookup: the engine re-creates some
+         * buttons (quick menu), and a re-created button has no marker, so it is
+         * decorated exactly once more. Without the marker the pass re-inserted
+         * icons and re-wrote classes every frame (see toggleClass). */
+        if (button.getAttribute('data-aurora-decorated') === '1') {
+            return button.querySelector('.aurora-ico');
+        }
+        var svg = button.querySelector('.aurora-ico');
         if (!svg) {
             svg = icon(name);
             button.insertBefore(svg, button.firstChild);
-            toggleClass(button, 'aurora-decorated', true);
         }
+        button.setAttribute('data-aurora-decorated', '1');
+        toggleClass(button, 'aurora-decorated', true);
         return svg;
     }
     function decorate () {
@@ -362,8 +380,14 @@
         var bg = doc.getElementById('background') || doc.querySelector('[data-ui="background"]');
         var vn = doc.querySelector('#vn-root > visual-novel');
         if (!bg || !vn) { return; }
-        var img = '';
-        try { img = global.getComputedStyle(bg).backgroundImage || ''; } catch (e) { img = ''; }
+        /* The engine writes the scene as an INLINE background-image, so read
+         * that first: getComputedStyle() flushes pending style changes, and
+         * asking for it on every pass forced a full style recalculation. The
+         * computed fallback stays for markup that sets the scene via classes. */
+        var img = (bg.style && bg.style.backgroundImage) || '';
+        if (!img) {
+            try { img = global.getComputedStyle(bg).backgroundImage || ''; } catch (e) { img = ''; }
+        }
         if (!img || img === 'none') { return; }
         if (img === lastBackdrop) { return; }
         lastBackdrop = img;
@@ -673,17 +697,34 @@
      * scheduler: one rAF-coalesced pass after any engine DOM change
      * ------------------------------------------------------------------ */
     var scheduled = false;
+    /* A full-screen overlay covers everything this pass decorates. Running the
+     * decorative half while the route atlas is open costs ~50 querySelectors +
+     * a forced style recalculation per frame over a 2 600-element document, and
+     * nothing it produces is visible. The overlay needs exactly two things kept
+     * in sync: the modal flag (pauses decorative motion behind it) and the
+     * screen classes. When the overlay closes, its own hidden-attribute change
+     * queues a full pass, so nothing is left undecorated. */
+    function heavyOverlayOpen () {
+        var ids = ['graph-overlay', 'archives-overlay', 'game-menu-overlay'];
+        var i, ov;
+        for (i = 0; i < ids.length; i++) {
+            ov = doc.getElementById(ids[i]);
+            if (ov && !ov.hidden) { return true; }
+        }
+        return false;
+    }
     function pass () {
         scheduled = false;
+        try { syncModalFlag(); } catch (e) { /* decorative */ }
+        try { syncScreens(); } catch (e) { /* decorative */ }
+        if (heavyOverlayOpen()) { return; }
         try { decorate(); } catch (e) { /* decorative */ }
         try { syncStates(); } catch (e) { /* decorative */ }
-        try { syncScreens(); } catch (e) { /* decorative */ }
         try { syncBackdrop(); } catch (e) { /* decorative */ }
         try { buildTitle(); } catch (e) { /* decorative */ }
         try { buildMeta(); } catch (e) { /* decorative */ }
         try { buildAppearance(); } catch (e) { /* decorative */ }
         try { tagLogRows(); } catch (e) { /* decorative */ }
-        try { syncModalFlag(); } catch (e) { /* decorative */ }
         try { undraggable(); } catch (e) { /* decorative */ }
     }
     function schedule () {
