@@ -154,6 +154,30 @@ matting tools (`tools/triangulate_matte.py`, `tools/check_matte.py`,
 `tools/composite_over.py`) need Pillow and numpy — they are **dev-only** and
 must never become a dependency of the shipped game.
 
+### No browser, and none can be installed
+
+Measured 2026-09-19 — this costs a turn per attempt, so do not re-litigate it:
+
+| Attempt | Result |
+|---|---|
+| `npx playwright@1.47.2 install --with-deps chromium` | apt cannot locate `fonts-wqy-zenhei` / `fonts-tlwg-loma-otf`; exit code 100 |
+| `npx playwright@1.47.2 install chromium` | `Failed to download Chromium 129.0.6668.29 … Download failure, code=1` |
+| `sudo apt-get update` | every `deb.debian.org` fetch fails (`Connection failed`) — Debian mirrors are *not* on the egress allowlist |
+| `find / -type f -name 'chrome' -o -name 'chromium' -o -name 'headless_shell'` | nothing; and no `wkhtmltoimage` / `cutycapt` / `xvfb-run` / `weasyprint` |
+
+`sudo` itself works without a password — which is exactly why the apt failure
+is misleading: the blocker is the network, not privileges.
+
+Consequence for UI work (`game/vendor/*.css`, `aurora-ui.css`): Playwright
+screenshots are **not available here** (the 1440×900 / 844×390 visual pass
+recorded in `design/AURORA_UI.md` was done elsewhere). Verify layout with
+
+- the jsdom smoke test — `npm i jsdom@25 --prefix game --no-save` then
+  `cd game && REQUIRE_JSDOM=1 node tests/offline-smoke.mjs` (DOM structure,
+  counts, ordering — **no layout**: jsdom reports `display: block` for grid), and
+- explicit arithmetic on the CSS you wrote (panel width − padding − gaps →
+  tracks × card width), stated as such in the hand-off.
+
 ## 6. Git and GitHub
 
 - **The session is bound to one branch.** Commit to it, push only to it, open
@@ -220,6 +244,12 @@ for m in ['PIL','numpy','requests','yaml']:
 for c in git gh node python3 jq convert ffmpeg; do
   printf "%-8s " "$c"; command -v $c >/dev/null && echo present || echo ABSENT
 done
+
+# browser availability (expect: nothing installed, and see §5)
+for c in chromium chromium-browser google-chrome headless_shell wkhtmltoimage xvfb-run; do
+  printf "%-18s " "$c"; command -v $c >/dev/null && echo present || echo ABSENT
+done
+ls ~/.cache/ms-playwright 2>/dev/null || echo "no playwright browsers"
 
 # branch binding
 git branch --show-current

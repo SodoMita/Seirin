@@ -435,8 +435,10 @@ main-menu button:hover {
 
 .graph-overlay[hidden] { display: none; }
 
+/* The atlas is a MAP: it wants the whole window, and a landscape window is
+   where it is read (aurora-ui.css, loaded last, repeats this width). */
 .graph-panel {
-  width: min(1180px, calc(100% - 32px));
+  width: 100%;
   max-height: 86vh;
   overflow: auto;
   background: var(--sn-bg-dark);
@@ -477,6 +479,9 @@ main-menu button:hover {
   color: var(--sn-cyan-glow);
 }
 .graph-chip.dim { color: #64748b; font-weight: 500; }
+/* The current-label chip is a button: click = scroll to that card. */
+.graph-chip-action { font-family: inherit; cursor: pointer; }
+.graph-chip-action:hover { color: var(--sn-cyan-glow); }
 
 .graph-hint {
   font-size: 0.78rem;
@@ -484,19 +489,86 @@ main-menu button:hover {
   margin: 8px 0 14px;
 }
 
+/* The map wraps. Columns are equal grid tracks that together fill the panel
+   width, so a landscape window is used end to end: the 205-node / ~55-column
+   atlas used to be one horizontal strip — a ~25 000 px scroll in which four
+   235 px columns fit and every card sat at its minimum width.
+   auto-fill (not auto-fit) keeps the empty tracks of a short last row, so a
+   lone card never stretches across the whole width. */
+.graph-overlay { --graph-track: 300px; }
+/* Narrower screens buy tracks back instead of shrinking the cards below a
+   readable width; a short landscape window (phone turned sideways) is the
+   case the atlas is actually read in, so it gets the extra track. */
+@media screen and (max-width: 900px) {
+  .graph-overlay { --graph-track: 250px; }
+}
+@media screen and (orientation: landscape) and (max-height: 620px) {
+  .graph-overlay { --graph-track: 230px; }
+}
+@media screen and (max-width: 37.5em) {
+  .graph-overlay { --graph-track: 240px; }
+}
 .graph-cols {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  overflow-x: auto;
   padding: 2px 2px 10px;
+}
+.graph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--graph-track), 100%), 1fr));
+  gap: 14px 16px;
+  align-items: start;
 }
 .graph-col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 235px;
-  flex: 1 0 235px;
+  gap: 10px;
+  min-width: 0;
+}
+/* Depth badge: the column's distance from the prologue. With wrapped rows the
+   badge is what keeps the timeline readable, and "1 / 2" marks the even split
+   of a depth whose fan-out is wider than a comfortable column. */
+.graph-col-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 20px;
+}
+.graph-col-depth {
+  font-family: var(--mono, 'Share Tech Mono', monospace);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--muted, #94a3b8);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 5px;
+  padding: 3px 7px;
+}
+.graph-col-part {
+  font-family: var(--mono, 'Share Tech Mono', monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--muted, #64748b);
+}
+/* Labels nothing reaches: kept out of the timeline (they have no distance
+   from the prologue) and shown as a marked section at the end of the map. */
+.graph-offroute {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.25);
+}
+.graph-offroute h3 {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sn-amber-glow);
+}
+.graph-offroute p {
+  margin: 0 0 12px;
+  max-width: 78ch;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--muted, #94a3b8);
 }
 
 .graph-node {
@@ -524,6 +596,12 @@ main-menu button:hover {
   color: #7c8aa5;
   margin-top: 2px;
 }
+/* A label with no LABEL_TITLES entry (most off-route content) has no title
+   line — its id becomes the heading instead of being printed twice. */
+.graph-node > .graph-node-id:first-child {
+  font-size: 0.86rem;
+  color: #e2e8f0;
+}
 .graph-node-banner {
   margin-top: 8px;
   font-size: 0.78rem;
@@ -550,14 +628,18 @@ main-menu button:hover {
   flex-direction: column;
   gap: 7px;
 }
+/* Edge row: full option text, target chip right-aligned. The row wraps, so a
+   80-character choice drops its chip to the next line instead of squeezing
+   both into 235 px and cutting the text with "…". */
 .graph-edge {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 8px;
+  gap: 5px 10px;
   font-size: 0.78rem;
 }
-.graph-edge-text { color: #cbd5e1; line-height: 1.35; }
+.graph-edge-text { color: #cbd5e1; line-height: 1.35; flex: 1 1 12ch; }
 .graph-edge.choice  .graph-edge-text::before { content: '▸ '; color: var(--sn-cyan-glow); }
 .graph-edge.branch  .graph-edge-text::before { content: '⑂ '; color: var(--sn-purple-glow); }
 .graph-edge.jump    .graph-edge-text::before { content: '→ '; color: #64748b; }
@@ -565,6 +647,7 @@ main-menu button:hover {
 
 .graph-target {
   flex: none;
+  margin-left: auto; /* right-aligned even when the row wraps below the text */
   background: rgba(56, 189, 248, 0.1);
   border: 1px solid rgba(56, 189, 248, 0.35);
   border-radius: 7px;
@@ -582,6 +665,7 @@ main-menu button:hover {
 }
 .graph-edge-stat {
   flex: none;
+  margin-left: auto;
   font-size: 0.66rem;
   color: #64748b;
   border: 1px solid rgba(100, 116, 139, 0.4);
@@ -712,14 +796,13 @@ main-menu button:focus-visible,
   }
   [data-screen="game"] [data-ui="choices"] button { padding: 12px 16px; font-size: 0.95rem; }
   main-menu button { width: auto !important; min-width: min(260px, 76vw) !important; }
-  .graph-col { min-width: 200px; flex-basis: 200px; }
-  .graph-panel { padding: 14px 16px; }
+  /* Graph panel padding: aurora-ui.css (.panel, loaded last) owns it. */
 }
 
 @media screen and (max-width: 30em) {
   .hud-btn span { display: none; } /* icon-only HUD on very small phones */
   .cyber-top-hud { font-size: 0.74rem; }
-  .archives-panel, .graph-panel { width: calc(100% - 20px); }
+  .archives-panel { width: calc(100% - 20px); }
 }
 
 /* Respect users who prefer reduced motion */

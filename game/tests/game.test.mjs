@@ -233,6 +233,120 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
         .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
 });
 
+test('route atlas fills the landscape width and wraps instead of scrolling sideways', () => {
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    const skin = readFileSync(join(here, '..', 'vendor', 'aurora-ui.css'), 'utf8');
+    // Regression: the panel was capped at min(1100px, 100%) while the columns
+    // ran as ONE horizontal strip (overflow-x: auto + 235px min-width). The
+    // shipped map is 205 labels over ~55 depth columns, so that strip was a
+    // ~25 000 px scroll in which four shrunk columns fit and the rest of a
+    // landscape window stayed empty.
+    assert.match(skin, /\.graph-panel\s*\{[^}]*width:\s*100%/);
+    assert.doesNotMatch(skin, /width:\s*min\(1100px/);
+    assert.doesNotMatch(css, /overflow-x:\s*auto/);
+    assert.doesNotMatch(css, /\.graph-col\s*\{[^}]*min-width:\s*235px/);
+    // Columns are equal tracks that together fill the row. auto-fill (not
+    // auto-fit) keeps the empty tracks of a short last row, so a lone card
+    // never stretches across the whole width.
+    assert.match(css, /\.graph-grid\s*\{[^}]*repeat\(auto-fill,\s*minmax\(min\(var\(--graph-track\),\s*100%\),\s*1fr\)\)/);
+    assert.match(css, /\.graph-overlay\s*\{\s*--graph-track:\s*3\d\dpx/);
+    // Wide cards get their own track budget on small / short-landscape screens
+    // (phone turned sideways is where a map is actually read).
+    assert.match(css, /@media screen and \(max-width:\s*900px\)\s*\{\s*\.graph-overlay\s*\{\s*--graph-track/);
+    assert.match(css, /@media screen and \(orientation:\s*landscape\) and \(max-height:\s*\d+px\)\s*\{\s*\.graph-overlay\s*\{\s*--graph-track/);
+    // Short landscape: the chrome above the map gives up its height.
+    assert.match(skin, /@media \(orientation:\s*landscape\) and \(max-height:\s*\d+px\)\s*\{\s*\.graph-panel\s*\{/);
+});
+
+test('atlas stacks wide depths by distance and keeps the full option text', () => {
+    // 17 labels share one depth in the prologue fan-out. One card per label in
+    // one column made that row several screens tall while five of six tracks
+    // beside it stayed empty — depths now split into even stacks ("1 / 3").
+    assert.match(source, /var GRAPH_STACK_MAX = \d+;/);
+    assert.match(source, /function splitDepthIntoStacks \(ids, depth\)/);
+    assert.match(source, /Math\.ceil\(ids\.length \/ parts\)/);
+    assert.match(source, /graph-col-depth/);
+    // Card text is no longer cut at 34/26/44 chars: the "…" in most cards was
+    // the other half of "the atlas reads as cramped".
+    assert.doesNotMatch(source, /truncateText\(edge\.text/);
+    assert.doesNotMatch(source, /truncateText\(infos\[edge\.target\]\.title/);
+    assert.doesNotMatch(source, /truncateText\(info\.banner/);
+    // Empty depth slots between chained labels are skipped, and labels nothing
+    // reaches (24 ship: Solo1Extra_*, Solo1PC_Chat, …) get their own section
+    // instead of a mystery column after 44 blank ones.
+    assert.match(source, /if \(depthKeys\[i\] === GRAPH_OFF_ROUTE\)/);
+    assert.match(source, /graph-offroute/);
+    assert.match(source, /Вне маршрута/);
+});
+
+test('route atlas paints once, then patches state (no per-change rebuild)', () => {
+    // renderGraph() runs from updateHUD() on every vn.* change; it used to
+    // rebuild 205 cards / ~2 000 nodes through innerHTML each time. Now the
+    // structure is built once (kept even while the overlay is closed), and a
+    // state-only change patches chips + the current marker.
+    assert.match(source, /var graphStructureKey = null;/);
+    assert.match(source, /var graphSignature = null;/);
+    assert.match(source, /function graphStateSignature \(structureKey, current, p\)/);
+    assert.match(source, /function patchGraphState \(body, current, p\)/);
+    assert.match(source, /function paintGraphCurrentMarker \(node\)/);
+    assert.match(source, /function setGraphStatText \(body, name, text\)/);
+    assert.match(source, /data-graph-stat-text/);
+    // The cheap signature check must come BEFORE the expensive script walk.
+    const renderStart = source.indexOf('function renderGraph ()');
+    const renderFn = source.slice(renderStart, source.indexOf('function patchGraphState'));
+    assert.ok(renderFn.indexOf('signature === graphSignature') < renderFn.indexOf('collectLabelInfo'),
+        'signature guard must run before collectLabelInfo/computeLabelDepths');
+    assert.match(renderFn, /if \(structureKey === graphStructureKey && body\.querySelector\('\.graph-grid'\)\)/);
+    assert.match(renderFn, /graphStructureKey = structureKey;/);
+    // First open shows the panel before the build task runs.
+    assert.match(source, /var graphBuilding = false;/);
+    assert.match(source, /setTimeout\(function \(\) \{ graphBuilding = false; renderGraph\(\); \}, 0\)/);
+    // The chips are patched as text nodes, never re-parsed as markup (markup
+    // would re-run the offline icon shim on the <i> inside every chip).
+    assert.doesNotMatch(source, /graph-stat[^']*'\)\.innerHTML/);
+    assert.match(source, /node\.insertBefore\(badge, node\.querySelector\('\.graph-edges'\)/);
+});
+
+test('the atlas is neither blurred nor animated (perf: blur over ~2 000 nodes)', () => {
+    // A full-window backdrop-filter is re-blurred by the compositor every
+    // frame: the panel's own entrance animation, scrolling, and anything still
+    // animating behind it (title glow, HUD brand, clock colon). Over the atlas
+    // that was the difference between unusable and instant.
+    const skin = readFileSync(join(here, '..', 'vendor', 'aurora-ui.css'), 'utf8');
+    const panelStart = skin.indexOf('.graph-panel {');
+    const panel = skin.slice(panelStart, skin.indexOf('.archives-head', panelStart));
+    assert.match(panel, /-webkit-backdrop-filter: none; backdrop-filter: none;/);
+    assert.match(panel, /animation: none;/);
+    assert.match(panel, /background: rgb\(var\(--surface-rgb\)/);
+    // Scrolled-out columns are not laid out or painted at all.
+    assert.match(skin, /\.graph-col \{ content-visibility: auto; contain-intrinsic-size: auto \d+px; \}/);
+    // Decorative motion behind a full-screen overlay is paused, not just the
+    // sprites: an animating layer behind a translucent surface repaints.
+    assert.match(skin, /html\.aurora-modal-open main-screen::before/);
+    assert.match(skin, /html\.aurora-modal-open \.hud-brand/);
+});
+
+test('aurora driver: idempotent writes, no observer feedback loop', () => {
+    // Regression: a no-op class write still queues a MutationObserver record,
+    // and the driver observes the subtree it decorates — so an unconditional
+    // classList.add made every pass schedule the next one (60 fps of ~50
+    // querySelectors + a forced style recalculation).
+    const js = readFileSync(join(here, '..', 'vendor', 'aurora-ui.js'), 'utf8');
+    const toggle = js.slice(js.indexOf('function toggleClass'), js.indexOf('function closest'));
+    assert.match(toggle, /node\.classList\.contains\(cls\)/);
+    assert.doesNotMatch(toggle, /if \(on\) \{ node\.classList\.add/);
+    // Buttons carry an idempotence marker instead of being re-decorated blindly.
+    assert.match(js, /data-aurora-decorated/);
+    assert.match(js, /if \(button\.getAttribute\('data-aurora-decorated'\) === '1'\)/);
+    // Heavy overlay open => the decorative half of the pass is skipped.
+    assert.match(js, /function heavyOverlayOpen \(\)/);
+    const passFn = js.slice(js.indexOf('function pass ()'), js.indexOf('function schedule ()'));
+    assert.ok(passFn.indexOf('heavyOverlayOpen()') < passFn.indexOf('decorate()'),
+        'the overlay guard must run before the decorative work');
+    // No forced style recalculation per pass: read the engine's inline scene.
+    assert.match(js, /var img = \(bg\.style && bg\.style\.backgroundImage\) \|\| '';/);
+});
+
 test('stat-only choices carry a real engine action (rollback regression)', () => {
     // Regression: callback-only choices (onChosen, no Do) broke the Back
     // command — engine.revert(undefined) rejected, stats stayed applied and

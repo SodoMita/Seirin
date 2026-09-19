@@ -408,7 +408,16 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
          * Walks engine.script() and derives every fork: choice options with a
          * jump target, vn.branch condition arms, direct jumps and 'end'
          * markers. Story data itself is never parsed by hand here, so the map
-         * always mirrors the shipped script. Pure UI except jumpToLabel(). */
+         * always mirrors the shipped script. Pure UI except jumpToLabel().
+         *
+         * Layout: one card per label, one column per "distance from prologue"
+         * (BFS depth over every edge), columns flowing left-to-right and
+         * wrapping inside the panel. The shipped map is 205 labels over ~55
+         * depths; as a single horizontal strip that was a ~25 000 px scroll
+         * where four 235 px columns fit, so the landscape width was never
+         * used and every card was squeezed to its minimum. */
+        var GRAPH_STACK_MAX = 6;   /* cards per column before it splits evenly */
+        var GRAPH_OFF_ROUTE = 99;  /* computeLabelDepths() sentinel: nothing reaches it */
         function truncateText (s, n) {
             s = String(s);
             return s.length > n ? s.slice(0, n - 1) + '…' : s;
@@ -468,11 +477,130 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                     }
                 });
             }
-            // Unreachable labels (defensive: there should be none) go to the end.
+            /* Labels no edge leads into are dead content (24 of them ship:
+             * Solo1Extra_*, Solo1PC_Chat, …). They are NOT "depth 99" — they
+             * have no depth, so the atlas renders them in their own section
+             * instead of as a mystery column at the end of the timeline. */
             for (i = 0; i < labels.length; i++) {
-                if (depth[labels[i]] === undefined) { depth[labels[i]] = 99; }
+                if (depth[labels[i]] === undefined) { depth[labels[i]] = GRAPH_OFF_ROUTE; }
             }
             return depth;
+        }
+
+        /* Even split: 8 cards become 4+4, never 6+2. A depth with a wide
+         * fan-out (the prologue fan-out holds up to 17 labels) used to render
+         * as one tower several screens tall while the five tracks beside it
+         * stayed empty — the other half of "the landscape view is wasted". */
+        function splitDepthIntoStacks (ids, depth) {
+            var parts = Math.ceil(ids.length / GRAPH_STACK_MAX);
+            var per = Math.ceil(ids.length / parts);
+            var stacks = [], i;
+            for (i = 0; i < ids.length; i += per) {
+                stacks.push({ depth: depth, labels: ids.slice(i, i + per),
+                    part: (i / per) + 1, parts: parts });
+            }
+            return stacks;
+        }
+
+        function graphColumnHtml (stack, infos, current, withBadge) {
+            var html = '<div class="graph-col" data-depth="' +
+                (stack.depth === GRAPH_OFF_ROUTE ? 'off' : stack.depth) + '">';
+            var i;
+            if (withBadge) {
+                html += '<div class="graph-col-head">' +
+                    '<span class="graph-col-depth" title="Расстояние от пролога: ' + stack.depth + '">' +
+                    (stack.depth < 10 ? '0' + stack.depth : String(stack.depth)) + '</span>' +
+                    (stack.parts > 1 ? '<span class="graph-col-part">' + stack.part + ' / ' + stack.parts + '</span>' : '') +
+                    '</div>';
+            }
+            for (i = 0; i < stack.labels.length; i++) {
+                html += graphCardHtml(infos[stack.labels[i]], current, infos);
+            }
+            return html + '</div>';
+        }
+
+        function graphCardHtml (info, current, infos) {
+            /* LABEL_TITLES is the only hand-written part of the atlas; a label
+             * without one (most of the off-route content) shows its id alone
+             * instead of printing the same string twice. */
+            var html = '<div class="graph-node' + (info.ending ? ' ending' : '') +
+                (current === info.id ? ' current' : '') + '" id="graph-node-' + info.id + '">' +
+                (info.title === info.id ? '' : '<div class="graph-node-title">' + info.title + '</div>') +
+                '<div class="graph-node-id">' + info.id + '</div>' +
+                (info.banner ? '<div class="graph-node-banner">[ ' + info.banner + ' ]</div>' : '') +
+                (current === info.id ? '<div class="graph-node-here">ВЫ ЗДЕСЬ</div>' : '');
+            if (info.edges.length) {
+                html += '<div class="graph-edges">';
+                for (var i = 0; i < info.edges.length; i++) {
+                    html += graphEdgeHtml(info.edges[i], infos);
+                }
+                html += '</div>';
+            }
+            return html + '<button type="button" class="graph-jump" data-graph-jump="' + info.id + '">ПЕРЕЙТИ СЮДА</button></div>';
+        }
+
+        /* Edge row. Text is no longer truncated: the columns are wide enough
+         * to wrap the longest choice in the script (89 chars), and "…"-cut
+         * options were most of what made the cards read as cramped. */
+        function graphEdgeHtml (edge, infos) {
+            var html = '<div class="graph-edge ' + edge.kind + '">' +
+                '<span class="graph-edge-text">' + edge.text + '</span>';
+            if (edge.target && infos[edge.target]) {
+                html += '<button type="button" class="graph-target" data-graph-goto="' + edge.target + '">' +
+                    infos[edge.target].title + '</button>';
+            } else {
+                html += '<span class="graph-edge-stat">стат</span>';
+            }
+            return html + '</div>';
+        }
+
+        /* The map is taller than any window, so the chip with the current
+         * label doubles as "scroll to me": it reuses the edge-chip delegation
+         * (data-graph-goto → scrollIntoView + flash). It stays a plain span
+         * until there is a label to scroll to, and patchGraph() swaps the node
+         * when that changes (never rebuilds the map for it). */
+        function graphCurrentChipHtml (current, known) {
+            return (known
+                ? '<button type="button" class="graph-chip graph-chip-action" data-graph-stat="current" data-graph-goto="' + current + '" title="Прокрутить к текущему узлу">'
+                : '<span class="graph-chip" data-graph-stat="current">') +
+                '<i class="fas fa-terminal"></i><span data-graph-stat-text="current">' + graphCurrentChipText(current, known) + '</span>' +
+                (known ? '</button>' : '</span>');
+        }
+        function graphCurrentChipText (current, known) {
+            return truncateText(current || '—', 22) + (known ? ' ↓' : '');
+        }
+        /* Chip text lives in its own node so a state update can rewrite a text
+         * node instead of re-parsing markup (which would also re-run the icon
+         * shim on the <i> inside). */
+        function graphStatChipHtml (name, icon, text, cls) {
+            return '<span class="graph-chip' + (cls ? ' ' + cls : '') + '" data-graph-stat="' + name + '">' +
+                /* no icon => no <i> at all: an empty .fas span would be an
+                   unmapped glyph for the offline icon shim */
+                (icon ? '<i class="fas ' + icon + '"></i>' : '') +
+                '<span data-graph-stat-text="' + name + '">' + text + '</span></span>';
+        }
+        function setGraphStatText (body, name, text) {
+            var slot = body.querySelector('[data-graph-stat="' + name + '"] [data-graph-stat-text]');
+            if (slot && slot.textContent !== text) { slot.textContent = text; }
+        }
+
+        /* renderGraph() is called from updateHUD() on every vn.* state change
+         * (and from openGraph). Rebuilding 205 cards / ~2 000 nodes through
+         * innerHTML each time was the second half of "the atlas renders
+         * slowly", so:
+         *   - the STRUCTURE is built once and kept in #graph-body (also while
+         *     the overlay is closed), keyed by the label set;
+         *   - every call computes a cheap state signature first and returns
+         *     without touching the DOM when nothing the atlas shows changed;
+         *   - when only the state changed (current label, location, clock,
+         *     money, alert) it patches those few nodes instead of rebuilding. */
+        var graphStructureKey = null;
+        var graphSignature = null;
+        var graphBuilding = false;
+
+        function graphStateSignature (structureKey, current, p) {
+            return structureKey + '|' + (current || '') + '|' + (p.location || '') + '|' +
+                (p.time || 0) + '|' + (p.money || 0) + '|' + (p.akatomi_alert || 0);
         }
 
         function renderGraph () {
@@ -480,59 +608,105 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             if (!body || !engine.script()) { return; }
             var script = engine.script();
             var labels = Object.keys(script);
-            var infos = {}, depths, columns = [], html = '', maxDepth = 0, i, j;
-            labels.forEach(function (label) { infos[label] = collectLabelInfo(label); });
-            depths = computeLabelDepths(infos, labels);
-            labels.forEach(function (label) { if (depths[label] > maxDepth) { maxDepth = depths[label]; } });
-            for (i = 0; i <= maxDepth; i++) { columns.push([]); }
-            labels.forEach(function (label) { columns[depths[label]].push(label); });
-
             var current = engine.state('label') || null;
             var p = engine.storage('player') || {};
+            var structureKey = labels.length + ':' + labels[0] + ':' + labels[labels.length - 1];
+            var signature = graphStateSignature(structureKey, current, p);
+            if (signature === graphSignature && body.firstChild) { return; }
+            if (structureKey === graphStructureKey && body.querySelector('.graph-grid')) {
+                patchGraphState(body, current, p);
+                graphSignature = signature;
+                return;
+            }
+            var infos = {}, depths, html = '', i;
+            labels.forEach(function (label) { infos[label] = collectLabelInfo(label); });
+            depths = computeLabelDepths(infos, labels);
+
+            /* Group by depth: columns of equal depth hold the parallel routes
+             * the player can be on at the same moment of the story. */
+            var byDepth = {}, depthKeys = [], offRoute = [];
+            labels.forEach(function (label) {
+                var d = depths[label];
+                if (!byDepth[d]) { byDepth[d] = []; depthKeys.push(d); }
+                byDepth[d].push(label);
+            });
+            depthKeys.sort(function (a, b) { return a - b; });
+            var stacks = [];
+            for (i = 0; i < depthKeys.length; i++) {
+                if (depthKeys[i] === GRAPH_OFF_ROUTE) { offRoute = byDepth[depthKeys[i]]; continue; }
+                stacks = stacks.concat(splitDepthIntoStacks(byDepth[depthKeys[i]], depthKeys[i]));
+            }
+
             html += '<div class="graph-stats">' +
-                '<span class="graph-chip"><i class="fas fa-terminal"></i>' + truncateText(current || '—', 22) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-map-marker-alt"></i>' + truncateText(p.location || '—', 24) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-calendar"></i>' + fmtClockDate(p.time) + ' ' + fmtHHMM(p.time) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-coins"></i>' + (p.money || 0) + '</span>' +
-                '<span class="graph-chip"><i class="fas fa-shield-alt"></i>' + (p.akatomi_alert || 0) + '%</span>' +
-                '<span class="graph-chip dim">узлов: ' + labels.length + '</span>' +
+                graphCurrentChipHtml(current, !!(current && infos[current])) +
+                graphStatChipHtml('location', 'fa-map-marker-alt', truncateText(p.location || '—', 24)) +
+                graphStatChipHtml('clock', 'fa-calendar', fmtClockDate(p.time) + ' ' + fmtHHMM(p.time)) +
+                graphStatChipHtml('money', 'fa-coins', String(p.money || 0)) +
+                graphStatChipHtml('alert', 'fa-shield-alt', (p.akatomi_alert || 0) + '%') +
+                graphStatChipHtml('nodes', '', 'узлов: ' + labels.length, 'dim') +
+                graphStatChipHtml('columns', '', 'столбцов: ' + stacks.length, 'dim') +
                 '</div>';
-            html += '<div class="graph-hint">Колонки = расстояние от пролога. Карточка показывает все выходы. ' +
-                'Клик по цели прокручивает к ней · «ПЕРЕЙТИ» телепортирует игру в этот узел.</div>';
-            html += '<div class="graph-cols">';
-            for (i = 0; i < columns.length; i++) {
-                html += '<div class="graph-col">';
-                for (j = 0; j < columns[i].length; j++) {
-                    var info = infos[columns[i][j]];
-                    html += '<div class="graph-node' + (info.ending ? ' ending' : '') +
-                        (current === info.id ? ' current' : '') + '" id="graph-node-' + info.id + '">' +
-                        '<div class="graph-node-title">' + info.title + '</div>' +
-                        '<div class="graph-node-id">' + info.id + '</div>' +
-                        (info.banner ? '<div class="graph-node-banner">[ ' + truncateText(info.banner, 44) + ' ]</div>' : '') +
-                        (current === info.id ? '<div class="graph-node-here">ВЫ ЗДЕСЬ</div>' : '');
-                    if (info.edges.length) {
-                        html += '<div class="graph-edges">';
-                        info.edges.forEach(function (edge) {
-                            html += '<div class="graph-edge ' + edge.kind + '">';
-                            if (edge.target && infos[edge.target]) {
-                                html += '<span class="graph-edge-text">' + truncateText(edge.text, 34) + '</span>' +
-                                    '<button type="button" class="graph-target" data-graph-goto="' + edge.target + '">' +
-                                    truncateText(infos[edge.target].title, 26) + '</button>';
-                            } else {
-                                html += '<span class="graph-edge-text">' + truncateText(edge.text, 40) + '</span>' +
-                                    '<span class="graph-edge-stat">стат</span>';
-                            }
-                            html += '</div>';
-                        });
-                        html += '</div>';
-                    }
-                    html += '<button type="button" class="graph-jump" data-graph-jump="' + info.id + '">ПЕРЕЙТИ СЮДА</button>' +
-                        '</div>';
+            html += '<div class="graph-hint">Столбцы = расстояние от пролога (бейдж над столбцом), внутри столбца — параллельные маршруты. ' +
+                'Карточка показывает все выходы · клик по цели прокручивает к ней · «ПЕРЕЙТИ» телепортирует игру в этот узел.</div>';
+            html += '<div class="graph-cols"><div class="graph-grid">';
+            for (i = 0; i < stacks.length; i++) {
+                html += graphColumnHtml(stacks[i], infos, current, true);
+            }
+            html += '</div>';
+            if (offRoute.length) {
+                html += '<section class="graph-offroute">' +
+                    '<h3>Вне маршрута · ' + offRoute.length + '</h3>' +
+                    '<p>Ни один переход из достижимой части сценария сюда не ведёт: органической игрой в эти метки не попасть, ' +
+                    '«ПЕРЕЙТИ СЮДА» работает — это способ проверить такой контент вручную.</p>' +
+                    '<div class="graph-grid">';
+                var offStacks = splitDepthIntoStacks(offRoute, GRAPH_OFF_ROUTE);
+                for (i = 0; i < offStacks.length; i++) {
+                    html += graphColumnHtml(offStacks[i], infos, current, false);
                 }
-                html += '</div>';
+                html += '</div></section>';
             }
             html += '</div>';
             body.innerHTML = html;
+            graphStructureKey = structureKey;
+            graphSignature = signature;
+        }
+
+        /* State-only update: chips + the "you are here" marker. Touches ~8
+         * nodes instead of re-parsing 130 KB of markup. */
+        function patchGraphState (body, current, p) {
+            var node = (current && document.getElementById('graph-node-' + current)) || null;
+            var chip = body.querySelector('[data-graph-stat="current"]');
+            var chipIsButton = !!(chip && chip.tagName === 'BUTTON');
+            if (chip && chipIsButton !== !!node) {
+                var fresh = document.createElement('div');
+                fresh.innerHTML = graphCurrentChipHtml(current, !!node);
+                chip.parentNode.replaceChild(fresh.firstChild, chip);
+                chip = body.querySelector('[data-graph-stat="current"]');
+            }
+            if (chip && node) { chip.setAttribute('data-graph-goto', current); }
+            setGraphStatText(body, 'current', graphCurrentChipText(current, !!node));
+            setGraphStatText(body, 'location', truncateText(p.location || '—', 24));
+            setGraphStatText(body, 'clock', fmtClockDate(p.time) + ' ' + fmtHHMM(p.time));
+            setGraphStatText(body, 'money', String(p.money || 0));
+            setGraphStatText(body, 'alert', (p.akatomi_alert || 0) + '%');
+            paintGraphCurrentMarker(node);
+        }
+
+        function paintGraphCurrentMarker (node) {
+            var marked = document.querySelectorAll('.graph-node.current');
+            var i, badge;
+            for (i = 0; i < marked.length; i++) {
+                if (marked[i] === node) { continue; }
+                marked[i].classList.remove('current');
+                badge = marked[i].querySelector('.graph-node-here');
+                if (badge) { marked[i].removeChild(badge); }
+            }
+            if (!node || node.classList.contains('current')) { return; }
+            node.classList.add('current');
+            badge = document.createElement('div');
+            badge.className = 'graph-node-here';
+            badge.textContent = 'ВЫ ЗДЕСЬ';
+            node.insertBefore(badge, node.querySelector('.graph-edges') || node.querySelector('.graph-jump'));
         }
 
         function syncGraph () {
@@ -615,9 +789,15 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         }
 
         function openGraph () {
-            renderGraph();
             var overlay = document.getElementById('graph-overlay');
+            /* Show the panel FIRST: the atlas shell (header, stats slots) is
+             * static markup, so the overlay appears on the next paint even if
+             * the very first build has to parse ~130 KB of cards. Any later
+             * open reuses the built structure and patching is microseconds. */
             if (overlay) { overlay.hidden = false; }
+            if (graphStructureKey || graphBuilding) { renderGraph(); return; }
+            graphBuilding = true;
+            setTimeout(function () { graphBuilding = false; renderGraph(); }, 0);
         }
 
         function wireGraph () {
