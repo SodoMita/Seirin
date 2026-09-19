@@ -65,10 +65,11 @@ Buttons: `.aurora-decorated` = icon already injected; `is-on` /
 are read-only getters, `showScreen`/`runListener`, `rollback` (same path as
 the Back button) and `preference('Volume')`.
 
-Text is Russian throughout; the mockup's English strings were preview copy.
-Engine strings that had no Russian entry (help screen, quick-menu titles,
-slot deletion prompts, loading) were added to the `engine.translation`
-block in `game.js`.
+UI text supports Russian (default), English, Simplified Chinese, Japanese,
+Hindi and Swahili. The selector is available in the main menu and Appearance
+settings. `vendor/locales/ui.js` holds all six UI catalogs;
+`vendor/i18n.js` handles persistence, engine chrome, accessible labels and CSS
+headings. See [UI_I18N.md](UI_I18N.md) for scope and maintenance details.
 
 ## How the mockup maps onto engine markup
 

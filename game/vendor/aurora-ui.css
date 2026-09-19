@@ -303,8 +303,8 @@ choice-container {
   display: flex; flex-direction: column; justify-content: flex-start; flex-wrap: nowrap;
   counter-reset: none;
 }
-choice-container::before { content: "Развилка"; display: block; margin: 0 0 6px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
-choice-container::after { content: "Ваш ответ"; display: block; order: -1; margin: 0 0 22px; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; }
+choice-container::before { content: var(--ui-crossroads, "Развилка"); display: block; margin: 0 0 6px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+choice-container::after { content: var(--ui-response, "Ваш ответ"); display: block; order: -1; margin: 0 0 22px; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; }
 choice-container::before { order: -2; }
 choice-container [data-content="wrapper"] { display: grid; gap: 10px; width: 100%; }
 [data-screen="game"] choice-container button,
@@ -351,14 +351,14 @@ html.aurora-playing #seirin-build-badge { display: none !important; }
   order: -1; margin: 0 44px 25px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink);
 }
 [data-screen] > h2::before { display: block; margin-bottom: 7px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
-settings-screen > h2::before { content: "Ночная смена · предпочтения"; }
-load-screen > h2::before { content: "Ночная смена · загрузка"; }
-save-screen > h2::before { content: "Ночная смена · сохранение"; }
+settings-screen > h2::before { content: var(--ui-preferences, "Ночная смена · предпочтения"); }
+load-screen > h2::before { content: var(--ui-load, "Ночная смена · загрузка"); }
+save-screen > h2::before { content: var(--ui-save, "Ночная смена · сохранение"); }
 /* The engine's save screen has no heading: synthesise eyebrow + title. */
-save-screen::before { content: "Ночная смена · сохранение"; order: -3; display: block; margin: 0 44px 7px 0; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
-save-screen::after { content: "Сохранить"; order: -2; display: block; margin: 0 44px 25px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); }
-help-screen > h2::before { content: "Ночная смена · справка"; }
-gallery-screen > h2::before, credits-screen > h2::before { content: "Ночная смена"; }
+save-screen::before { content: var(--ui-save, "Ночная смена · сохранение"); order: -3; display: block; margin: 0 44px 7px 0; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+save-screen::after { content: var(--ui-saveTitle, "Сохранить"); order: -2; display: block; margin: 0 44px 25px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); }
+help-screen > h2::before { content: var(--ui-help, "Ночная смена · справка"); }
+gallery-screen > h2::before, credits-screen > h2::before { content: var(--ui-night, "Ночная смена"); }
 [data-screen] h3 { margin: 0 0 12px; color: var(--accent); font: 500 10px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
 [data-screen] p { color: var(--ink); }
 
@@ -548,7 +548,7 @@ help-screen [data-content="instruction"] { order: 1; flex: 1 1 auto; width: auto
 }
 alert-modal .modal__content, message-modal .modal__content { width: min(375px, calc(100% - 24px)); }
 alert-modal .modal__content [data-content="message"], alert-modal p { margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: var(--ink); }
-alert-modal .modal__content [data-content="message"]::before { content: "Подтверждение"; display: block; margin-bottom: 7px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+alert-modal .modal__content [data-content="message"]::before { content: var(--ui-confirm, "Подтверждение"); display: block; margin-bottom: 7px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
 alert-modal [data-content="actions"] { display: flex; flex-direction: column; gap: 6px; }
 alert-modal [data-content="actions"] button, dialog-log button[data-action="dialog-log"] {
   display: inline-flex; align-items: center; justify-content: center; width: 100%; height: auto; min-height: 42px; margin: 0; padding: 10px 16px;
@@ -558,7 +558,7 @@ alert-modal [data-content="actions"] button, dialog-log button[data-action="dial
 alert-modal [data-content="actions"] button:first-child { color: var(--accent); background: var(--glass-selected); }
 alert-modal [data-content="actions"] button:hover, dialog-log button[data-action="dialog-log"]:hover { background: var(--glass-hover); }
 dialog-log .modal__content { display: flex; flex-direction: column; height: auto; max-height: calc(var(--vh) - 24px); max-width: 660px; }
-dialog-log .modal__content::before { content: "История реплик"; order: -2; display: block; margin: 0 44px 22px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); }
+dialog-log .modal__content::before { content: var(--ui-log, "История реплик"); order: -2; display: block; margin: 0 44px 22px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); }
 .aurora-log-hint { order: -1; margin: -12px 0 14px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
 dialog-log .modal__content [data-content="log"] { flex: 1 1 auto; min-height: 0; height: auto; max-height: none; padding: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--edge) transparent; text-align: left; }
 dialog-log .modal__content [data-content="log"] [data-spoke] { padding: 15px 0; border-bottom: 1px solid var(--divider); font-size: 12px; }
@@ -695,3 +695,11 @@ html.aurora-modal-open .hud-clock-colon, html.aurora-modal-open game-screen [dat
   .aurora-title { padding: 14px 20px 10px; }
   .aurora-title h1 { font-size: 24px; }
 }
+
+/* Locale picker uses local system fallbacks for CJK and Devanagari. No web fonts. */
+.seirin-language { margin: 14px 0; min-width: 0; }
+.seirin-language label { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.seirin-language select { max-width: 100%; padding: 8px 12px; color: var(--ink); background: rgb(var(--surface-rgb)); border: 1px solid var(--edge-active); border-radius: 8px; font: inherit; }
+.seirin-language option { font-family: system-ui, sans-serif; }
+html:lang(hi), html:lang(ja), html:lang(zh) { --sans: system-ui, sans-serif; --mono: system-ui, sans-serif; }
+html:lang(hi) .button, html:lang(hi) [data-string], html:lang(hi) .eyebrow { letter-spacing: normal; line-height: 1.6; }
