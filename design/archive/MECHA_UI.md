@@ -1,3 +1,11 @@
+> **SUPERSEDED (2026-09-19).** The 2.5D "mecha" skin described below was
+> removed from `game/` and replaced by the aurora glass skin
+> (`game/vendor/aurora-ui.{css,js}`, see [`../AURORA_UI.md`](../AURORA_UI.md)).
+> This file is kept as history: the engine traps and the merge data-loss
+> incident are still relevant; the plate/texture/animation sections are not.
+> Old concept boards and screenshots live in the `backup-pre-slim-2026-09-19`
+> release bundle, not in the working tree.
+
 # Mecha UI — 2.5D skeuomorphic armour skin
 
 A visual layer for `game/` that reskins the Monogatari VN as a piece of

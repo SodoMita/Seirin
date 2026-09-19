@@ -1,0 +1,697 @@
+/* ============================================================================
+ * Seirin: Night Shift — AURORA GLASS SKIN
+ * ----------------------------------------------------------------------------
+ * Ported from the "visual-novel-interface-mockup" specimen: translucent glass
+ * surfaces tinted by one accent, outlined HUD text over the scene, a speaker
+ * tab on top of a wide dialogue box, an icon rail under it, and popover-style
+ * panels for every system screen. Five palettes (aurora / tidal / dusk /
+ * amber / gray), glass transparency and dialogue text size are runtime
+ * settings persisted by vendor/aurora-ui.js.
+ *
+ * Load order matters: this sheet comes AFTER vendor/custom-ui.css (layout
+ * pins + regression rules covered by tests) and repaints it at equal
+ * specificity. It never touches engine JS or story state.
+ *
+ * Offline-pure: no @import, no remote fonts, no external images. The only
+ * URL used is the local courtyard scene as a backdrop for system screens.
+ * ========================================================================== */
+
+/* ── 1. Tokens ───────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --ink-rgb: 236 248 242;
+  --muted-rgb: 181 204 194;
+  --accent-rgb: 170 229 201;
+  --surface-rgb: 17 38 37;
+  --glint-rgb: 239 255 247;
+  --shadow-rgb: 5 15 18;
+  --ui-transparency: .95;     /* 0 = opaque panels, 1 = clearest glass */
+  --reading-scale: 1;         /* dialogue text multiplier               */
+  --ink: rgb(var(--ink-rgb));
+  --muted: rgb(var(--muted-rgb));
+  --accent: rgb(var(--accent-rgb));
+  --edge: rgb(var(--glint-rgb) / .30);
+  --edge-active: rgb(var(--accent-rgb) / .72);
+  --divider: rgb(var(--accent-rgb) / .17);
+  --hover: rgb(var(--accent-rgb) / .12);
+  --selected: rgb(var(--accent-rgb) / .18);
+  --density: clamp(0, calc(1 - var(--ui-transparency)), 1);
+  --sheen: linear-gradient(135deg, rgb(var(--glint-rgb) / .10), rgb(var(--glint-rgb) / .01) 38%, rgb(var(--accent-rgb) / .035) 70%, rgb(var(--glint-rgb) / .06));
+  --glass: var(--sheen), rgb(var(--surface-rgb) / calc(.05 + var(--density) * .95));
+  --glass-hover: linear-gradient(var(--hover), var(--hover)), var(--glass);
+  --glass-selected: linear-gradient(var(--selected), var(--selected)), var(--glass);
+  --panel-glass: var(--sheen), rgb(var(--surface-rgb) / calc(.72 + var(--density) * .28));
+  --dialogue-glass: linear-gradient(135deg, rgb(var(--glint-rgb) / .04), transparent 44%, rgb(var(--accent-rgb) / .02)), rgb(var(--surface-rgb) / calc(.18 + var(--density) * .82));
+  --glass-shadow: 0 7px 24px rgb(var(--shadow-rgb) / .10);
+  --blur: 14px;
+  --text-size-base: clamp(21px, 1.7vw, 27px);
+  --text-size: calc(var(--text-size-base) * var(--reading-scale));
+  --outline: rgb(var(--shadow-rgb));
+  --sans: "Bahnschrift", "DIN Alternate", "Roboto", "Segoe UI", Arial, sans-serif;
+  --dialogue-font: "Segoe UI", "Roboto", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --digital: "DSEG7 Classic", var(--mono);
+  --handle-glass: linear-gradient(135deg, rgb(var(--glint-rgb) / .32), rgb(var(--glint-rgb) / .04) 38%, transparent 40% 64%, rgb(var(--glint-rgb) / .12) 66%, rgb(var(--accent-rgb) / .07));
+  --track: linear-gradient(rgb(var(--glint-rgb) / .70), rgb(var(--glint-rgb) / .70)) right 12.5px top 1px/1px 7px no-repeat,
+    repeating-linear-gradient(90deg, rgb(var(--glint-rgb) / .70) 0 1px, transparent 1px 25%) 12.5px 1px/calc(100% - 25px) 7px no-repeat,
+    repeating-linear-gradient(90deg, rgb(var(--accent-rgb) / .48) 0 1px, transparent 1px 5%) 12.5px 1px/calc(100% - 25px) 3px no-repeat,
+    linear-gradient(rgb(var(--shadow-rgb) / .55), rgb(var(--surface-rgb) / .32) 50%, rgb(var(--shadow-rgb) / .50));
+  --handle-bevel: inset 0 3px 6px rgb(var(--glint-rgb) / .15), inset 0 -3px 6px rgb(var(--shadow-rgb) / .16);
+  --track-shadow: inset 0 1px 2px rgb(var(--shadow-rgb) / .50);
+  --handle-mark: rgb(var(--accent-rgb) / .92);
+  --handle-face: linear-gradient(90deg, transparent 46%, var(--handle-mark) 46% 54%, transparent 54%) center/100% 44% no-repeat, var(--handle-glass);
+  --shell-x: max(38px, env(safe-area-inset-left));
+  --shell-w: min(100% - 2 * var(--shell-x), 1360px);
+  --rail-h: 44px;
+  --vh: 100vh;
+  /* Engine variables reused by vendored monogatari.css */
+  --main-color: rgb(var(--surface-rgb) / .72);
+  --text-color: var(--ink);
+  --character-name-color: var(--ink);
+  --quick-menu-text-color: var(--ink);
+  --screen-background-color: rgb(var(--surface-rgb));
+}
+@supports (height: 100dvh) { :root { --vh: 100dvh; } }
+
+html[data-aurora-theme="tidal"] { --ink-rgb: 237 245 255; --muted-rgb: 182 201 220; --accent-rgb: 155 210 248; --surface-rgb: 19 32 49; --glint-rgb: 239 249 255; --shadow-rgb: 5 11 20; }
+html[data-aurora-theme="dusk"]  { --ink-rgb: 246 240 253; --muted-rgb: 202 189 218; --accent-rgb: 207 181 241; --surface-rgb: 35 26 47; --glint-rgb: 251 242 255; --shadow-rgb: 13 8 20; }
+html[data-aurora-theme="amber"] { --ink-rgb: 252 245 229; --muted-rgb: 215 200 174; --accent-rgb: 237 204 145; --surface-rgb: 43 34 23; --glint-rgb: 255 249 232; --shadow-rgb: 18 12 5; }
+html[data-aurora-theme="gray"]  { --ink-rgb: 244 244 244; --muted-rgb: 195 195 195; --accent-rgb: 216 216 216; --surface-rgb: 30 30 30; --glint-rgb: 255 255 255; --shadow-rgb: 8 8 8; }
+
+/* ── 2. Base ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: rgb(var(--surface-rgb)); }
+body {
+  background: rgb(var(--surface-rgb));
+  color: var(--ink);
+  font: 14px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-align: left;
+}
+#vn-root { background: rgb(var(--surface-rgb)); color: var(--ink); font-family: var(--sans); }
+visual-novel, main-screen, game-screen, text-box, main-menu, quick-menu, dialog-log { font-family: var(--sans); }
+/* Scene backdrop for every non-game screen: the current scene is mirrored
+   here by aurora-ui.js (--aurora-backdrop); the courtyard is the fallback. */
+#vn-root > visual-novel {
+  position: relative;
+  background:
+    linear-gradient(rgb(var(--shadow-rgb) / .55), rgb(var(--shadow-rgb) / .35) 40%, rgb(var(--shadow-rgb) / .65)),
+    var(--aurora-backdrop, url('../assets/scenes/courtyard.webp?v=20260919r1')) center/cover no-repeat;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+.icon, .aurora-ico { width: 21px; height: 21px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.eyebrow { margin: 0; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+.small { color: var(--muted); font-size: 11px; line-height: 1.75; }
+.outlined { color: var(--ink); text-shadow: -1px -1px 0 var(--outline), 1px -1px 0 var(--outline), -1px 1px 0 var(--outline), 1px 1px 0 var(--outline), 0 2px 4px rgb(var(--shadow-rgb) / .70); }
+@supports (-webkit-text-stroke: 1px black) and (paint-order: stroke fill) {
+  .outlined { -webkit-text-stroke: 2px var(--outline); paint-order: stroke fill; text-shadow: 0 2px 4px rgb(var(--shadow-rgb) / .64); }
+}
+
+/* Glass button primitive (used by our own markup and, via aurora-ui.js
+   decoration, by engine buttons). Resets the vendored button sizing. */
+.button {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  width: auto; height: auto; min-height: 42px; margin: 0; padding: 10px 16px;
+  border: 0; border-radius: 9px; background: var(--glass); box-shadow: var(--glass-shadow);
+  color: var(--ink); font: 500 12px/1.3 var(--sans); letter-spacing: .02em; text-transform: none;
+  cursor: pointer; transition: background .2s, color .2s;
+}
+.button:hover, .button:focus-visible { background: var(--glass-hover); color: var(--ink); }
+.button:focus { border: 0; }
+.button .icon { width: 17px; height: 17px; }
+.icon-button { width: 40px; height: 40px; min-height: 40px; flex: 0 0 auto; padding: 0; border-radius: 50%; }
+.primary { color: var(--accent); background: var(--glass-selected); }
+.button.is-on, .button[aria-pressed="true"] { color: var(--accent); background: var(--glass-selected); }
+.button.is-on::after, .button[aria-pressed="true"]::after {
+  content: ""; position: absolute; right: 8px; top: 8px; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 6px var(--accent);
+}
+.button > .svg-inline--fa, .button > .fas, .button > .far { display: none !important; }
+
+/* ── 3. Shell header (in-game HUD) ───────────────────────────────────────── */
+.shell-header {
+  position: fixed; z-index: 70; left: var(--shell-x); right: var(--shell-x);
+  top: max(6px, env(safe-area-inset-top));
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px;
+  min-width: 0; pointer-events: none;
+  animation: aurora-ui-in .7s .15s backwards;
+}
+.shell-header button, .shell-header .clock { pointer-events: auto; }
+.header-main { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; flex: 1 0 auto; min-width: 0; max-width: 100%; gap: 8px 16px; }
+.location { display: flex; align-items: center; flex: 0 1 auto; gap: 6px; min-width: 0; max-width: min(46vw, 330px); }
+.location > div { min-width: 0; overflow-wrap: anywhere; }
+.location .icon { width: 13px; height: 13px; color: var(--accent); filter: drop-shadow(0 1px 1px rgb(var(--shadow-rgb) / .9)); }
+.location h1 { margin: 0; font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
+.location .eyebrow { margin-top: 3px; font-size: 9px; line-height: 1.35; letter-spacing: .6px; color: var(--muted); }
+.hud { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; min-width: 0; max-width: 100%; gap: 16px; margin-left: auto; }
+.resources { display: flex; align-items: center; gap: 16px; }
+.resource {
+  display: inline-flex; align-items: center; gap: 6px; width: auto; height: auto; min-height: 40px; margin: 0; padding: 0 2px;
+  border: 0; background: none; box-shadow: none; color: var(--ink);
+  font: 11px/1.5 var(--mono); font-variant-numeric: tabular-nums; cursor: pointer; transition: color .2s;
+}
+.resource:hover, .resource:focus-visible { color: var(--accent); background: none; }
+.resource .icon { width: 16px; height: 16px; color: var(--accent); filter: drop-shadow(0 1px 1px rgb(var(--shadow-rgb) / .9)); }
+.alert-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 7px rgb(var(--accent-rgb) / .30); transition: background .3s, box-shadow .3s; }
+.resource.alert-pulse .alert-dot, .resource.alert-high .alert-dot { background: #ff8a8a; box-shadow: 0 0 9px rgb(255 120 120 / .6); }
+.resource.alert-pulse { animation: aurora-pulse .7s ease-out 1; }
+.header-actions { display: flex; gap: 8px; }
+.header-actions .icon-button { color: var(--ink); }
+#btn-mute .icon-muted { display: none; }
+#btn-mute[aria-pressed="true"] .icon-sound { display: none; }
+#btn-mute[aria-pressed="true"] .icon-muted { display: block; }
+.clock {
+  display: grid; justify-items: end; flex: 0 0 auto; gap: 4px; margin-left: auto; padding-left: 14px;
+  border-left: 1px solid var(--divider); font-family: var(--digital); font-weight: 400; font-synthesis: none;
+  text-align: right; white-space: nowrap;
+}
+.clock time { display: block; }
+.clock time:first-child { font-size: 24px; font-variant-numeric: tabular-nums; letter-spacing: .8px; line-height: 1.25; }
+.clock time:last-child { color: var(--muted); font-size: 10px; letter-spacing: .8px; line-height: 1.4; }
+.hud-clock-colon { display: inline-block; opacity: 1; animation: aurora-clock-blink 1s steps(1, end) infinite; }
+
+/* ── 4. Shell footer (rail under the dialogue) ───────────────────────────── */
+.shell-footer {
+  position: fixed; z-index: 60; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: var(--shell-w); height: calc(var(--rail-h) + env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px) minmax(0, 1fr); align-items: center; gap: 16px;
+  padding: 0 16px env(safe-area-inset-bottom);
+  background: var(--glass); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  animation: aurora-ui-in .7s .3s backwards;
+}
+.footer-status { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 9px; line-height: 1.2; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.footer-status .icon { width: 14px; height: 14px; color: var(--accent); }
+.footer-status--right { justify-content: flex-end; text-align: right; }
+.footer-status--right.is-live { color: var(--accent); }
+
+/* Visibility: header/footer only during play, and both slide away with
+   the engine's "hide UI" toggle (aurora-ui.js mirrors the engine state). */
+html:not(.aurora-playing) .shell-header, html:not(.aurora-playing) .shell-footer { display: none; }
+html.aurora-hidden .shell-header, html.aurora-hidden .shell-footer { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s, visibility 0s .25s; }
+html.aurora-screen .shell-header, html.aurora-screen .shell-footer { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ── 5. Game screen: scene, dialogue, quick menu ─────────────────────────── */
+game-screen { background: rgb(var(--surface-rgb)); }
+game-screen::after { content: none; }
+game-screen [data-ui="background"]::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(rgb(0 0 0 / .30), transparent 24%, transparent 55%, rgb(0 0 0 / .22));
+}
+
+/* Text box: transparent shell; the glass is painted on the text pane and the
+   speaker tab so the tab can sit "on top" of the box like in the specimen. */
+[data-screen="game"] text-box,
+text-box {
+  position: absolute; z-index: 50; bottom: var(--rail-h); left: 50%; top: auto; transform: translateX(-50%);
+  width: var(--shell-w); max-width: none; min-height: 0; max-height: min(58vh, 520px); height: auto;
+  display: flex !important; flex-direction: column; justify-content: flex-end; align-items: stretch;
+  grid-template-columns: none; grid-template-rows: none; grid-template-areas: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; clip-path: none; filter: none;
+  background: none; box-shadow: none; overflow: visible; color: var(--ink);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  animation: textboxIn .45s ease both;
+}
+text-box[style*="display: none"] { display: none !important; }
+text-box::after { content: none !important; }
+text-box [data-content="side-image"] { display: none; }
+text-box [data-content="name"] {
+  order: 0; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; flex: 0 0 auto;
+  min-height: 40px; margin: 0; padding: 8px 23px 8px 20px; border: 0; border-radius: 13px 13px 0 0;
+  background: var(--dialogue-glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  color: var(--ink); grid-area: auto;
+}
+text-box [data-content="name"]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px rgb(var(--accent-rgb) / .6); flex: 0 0 auto; }
+text-box[data-speaking="narrator"] [data-content="name"], text-box[data-speaking="centered"] [data-content="name"] { display: none; }
+[data-screen="game"] text-box [data-ui="who"],
+text-box [data-ui="who"] {
+  display: inline-block; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; clip-path: none;
+  font: 600 17px/1.2 var(--sans); letter-spacing: .10em; text-transform: uppercase;
+  text-shadow: -1px -1px 0 var(--outline), 1px -1px 0 var(--outline), -1px 1px 0 var(--outline), 1px 1px 0 var(--outline), 0 2px 4px rgb(var(--shadow-rgb) / .70);
+}
+text-box [data-content="text"] {
+  order: 1; flex: 0 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; grid-area: auto;
+  padding: 26px 28px 20px; border: 0; border-radius: 0 16px 0 0;
+  background: var(--dialogue-glass); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--edge-active) transparent;
+}
+text-box[data-speaking="narrator"] [data-content="text"], text-box[data-speaking="centered"] [data-content="text"] { border-radius: 16px 16px 0 0; }
+[data-screen="game"] text-box [data-ui="say"],
+text-box [data-ui="say"], text-box p {
+  width: 100%; margin: 0; padding: 0; color: var(--ink);
+  font: 400 var(--text-size)/1.6 var(--dialogue-font); letter-spacing: .005em; overflow-wrap: anywhere;
+  text-shadow: -1px -1px 0 var(--outline), 1px -1px 0 var(--outline), -1px 1px 0 var(--outline), 1px 1px 0 var(--outline), 0 2px 4px rgb(var(--shadow-rgb) / .70);
+}
+@supports (-webkit-text-stroke: 1px black) and (paint-order: stroke fill) {
+  text-box [data-ui="say"], text-box p, text-box [data-ui="who"], .aurora-meta {
+    -webkit-text-stroke: 2px var(--outline); paint-order: stroke fill; text-shadow: 0 2px 4px rgb(var(--shadow-rgb) / .64);
+  }
+  .aurora-meta { -webkit-text-stroke: 1.5px var(--outline); }
+}
+text-box [data-ui="say"] .radio-line { font-family: var(--mono); font-size: .92em; }
+text-box[mode="nvl"] [data-content="text"] { border-radius: 16px 16px 0 0; }
+.aurora-meta {
+  order: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  margin: 0; padding: 0 28px 14px; background: var(--dialogue-glass);
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  font: 8px/1.5 var(--mono); letter-spacing: .8px; color: var(--muted); text-transform: uppercase;
+}
+.aurora-meta > span { display: flex; align-items: center; gap: 9px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aurora-meta > span:first-child::before { content: ""; width: 23px; height: 1px; background: var(--edge-active); flex: 0 0 auto; }
+text-box[data-speaking="narrator"] .aurora-meta { border-radius: 0; }
+/* Engine's "unread" marker in NVL mode is meaningless here. */
+text-box[mode="nvl"].unread::after { content: none; }
+
+/* Quick menu: icon rail centred over the footer glass. Labels are kept for
+   screen readers / tooltips only. Icons are injected by aurora-ui.js
+   (.aurora-ico); the vendored Font Awesome SVG stays as a fallback until
+   the decoration lands, then hides. */
+quick-menu, [data-screen="game"] quick-menu {
+  position: absolute; z-index: 61; top: auto; bottom: 0; left: 50%; right: auto; transform: translateX(-50%);
+  width: min(400px, 100%); height: calc(var(--rail-h) + env(safe-area-inset-bottom)); max-height: none;
+  display: flex; justify-content: center; align-items: center; gap: 0; padding: 0 0 env(safe-area-inset-bottom);
+  background: transparent !important; box-shadow: none; border: 0;
+}
+quick-menu.transparent { background: transparent !important; }
+quick-menu.transparent button { opacity: .55; }
+quick-menu.transparent button:hover { opacity: 1; }
+quick-menu button, quick-menu > button, quick-menu.transparent button {
+  position: relative; display: flex; align-items: center; justify-content: center; flex: 0 1 40px;
+  width: 40px; min-width: 32px; height: 32px; margin: 0; padding: 0; border: 0 !important; border-radius: 4px;
+  background: transparent; color: var(--ink); font-size: 0; line-height: 0; cursor: pointer; transition: background .2s, color .2s;
+}
+quick-menu button:hover, quick-menu button:focus, quick-menu button:focus-visible { background: var(--hover); color: var(--ink); border: 0 !important; outline-offset: -3px; }
+quick-menu button > [data-string] { display: none !important; }
+quick-menu button > .svg-inline--fa, quick-menu button > .fas, quick-menu button > .far { display: inline-block; width: 17px; height: 17px; font-size: 17px; opacity: .9; }
+quick-menu button.aurora-decorated > .svg-inline--fa, quick-menu button.aurora-decorated > .fas, quick-menu button.aurora-decorated > .far { display: none !important; }
+quick-menu button .aurora-ico { width: 17px; height: 17px; stroke-width: 1.5; }
+quick-menu button.is-on { color: var(--accent); background: var(--selected); }
+quick-menu button.is-on::after { content: ""; position: absolute; right: 5px; top: 5px; width: 3px; height: 3px; border-radius: 50%; background: var(--accent); }
+quick-menu.splash-screen { display: none; }
+
+/* Choices: a floating panel of glass rows, each with a slider-style handle. */
+[data-screen="game"] choice-container,
+choice-container {
+  position: fixed; z-index: 100; top: 50%; left: 50%; bottom: auto; transform: translate(-50%, -52%);
+  width: min(660px, calc(100% - 24px)); max-width: none; max-height: calc(var(--vh) - 24px - var(--rail-h));
+  margin: 0; padding: 26px 28px 28px; gap: 0; border-radius: 16px;
+  background: var(--panel-glass); box-shadow: var(--glass-shadow); color: var(--ink);
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--edge) transparent;
+  display: flex; flex-direction: column; justify-content: flex-start; flex-wrap: nowrap;
+  counter-reset: none;
+}
+choice-container::before { content: "Развилка"; display: block; margin: 0 0 6px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+choice-container::after { content: "Ваш ответ"; display: block; order: -1; margin: 0 0 22px; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; }
+choice-container::before { order: -2; }
+choice-container [data-content="wrapper"] { display: grid; gap: 10px; width: 100%; }
+[data-screen="game"] choice-container button,
+choice-container button {
+  position: relative; display: flex; align-items: center; gap: 14px; width: 100%; height: auto; min-height: 0;
+  margin: 0; padding: 13px 15px 13px 15px; border: 0; border-radius: 9px; clip-path: none; filter: none;
+  background: var(--glass); box-shadow: var(--glass-shadow); color: var(--ink);
+  font: 400 15px/1.5 var(--sans); letter-spacing: .01em; text-align: left; text-transform: none; cursor: pointer;
+  transition: background .2s;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+choice-container button::before {
+  content: ""; flex: 0 0 22px; width: 22px; height: 26px; border-radius: 0; position: static; transform: none;
+  background: var(--handle-face); box-shadow: var(--handle-bevel); counter-increment: none;
+  --handle-mark: rgb(var(--glint-rgb) / .20);
+}
+choice-container button::after { content: none; }
+[data-screen="game"] choice-container button:hover, [data-screen="game"] choice-container button:focus-visible,
+choice-container button:hover, choice-container button:focus-visible {
+  background: var(--glass-selected); border: 0; transform: none; box-shadow: var(--glass-shadow); filter: none; animation: none; outline-offset: -3px;
+}
+choice-container button:hover::before, choice-container button:focus-visible::before { --handle-mark: var(--accent); box-shadow: var(--handle-bevel), inset 0 0 8px rgb(var(--accent-rgb) / .22); }
+
+/* Build badge from game.js: keep it above the rail. */
+#seirin-build-badge { bottom: 12px !important; left: 12px !important; color: var(--muted) !important; opacity: .55 !important; font-family: var(--mono) !important; }
+html.aurora-playing #seirin-build-badge { display: none !important; }
+
+/* ── 6. Panels: system screens, main menu, modals, overlays ──────────────── */
+[data-screen]:not([data-screen="game"]) {
+  position: fixed !important; z-index: 90;
+  inset: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  width: min(660px, 100%); height: -moz-fit-content; height: fit-content;
+  max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  max-height: calc(var(--vh) - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto; padding: 28px; border-radius: 16px;
+  background: var(--panel-glass); background-color: transparent; color: var(--ink); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--edge) transparent; overflow-wrap: anywhere;
+  flex-direction: column; align-items: stretch; justify-content: flex-start; text-align: left;
+  animation: aurora-ui-in .22s ease-out;
+}
+[data-screen]:not([data-screen="game"]).active { display: flex; }
+[data-screen] > h2 {
+  order: -1; margin: 0 44px 25px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink);
+}
+[data-screen] > h2::before { display: block; margin-bottom: 7px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+settings-screen > h2::before { content: "Ночная смена · предпочтения"; }
+load-screen > h2::before { content: "Ночная смена · загрузка"; }
+save-screen > h2::before { content: "Ночная смена · сохранение"; }
+/* The engine's save screen has no heading: synthesise eyebrow + title. */
+save-screen::before { content: "Ночная смена · сохранение"; order: -3; display: block; margin: 0 44px 7px 0; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+save-screen::after { content: "Сохранить"; order: -2; display: block; margin: 0 44px 25px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); }
+help-screen > h2::before { content: "Ночная смена · справка"; }
+gallery-screen > h2::before, credits-screen > h2::before { content: "Ночная смена"; }
+[data-screen] h3 { margin: 0 0 12px; color: var(--accent); font: 500 10px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+[data-screen] p { color: var(--ink); }
+
+/* Back / close circle of every system screen — top-right of the panel. */
+[data-screen]:not([data-screen="game"]) [data-action="back"] {
+  position: absolute; top: 20px; right: 20px; left: auto; bottom: auto; margin: 0; z-index: 2;
+  width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 50%;
+  border: 0; clip-path: none; background: var(--glass); color: var(--ink); box-shadow: var(--glass-shadow);
+  display: flex; align-items: center; justify-content: center; transition: background .2s; transform: none;
+}
+[data-screen]:not([data-screen="game"]) [data-action="back"]:hover { background: var(--glass-hover); border: 0; box-shadow: var(--glass-shadow); transform: none; }
+[data-screen] [data-action="back"] > .svg-inline--fa { width: 16px; height: 16px; }
+[data-screen] [data-action="back"].aurora-decorated > .svg-inline--fa, [data-screen] [data-action="back"].aurora-decorated > .fas { display: none !important; }
+[data-screen] [data-action="back"] .aurora-ico { width: 17px; height: 17px; }
+
+/* Main menu: title block (aurora-ui.js) + engine buttons in one card. */
+main-screen[data-screen]:not([data-screen="game"]) {
+  background: none !important; animation: aurora-fade-in .4s ease-out;
+  width: min(375px, 100%); padding: 0; overflow: visible; box-shadow: none; background-color: transparent !important;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+main-screen::before, main-screen::after { content: none !important; }
+.aurora-title {
+  display: block; padding: 26px 28px 18px; border-radius: 16px 16px 0 0;
+  background: var(--panel-glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+}
+.aurora-title .eyebrow { color: var(--muted); }
+.aurora-title h1 { margin: 6px 0 0; font: 600 34px/1.1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); }
+.aurora-title p.small { margin: 8px 0 0; }
+main-menu, main-screen main-menu {
+  position: static !important; inset: auto !important; top: auto !important; bottom: auto !important;
+  width: 100% !important; height: auto !important; padding: 8px 20px 20px !important; margin: 0;
+  display: flex; flex-direction: column; align-items: stretch !important; justify-content: flex-start !important; align-self: auto !important; gap: 2px;
+  border-radius: 0 0 16px 16px; background: var(--panel-glass); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+}
+main-screen:not(.has-title) main-menu { border-radius: 16px; padding-top: 20px !important; }
+main-menu button, main-menu button:hover {
+  position: relative; display: flex !important; align-items: center; justify-content: flex-start; gap: 12px;
+  width: 100% !important; min-width: 0 !important; height: auto !important; min-height: 42px !important; margin: 0 !important; padding: 10px 14px !important;
+  border: 0 !important; border-radius: 9px !important; clip-path: none !important; filter: none !important; overflow: visible;
+  background: none !important; box-shadow: none !important; color: var(--ink) !important;
+  font: 500 13px/1.3 var(--sans) !important; letter-spacing: .04em !important; text-transform: uppercase !important; text-align: left; white-space: normal !important;
+  transition: background .2s !important; transform: none !important; animation: none !important;
+}
+main-menu button:hover, main-menu button:focus-visible { background: var(--hover) !important; outline-offset: -3px; }
+main-menu button::before, main-menu button::after { content: none !important; animation: none !important; }
+main-menu button:first-child { color: var(--accent) !important; background: var(--glass) !important; box-shadow: var(--glass-shadow) !important; margin-bottom: 8px !important; }
+main-menu button:first-child:hover { background: var(--glass-hover) !important; }
+main-menu button .aurora-ico { width: 17px; height: 17px; }
+main-menu button > span:empty, main-menu button > span.undefined { display: none; }
+
+/* Settings screen */
+settings-screen > .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin: 0; padding: 0; text-align: left; }
+settings-screen > .row > .row__column { width: auto; max-width: none; flex: none; padding: 0; margin: 0; }
+settings-screen [data-settings] { display: block; text-align: left; margin-bottom: 21px; }
+settings-screen [data-settings="audio"] { align-items: stretch; }
+settings-screen span[data-string], settings-screen label { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 6px; font-size: 12px; color: var(--ink); }
+settings-screen span[data-string="Video"], settings-screen input[data-target="video"] { display: none; }
+settings-screen input, settings-screen select { margin: 0 0 16px; }
+settings-screen select {
+  width: 100%; padding: 10px 12px; border: 0; border-radius: 9px; background: var(--glass); color: var(--ink); font: 12px var(--sans); box-shadow: var(--glass-shadow);
+}
+.aurora-note { margin: -6px 0 16px; color: var(--muted); font-size: 10px; line-height: 1.6; }
+.aurora-appearance {
+  grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; align-items: start;
+  margin: 0 0 4px; padding: 0 0 12px; border: 0; border-bottom: 1px solid var(--divider); min-width: 0;
+}
+.aurora-appearance > legend, .aurora-appearance > .aurora-theme-picker { grid-column: 1 / -1; }
+.aurora-appearance legend, .aurora-legend { display: block; margin: 0 0 18px; padding: 0; color: var(--accent); font: 500 10px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+.aurora-theme-picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(94px, 100%), 1fr)); gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+.aurora-theme-option {
+  position: relative; display: flex; align-items: center; justify-content: flex-start; gap: 8px; min-width: 0; margin: 0; padding: 9px 8px;
+  border: 0; border-radius: 9px; background: var(--glass); box-shadow: var(--glass-shadow); font-size: 10px; color: var(--ink); cursor: pointer; transition: background .2s;
+}
+.aurora-theme-option:hover { background: var(--glass-hover); }
+.aurora-theme-option.is-on { background: var(--glass-selected); color: var(--accent); }
+.aurora-theme-option input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.aurora-swatch { width: 18px; height: 18px; flex: 0 0 auto; border-radius: 50%; background: linear-gradient(135deg, rgb(var(--sw-accent)) 0 48%, rgb(var(--sw-surface)) 52%); box-shadow: inset 0 0 0 1px rgb(var(--glint-rgb) / .25); }
+.aurora-setting { display: block; margin: 0 0 16px; min-width: 0; }
+.aurora-setting-name { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 6px; font-size: 12px; color: var(--ink); }
+.aurora-setting-name output, .aurora-value { color: var(--accent); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.aurora-range-ends { display: flex; justify-content: space-between; gap: 12px; margin: 4px 2px 0; color: var(--muted); font: 8px/1.5 var(--mono); letter-spacing: .6px; text-transform: uppercase; }
+.aurora-preview { margin: 8px 0 0; padding: 10px 12px; border-radius: 9px; background: var(--dialogue-glass); font: 400 var(--text-size)/1.45 var(--dialogue-font); color: var(--ink); max-height: 4.4em; overflow: hidden; }
+.aurora-scale-row { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+.aurora-scale-row .button { min-height: 34px; padding: 6px 10px; font-size: 11px; }
+.aurora-scale-row .icon-button { width: 34px; height: 34px; min-height: 34px; }
+
+/* Range sliders — glass track with a transparent handle (engine's inputs
+   and ours share the look). */
+input[type="range"], .range {
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 40px; margin: 0; padding: 0; border: 0;
+  background: transparent; overflow: hidden; cursor: pointer; outline: none;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
+input[type="range"]::-moz-range-track { height: 16px; border-radius: 2px; background: var(--track); box-shadow: var(--track-shadow); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 25px; height: 29px; margin-top: -6.5px; padding: 0; border: 0; border-radius: 3px;
+  background: var(--handle-face); box-shadow: var(--handle-bevel), 0 0 0 1px rgb(var(--accent-rgb) / .25);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 25px; height: 29px; padding: 0; border: 0; border-radius: 3px;
+  background: var(--handle-face); box-shadow: var(--handle-bevel), 0 0 0 1px rgb(var(--accent-rgb) / .25);
+}
+input[type="range"]::-moz-range-progress { height: 0; border: 0; background: transparent; }
+input[type="range"]:hover, input[type="range"]:focus-visible { --handle-mark: rgb(var(--glint-rgb)); }
+input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 5px; }
+
+/* Save / load screens */
+save-screen .horizontal, save-screen .horizontal--center { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin: 0 0 20px; }
+save-screen input[type="text"], save-screen input[data-input="slotName"] {
+  flex: 1 1 auto; min-width: 0; width: auto; margin: 0; padding: 10px 14px; border: 0; border-radius: 9px;
+  background: var(--glass); color: var(--ink); font: 13px var(--sans); box-shadow: var(--glass-shadow); outline: none;
+}
+save-screen input[type="text"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+save-screen input::placeholder { color: var(--muted); }
+save-screen [data-action="save"] {
+  display: inline-flex; align-items: center; justify-content: center; width: auto; height: auto; min-height: 42px; margin: 0; padding: 10px 18px;
+  border: 0; border-radius: 9px; background: var(--glass-selected); color: var(--accent); box-shadow: var(--glass-shadow);
+  font: 500 12px/1.3 var(--sans); letter-spacing: .04em; text-transform: uppercase; cursor: pointer; transition: background .2s;
+}
+save-screen [data-action="save"]:hover { background: var(--glass-hover); }
+[data-ui="saveSlots"] { width: 100%; }
+[data-ui="slots"], [data-ui="slots"].row { display: block; width: 100%; padding: 0; margin: 0; }
+slot-container, slot-container.row {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; margin: 0; padding: 0; justify-content: stretch; text-align: left;
+}
+slot-container > p, slot-container [data-string="NoSavedGames"] {
+  grid-column: 1 / -1; display: grid; place-items: center; gap: 10px; min-height: 120px; margin: 0; padding: 24px; border-radius: 9px;
+  background: var(--glass); color: var(--muted); font-size: 11px; text-align: center;
+}
+save-slot, slot-container save-slot {
+  position: relative; display: flex; flex-direction: column; width: auto; min-width: 0; min-height: 150px; margin: 0; padding: 0; overflow: hidden;
+  border: 0; border-radius: 9px; background: var(--glass); box-shadow: var(--glass-shadow); color: var(--ink); font-size: 11px; cursor: pointer; transition: background .2s;
+}
+/* The engine stamps .row__column--desktop--3 etc. (percentage widths) on
+   each slot; inside our grid the cell is the width. */
+slot-container > save-slot[class], slot-container > save-slot.row__column { width: auto !important; max-width: none !important; flex: none; align-self: stretch; }
+save-slot:hover { background: var(--glass-hover); }
+save-slot [data-content="background"] { width: 100%; height: 91px; border: 0; background-color: rgb(var(--surface-rgb)); background-size: cover; background-position: center; }
+save-slot figcaption { padding: 10px; color: var(--ink); font-size: 11px; line-height: 1.4; text-align: left; }
+save-slot figcaption small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+save-slot .badge {
+  position: absolute; top: 8px; left: 8px; z-index: 1; padding: 3px 7px; border-radius: 5px;
+  background: rgb(var(--surface-rgb) / .78); color: var(--ink); font: 500 8px/1.4 var(--mono); letter-spacing: .8px; text-transform: uppercase; font-style: normal;
+  max-width: calc(100% - 48px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+save-slot [data-delete] {
+  position: absolute; top: 6px; right: 6px; left: auto; z-index: 1; width: 28px; height: 28px; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: rgb(var(--surface-rgb) / .78); color: var(--ink); font-size: 12px; cursor: pointer; transition: background .2s, color .2s;
+}
+save-slot [data-delete]:hover { background: rgb(var(--surface-rgb) / .95); color: #ff9c9c; }
+save-slot [data-delete] > .svg-inline--fa { width: 12px; height: 12px; }
+save-slot [data-delete].aurora-decorated > .svg-inline--fa, save-slot [data-delete].aurora-decorated > .fas { display: none !important; }
+save-slot [data-delete] .aurora-ico { width: 14px; height: 14px; }
+
+/* Help screen — engine markup is a nest of .row grids; flatten it into
+   "key rows": instruction on the left, glyph / shortcut chip on the right. */
+help-screen [data-content="help"], help-screen [data-content="help"].row { display: block; width: 100%; margin: 0; padding: 0; text-align: left; }
+help-screen [data-content="help"] > p { display: block; width: 100%; margin: 0 0 18px; padding: 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+help-screen [data-content="help"] > .row__column--tablet--6 { display: block; width: 100%; max-width: none; margin: 0 0 10px; padding: 0; }
+help-screen [data-content="help"] > .row__column--tablet--6 > .row__column--12:not(.row) { display: block; width: 100%; }
+help-screen h3 { margin: 16px 0 4px; }
+/* .row--spaced > .row__column adds a .75rem margin on every level — keep
+   the rows flush with the panel title like the mockup. */
+help-screen [data-content="help"] .row__column, help-screen [data-content="help"] > p, help-screen [data-content="help"] > .row__column--tablet--6 > .row__column--12.row { margin-left: 0 !important; margin-right: 0 !important; }
+help-screen [data-content="help"] > .row__column--tablet--6 > .row__column--12.row { margin-top: 0; margin-bottom: 0; }
+help-screen [data-content="help"] > .row__column--tablet--6 > .row__column--12.row {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; width: 100%;
+  padding: 11px 0; border-bottom: 1px solid var(--divider); font-size: 12px;
+}
+help-screen [data-content="symbols"] { order: 2; display: flex; align-items: center; justify-content: flex-end; gap: 6px; width: auto; flex: 0 0 auto; padding: 0; margin: 0; }
+help-screen [data-content="symbols"] > .svg-inline--fa, help-screen [data-content="symbols"] > .fas, help-screen [data-content="symbols"] > .far { width: 16px; height: 16px; color: var(--accent); }
+help-screen [data-content="symbols"] [data-content="shortcut"] {
+  width: auto; min-width: 26px; height: 24px; margin: 0; padding: 0 7px; border-radius: 5px;
+  background: var(--glass); color: var(--ink); font: 10px var(--mono); box-shadow: var(--glass-shadow); display: inline-flex; align-items: center; justify-content: center;
+}
+help-screen [data-content="instruction"] { order: 1; flex: 1 1 auto; width: auto; padding: 0; margin: 0; color: var(--ink); text-align: left; }
+
+/* Engine modals: dialog log + alert (quit / delete confirmation) */
+.modal { z-index: 120; background: rgb(var(--shadow-rgb) / .30); } /* above the choice panel (100) */
+.modal .modal__content, dialog-log .modal__content, alert-modal .modal__content {
+  width: min(660px, calc(100% - 24px)); max-height: calc(var(--vh) - 24px); height: auto; padding: 28px; border-radius: 16px;
+  background: var(--panel-glass); color: var(--ink); box-shadow: var(--glass-shadow); text-align: left; overflow: auto;
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  animation: aurora-ui-in .22s ease-out;
+}
+alert-modal .modal__content, message-modal .modal__content { width: min(375px, calc(100% - 24px)); }
+alert-modal .modal__content [data-content="message"], alert-modal p { margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: var(--ink); }
+alert-modal .modal__content [data-content="message"]::before { content: "Подтверждение"; display: block; margin-bottom: 7px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+alert-modal [data-content="actions"] { display: flex; flex-direction: column; gap: 6px; }
+alert-modal [data-content="actions"] button, dialog-log button[data-action="dialog-log"] {
+  display: inline-flex; align-items: center; justify-content: center; width: 100%; height: auto; min-height: 42px; margin: 0; padding: 10px 16px;
+  border: 0; border-radius: 9px; background: var(--glass); color: var(--ink); box-shadow: var(--glass-shadow);
+  font: 500 12px/1.3 var(--sans); letter-spacing: .04em; text-transform: uppercase; cursor: pointer; transition: background .2s;
+}
+alert-modal [data-content="actions"] button:first-child { color: var(--accent); background: var(--glass-selected); }
+alert-modal [data-content="actions"] button:hover, dialog-log button[data-action="dialog-log"]:hover { background: var(--glass-hover); }
+dialog-log .modal__content { display: flex; flex-direction: column; height: auto; max-height: calc(var(--vh) - 24px); max-width: 660px; }
+dialog-log .modal__content::before { content: "История реплик"; order: -2; display: block; margin: 0 44px 22px 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); }
+.aurora-log-hint { order: -1; margin: -12px 0 14px; color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+dialog-log .modal__content [data-content="log"] { flex: 1 1 auto; min-height: 0; height: auto; max-height: none; padding: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--edge) transparent; text-align: left; }
+dialog-log .modal__content [data-content="log"] [data-spoke] { padding: 15px 0; border-bottom: 1px solid var(--divider); font-size: 12px; }
+dialog-log .modal__content [data-content="log"] [data-spoke] > span { display: block; margin: 0 0 4px; font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; opacity: .9; }
+dialog-log .modal__content [data-content="log"] [data-spoke] > p { margin: 0; font: 400 16px/1.75 var(--dialogue-font); color: var(--ink); }
+dialog-log .modal__content [data-content="log"] [data-spoke][data-spoke="narrator"] > p { color: var(--muted); }
+dialog-log .modal__content [data-content="log"] [data-spoke][data-log-jump] { cursor: pointer; border-radius: 6px; transition: background .2s; }
+dialog-log .modal__content [data-content="log"] [data-spoke][data-log-jump]:hover, dialog-log .modal__content [data-content="log"] [data-spoke][data-log-jump]:focus-visible { background: var(--hover); outline-offset: -2px; }
+dialog-log .modal__content [data-content="log"] [data-content="placeholder"] { padding: 24px; color: var(--muted); font-size: 12px; text-align: center; }
+dialog-log button[data-action="dialog-log"] { width: auto; align-self: flex-end; margin-top: 18px; }
+
+/* Our overlays: in-game menu, archives codex, route graph (game.js). */
+.aurora-overlay, .archives-overlay, .graph-overlay {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 12px;
+  background: rgb(var(--shadow-rgb) / .30); -webkit-backdrop-filter: none; backdrop-filter: none;
+  animation: none;
+}
+.aurora-overlay { z-index: 150; }
+.aurora-overlay[hidden], .archives-overlay[hidden], .graph-overlay[hidden] { display: none; }
+.panel {
+  position: relative; width: min(660px, 100%); max-height: calc(var(--vh) - 24px); margin: 0; padding: 28px; border: 0; border-radius: 16px;
+  background: var(--panel-glass); color: var(--ink); box-shadow: var(--glass-shadow); overflow: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--edge) transparent; overflow-wrap: anywhere; text-align: left;
+  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  animation: aurora-ui-in .22s ease-out;
+}
+.panel::before, .panel::after { content: none; }
+.panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 0 0 25px; padding: 0; border: 0; }
+.panel-header > div { min-width: 0; }
+.panel h2 { margin: 7px 0 0; font: 600 26px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); text-shadow: none; }
+.panel h2 > span { display: inline; }
+.panel-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--divider); }
+.menu-panel { width: min(375px, 100%); }
+.menu-list { display: grid; gap: 2px; }
+.menu-list > .button { justify-content: flex-start; background: none; box-shadow: none; text-transform: uppercase; letter-spacing: .04em; font-weight: 500; font-size: 13px; }
+.menu-list > .button:hover, .menu-list > .button:focus-visible { background: var(--hover); }
+.menu-list > .primary { background: var(--glass); box-shadow: var(--glass-shadow); margin-bottom: 8px; }
+.menu-list > .primary:hover { background: var(--glass-hover); }
+.menu-divider { height: 1px; margin: 8px 0; background: var(--divider); }
+
+.archives-panel, .graph-panel { max-width: none; border: 0; box-shadow: var(--glass-shadow); font-family: var(--sans); }
+.graph-panel { width: min(1100px, 100%); }
+.archives-head, .graph-head { background: none; border: 0; }
+.archives-head > span, .graph-head > span { color: inherit; font: inherit; letter-spacing: inherit; }
+.archives-body, .graph-body { padding: 0; max-height: none; overflow: visible; }
+.archives-section { padding: 15px 0; border: 0; border-bottom: 1px solid var(--divider); background: none; border-radius: 0; margin: 0; }
+.archives-section:last-child { border-bottom: 0; }
+.archives-section h3 { margin: 0 0 8px; color: var(--accent); font: 500 10px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; }
+.archives-route { font: 600 20px/1.25 var(--sans); letter-spacing: .025em; text-transform: uppercase; color: var(--ink); text-shadow: none; }
+.archives-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid rgb(var(--accent-rgb) / .08); font-size: 12px; color: var(--ink); }
+.archives-row b { color: var(--accent); font-family: var(--mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+.archives-row.met b { color: var(--accent); }
+.archives-row.unknown { color: var(--muted); }
+.t-cyan { color: var(--accent); }
+.t-red { color: #ff9c9c; }
+.t-violet { color: rgb(207 181 241); }
+.graph-stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.graph-chip { padding: 5px 9px; border-radius: 6px; background: var(--glass); color: var(--ink); font: 10px/1.4 var(--mono); border: 0; box-shadow: var(--glass-shadow); }
+.graph-chip.dim { color: var(--muted); }
+.graph-hint { color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 16px; }
+.graph-col { background: none; border: 0; }
+.graph-node { border: 0; border-radius: 9px; background: var(--glass); box-shadow: var(--glass-shadow); color: var(--ink); transition: background .2s; }
+.graph-node:hover { background: var(--glass-hover); border: 0; box-shadow: var(--glass-shadow); }
+.graph-node.current { background: var(--glass-selected); box-shadow: var(--glass-shadow), inset 0 0 0 1px rgb(var(--accent-rgb) / .5); }
+.graph-node.ending { box-shadow: var(--glass-shadow), inset 0 0 0 1px rgb(var(--accent-rgb) / .25); }
+.graph-node-title { color: var(--ink); font-family: var(--sans); font-weight: 600; }
+.graph-node-id { color: var(--muted); font-family: var(--mono); }
+.graph-node-banner, .graph-node-here { color: var(--accent); font-family: var(--mono); }
+.graph-edge-text, .graph-edge-stat { color: var(--muted); font-family: var(--mono); }
+.graph-target, .graph-jump { color: var(--accent); }
+.graph-target:hover, .graph-jump:hover { color: var(--ink); }
+
+/* ── 7. Sprites & scene polish ───────────────────────────────────────────── */
+game-screen [data-character] { transition: filter .4s; }
+game-screen img { -webkit-user-drag: none; user-select: none; }
+
+/* ── 8. Motion ───────────────────────────────────────────────────────────── */
+@keyframes aurora-ui-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes aurora-clock-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes aurora-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+/* Fixed-position elements cannot animate transform without breaking their
+   centring; give them opacity-only entrances. */
+.shell-footer, [data-screen]:not([data-screen="game"]), choice-container, text-box { animation-name: aurora-fade-in; }
+[data-screen="game"] text-box { animation: aurora-fade-in .35s ease both; }
+@keyframes aurora-fade-in { from { opacity: 0; } to { opacity: 1; } }
+/* Pause decorative motion while a heavy overlay is open (aurora-ui.js sets
+   html.aurora-modal-open when the graph / archives / log is up). */
+html.aurora-modal-open .hud-clock-colon, html.aurora-modal-open game-screen [data-character] { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .shell-header, .shell-footer, [data-screen], .panel, .modal .modal__content, choice-container, text-box, main-screen,
+  .hud-clock-colon, .resource.alert-pulse, [data-screen="game"] text-box, [data-screen="game"] choice-container button { animation: none !important; transition: none !important; }
+}
+
+/* ── 9. Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  :root { --shell-x: max(24px, env(safe-area-inset-left)); }
+  .shell-footer { display: flex; justify-content: center; }
+  .footer-status { display: none; }
+}
+@media (max-width: 650px) {
+  :root { --shell-x: max(12px, env(safe-area-inset-left)); --text-size-base: 19px; }
+  .shell-header { gap: 8px 10px; }
+  .header-main { column-gap: 10px; }
+  .hud { gap: clamp(6px, 2vw, 10px); }
+  .clock { padding-left: 10px; }
+  .clock time:first-child { font-size: 22px; }
+  .clock time:last-child { font-size: 9px; letter-spacing: .6px; }
+  .resources { gap: clamp(6px, 2.5vw, 12px); }
+  .header-actions { gap: 5px; }
+  .header-actions .icon-button { width: 34px; height: 34px; min-height: 34px; }
+  .location { max-width: 42vw; }
+  text-box [data-content="name"] { min-height: 35px; padding: 7px 17px; }
+  text-box [data-ui="who"] { font-size: 16px; }
+  text-box [data-content="text"] { padding: 18px 18px 15px; }
+  text-box [data-ui="say"] { line-height: 1.55; }
+  .aurora-meta { padding: 0 18px 10px; font-size: 7px; letter-spacing: .7px; }
+  .aurora-meta > span:last-child { display: none; }
+  quick-menu button { height: 36px; }
+  [data-screen]:not([data-screen="game"]), .panel, .modal .modal__content, choice-container { padding: 21px; }
+  [data-screen] > h2, .panel h2, dialog-log .modal__content::before, choice-container::after { font-size: 23px; }
+  settings-screen > .row { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .aurora-appearance { grid-template-columns: minmax(0, 1fr); }
+  slot-container { grid-template-columns: repeat(auto-fit, minmax(min(125px, 100%), 1fr)); }
+  .panel-footer { align-items: flex-start; }
+  main-screen[data-screen]:not([data-screen="game"]) { width: min(375px, 100%); }
+}
+@media (max-height: 500px) {
+  :root { --text-size-base: 17px; }
+  .aurora-meta { display: none; }
+  text-box [data-content="name"] { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
+  text-box [data-content="text"] { padding: 13px 18px; }
+  text-box { max-height: 62vh; }
+  quick-menu button { height: 32px; }
+  .aurora-title { padding: 14px 20px 10px; }
+  .aurora-title h1 { font-size: 24px; }
+}

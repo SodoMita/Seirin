@@ -219,6 +219,19 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         function fmtClockDate (mins) {
             return fmtWeekday(mins) + ' ' + fmtDateShort(mins);
         }
+        /* Clock date row (aurora shell): "15.07.2026" — digits only, so the
+         * 7-segment font renders every glyph; the weekday goes to the tooltip. */
+        function fmtClockDateDigits (mins) {
+            var m = (typeof mins === 'number' && isFinite(mins)) ? mins : 0;
+            var d = new Date(Date.UTC(2026, 6, 15 + Math.floor(m / 1440)));
+            try {
+                return d.toLocaleString(playerLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
+            } catch (e) {
+                var day = d.getUTCDate();
+                var mon = d.getUTCMonth() + 1;
+                return (day < 10 ? '0' : '') + day + '.' + (mon < 10 ? '0' : '') + mon + '.' + d.getUTCFullYear();
+            }
+        }
         function fmtDateTime (mins) {
             return fmtDate(mins) + ' · ' + fmtHHMM(mins);
         }
@@ -686,42 +699,58 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
         }
 
         var lastAlertLevel = null;
+        /* HUD writer. The aurora shell (index.html) gives every HUD element a
+         * [data-hud-text] slot so only the text changes and the inline SVG
+         * icons survive; the legacy branch keeps older markup working by
+         * rebuilding the <i class="fas …"><span> pair. */
+        function setHudText (id, text, legacyHtml) {
+            var el = document.getElementById(id);
+            if (!el) { return null; }
+            var slot = el.querySelector ? el.querySelector('[data-hud-text]') : null;
+            if (!slot && el.hasAttribute && el.hasAttribute('data-hud-text')) { slot = el; }
+            if (slot) {
+                if (slot.textContent !== String(text)) { slot.textContent = String(text); }
+            } else {
+                el.innerHTML = legacyHtml;
+            }
+            return el;
+        }
         function updateHUD () {
             var p = engine.storage('player') || {};
             var set = function (id, icon, text) {
-                var el = document.getElementById(id);
-                if (el) { el.innerHTML = '<i class="fas ' + icon + '"></i><span>' + text + '</span>'; }
+                setHudText(id, text, '<i class="fas ' + icon + '"></i><span>' + text + '</span>');
             };
             set('hud-player-name', 'fa-user-secret', p.name || 'Рэн');
             set('hud-location', 'fa-map-marker-alt', p.location || 'Тэцуба: Улица');
             set('hud-route', 'fa-terminal', routeLabel(p.route || 'none'));
-            set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');            /* Resource strip: date + time as a 7-segment clock (no icons —
-             * written via textContent so no <i> badge markup is injected),
-             * then money and item count as badges. */
+            set('hud-alert-level', 'fa-shield-alt', String(p.akatomi_alert || 0) + '%');
+            /* Clock: dd.mm.yyyy on the 7-segment date row (weekday in the
+             * tooltip — DSEG7 has no Cyrillic), HH:MM with a blinking colon
+             * (only the colon blinks — see .hud-clock-colon). */
             var dateEl = document.getElementById('hud-date');
-            if (dateEl) { dateEl.textContent = String(fmtClockDate(p.time)).toUpperCase(); }
+            if (dateEl) {
+                dateEl.textContent = fmtClockDateDigits(p.time);
+                dateEl.setAttribute('title', fmtWeekday(p.time) + ', ' + fmtDate(p.time));
+            }
             var timeEl = document.getElementById('hud-time');
             if (timeEl) {
-                /* Only the colon blinks (see .hud-clock-colon) — the digits
-                 * must stay steady, so the colon gets its own span. */
                 timeEl.innerHTML = fmtHHMM(p.time).replace(':', '<span class="hud-clock-colon">:</span>');
             }
-            var moneyEl = document.getElementById('hud-money');
-            if (moneyEl) {
-                moneyEl.innerHTML = '<img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>' + (p.money || 0) + '</span>';
-            }
+            setHudText('hud-money', p.money || 0,
+                '<img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>' + (p.money || 0) + '</span>');
             var itemCount = 0;
             var it = p.items || {};
             for (var ik in it) { if (Object.prototype.hasOwnProperty.call(it, ik)) { itemCount += it[ik]; } }
-            var itemsEl = document.getElementById('hud-items');
-            if (itemsEl) {
-                itemsEl.innerHTML = '<img src="assets/icons/box-open.svg?v=20260804r1" class="hud-svg" alt=""><span>' + itemCount + '</span>';
-            }
+            setHudText('hud-items', itemCount,
+                '<img src="assets/icons/box-open.svg?v=20260804r1" class="hud-svg" alt=""><span>' + itemCount + '</span>');
             var alertEl = document.getElementById('hud-alert-level');
             var level = p.akatomi_alert || 0;
-            if (alertEl && lastAlertLevel !== null && level > lastAlertLevel && alertEl.classList) {
-                alertEl.classList.add('alert-pulse');
-                setTimeout(function () { alertEl.classList.remove('alert-pulse'); }, 700);
+            if (alertEl && alertEl.classList) {
+                alertEl.classList.toggle('alert-high', level >= 50);
+                if (lastAlertLevel !== null && level > lastAlertLevel) {
+                    alertEl.classList.add('alert-pulse');
+                    setTimeout(function () { alertEl.classList.remove('alert-pulse'); }, 700);
+                }
             }
             lastAlertLevel = level;
             syncArchives();
@@ -782,6 +811,16 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 SaveInSlot: 'Сохранить в слот', LoadSlots: 'Сохранения',
                 NoSavedGames: 'Нет сохранений', SaveGame: 'Сохранить игру',
                 LoadAutoSaveSlots: 'Автосохранения', Cancel: 'Отмена', Confirm: 'Подтвердить',
+                /* help screen */
+                AdvanceHelp: 'Чтобы продолжить, щёлкните или коснитесь экрана в любом месте либо нажмите пробел.',
+                QuickMenu: 'Быстрое меню', KeyboardShortcuts: 'Горячие клавиши', QuickButtons: 'Кнопки быстрого меню',
+                BackButton: 'Вернуться на шаг назад', HideButton: 'Скрыть текстовое окно',
+                DialogLogButton: 'Показать журнал реплик', AutoPlayButton: 'Включить автовоспроизведение',
+                SkipButton: 'Включить перемотку', SaveButton: 'Открыть экран сохранения',
+                SettingsButton: 'Открыть настройки', QuitButton: 'Выйти в главное меню',
+                NoDialogsAvailable: 'Реплик пока нет. Они появятся здесь по ходу истории.',
+                SlotDeletion: 'Удалить это сохранение?', SlotOverwrite: 'Перезаписать это сохранение?',
+                Loading: 'Загрузка', LoadingMessage: 'Подождите, файлы загружаются…',
                 /* dialogs */
                 Delete: 'Удалить', OK: 'ОК',
                 Confirm: 'Выйти из игры? Несохранённый прогресс будет потерян.',
