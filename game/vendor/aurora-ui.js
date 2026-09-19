@@ -41,8 +41,8 @@
         { id: 'amber',  label: 'Янтарь', accent: '237 204 145', surface: '43 34 23' },
         { id: 'gray',   label: 'Графит', accent: '216 216 216', surface: '30 30 30' }
     ];
-    var GLASS = { min: 0, max: 100, def: 95 };          /* percent transparency */
-    var TEXT = { min: 70, max: 160, def: 100, step: 5 }; /* percent of base size */
+    var GLASS = { min: 0, max: 100, def: 95 };          /* percent transparency — mockup uses 0..100 */
+    var TEXT = { min: 10, max: 300, def: 100, step: 1 }; /* percent of base size — mockup: 10..300, continuous via view-timeline */
     var SCALE = { min: 35, max: 230, def: 100, step: 5 };/* percent of 16px      */
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var XLINK_NS = 'http://www.w3.org/1999/xlink';
@@ -139,22 +139,100 @@
         for (i = 0; i < THEMES.length; i++) { if (THEMES[i].id === id) { return THEMES[i]; } }
         return THEMES[0];
     }
+    /* Mockup uses pure CSS: :root:has(#theme-*:checked) and animated
+       --ui-transparency / --reading-scale via view-timeline on the range
+       thumb. JS only persists the choice and flips the checked state;
+       it never sets --ui-transparency / --reading-scale directly. */
+    function ensureMockupState () {
+        var holder = doc.getElementById('mockup-state');
+        if (holder) { return holder; }
+        holder = el('form', null, null);
+        holder.id = 'mockup-state';
+        holder.setAttribute('autocomplete', 'off');
+        holder.style.position = 'fixed';
+        holder.style.left = '-9999px';
+        holder.style.top = '-9999px';
+        holder.style.width = '0';
+        holder.style.height = '0';
+        holder.style.overflow = 'hidden';
+        holder.style.pointerEvents = 'none';
+        holder.setAttribute('aria-hidden', 'true');
+        var i, t, html = '';
+        for (i = 0; i < THEMES.length; i++) {
+            t = THEMES[i];
+            html += '<input type="radio" name="theme" id="theme-' + t.id + '" value="' + t.id + '"' + (t.id === 'aurora' ? ' checked' : '') + '>';
+        }
+        html += '<input type="radio" name="transparency-preset" id="transparency-opaque">';
+        html += '<input type="radio" name="transparency-preset" id="transparency-balanced">';
+        html += '<input type="radio" name="transparency-preset" id="transparency-clear" checked>';
+        html += '<input type="radio" name="text-size-preset" id="text-smallest">';
+        html += '<input type="radio" name="text-size-preset" id="text-standard" checked>';
+        html += '<input type="radio" name="text-size-preset" id="text-large">';
+        html += '<input type="radio" name="text-size-preset" id="text-largest">';
+        holder.innerHTML = html;
+        if (doc.body.firstChild) { doc.body.insertBefore(holder, doc.body.firstChild); }
+        else { doc.body.appendChild(holder); }
+        return holder;
+    }
+    function setChecked (id, on) {
+        var node = doc.getElementById(id);
+        if (node && node.checked !== on) { node.checked = on; }
+    }
+    function pickGlassPreset (pct) {
+        if (pct <= 25) { return 'transparency-opaque'; }
+        if (pct <= 72) { return 'transparency-balanced'; }
+        return 'transparency-clear';
+    }
+    function pickTextPreset (pct) {
+        if (pct <= 55) { return 'text-smallest'; }
+        if (pct <= 150) { return 'text-standard'; }
+        if (pct <= 250) { return 'text-large'; }
+        return 'text-largest';
+    }
     function applyTheme (id, persist) {
         prefs.theme = themeById(id).id;
+        /* data-attribute kept as JS fallback for immediate paint before the
+           hidden radios exist; CSS :has takes over once they are in the DOM. */
         if (prefs.theme === 'aurora') { root.removeAttribute('data-aurora-theme'); }
         else { root.setAttribute('data-aurora-theme', prefs.theme); }
+        ensureMockupState();
+        var i;
+        for (i = 0; i < THEMES.length; i++) {
+            setChecked('theme-' + THEMES[i].id, THEMES[i].id === prefs.theme);
+        }
         if (persist) { store(KEYS.theme, prefs.theme); }
         syncAppearanceControls();
     }
     function applyGlass (pct, persist) {
         prefs.glass = clamp(Math.round(num(pct, GLASS.def)), GLASS.min, GLASS.max);
-        root.style.setProperty('--ui-transparency', String(prefs.glass / 100));
+        ensureMockupState();
+        var holder = doc.getElementById('mockup-state');
+        var range = holder && holder.querySelector('#transparency');
+        if (range && String(range.value) !== String(prefs.glass)) { range.value = String(prefs.glass); }
+        /* Fallback radios for non-view-timeline browsers */
+        var preset = pickGlassPreset(prefs.glass);
+        setChecked('transparency-opaque', preset === 'transparency-opaque');
+        setChecked('transparency-balanced', preset === 'transparency-balanced');
+        setChecked('transparency-clear', preset === 'transparency-clear');
+        /* Also sync the visible settings panel if it exists */
+        var panelRange = doc.querySelector('settings-screen #transparency, .aurora-appearance #transparency');
+        if (panelRange && String(panelRange.value) !== String(prefs.glass)) { panelRange.value = String(prefs.glass); }
         if (persist) { store(KEYS.glass, prefs.glass); }
         syncAppearanceControls();
     }
     function applyText (pct, persist) {
         prefs.text = clamp(Math.round(num(pct, TEXT.def)), TEXT.min, TEXT.max);
-        root.style.setProperty('--reading-scale', String(prefs.text / 100));
+        ensureMockupState();
+        var holder = doc.getElementById('mockup-state');
+        var range = holder && holder.querySelector('#text-size');
+        if (range && String(range.value) !== String(prefs.text)) { range.value = String(prefs.text); }
+        var preset = pickTextPreset(prefs.text);
+        setChecked('text-smallest', preset === 'text-smallest');
+        setChecked('text-standard', preset === 'text-standard');
+        setChecked('text-large', preset === 'text-large');
+        setChecked('text-largest', preset === 'text-largest');
+        var panelRange = doc.querySelector('settings-screen #text-size, .aurora-appearance #text-size');
+        if (panelRange && String(panelRange.value) !== String(prefs.text)) { panelRange.value = String(prefs.text); }
         if (persist) { store(KEYS.text, prefs.text); }
         syncAppearanceControls();
     }
@@ -167,9 +245,16 @@
         syncAppearanceControls();
     }
     function restorePrefs () {
+        ensureMockupState();
         applyTheme(store(KEYS.theme) || 'aurora', false);
-        applyGlass(num(store(KEYS.glass), GLASS.def), false);
-        applyText(num(store(KEYS.text), TEXT.def), false);
+        var rawGlass = num(store(KEYS.glass), GLASS.def);
+        /* Migrate legacy 70..160 text values into 10..300: map 100 stays 100 */
+        var rawText = num(store(KEYS.text), TEXT.def);
+        if (rawText >= 70 && rawText <= 160 && rawText !== 10 && rawText !== 200 && rawText !== 300) {
+            /* keep as is; 70..160 is within 10..300 */
+        }
+        applyGlass(rawGlass, false);
+        applyText(rawText, false);
         /* Legacy key stores a factor (1 == 100%); accept both spellings. */
         var rawScale = num(store(KEYS.scale), 1);
         applyScale(rawScale <= 5 ? rawScale * 100 : rawScale, false);
@@ -186,30 +271,29 @@
 
         var box = el('fieldset', 'aurora-appearance');
         box.setAttribute('data-settings', 'appearance');
+        /* Faithful to mockup: ids #theme-*, #transparency, #text-size, .transparency-range/.text-size-range,
+           .transparency-value/.text-size-value counters, .radio/.range + border-image glow, fallback radios. */
         var themes = '';
         var i, t;
         for (i = 0; i < THEMES.length; i++) {
             t = THEMES[i];
-            themes += '<label class="aurora-theme-option" data-theme="' + t.id + '">' +
-                '<input type="radio" name="aurora-theme" value="' + t.id + '" aria-label="' + t.label + '">' +
+            themes += '<label class="aurora-theme-option theme-option" data-theme="' + t.id + '">' +
+                '<input class="radio" type="radio" name="theme" id="theme-' + t.id + '" value="' + t.id + '" aria-label="' + t.label + '"' + (t.id === prefs.theme ? ' checked' : '') + '>' +
                 '<span class="aurora-swatch" style="--sw-accent:' + t.accent + ';--sw-surface:' + t.surface + '"></span>' +
                 '<span>' + t.label + '</span></label>';
         }
         box.innerHTML =
             '<legend>Оформление</legend>' +
-            '<div class="aurora-theme-picker" role="radiogroup" aria-label="Палитра">' + themes + '</div>' +
-            '<label class="aurora-setting">' +
-                '<span class="aurora-setting-name"><span>Прозрачность стекла</span><output data-out="glass">' + prefs.glass + '%</output></span>' +
-                '<input type="range" data-pref="glass" min="' + GLASS.min + '" max="' + GLASS.max + '" step="1" value="' + prefs.glass + '" aria-label="Прозрачность стекла">' +
-                '<span class="aurora-range-ends"><span>Плотное</span><span>Прозрачное</span></span>' +
-            '</label>' +
-            '<label class="aurora-setting">' +
-                '<span class="aurora-setting-name"><span>Размер текста реплик</span><output data-out="text">' + prefs.text + '%</output></span>' +
-                '<input type="range" data-pref="text" min="' + TEXT.min + '" max="' + TEXT.max + '" step="' + TEXT.step + '" value="' + prefs.text + '" aria-label="Размер текста реплик">' +
-                '<span class="aurora-range-ends"><span>Мельче</span><span>Крупнее</span></span>' +
-                '<p class="aurora-preview">Дворник подметает свой метр асфальта у выхода на улочку. Как вчера.</p>' +
-            '</label>' +
-            '<div class="aurora-setting" data-settings="scale">' +
+            '<div class="aurora-theme-picker theme-picker" role="radiogroup" aria-label="Палитра">' + themes + '</div>' +
+            '<label class="transparency-range aurora-setting" style="margin-top:20px"><span class="setting-name aurora-setting-name"><span>Прозрачность стекла</span><span class="transparency-value" aria-hidden="true"></span></span><span class="range-scale"><input class="range" id="transparency" type="range" min="' + GLASS.min + '" max="' + GLASS.max + '" step="1" value="' + prefs.glass + '" aria-label="Прозрачность стекла" aria-describedby="appearance-help"></span><span class="range-ends" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></span><span class="scale-captions" aria-hidden="true"><span>Плотное</span><span>Прозрачное</span></span></label>' +
+            '<div class="transparency-fallback"><p class="setting-name" id="transparency-label">Прозрачность стекла (резерв)</p><div class="options" role="group" aria-labelledby="transparency-label"><label class="option"><input class="radio" type="radio" name="transparency-preset" id="transparency-opaque">Плотное</label><label class="option"><input class="radio" type="radio" name="transparency-preset" id="transparency-balanced">50%</label><label class="option"><input class="radio" type="radio" name="transparency-preset" id="transparency-clear" checked>Прозрачное</label></div></div>' +
+            '<p class="small appearance-note" id="appearance-help">Темы меняют весь интерфейс, не сцену. Прозрачность — только стекло, не текст. Размытие не используется — как в макете.</p>' +
+            '<div class="setting" style="margin-top:18px">' +
+                '<label class="text-size-range aurora-setting"><span class="setting-name aurora-setting-name"><span>Размер текста реплик</span><span class="text-size-value" aria-hidden="true"></span></span><span class="range-scale"><input class="range" id="text-size" type="range" min="' + TEXT.min + '" max="' + TEXT.max + '" step="' + TEXT.step + '" value="' + prefs.text + '" aria-label="Размер текста реплик" aria-describedby="text-size-help"></span><span class="range-ends" aria-hidden="true"><span>10</span><span>82.5</span><span>155</span><span>227.5</span><span>300</span></span><span class="scale-captions" aria-hidden="true"><span>Мельче</span><span>Крупнее</span></span></label>' +
+                '<div class="text-size-fallback"><p class="setting-name" id="size-label">Размер текста (резерв)</p><div class="options" role="group" aria-labelledby="size-label"><label class="option"><input class="radio" type="radio" name="text-size-preset" id="text-smallest">10%</label><label class="option"><input class="radio" type="radio" name="text-size-preset" id="text-standard" checked>100%</label><label class="option"><input class="radio" type="radio" name="text-size-preset" id="text-large">200%</label><label class="option"><input class="radio" type="radio" name="text-size-preset" id="text-largest">300%</label></div></div>' +
+                '<p class="text-size-preview aurora-preview">Дворник подметает свой метр асфальта у выхода на улочку. Как вчера.</p><p class="small" id="text-size-help">Превью реплики. Интерфейс и HUD не меняются.</p>' +
+            '</div>' +
+            '<div class="aurora-setting" data-settings="scale" style="margin-top:16px">' +
                 '<span class="aurora-setting-name"><span>Масштаб интерфейса</span><output data-out="scale">' + prefs.scale + '%</output></span>' +
                 '<div class="aurora-scale-row">' +
                     '<button type="button" class="button icon-button" data-scale-step="-' + SCALE.step + '" aria-label="Уменьшить"><svg class="icon" aria-hidden="true"><use href="#i-minus"></use></svg></button>' +
@@ -223,12 +307,31 @@
 
         box.addEventListener('change', function (evt) {
             var target = evt.target;
-            if (target && target.name === 'aurora-theme') { applyTheme(target.value, true); }
+            if (!target) { return; }
+            if (target.name === 'theme' || target.name === 'aurora-theme') { applyTheme(target.value, true); }
+            else if (target.name === 'transparency-preset') {
+                var v = 95;
+                if (target.id === 'transparency-opaque') { v = 0; }
+                else if (target.id === 'transparency-balanced') { v = 50; }
+                else if (target.id === 'transparency-clear') { v = 95; }
+                applyGlass(v, true);
+            } else if (target.name === 'text-size-preset') {
+                var tv = 100;
+                if (target.id === 'text-smallest') { tv = 10; }
+                else if (target.id === 'text-standard') { tv = 100; }
+                else if (target.id === 'text-large') { tv = 200; }
+                else if (target.id === 'text-largest') { tv = 300; }
+                applyText(tv, true);
+            }
         }, false);
         box.addEventListener('input', function (evt) {
             var target = evt.target;
-            var pref = target && target.getAttribute && target.getAttribute('data-pref');
-            if (pref === 'glass') { applyGlass(target.value, true); }
+            if (!target || !target.getAttribute) { return; }
+            var id = target.id;
+            var pref = target.getAttribute('data-pref');
+            if (id === 'transparency') { applyGlass(target.value, true); }
+            else if (id === 'text-size') { applyText(target.value, true); }
+            else if (pref === 'glass') { applyGlass(target.value, true); }
             else if (pref === 'text') { applyText(target.value, true); }
             else if (pref === 'scale') { applyScale(target.value, true); }
         }, false);
@@ -251,15 +354,29 @@
     function syncAppearanceControls () {
         var box = doc.querySelector('.aurora-appearance');
         if (!box) { return; }
-        var opts = box.querySelectorAll('.aurora-theme-option');
+        var opts = box.querySelectorAll('.aurora-theme-option, .theme-option');
         var i, on;
         for (i = 0; i < opts.length; i++) {
             on = opts[i].getAttribute('data-theme') === prefs.theme;
             toggleClass(opts[i], 'is-on', on);
             var input = opts[i].querySelector('input');
             if (input && input.checked !== on) { input.checked = on; }
+            var hid = doc.getElementById('theme-' + opts[i].getAttribute('data-theme'));
+            if (hid && hid !== input && hid.checked !== on) { hid.checked = on; }
         }
-        var map = { glass: prefs.glass, text: prefs.text, scale: prefs.scale };
+        var glassPreset = pickGlassPreset(prefs.glass);
+        var textPreset = pickTextPreset(prefs.text);
+        var ids = ['transparency-opaque', 'transparency-balanced', 'transparency-clear',
+                   'text-smallest', 'text-standard', 'text-large', 'text-largest'];
+        for (i = 0; i < ids.length; i++) {
+            var should = (ids[i] === glassPreset) || (ids[i] === textPreset);
+            var all = doc.querySelectorAll('#' + ids[i]);
+            var j;
+            for (j = 0; j < all.length; j++) {
+                if (all[j].checked !== should) { all[j].checked = should; }
+            }
+        }
+        var map = { scale: prefs.scale };
         var key;
         for (key in map) {
             if (!Object.prototype.hasOwnProperty.call(map, key)) { continue; }
@@ -268,6 +385,15 @@
             var out = box.querySelector('output[data-out="' + key + '"]');
             if (out) { out.textContent = map[key] + '%'; }
         }
+        var tr = box.querySelector('#transparency');
+        if (tr && String(tr.value) !== String(prefs.glass)) { tr.value = String(prefs.glass); }
+        var ts = box.querySelector('#text-size');
+        if (ts && String(ts.value) !== String(prefs.text)) { ts.value = String(prefs.text); }
+        var holder = doc.getElementById('mockup-state');
+        var hTrans = holder && holder.querySelector('#transparency');
+        if (hTrans && String(hTrans.value) !== String(prefs.glass)) { hTrans.value = String(prefs.glass); }
+        var hText = holder && holder.querySelector('#text-size');
+        if (hText && String(hText.value) !== String(prefs.text)) { hText.value = String(prefs.text); }
     }
 
     /* ------------------------------------------------------------------ *
