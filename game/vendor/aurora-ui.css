@@ -254,22 +254,12 @@ text-box [data-ui="say"], text-box p {
   text-shadow: -1px -1px 0 var(--outline), 1px -1px 0 var(--outline), -1px 1px 0 var(--outline), 1px 1px 0 var(--outline), 0 2px 4px rgb(var(--shadow-rgb) / .70);
 }
 @supports (-webkit-text-stroke: 1px black) and (paint-order: stroke fill) {
-  text-box [data-ui="say"], text-box p, text-box [data-ui="who"], .aurora-meta {
+  text-box [data-ui="say"], text-box p, text-box [data-ui="who"] {
     -webkit-text-stroke: 2px var(--outline); paint-order: stroke fill; text-shadow: 0 2px 4px rgb(var(--shadow-rgb) / .64);
   }
-  .aurora-meta { -webkit-text-stroke: 1.5px var(--outline); }
 }
 text-box [data-ui="say"] .radio-line { font-family: var(--mono); font-size: .92em; }
 text-box[mode="nvl"] [data-content="text"] { border-radius: 16px 16px 0 0; }
-.aurora-meta {
-  order: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-  margin: 0; padding: 0 28px 14px; background: var(--dialogue-glass);
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-  font: 8px/1.5 var(--mono); letter-spacing: .8px; color: var(--muted); text-transform: uppercase;
-}
-.aurora-meta > span { display: flex; align-items: center; gap: 9px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.aurora-meta > span:first-child::before { content: ""; width: 23px; height: 1px; background: var(--edge-active); flex: 0 0 auto; }
-text-box[data-speaking="narrator"] .aurora-meta { border-radius: 0; }
 /* Engine's "unread" marker in NVL mode is meaningless here. */
 text-box[mode="nvl"].unread::after { content: none; }
 
@@ -383,7 +373,8 @@ gallery-screen > h2::before, credits-screen > h2::before { content: "Ночна�
 [data-screen] [data-action="back"].aurora-decorated > .svg-inline--fa, [data-screen] [data-action="back"].aurora-decorated > .fas { display: none !important; }
 [data-screen] [data-action="back"] .aurora-ico { width: 17px; height: 17px; }
 
-/* Main menu: title block (aurora-ui.js) + engine buttons in one card. */
+/* Main menu: the title card is static markup (as in the mockup), while the
+   engine owns the button list. */
 main-screen[data-screen]:not([data-screen="game"]) {
   background: none !important; animation: aurora-fade-in .4s ease-out;
   width: min(375px, 100%); padding: 0; overflow: visible; box-shadow: none; background-color: transparent !important;
@@ -404,7 +395,7 @@ main-menu, main-screen main-menu {
   border-radius: 0 0 16px 16px; background: var(--panel-glass); box-shadow: var(--glass-shadow);
   -webkit-backdrop-filter: none; backdrop-filter: none;
 }
-main-screen:not(.has-title) main-menu { border-radius: 16px; padding-top: 20px !important; }
+
 main-menu button, main-menu button:hover {
   position: relative; display: flex !important; align-items: center; justify-content: flex-start; gap: 12px;
   width: 100% !important; min-width: 0 !important; height: auto !important; min-height: 42px !important; margin: 0 !important; padding: 10px 14px !important;
@@ -783,8 +774,7 @@ html.aurora-modal-open #hud-time { animation-play-state: paused; }
   text-box [data-ui="who"] { font-size: 16px; }
   text-box [data-content="text"] { padding: 18px 18px 15px; }
   text-box [data-ui="say"] { line-height: 1.55; }
-  .aurora-meta { padding: 0 18px 10px; font-size: 7px; letter-spacing: .7px; }
-  .aurora-meta > span:last-child { display: none; }
+
   quick-menu button { height: 36px; }
   [data-screen]:not([data-screen="game"]), .panel, .modal .modal__content, choice-container { padding: 21px; }
   [data-screen] > h2, .panel h2, dialog-log .modal__content::before, choice-container::after { font-size: 23px; }
@@ -806,7 +796,7 @@ html.aurora-modal-open #hud-time { animation-play-state: paused; }
 }
 @media (max-height: 500px) {
   :root { --text-size-base: 17px; }
-  .aurora-meta { display: none; }
+
   text-box [data-content="name"] { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
   text-box [data-content="text"] { padding: 13px 18px; }
   text-box { max-height: 62vh; }

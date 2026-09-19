@@ -125,6 +125,14 @@
             <language-selection-screen></language-selection-screen>
             <loading-screen></loading-screen>
             <main-screen>
+                <!-- The title card is part of the skin's static markup. The
+                     mockup used CSS to place and style it; it is not created
+                     on every engine mutation by the skin driver. -->
+                <div class="aurora-title" aria-labelledby="title-heading">
+                    <p class="eyebrow">Визуальная новелла · Ночная смена</p>
+                    <h1 id="title-heading">Сэйрин</h1>
+                    <p class="small">Резонанс 2030. Одна ночь в Тэцубе — и развилка, после которой город уже не будет прежним.</p>
+                </div>
                 <main-menu></main-menu>
             </main-screen>
             <game-screen>
