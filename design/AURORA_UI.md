@@ -163,7 +163,7 @@ initial build by a task, so the overlay never waits for 130 KB of markup.
 ## Verification
 
 ```bash
-node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs   # 70 pass
+node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs   # 71 pass
 node game/tests/es5-scan.mjs game/vendor/aurora-ui.js game/vendor/game.js                        # no output
 cd game && npm i jsdom@25 --prefix . --no-save --silent && REQUIRE_JSDOM=1 node tests/offline-smoke.mjs  # SMOKE PASSED
 ```

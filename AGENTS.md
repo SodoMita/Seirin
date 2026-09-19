@@ -69,7 +69,7 @@ node game/tests/es5-scan.mjs game/vendor/game.js        # ES5 shape of shipped J
 node game/tests/es5-scan.mjs game/vendor/aurora-ui.js
 node --test game/tests/game.test.mjs \
              game/tests/failsafe.test.mjs \
-             game/tests/icons-offline.test.mjs          # -> 70 pass, 0 fail
+             game/tests/icons-offline.test.mjs          # -> 71 pass, 0 fail
 
 # Offline smoke test of the real page over file:// (dev-only jsdom)
 cd game && npm i jsdom --prefix . --no-save --silent
