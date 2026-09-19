@@ -2,49 +2,113 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1" />
     <title>Сэйрин: Ночная смена — Резонанс 2030 | Visual Novel</title>
     <meta name="description" content="Visual Novel: Seirin: Night Shift — Resonance 2030. Runs 100% offline." />
+    <meta name="color-scheme" content="dark" />
 
-    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260804r12" />
-    <link rel="stylesheet" href="vendor/monogatari.css?v=20260728r11" />
-    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260804r12" />
-    <link rel="stylesheet" href="vendor/custom-ui.css?v=20260728r11" />
-    <!-- 2.5D skeuomorphic mecha armour skin. MUST stay last: it repaints the
-         flat reskin in vendor/custom-ui.css and relies on winning the cascade
-         at equal specificity. Layer markup is injected by vendor/mecha-ui.js. -->
-    <link rel="stylesheet" href="vendor/mecha-ui.css?v=20260804r18" />
+    <link rel="stylesheet" href="assets/fonts/fonts.css?v=20260919r1" />
+    <link rel="stylesheet" href="vendor/monogatari.css?v=20260919r1" />
+    <link rel="stylesheet" href="vendor/icons-offline.css?v=20260919r1" />
+    <link rel="stylesheet" href="vendor/custom-ui.css?v=20260919r1" />
+    <!-- Aurora glass skin. MUST stay last: it repaints the flat reskin in
+         vendor/custom-ui.css and relies on winning the cascade at equal
+         specificity. Runtime controls (theme, glass transparency, text size,
+         interface scale, in-game menu) are wired by vendor/aurora-ui.js. -->
+    <link rel="stylesheet" href="vendor/aurora-ui.css?v=20260919r1" />
 </head>
 <body>
 
-    <!-- TOP HUD -->
-    <header class="cyber-top-hud">
-        <div class="hud-group">
-            <span class="hud-brand"><i class="fas fa-microchip"></i> СЭЙРИН РЕЗОНАНС 2030</span>
-            <span id="hud-location" class="hud-badge"><i class="fas fa-map-marker-alt"></i><span>Тэцуба: Улица</span></span>
-        </div>
+    <!-- Inline icon sprite (stroke icons, currentColor). Referenced with
+         <svg class="icon"><use href="#i-…"></use></svg> — same document, so
+         it works from file:// with no network at all. -->
+    <svg class="icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+        <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="6" rx="6" ry="3"/><path d="M3 6v5c0 4 12 4 12 0V6M3 11v5c0 4 12 4 12 0v-5m0-2c8 0 8 6 0 6m6-3v5c0 3-5 4-8 3"/></symbol>
+        <symbol id="i-box" viewBox="0 0 24 24"><path d="m3 8 9-5 9 5-9 5-9-5Zm0 0v10l9 4 9-4V8m-9 5v9m-5-16 9 5"/></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/></symbol>
+        <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M15 3a6 6 0 0 0-7 8L2 17a3 3 0 0 0 5 5l6-7a6 6 0 0 0 8-7l-4 4-5-5 3-4Z" transform="translate(0 -1)"/></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/></symbol>
+        <symbol id="i-volume" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+        <symbol id="i-muted" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm5 5 6 6m0-6-6 6"/></symbol>
+        <symbol id="i-back" viewBox="0 0 24 24"><path d="m8 4-5 5 5 5M3 9h10a6 6 0 0 1 0 12"/></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+        <symbol id="i-history" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4M3 7h3M3 12h3M3 17h3"/></symbol>
+        <symbol id="i-skip" viewBox="0 0 24 24"><path d="m3 6 8 6-8 6V6Zm10 0 8 6-8 6V6Z"/></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4V8Z"/></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8v8M15 8v8"/></symbol>
+        <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 14v6h16v-6"/></symbol>
+        <symbol id="i-load" viewBox="0 0 24 24"><path d="M12 15V3m-4 4 4-4 4 4M4 14v6h16v-6"/></symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24"><path d="M5 3v5m0 4v9M12 3v10m0 4v4M19 3v2m0 4v12M2 8h6v4H2zM9 13h6v4H9zM16 5h6v4h-6z"/></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+        <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path d="m4 4 16 16"/></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="m2 11 10-8 10 8M5 9v12h14V9M9 21v-7h6v7"/></symbol>
+        <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5c-4-3-7-3-10-2v16c3-1 6-1 10 2 4-3 7-3 10-2V3c-3-1-6-1-10 2Zm0 0v16"/></symbol>
+        <symbol id="i-routes" viewBox="0 0 24 24"><circle cx="5" cy="4" r="2"/><circle cx="19" cy="4" r="2"/><circle cx="12" cy="20" r="2"/><path d="M5 6v3c0 5 7 3 7 9m7-12v3c0 5-7 3-7 9"/></symbol>
+        <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 0 1 6 1c0 2-3 2-3 5m0 3h.01"/></symbol>
+        <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v9M6 5a9 9 0 1 0 12 0"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+        <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 7V4h16v3M12 4v16m-3 0h6"/></symbol>
+        <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2v-1c0-1 .5-2 2-2h1c2 0 4-1 4-4a9 9 0 0 0-9-9Z"/><circle cx="7.5" cy="12" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="15" cy="7.5" r="1"/></symbol>
+        <symbol id="i-zap" viewBox="0 0 24 24"><path d="m13 2-6 9h5l-1 6 7-10h-5l1-5"/></symbol>
+    </svg>
 
-        <div class="hud-group">
-            <span id="hud-player-name" class="hud-badge amber"><i class="fas fa-user-secret"></i><span>Рэн</span></span>
-            <span id="hud-route" class="hud-badge pink"><i class="fas fa-terminal"></i><span>Начало</span></span>
-            <span id="hud-alert-level" class="hud-badge red"><i class="fas fa-shield-alt"></i><span>0%</span></span>
-        </div>
-        <div class="hud-group hud-resources">
-            <div class="hud-clock" role="timer" aria-label="Дата и время">
-                <span id="hud-date" class="hud-clock-date">СР 15.07</span>
-                <span id="hud-time" class="hud-clock-time">21<span class="hud-clock-colon">:</span>00</span>
+    <!-- SHELL HEADER — live HUD over the scene (location, resources, actions,
+         7-segment clock). Values are written by updateHUD() in vendor/game.js
+         into the [data-hud-text] slots; visible only while the game screen is
+         active (vendor/aurora-ui.js toggles html.aurora-playing). -->
+    <header class="shell-header" id="shell-header" aria-label="Статус смены">
+        <div class="header-main">
+            <div class="location">
+                <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+                <div>
+                    <h1 id="hud-location" class="outlined"><span data-hud-text>Тэцуба: Улица</span></h1>
+                    <p class="eyebrow outlined"><span id="hud-route" data-hud-text>Начало</span></p>
+                </div>
             </div>
-            <span id="hud-money" class="hud-badge amber"><img src="assets/icons/coins.svg?v=20260804r1" class="hud-svg" alt=""><span>1000</span></span>
-            <span id="hud-items" class="hud-badge"><img src="assets/icons/box-open.svg?v=20260804r1" class="hud-svg" alt=""><span>0</span></span>
+            <div class="hud">
+                <div class="resources" aria-label="Ресурсы">
+                    <button type="button" class="resource" id="hud-money" title="Деньги — открыть архив" data-open-archives>
+                        <svg class="icon" aria-hidden="true"><use href="#i-coins"></use></svg><span class="outlined" data-hud-text>1000</span>
+                    </button>
+                    <button type="button" class="resource" id="hud-items" title="Предметы — открыть архив" data-open-archives>
+                        <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg><span class="outlined" data-hud-text>0</span>
+                    </button>
+                    <button type="button" class="resource" id="hud-alert-level" title="Тревога Акатоми — открыть архив" data-open-archives>
+                        <span class="alert-dot" aria-hidden="true"></span><span class="outlined" data-hud-text>0%</span>
+                    </button>
+                </div>
+                <div class="header-actions">
+                    <button type="button" class="button icon-button" id="btn-skip" aria-pressed="false" title="Быстрая перемотка текста">
+                        <i class="fas fa-fast-forward" hidden></i>
+                        <svg class="icon" aria-hidden="true"><use href="#i-skip"></use></svg>
+                        <span class="sr-only">Перемотка</span>
+                    </button>
+                    <button type="button" class="button icon-button" id="btn-archives" title="Архив Сэйрин">
+                        <svg class="icon" aria-hidden="true"><use href="#i-book"></use></svg>
+                        <span class="sr-only">Архив</span>
+                    </button>
+                    <button type="button" class="button icon-button" id="btn-mute" aria-pressed="false" title="Звук">
+                        <svg class="icon icon-sound" aria-hidden="true"><use href="#i-volume"></use></svg>
+                        <svg class="icon icon-muted" aria-hidden="true"><use href="#i-muted"></use></svg>
+                        <span class="sr-only">Звук</span>
+                    </button>
+                    <button type="button" class="button icon-button" id="btn-menu" title="Меню игры" aria-haspopup="dialog" aria-expanded="false">
+                        <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+                        <span class="sr-only">Меню игры</span>
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div class="hud-group">
-            <button type="button" class="hud-btn" id="btn-skip" aria-pressed="false" title="Быстрая перемотка текста">
-                <i class="fas fa-fast-forward"></i><span>ПЕРЕМОТКА</span>
-            </button>
-            <button type="button" class="hud-btn" id="btn-archives">
-                <i class="fas fa-book"></i><span>АРХИВ</span>
-            </button>
+        <div class="clock" role="timer" aria-label="Дата и время">
+            <time id="hud-time" class="outlined">21<span class="hud-clock-colon">:</span>00</time>
+            <time id="hud-date" class="outlined">15.07.2026</time>
         </div>
     </header>
 
@@ -77,66 +141,121 @@
         </visual-novel>
     </div>
 
+    <!-- SHELL FOOTER — glass rail under the dialogue box. The engine's own
+         <quick-menu> is pinned over the middle cell by vendor/aurora-ui.css;
+         the two side cells are ours. -->
+    <footer class="shell-footer" id="shell-footer" aria-label="Панель управления">
+        <div class="footer-status">
+            <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+            <span id="hud-player-name" data-hud-text>Рэн</span>
+        </div>
+        <div class="footer-center" aria-hidden="true"></div>
+        <div class="footer-status footer-status--right">
+            <span id="hud-status">Город ещё не спит.</span>
+        </div>
+    </footer>
+
+    <!-- IN-GAME MENU (opened by #btn-menu in the header; wired in
+         vendor/aurora-ui.js). Its buttons only forward to the engine's own
+         actions, so it never touches story state. -->
+    <div id="game-menu-overlay" class="aurora-overlay" hidden>
+        <div class="panel menu-panel" role="dialog" aria-modal="true" aria-labelledby="game-menu-title">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Ночная смена</p>
+                    <h2 id="game-menu-title">Меню игры</h2>
+                </div>
+                <button type="button" class="button icon-button" id="btn-game-menu-close" title="Закрыть">
+                    <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                    <span class="sr-only">Закрыть</span>
+                </button>
+            </div>
+            <div class="menu-list">
+                <button type="button" class="button primary" data-menu="resume"><svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>Вернуться в ночь</button>
+                <button type="button" class="button" data-menu="save"><svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>Сохранить</button>
+                <button type="button" class="button" data-menu="load"><svg class="icon" aria-hidden="true"><use href="#i-load"></use></svg>Загрузить</button>
+                <button type="button" class="button" data-menu="log"><svg class="icon" aria-hidden="true"><use href="#i-history"></use></svg>История реплик</button>
+                <button type="button" class="button" data-menu="archives"><svg class="icon" aria-hidden="true"><use href="#i-book"></use></svg>Архив Сэйрин</button>
+                <div class="menu-divider" role="separator"></div>
+                <button type="button" class="button" data-menu="settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg>Настройки</button>
+                <button type="button" class="button" data-menu="help"><svg class="icon" aria-hidden="true"><use href="#i-help"></use></svg>Помощь</button>
+                <button type="button" class="button" data-menu="quit"><svg class="icon" aria-hidden="true"><use href="#i-power"></use></svg>Выйти в главное меню</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ARCHIVES CODEX MODAL (opened by #btn-archives, wired in vendor/game.js) -->
     <div id="archives-overlay" class="archives-overlay" hidden>
-        <div class="archives-panel" role="dialog" aria-modal="true" aria-labelledby="archives-title">
-            <div class="archives-head">
-                <span id="archives-title"><i class="fas fa-book"></i><span>АРХИВ СЭЙРИН</span></span>
-                <button type="button" class="hud-btn" id="btn-archives-close">
-                    <i class="fas fa-times"></i><span>ЗАКРЫТЬ</span>
+        <div class="archives-panel panel" role="dialog" aria-modal="true" aria-labelledby="archives-title">
+            <div class="archives-head panel-header">
+                <div>
+                    <p class="eyebrow">Кодекс</p>
+                    <h2 id="archives-title"><i class="fas fa-book" hidden></i><span>Архив Сэйрин</span></h2>
+                </div>
+                <button type="button" class="button icon-button" id="btn-archives-close" title="Закрыть">
+                    <i class="fas fa-times" hidden></i>
+                    <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                    <span class="sr-only">Закрыть</span>
                 </button>
             </div>
             <div id="archives-body" class="archives-body"></div>
         </div>
     </div>
 
-    <!-- ROUTE GRAPH DEBUG MODAL (opened by #btn-graph, wired in vendor/game.js).
-         The graph itself is generated at runtime from engine.script(), so the
-         map can never drift out of sync with the shipped story. -->
+    <!-- ROUTE GRAPH DEBUG MODAL (opened from the main menu, wired in
+         vendor/game.js). The graph itself is generated at runtime from
+         engine.script(), so the map can never drift out of sync with the
+         shipped story. -->
     <div id="graph-overlay" class="graph-overlay" hidden>
-        <div class="graph-panel" role="dialog" aria-modal="true" aria-labelledby="graph-title">
-            <div class="graph-head">
-                <span id="graph-title"><i class="fas fa-network-wired"></i><span>ГРАФ МАРШРУТОВ — ОТЛАДКА</span></span>
-                <button type="button" class="hud-btn" id="btn-graph-close">
-                    <i class="fas fa-times"></i><span>ЗАКРЫТЬ</span>
+        <div class="graph-panel panel" role="dialog" aria-modal="true" aria-labelledby="graph-title">
+            <div class="graph-head panel-header">
+                <div>
+                    <p class="eyebrow">Отладка</p>
+                    <h2 id="graph-title"><i class="fas fa-network-wired" hidden></i><span>Граф маршрутов</span></h2>
+                </div>
+                <button type="button" class="button icon-button" id="btn-graph-close" title="Закрыть">
+                    <i class="fas fa-times" hidden></i>
+                    <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                    <span class="sr-only">Закрыть</span>
                 </button>
             </div>
             <div id="graph-body" class="graph-body"></div>
         </div>
     </div>
 
-    <script src="vendor/failsafe.js?v=20260804r11"></script>
-    <script src="vendor/monogatari.js?v=20260728r11"></script>
-    <script src="vendor/icons-offline.js?v=20260804r12"></script>
+    <script src="vendor/failsafe.js?v=20260919r1"></script>
+    <script src="vendor/monogatari.js?v=20260919r1"></script>
+    <script src="vendor/icons-offline.js?v=20260919r1"></script>
     <!-- Story arcs are standalone ES5 modules; game.js only wires the engine/UI. -->
-    <script src="vendor/story/prologue.js?v=20260804r20"></script>
-    <script src="vendor/story/procrastination.js?v=20260804r25"></script>
-    <script src="vendor/story/anime_shorts.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_comfort.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_activities.js?v=20260804r26"></script>
-    <script src="vendor/story/anime_watchlist.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_eva_01_07.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_eva_09_16.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_eva_17_24.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_eva_25_end.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_nausicaa.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_key.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_cicada.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_gacha.js?v=20260804r20"></script>
-    <script src="vendor/story/anime_fandom.js?v=20260804r20"></script>
-    <script src="vendor/story/club.js?v=20260804r4"></script>
-    <script src="vendor/story/tower.js?v=20260804r4"></script>
-    <script src="vendor/story/bench.js?v=20260804r4"></script>
-    <script src="vendor/story/lonewar.js?v=20260804r4"></script>
-    <script src="vendor/story/miya.js?v=20260804r4"></script>
-    <script src="vendor/story/ai.js?v=20260804r4"></script>
-    <script src="vendor/story/momo.js?v=20260804r4"></script>
-    <script src="vendor/game.js?v=20260804r29"></script>
-    <!-- Mecha skin driver: bakes metal/wear textures on a canvas, injects the
-         armour layer stack, builds the HUD instrument rail + telemetry strip,
-         and drives the indicators from engine storage. Read-only w.r.t. game
-         state; loads after game.js so window.engine already exists. -->
-    <script src="vendor/mecha-ui.js?v=20260728r11"></script>
+    <script src="vendor/story/prologue.js?v=20260919r1"></script>
+    <script src="vendor/story/procrastination.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_shorts.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_comfort.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_activities.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_watchlist.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_eva_01_07.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_eva_09_16.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_eva_17_24.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_eva_25_end.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_nausicaa.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_key.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_cicada.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_gacha.js?v=20260919r1"></script>
+    <script src="vendor/story/anime_fandom.js?v=20260919r1"></script>
+    <script src="vendor/story/club.js?v=20260919r1"></script>
+    <script src="vendor/story/tower.js?v=20260919r1"></script>
+    <script src="vendor/story/bench.js?v=20260919r1"></script>
+    <script src="vendor/story/lonewar.js?v=20260919r1"></script>
+    <script src="vendor/story/miya.js?v=20260919r1"></script>
+    <script src="vendor/story/ai.js?v=20260919r1"></script>
+    <script src="vendor/story/momo.js?v=20260919r1"></script>
+    <script src="vendor/game.js?v=20260919r1"></script>
+    <!-- Aurora skin driver: theme / transparency / text-size / interface-scale
+         preferences (localStorage), the header menu + mute toggle, icon
+         decoration of engine buttons, log-jump rewind and the reduced-work
+         modal flag. Read-only w.r.t. story state; loads after game.js so
+         window.engine already exists. -->
+    <script src="vendor/aurora-ui.js?v=20260919r1"></script>
 
 </body>
 </html>
