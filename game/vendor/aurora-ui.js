@@ -9,9 +9,9 @@
  *   2. Icon decoration of engine-rendered buttons (quick menu, screen back
  *      buttons, main menu, slot delete) with the inline SVG sprite from
  *      index.html, plus live on/off states (auto-play, skip, hide UI).
- *   3. The header menu button (in-game menu overlay), the mute toggle, the
- *      status line, the dialogue meta row, the main-menu title block and the
- *      "Appearance" fieldset injected into the engine's settings screen.
+ *   3. The header menu button (in-game menu overlay), the mute toggle,
+ *      the status line and the "Appearance" fieldset injected into the
+ *      engine's settings screen.
  *   4. Quality-of-life carried over from the previous skin: click a log
  *      line to rewind to it (chained engine.rollback, so FailSafe reverts
  *      stats), modal-open flag to pause decorative motion, gesture guard.
@@ -369,8 +369,6 @@
         toggleClass(root, 'aurora-playing', playing || (isPlaying() && !!doc.querySelector('[data-screen].active')));
         var other = doc.querySelector('[data-screen].active:not([data-screen="game"])');
         toggleClass(root, 'aurora-screen', !!other);
-        var main = doc.querySelector('main-screen');
-        if (main) { toggleClass(main, 'has-title', !!main.querySelector('.aurora-title')); }
     }
 
     /* Mirror the scene behind system screens (settings over the street,
@@ -395,45 +393,7 @@
     }
 
     /* ------------------------------------------------------------------ *
-     * 3a. main-menu title block
-     * ------------------------------------------------------------------ */
-    function buildTitle () {
-        var main = doc.querySelector('main-screen');
-        var menu = main && main.querySelector('main-menu');
-        if (!main || !menu || main.querySelector('.aurora-title')) { return; }
-        var block = el('div', 'aurora-title');
-        block.innerHTML =
-            '<p class="eyebrow">Визуальная новелла · Ночная смена</p>' +
-            '<h1>Сэйрин</h1>' +
-            '<p class="small">Резонанс 2030. Одна ночь в Тэцубе — и развилка, после которой город уже не будет прежним.</p>';
-        main.insertBefore(block, menu);
-        toggleClass(main, 'has-title', true);
-    }
-
-    /* ------------------------------------------------------------------ *
-     * 3b. dialogue meta row (route · location | advance hint)
-     * ------------------------------------------------------------------ */
-    function buildMeta () {
-        var box = doc.querySelector('text-box');
-        if (!box) { return; }
-        var meta = box.querySelector(':scope > .aurora-meta');
-        if (!meta) {
-            meta = el('div', 'aurora-meta');
-            meta.setAttribute('aria-hidden', 'true');
-            meta.innerHTML = '<span data-meta="where"></span><span data-meta="hint">Клик или пробел — дальше</span>';
-            box.appendChild(meta);
-        }
-        var where = meta.querySelector('[data-meta="where"]');
-        var route = doc.getElementById('hud-route');
-        var loc = doc.getElementById('hud-location');
-        var text = ((route && route.textContent) || '').replace(/\s+/g, ' ').replace(/^\s|\s$/g, '');
-        var locText = ((loc && loc.textContent) || '').replace(/\s+/g, ' ').replace(/^\s|\s$/g, '');
-        if (locText) { text = text ? text + ' / ' + locText : locText; }
-        if (where && where.textContent !== text) { where.textContent = text; }
-    }
-
-    /* ------------------------------------------------------------------ *
-     * 3c. header: in-game menu overlay, mute toggle, resources -> archives
+     * 3a. header: in-game menu overlay, mute toggle, resources -> archives
      * ------------------------------------------------------------------ */
     function menuOverlay () { return doc.getElementById('game-menu-overlay'); }
     function openMenu () {
@@ -721,8 +681,6 @@
         try { decorate(); } catch (e) { /* decorative */ }
         try { syncStates(); } catch (e) { /* decorative */ }
         try { syncBackdrop(); } catch (e) { /* decorative */ }
-        try { buildTitle(); } catch (e) { /* decorative */ }
-        try { buildMeta(); } catch (e) { /* decorative */ }
         try { buildAppearance(); } catch (e) { /* decorative */ }
         try { tagLogRows(); } catch (e) { /* decorative */ }
         try { undraggable(); } catch (e) { /* decorative */ }

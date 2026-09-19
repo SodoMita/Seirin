@@ -18,7 +18,7 @@ game/index.html
 ├── vendor/monogatari.{js,css}    engine + animate.css (vendored, do not edit)
 ├── vendor/failsafe.js            all story-state mutation goes through FailSafe.vn
 ├── vendor/icons-offline.{js,css} Font-Awesome-class → local glyph shim
-├── vendor/custom-ui.css          legacy flat theme; still owns a few layout pins
+├── vendor/custom-ui.css          engine geometry / atlas layout pins only
 ├── vendor/game.js                story, HUD text, archives codex, route atlas
 ├── vendor/aurora-ui.css          THE SKIN — loaded last, wins the cascade
 └── vendor/aurora-ui.js           presentation driver (prefs, icons, menu, states)
@@ -47,7 +47,7 @@ Preferences (localStorage):
 |---|---|---|
 | `SeirinGame_Theme` | `aurora` (default) `tidal` `dusk` `amber` `gray` | `html[data-aurora-theme]` → `--accent-rgb`, `--surface-rgb` |
 | `SeirinGame_GlassTransparency` | 0–100 (default 95) | `--density` = 1 − pct/100 |
-| `SeirinGame_TextScale` | 70–160 % (default 100) | `--text-scale` (dialogue only) |
+| `SeirinGame_TextScale` | 70–160 % (default 100) | `--reading-scale` (dialogue only) |
 | `SeirinGame_UIScale` | 35–230 % (default 100) | `html { font-size }` — every `rem` in the shell follows |
 | `SeirinGame_Muted`, `SeirinGame_MutedVolumes` | `1` / saved volumes | mute toggle restores the engine `Volume` preference |
 
@@ -74,8 +74,8 @@ block in `game.js`.
 
 | Mockup | Engine element | Note |
 |---|---|---|
-| Title panel + menu list | `main-screen > main-menu` | `.aurora-title` is injected above the engine's buttons; `custom-ui.css` still has `main-menu … !important` rules the skin has to beat |
-| Dialogue glass (name tab, text, meta) | `text-box > [data-content=name]`, `[data-content=text]`, injected `.aurora-meta` | text-box is repositioned to sit on the footer rail; text is outlined (4-way shadow + `-webkit-text-stroke`) because the glass is 95 % transparent by default |
+| Title panel + menu list | `main-screen > .aurora-title + main-menu` | `.aurora-title` is static markup in `index.html`, so CSS owns its placement and animation; the engine still owns the button list |
+| Dialogue glass (name tab, text) | `text-box > [data-content=name]`, `[data-content=text]` | text-box is repositioned to sit on the footer rail; text is outlined (4-way shadow + `-webkit-text-stroke`) because the glass is 95 % transparent by default |
 | Quick actions rail | `quick-menu` | moved into `#shell-footer`'s middle column; icons via sprite |
 | Choice panel | `choice-container` | fixed, centred, z 100; `::before/::after` supply the "Развилка / Ваш ответ" heading |
 | Settings panel | `settings-screen` | `.aurora-appearance` fieldset (theme picker, glass, text size, UI scale) is injected before the engine's audio/speed blocks |
@@ -154,7 +154,7 @@ initial build by a task, so the overlay never waits for 130 KB of markup.
 | Footer above quick-menu | `#shell-footer` (z 62) swallowed clicks meant for the quick menu (z 61) | keep the rail *below* the quick menu; the rail is only a backdrop |
 | Nested `backdrop-filter` | every `.button` inside a blurred panel drew a visible frosted rectangle | blur only top-level surfaces (panels, text-box, footer); buttons are plain translucent glass, as in the mockup |
 | animate.css `.animated` pins `animation-duration: 1s` | long loops on engine-managed elements run in 1 s | pin duration with `!important` on anything the engine tags `.animated` |
-| `main-menu` rules in `custom-ui.css` use `!important` | skin styles silently lost | the skin's main-menu block also uses `!important`; do not add more |
+| `custom-ui.css` is loaded before the skin | legacy geometry can silently win if the files are reordered | keep `aurora-ui.css` last; `custom-ui.css` must remain structural and theme-free |
 | `cssRules` is unreadable over `file://` | probes reporting "0 rules" | verify with `getComputedStyle` |
 | `classList.add('x')` on an element that already has `x` **still queues a MutationObserver record** (same for `setAttribute` with an equal value) | the driver observed `class` on `#vn-root` and wrote classes unconditionally → it scheduled itself: 60 fps of decoration + forced style recalcs, worst with the atlas open | every skin write must be write-on-change (`toggleClass` checks `classList.contains`); never add a blind `classList.add`/`remove` to `aurora-ui.js` |
 | `getComputedStyle()` in a rAF pass | flushes pending style changes → a full recalculation per frame | read the engine's inline style (`bg.style.backgroundImage`) first; only fall back to computed |
