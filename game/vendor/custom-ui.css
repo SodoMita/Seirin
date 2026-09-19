@@ -7,7 +7,7 @@
  * sizing, the route-atlas grid, sprite scale/anchors and motion hooks that are
  * shared with the story's radio prop.
  *
- * Do not put a second theme here. The old sheet mixed the retired mecha theme,
+ * Do not put a second theme here. The old sheet mixed a retired theme,
  * the previous HUD and the current glass skin; because it was loaded before
  * aurora-ui.css, those stale rules made the final appearance depend on
  * selector order rather than on the mockup's CSS contract.

@@ -201,6 +201,19 @@ test('index.html ships the engine markup skeleton (white-screen regression)', ()
     assert.ok(rootMatch[1].includes('<main-menu>'), '#vn-root must not be an empty div');
 });
 
+test('mockup chrome is static CSS, not a per-mutation DOM rewrite', () => {
+    const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
+    const skin = readFileSync(join(here, '..', 'vendor', 'aurora-ui.css'), 'utf8');
+    const driver = readFileSync(join(here, '..', 'vendor', 'aurora-ui.js'), 'utf8');
+    const layout = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    assert.match(html, /<main-screen>[\s\S]*<div class="aurora-title"[\s\S]*<main-menu>/);
+    assert.doesNotMatch(driver, /function buildTitle|function buildMeta/);
+    assert.doesNotMatch(driver, /\.aurora-meta/);
+    assert.doesNotMatch(skin, /\.aurora-meta/);
+    assert.doesNotMatch(layout, /@import\s/);
+    assert.doesNotMatch(layout, /cyber-top-hud|sn-bg-dark|mecha/i);
+});
+
 test('debug route atlas: menu entry, overlay, generator and teleport are wired', () => {
     const html = readFileSync(join(here, '..', 'index.html'), 'utf8');
     // The atlas must live in the MAIN MENU, never as an in-game HUD button.
