@@ -45,7 +45,7 @@
   --panel-glass: var(--sheen), rgb(var(--surface-rgb) / calc(.72 + var(--density) * .28));
   --dialogue-glass: linear-gradient(135deg, rgb(var(--glint-rgb) / .04), transparent 44%, rgb(var(--accent-rgb) / .02)), rgb(var(--surface-rgb) / var(--density));
   --glass-shadow: 0 7px 24px rgb(var(--shadow-rgb) / .10);
-  --blur: 14px;
+  /* --blur removed — mockup has no backdrop blur */
   --text-size-base: clamp(21px, 1.7vw, 27px);
   --text-size: calc(var(--text-size-base) * var(--reading-scale));
   --outline: rgb(var(--shadow-rgb));
@@ -187,7 +187,7 @@ visual-novel, main-screen, game-screen, text-box, main-menu, quick-menu, dialog-
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px) minmax(0, 1fr); align-items: center; gap: 16px;
   padding: 0 16px env(safe-area-inset-bottom);
   background: var(--glass); box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   animation: aurora-ui-in .7s .3s backwards;
 }
 .footer-status { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 9px; line-height: 1.2; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -228,7 +228,7 @@ text-box [data-content="side-image"] { display: none; }
 text-box [data-content="name"] {
   order: 0; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; flex: 0 0 auto;
   min-height: 40px; margin: 0; padding: 8px 23px 8px 20px; border: 0; border-radius: 13px 13px 0 0;
-  background: var(--dialogue-glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  background: var(--dialogue-glass); -webkit-backdrop-filter: none; backdrop-filter: none;
   color: var(--ink); grid-area: auto;
 }
 text-box [data-content="name"]::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px rgb(var(--accent-rgb) / .6); flex: 0 0 auto; }
@@ -243,7 +243,7 @@ text-box [data-content="text"] {
   order: 1; flex: 0 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; grid-area: auto;
   padding: 26px 28px 20px; border: 0; border-radius: 0 16px 0 0;
   background: var(--dialogue-glass); box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--edge-active) transparent;
 }
 text-box[data-speaking="narrator"] [data-content="text"], text-box[data-speaking="centered"] [data-content="text"] { border-radius: 16px 16px 0 0; }
@@ -264,7 +264,7 @@ text-box[mode="nvl"] [data-content="text"] { border-radius: 16px 16px 0 0; }
 .aurora-meta {
   order: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
   margin: 0; padding: 0 28px 14px; background: var(--dialogue-glass);
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   font: 8px/1.5 var(--mono); letter-spacing: .8px; color: var(--muted); text-transform: uppercase;
 }
 .aurora-meta > span { display: flex; align-items: center; gap: 9px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -307,7 +307,7 @@ choice-container {
   width: min(660px, calc(100% - 24px)); max-width: none; max-height: calc(var(--vh) - 24px - var(--rail-h));
   margin: 0; padding: 26px 28px 28px; gap: 0; border-radius: 16px;
   background: var(--panel-glass); box-shadow: var(--glass-shadow); color: var(--ink);
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--edge) transparent;
   display: flex; flex-direction: column; justify-content: flex-start; flex-wrap: nowrap;
   counter-reset: none;
@@ -350,7 +350,7 @@ html.aurora-playing #seirin-build-badge { display: none !important; }
   max-height: calc(var(--vh) - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   margin: auto; padding: 28px; border-radius: 16px;
   background: var(--panel-glass); background-color: transparent; color: var(--ink); box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--edge) transparent; overflow-wrap: anywhere;
   flex-direction: column; align-items: stretch; justify-content: flex-start; text-align: left;
   animation: aurora-ui-in .22s ease-out;
@@ -392,7 +392,7 @@ main-screen[data-screen]:not([data-screen="game"]) {
 main-screen::before, main-screen::after { content: none !important; }
 .aurora-title {
   display: block; padding: 26px 28px 18px; border-radius: 16px 16px 0 0;
-  background: var(--panel-glass); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  background: var(--panel-glass); -webkit-backdrop-filter: none; backdrop-filter: none;
 }
 .aurora-title .eyebrow { color: var(--muted); }
 .aurora-title h1 { margin: 6px 0 0; font: 600 34px/1.1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); }
@@ -402,7 +402,7 @@ main-menu, main-screen main-menu {
   width: 100% !important; height: auto !important; padding: 8px 20px 20px !important; margin: 0;
   display: flex; flex-direction: column; align-items: stretch !important; justify-content: flex-start !important; align-self: auto !important; gap: 2px;
   border-radius: 0 0 16px 16px; background: var(--panel-glass); box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
 main-screen:not(.has-title) main-menu { border-radius: 16px; padding-top: 20px !important; }
 main-menu button, main-menu button:hover {
@@ -614,7 +614,7 @@ help-screen [data-content="instruction"] { order: 1; flex: 1 1 auto; width: auto
 .modal .modal__content, dialog-log .modal__content, alert-modal .modal__content {
   width: min(660px, calc(100% - 24px)); max-height: calc(var(--vh) - 24px); height: auto; padding: 28px; border-radius: 16px;
   background: var(--panel-glass); color: var(--ink); box-shadow: var(--glass-shadow); text-align: left; overflow: auto;
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   animation: aurora-ui-in .22s ease-out;
 }
 alert-modal .modal__content, message-modal .modal__content { width: min(375px, calc(100% - 24px)); }
@@ -653,7 +653,7 @@ dialog-log button[data-action="dialog-log"] { width: auto; align-self: flex-end;
   position: relative; width: min(660px, 100%); max-height: calc(var(--vh) - 24px); margin: 0; padding: 28px; border: 0; border-radius: 16px;
   background: var(--panel-glass); color: var(--ink); box-shadow: var(--glass-shadow); overflow: auto; overscroll-behavior: contain;
   scrollbar-width: thin; scrollbar-color: var(--edge) transparent; overflow-wrap: anywhere; text-align: left;
-  -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: none; backdrop-filter: none;
   animation: aurora-ui-in .22s ease-out;
 }
 .panel::before, .panel::after { content: none; }
