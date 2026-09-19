@@ -17,6 +17,8 @@
  * ========================================================================== */
 
 /* ── 1. Tokens ───────────────────────────────────────────────────────────── */
+@property --ui-transparency { syntax: "<number>"; inherits: true; initial-value: .95; }
+@property --reading-scale { syntax: "<number>"; inherits: true; initial-value: 1; }
 :root {
   color-scheme: dark;
   --ink-rgb: 236 248 242;
@@ -41,7 +43,7 @@
   --glass-hover: linear-gradient(var(--hover), var(--hover)), var(--glass);
   --glass-selected: linear-gradient(var(--selected), var(--selected)), var(--glass);
   --panel-glass: var(--sheen), rgb(var(--surface-rgb) / calc(.72 + var(--density) * .28));
-  --dialogue-glass: linear-gradient(135deg, rgb(var(--glint-rgb) / .04), transparent 44%, rgb(var(--accent-rgb) / .02)), rgb(var(--surface-rgb) / calc(.18 + var(--density) * .82));
+  --dialogue-glass: linear-gradient(135deg, rgb(var(--glint-rgb) / .04), transparent 44%, rgb(var(--accent-rgb) / .02)), rgb(var(--surface-rgb) / var(--density));
   --glass-shadow: 0 7px 24px rgb(var(--shadow-rgb) / .10);
   --blur: 14px;
   --text-size-base: clamp(21px, 1.7vw, 27px);
@@ -50,14 +52,17 @@
   --sans: "Bahnschrift", "DIN Alternate", "Roboto", "Segoe UI", Arial, sans-serif;
   --dialogue-font: "Segoe UI", "Roboto", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --digital: "DSEG7 Classic", var(--mono);
+  --digital: "DSEG7 Classic Mini", var(--mono);
   --handle-glass: linear-gradient(135deg, rgb(var(--glint-rgb) / .32), rgb(var(--glint-rgb) / .04) 38%, transparent 40% 64%, rgb(var(--glint-rgb) / .12) 66%, rgb(var(--accent-rgb) / .07));
   --track: linear-gradient(rgb(var(--glint-rgb) / .70), rgb(var(--glint-rgb) / .70)) right 12.5px top 1px/1px 7px no-repeat,
     repeating-linear-gradient(90deg, rgb(var(--glint-rgb) / .70) 0 1px, transparent 1px 25%) 12.5px 1px/calc(100% - 25px) 7px no-repeat,
     repeating-linear-gradient(90deg, rgb(var(--accent-rgb) / .48) 0 1px, transparent 1px 5%) 12.5px 1px/calc(100% - 25px) 3px no-repeat,
     linear-gradient(rgb(var(--shadow-rgb) / .55), rgb(var(--surface-rgb) / .32) 50%, rgb(var(--shadow-rgb) / .50));
+  --handle-shape: inset(0);
   --handle-bevel: inset 0 3px 6px rgb(var(--glint-rgb) / .15), inset 0 -3px 6px rgb(var(--shadow-rgb) / .16);
   --track-shadow: inset 0 1px 2px rgb(var(--shadow-rgb) / .50);
+  --range-shape: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 75%, -100vw 75%, -100vw 25%, 0 25%);
+  --range-light: linear-gradient(transparent 25%, rgb(var(--accent-rgb) / .15) 32%, rgb(var(--accent-rgb) / .35) 42%, var(--accent) 52%, rgb(var(--glint-rgb) / .96) 58%, var(--accent) 62%, rgb(var(--accent-rgb) / .70) 68%, rgb(var(--accent-rgb) / .24) 72%, transparent 75%);
   --handle-mark: rgb(var(--accent-rgb) / .92);
   --handle-face: linear-gradient(90deg, transparent 46%, var(--handle-mark) 46% 54%, transparent 54%) center/100% 44% no-repeat, var(--handle-glass);
   --shell-x: max(38px, env(safe-area-inset-left));
@@ -73,6 +78,10 @@
 }
 @supports (height: 100dvh) { :root { --vh: 100dvh; } }
 
+:root:has(#theme-tidal:checked) { --ink-rgb: 237 245 255; --muted-rgb: 182 201 220; --accent-rgb: 155 210 248; --surface-rgb: 19 32 49; --glint-rgb: 239 249 255; --shadow-rgb: 5 11 20; }
+:root:has(#theme-dusk:checked) { --ink-rgb: 246 240 253; --muted-rgb: 202 189 218; --accent-rgb: 207 181 241; --surface-rgb: 35 26 47; --glint-rgb: 251 242 255; --shadow-rgb: 13 8 20; }
+:root:has(#theme-amber:checked) { --ink-rgb: 252 245 229; --muted-rgb: 215 200 174; --accent-rgb: 237 204 145; --surface-rgb: 43 34 23; --glint-rgb: 255 249 232; --shadow-rgb: 18 12 5; }
+:root:has(#theme-gray:checked) { --ink-rgb: 244 244 244; --muted-rgb: 195 195 195; --accent-rgb: 216 216 216; --surface-rgb: 30 30 30; --glint-rgb: 255 255 255; --shadow-rgb: 8 8 8; }
 html[data-aurora-theme="tidal"] { --ink-rgb: 237 245 255; --muted-rgb: 182 201 220; --accent-rgb: 155 210 248; --surface-rgb: 19 32 49; --glint-rgb: 239 249 255; --shadow-rgb: 5 11 20; }
 html[data-aurora-theme="dusk"]  { --ink-rgb: 246 240 253; --muted-rgb: 202 189 218; --accent-rgb: 207 181 241; --surface-rgb: 35 26 47; --glint-rgb: 251 242 255; --shadow-rgb: 13 8 20; }
 html[data-aurora-theme="amber"] { --ink-rgb: 252 245 229; --muted-rgb: 215 200 174; --accent-rgb: 237 204 145; --surface-rgb: 43 34 23; --glint-rgb: 255 249 232; --shadow-rgb: 18 12 5; }
