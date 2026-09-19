@@ -233,6 +233,52 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
         .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
 });
 
+test('route atlas fills the landscape width and wraps instead of scrolling sideways', () => {
+    const css = readFileSync(join(here, '..', 'vendor', 'custom-ui.css'), 'utf8');
+    const skin = readFileSync(join(here, '..', 'vendor', 'aurora-ui.css'), 'utf8');
+    // Regression: the panel was capped at min(1100px, 100%) while the columns
+    // ran as ONE horizontal strip (overflow-x: auto + 235px min-width). The
+    // shipped map is 205 labels over ~55 depth columns, so that strip was a
+    // ~25 000 px scroll in which four shrunk columns fit and the rest of a
+    // landscape window stayed empty.
+    assert.match(skin, /\.graph-panel\s*\{[^}]*width:\s*100%/);
+    assert.doesNotMatch(skin, /width:\s*min\(1100px/);
+    assert.doesNotMatch(css, /overflow-x:\s*auto/);
+    assert.doesNotMatch(css, /\.graph-col\s*\{[^}]*min-width:\s*235px/);
+    // Columns are equal tracks that together fill the row. auto-fill (not
+    // auto-fit) keeps the empty tracks of a short last row, so a lone card
+    // never stretches across the whole width.
+    assert.match(css, /\.graph-grid\s*\{[^}]*repeat\(auto-fill,\s*minmax\(min\(var\(--graph-track\),\s*100%\),\s*1fr\)\)/);
+    assert.match(css, /\.graph-overlay\s*\{\s*--graph-track:\s*3\d\dpx/);
+    // Wide cards get their own track budget on small / short-landscape screens
+    // (phone turned sideways is where a map is actually read).
+    assert.match(css, /@media screen and \(max-width:\s*900px\)\s*\{\s*\.graph-overlay\s*\{\s*--graph-track/);
+    assert.match(css, /@media screen and \(orientation:\s*landscape\) and \(max-height:\s*\d+px\)\s*\{\s*\.graph-overlay\s*\{\s*--graph-track/);
+    // Short landscape: the chrome above the map gives up its height.
+    assert.match(skin, /@media \(orientation:\s*landscape\) and \(max-height:\s*\d+px\)\s*\{\s*\.graph-panel\s*\{/);
+});
+
+test('atlas stacks wide depths by distance and keeps the full option text', () => {
+    // 17 labels share one depth in the prologue fan-out. One card per label in
+    // one column made that row several screens tall while five of six tracks
+    // beside it stayed empty — depths now split into even stacks ("1 / 3").
+    assert.match(source, /var GRAPH_STACK_MAX = \d+;/);
+    assert.match(source, /function splitDepthIntoStacks \(ids, depth\)/);
+    assert.match(source, /Math\.ceil\(ids\.length \/ parts\)/);
+    assert.match(source, /graph-col-depth/);
+    // Card text is no longer cut at 34/26/44 chars: the "…" in most cards was
+    // the other half of "the atlas reads as cramped".
+    assert.doesNotMatch(source, /truncateText\(edge\.text/);
+    assert.doesNotMatch(source, /truncateText\(infos\[edge\.target\]\.title/);
+    assert.doesNotMatch(source, /truncateText\(info\.banner/);
+    // Empty depth slots between chained labels are skipped, and labels nothing
+    // reaches (24 ship: Solo1Extra_*, Solo1PC_Chat, …) get their own section
+    // instead of a mystery column after 44 blank ones.
+    assert.match(source, /if \(depthKeys\[i\] === GRAPH_OFF_ROUTE\)/);
+    assert.match(source, /graph-offroute/);
+    assert.match(source, /Вне маршрута/);
+});
+
 test('stat-only choices carry a real engine action (rollback regression)', () => {
     // Regression: callback-only choices (onChosen, no Do) broke the Back
     // command — engine.revert(undefined) rejected, stats stayed applied and

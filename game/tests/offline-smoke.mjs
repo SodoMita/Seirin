@@ -239,6 +239,28 @@ if (graphMenuBtn) {
     check('debug route atlas opens mid-game too', overlay && overlay.hidden === false);
     const nodes = w.document.querySelectorAll('.graph-node');
     check('route atlas auto-renders all 205 shipped labels', nodes.length === 205, String(nodes.length));
+    // Landscape layout: columns are wrapped grid tracks (no 25 000 px strip)
+    // and a wide depth splits into short stacks instead of one 17-card tower.
+    const cols = [...w.document.querySelectorAll('#graph-body .graph-col')];
+    const colSizes = cols.map(col => col.querySelectorAll('.graph-node').length);
+    check('atlas columns stay short (wide depths are stacked)',
+        colSizes.length > 0 && Math.max.apply(null, colSizes) <= 6, 'max=' + Math.max.apply(null, colSizes));
+    const depths = cols.filter(col => col.getAttribute('data-depth') !== 'off')
+        .map(col => Number(col.getAttribute('data-depth')));
+    check('atlas columns are ordered by distance from the prologue',
+        depths.length > 0 && depths.every((d, i) => i === 0 || d >= depths[i - 1]),
+        depths.slice(0, 8).join(',') + ' … ' + depths.slice(-4).join(','));
+    // Depths 55-98 carry no label at all; they used to render as 44 blank
+    // columns of pure whitespace in the middle of the map.
+    const emptyCols = colSizes.filter(size => size === 0).length;
+    check('no empty columns are rendered (blank depth slots are skipped)',
+        cols.length > 0 && emptyCols === 0, 'empty=' + emptyCols);
+    check('atlas keeps the full option text (no ellipsis truncation)',
+        [...w.document.querySelectorAll('#graph-body .graph-node *')]
+            .every(el => el.children.length > 0 || el.textContent.indexOf('…') === -1));
+    check('labels nothing reaches are grouped in their own section',
+        !!w.document.querySelector('.graph-offroute') &&
+        w.document.querySelectorAll('.graph-offroute .graph-node').length > 0);
     const branchCard = w.document.getElementById('graph-node-SoloRoute5');
     check('atlas shows the vn.branch forks of Solo 5',
         !!(branchCard && branchCard.querySelector('[data-graph-goto="Solo5BadEnd"]') &&

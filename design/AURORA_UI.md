@@ -84,6 +84,42 @@ block in `game.js`.
 | Dialog log | `dialog-log .modal__content` | rows tagged `[data-spoke]`; clicking a row rewinds to it |
 | Confirm / quit | `alert-modal` | `.modal` z-index raised to 120 (above choices) |
 | Game menu | `#game-menu-overlay` (ours) | build stamp from `window.SeirinBoot.BUILD` in the footer |
+| Route atlas (debug) | `#graph-overlay` (ours) | generated from `engine.script()`; see below |
+
+## Route atlas: a map, not a dialog (2026-09-19)
+
+`renderGraph()` (in `game.js`) derives the whole map from `engine.script()`:
+one card per label, one column per *distance from the prologue* (BFS depth over
+every jump / choice / branch edge). What the layout has to survive is the data:
+**205 labels over 55 depth columns**, with a prologue fan-out of up to 17 labels
+sharing a single depth and 24 labels (Solo1Extra_*, Solo1PC_Chat, …) that no
+edge leads into at all.
+
+The version shipped on 2026-09-18 laid that out as one horizontal strip
+(`.graph-cols { display:flex; overflow-x:auto }`, `.graph-col { min-width:
+235px; flex: 1 0 235px }`) inside a panel capped at `min(1100px, 100%)`. What
+that produced, and what replaced it:
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| ~170 px of empty window on *each* side of a 1440 px landscape | `.graph-panel { width: min(1100px, 100%) }` | `width: 100%` — the overlay's 12 px padding is the only margin |
+| Every card sat at its 235 px minimum, text cut to 34/26/44 chars ("…" in 178 elements) | one 25 000 px strip of 100 columns: the viewport only ever showed four of them | columns are now equal tracks of a wrapped grid — `repeat(auto-fill, minmax(min(var(--graph-track), 100%), 1fr))` |
+| Depths 55-98 (44 slots) rendered as blank columns of nothing | empty depth slots were rendered as columns | empty depths are skipped; the depth badge above each column carries the axis instead |
+| One 17-card tower per dense depth, five tracks beside it empty | one column per depth, however wide the fan-out | depths wider than `GRAPH_STACK_MAX` (6) split into even stacks, badged "1 / 3" |
+| 24 unreachable labels dumped in a mystery column at the far right | BFS sentinel depth 99 used as a column index | they have no depth: they render in their own "Вне маршрута" section |
+
+`--graph-track` (300 px; 250 px ≤900 px wide, 230 px in short landscape,
+240 px ≤600 px) is the only knob: it sets the *minimum* card width, and
+`auto-fill` — never `auto-fit`, which would stretch a lone card across the
+whole row — decides how many tracks the width affords. Try 12 → auto-fill picks
+5 tracks of 355 px; at 844×390 (phone on its side, `max-height: 620px`) it picks
+3 of 249 px, and the `.graph-panel` chrome above the map tightens up so the map
+keeps the little height there is.
+
+Nothing in the atlas talks to the network or writes story state: it reads
+`engine.script()` / `engine.storage()`, opens targets with `scrollIntoView` and
+teleports through `jumpToLabel()` (which wipes presentation + history first —
+see the teleport regression test).
 
 ## Engine traps (measured, not assumed)
 
@@ -104,7 +140,7 @@ block in `game.js`.
 ## Verification
 
 ```bash
-node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs   # 65 pass
+node --test game/tests/game.test.mjs game/tests/failsafe.test.mjs game/tests/icons-offline.test.mjs   # 67 pass
 node game/tests/es5-scan.mjs game/vendor/aurora-ui.js game/vendor/game.js                        # no output
 cd game && npm i jsdom@25 --prefix . --no-save --silent && REQUIRE_JSDOM=1 node tests/offline-smoke.mjs  # SMOKE PASSED
 ```

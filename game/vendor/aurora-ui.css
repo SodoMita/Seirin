@@ -600,7 +600,10 @@ dialog-log button[data-action="dialog-log"] { width: auto; align-self: flex-end;
 .menu-divider { height: 1px; margin: 8px 0; background: var(--divider); }
 
 .archives-panel, .graph-panel { max-width: none; border: 0; box-shadow: var(--glass-shadow); font-family: var(--sans); }
-.graph-panel { width: min(1100px, 100%); }
+/* The route atlas is a map, not a dialog: it takes the window. The old
+   min(1100px, 100%) cap left ~170 px per side of a 1440 px landscape empty
+   while the map scrolled sideways inside it. */
+.graph-panel { width: 100%; }
 .archives-head, .graph-head { background: none; border: 0; }
 .archives-head > span, .graph-head > span { color: inherit; font: inherit; letter-spacing: inherit; }
 .archives-body, .graph-body { padding: 0; max-height: none; overflow: visible; }
@@ -618,14 +621,24 @@ dialog-log button[data-action="dialog-log"] { width: auto; align-self: flex-end;
 .graph-stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .graph-chip { padding: 5px 9px; border-radius: 6px; background: var(--glass); color: var(--ink); font: 10px/1.4 var(--mono); border: 0; box-shadow: var(--glass-shadow); }
 .graph-chip.dim { color: var(--muted); }
+.graph-chip-action { cursor: pointer; font-family: var(--mono); }
+.graph-chip-action:hover, .graph-chip-action:focus-visible { background: var(--glass-hover); color: var(--accent); }
 .graph-hint { color: var(--muted); font: 500 9px/1.5 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 16px; }
 .graph-col { background: none; border: 0; }
 .graph-node { border: 0; border-radius: 9px; background: var(--glass); box-shadow: var(--glass-shadow); color: var(--ink); transition: background .2s; }
 .graph-node:hover { background: var(--glass-hover); border: 0; box-shadow: var(--glass-shadow); }
 .graph-node.current { background: var(--glass-selected); box-shadow: var(--glass-shadow), inset 0 0 0 1px rgb(var(--accent-rgb) / .5); }
 .graph-node.ending { box-shadow: var(--glass-shadow), inset 0 0 0 1px rgb(var(--accent-rgb) / .25); }
+/* Depth badge / stack marker above every column, and the off-route section:
+   same glass language as the chips inside the cards. */
+.graph-col-depth { background: var(--glass); color: var(--accent); border: 0; box-shadow: var(--glass-shadow); }
+.graph-col-part { color: var(--muted); }
+.graph-offroute { border-top-color: var(--divider); }
+.graph-offroute h3 { color: var(--accent); font-family: var(--mono); }
+.graph-offroute p { color: var(--muted); }
 .graph-node-title { color: var(--ink); font-family: var(--sans); font-weight: 600; }
 .graph-node-id { color: var(--muted); font-family: var(--mono); }
+.graph-node > .graph-node-id:first-child { color: var(--ink); }
 .graph-node-banner, .graph-node-here { color: var(--accent); font-family: var(--mono); }
 .graph-edge-text, .graph-edge-stat { color: var(--muted); font-family: var(--mono); }
 .graph-target, .graph-jump { color: var(--accent); }
@@ -684,6 +697,16 @@ html.aurora-modal-open .hud-clock-colon, html.aurora-modal-open game-screen [dat
   slot-container { grid-template-columns: repeat(auto-fit, minmax(min(125px, 100%), 1fr)); }
   .panel-footer { align-items: flex-start; }
   main-screen[data-screen]:not([data-screen="game"]) { width: min(375px, 100%); }
+}
+/* Short landscape (phone on its side, small laptop): the map is the point of
+   this overlay, so the chrome above it gives up its height. */
+@media (orientation: landscape) and (max-height: 620px) {
+  .graph-panel { padding: 16px 20px; }
+  .graph-panel .panel-header { margin-bottom: 12px; }
+  .graph-panel h2 { font-size: 20px; }
+  .graph-stats { gap: 6px; margin-bottom: 10px; }
+  .graph-chip { padding: 4px 8px; }
+  .graph-hint { margin-bottom: 12px; }
 }
 @media (max-height: 500px) {
   :root { --text-size-base: 17px; }
