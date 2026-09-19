@@ -27,8 +27,8 @@
                 name:                FS.schema.string().default('Рэн'),
                 route:               FS.schema.string().default('none'),
                 /* Locale for i18n (date formatting via Date.toLocaleString).
-                 * Future language selection writes this; ru-RU is the default
-                 * and the only shipped locale for now. */
+                 * Story formatting only; UI language is an independent preference
+                 * and must not be restored or rewound with player state. */
                 locale:              FS.schema.string().default('ru-RU'),
                 procrastination:     FS.schema.number({ int: true, min: 0 }).default(0),
                 philosophical_depth: FS.schema.number({ int: true, min: 0 }).default(0),
@@ -965,12 +965,8 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             menuConfig.buttons.push({ string: 'GraphAtlas', data: { action: 'open-graph' } });
         }
         if (typeof engine.translation === 'function') {
-            /* The game ships Russian-only, but the engine boots the 'English'
-               string table, so every piece of built-in chrome (quick menu,
-               settings, save/load, help) rendered in English next to Russian
-               dialogue. Override the table in place rather than switching
-               language: MultiLanguage is off and the Russian table would drag
-               in a language-selection screen we do not want. */
+            /* Russian is the source UI table. SeirinI18n projects this table
+             * into the selected UI locale without changing story language. */
             engine.translation('English', {
                 GraphAtlas: 'ГРАФ МАРШРУТОВ · ОТЛАДКА',
                 /* main menu */
@@ -1010,6 +1006,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
                 Overwrite_Confirmation: 'Перезаписать это сохранение?'
             });
         }
+        if (window.SeirinI18n) { window.SeirinI18n.installEngine(engine); }
         engine.preferences({ 'TextSpeed': 30, 'AutoPlaySpeed': 5,
             'Volume': { 'Music': 0.8, 'Voice': 0.8, 'Sound': 0.8 } });
         engine.storage({

@@ -93,6 +93,25 @@ if (menuEl) {
         check('atlas closes again', overlay && overlay.hidden === true);
     }
 }
+// UI language is deliberately independent of scripts, save state and rollback.
+const ui = w.SeirinI18n;
+check('offline UI localization loads', !!ui && !!w.SeirinUICatalog);
+if (ui && w.engine) {
+    const stateBeforeLocale = JSON.stringify(w.engine.storage());
+    const scriptBeforeLocale = JSON.stringify(w.engine.script());
+    for (const locale of ['en', 'zh', 'ja', 'hi', 'sw', 'ru']) {
+        ui.setLanguage(locale);
+        await new Promise(resolve => setTimeout(resolve, 80));
+        const startLabel = w.document.querySelector('main-menu [data-string="Start"]');
+        check('live UI locale ' + locale, startLabel && startLabel.textContent === w.SeirinUICatalog[locale]['Начать']);
+        check('engine prompts follow locale ' + locale,
+            w.engine.string('SlotDeletion') === w.SeirinUICatalog[locale]['Удалить это сохранение?']);
+        check('title follows locale ' + locale,
+            w.document.querySelector('.aurora-title h1').textContent === w.SeirinUICatalog[locale]['Сэйрин']);
+    }
+    check('language switching preserves story and save state',
+        JSON.stringify(w.engine.storage()) === stateBeforeLocale && JSON.stringify(w.engine.script()) === scriptBeforeLocale);
+}
 check('runtime makes no network calls', network.length === 0, network.join(', '));
 const lint = w.engine ? w.eval('(() => window.FailSafe.vn(window.engine, { silent: true }).lintScript({ silent: true }))()') : { ok: false, issues: ['engine did not boot'] };
 check('shipped script passes rollback-safety lint', lint.ok, JSON.stringify(lint.issues));
