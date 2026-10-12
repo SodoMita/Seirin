@@ -293,6 +293,9 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             Solo2CallEnd:           'ФИНАЛ · Звонок до рассвета',
             SoloRoute3:            'Соло III · 84-й этаж',
             SoloRoute4:            'Соло IV · Скамейка и зеркало',
+            HanaRoute:             'Рут Ханы · Скамейка у храма',
+            HanaEndingWitness:     'ФИНАЛ · Свидетельство без мифа',
+            HanaEndingMyth:        'ФИНАЛ · Тёмная сила по приглашению',
             SoloRoute5:            'Соло V · Додзё, подготовка',
             Solo5BadEnd:           'ФИНАЛ · Ловушка №1: захвачен',
             Solo5Standoff:         'ФИНАЛ · Ничья',
@@ -864,6 +867,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.webp' } },
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.webp' } },
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
+            hana: { name: 'Хана Сироясики', color: '#c4b5fd' },
             radio: { name: 'РАДИО · ЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' },
@@ -890,7 +894,7 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
          * new route from becoming a risky edit to the engine/UI glue. */
         function buildStoryFromArcs () {
             var registry = window.SeirinStory;
-            var order = ['prologue', 'procrastination', 'anime_shorts', 'anime_comfort', 'anime_activities', 'anime_watchlist', 'anime_eva_01_07', 'anime_eva_09_16', 'anime_eva_17_24', 'anime_eva_25_end', 'anime_nausicaa', 'anime_key', 'anime_cicada', 'anime_gacha', 'anime_fandom', 'club', 'tower', 'bench', 'lonewar', 'miya', 'ai', 'momo'];
+            var order = ['prologue', 'procrastination', 'anime_shorts', 'anime_comfort', 'anime_activities', 'anime_watchlist', 'anime_eva_01_07', 'anime_eva_09_16', 'anime_eva_17_24', 'anime_eva_25_end', 'anime_nausicaa', 'anime_key', 'anime_cicada', 'anime_gacha', 'anime_fandom', 'club', 'tower', 'bench', 'hana', 'lonewar', 'miya', 'ai', 'momo'];
             var script = {};
             var api = { vn: vn, engine: engine, routeChoice: routeChoice, effectChoice: effectChoice };
             var i, arc, labels, key;

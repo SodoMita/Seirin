@@ -16,7 +16,8 @@
                 { Choice: { Dialog: 'Проверка реальности начинается с…',
                     CheckSky: effectChoice('Неба: облака повторяются каждые сорок секунд', { philosophical_depth: 2 }),
                     CheckMemory: effectChoice('Памяти: утро подозрительно похоже на сейчас', { philosophical_depth: 3 }),
-                    CheckMiya: effectChoice('Мысленного звонка Мие — вдруг магия правда есть', { philosophical_depth: 1, miya_affinity: 1 })
+                    CheckMiya: effectChoice('Мысленного звонка Мие — вдруг магия правда есть', { philosophical_depth: 1, miya_affinity: 1 }),
+                    CheckHana: routeChoice('Повернуться к девочке на дальнем конце скамейки — она тоже считает облака', 'HanaRoute', { philosophical_depth: 1 })
                 } },
                 'p Паттерны сходятся. Мир подогнан идеально — но до целого не хватает ровно одного наблюдателя.',
                 'p Эй, ты — за монитором. Я видел переменные нашего мира: procrastination, akatomi_alert, miya_affinity. Наша боль — это integer в памяти браузера. И всё это происходит за один день.',

@@ -34,7 +34,11 @@ const storyFiles = [
     'lonewar.js',
     'miya.js',
     'ai.js',
-    'momo.js'
+    'momo.js',
+    // Appended last on purpose: the "Ren pilots" test reads fixed 6000-char
+    // windows from each route label, and inserting hana.js mid-list shifts
+    // what those windows spill into. Keep new arcs at the end of this list.
+    'hana.js'
 ];
 const storySource = storyFiles.map(file => readFileSync(join(here, '..', 'vendor', 'story', file), 'utf8')).join('\n');
 const shippedSource = source + '\n' + storySource;
@@ -154,7 +158,8 @@ test('all declared story jumps target real labels', () => {
         'Solo5BadEnd', 'Solo5Standoff',
         'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
-        'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore'
+        'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore',
+        'HanaRoute', 'HanaEndingWitness', 'HanaEndingMyth'
     ];
     required.forEach(r => assert.ok(labels.includes(r), `required label missing ${r}`));
     // routeChoice constructs its jump dynamically, so inspect every supplied target
@@ -229,7 +234,8 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
         'Solo2DriftEnd', 'Solo2MuteEnd', 'Solo2CallEnd',
         'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
-        'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore']
+        'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore',
+        'HanaRoute', 'HanaEndingWitness', 'HanaEndingMyth']
         .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
 });
 
@@ -333,7 +339,8 @@ test('every route teaches with a micro-choice before its commitment beat', () =>
         ['SoloRoute5: [', 'PrepCharges: effectChoice', 'NightStrike: effectChoice'],
         ['MiyaRoute: [', 'ArtWire: effectChoice', 'Embrace: routeChoice'],
         ['AIRoute: [', 'GreetRhythm: effectChoice', 'Connect: routeChoice'],
-        ['MomoRoute: [', 'SweetLie: effectChoice', 'SingHerSong: routeChoice']
+        ['MomoRoute: [', 'SweetLie: effectChoice', 'SingHerSong: routeChoice'],
+        ['HanaRoute: [', 'AskGently: effectChoice', 'ToGuardian: routeChoice']
     ];
     beats.forEach(([label, micro, commitment]) => {
         const from = storySource.indexOf(label);
