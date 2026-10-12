@@ -235,7 +235,9 @@ test('debug route atlas: menu entry, overlay, generator and teleport are wired',
         'Solo5BadEnd', 'Solo5Standoff', 'MiyaRoute', 'MiyaEndingHarmony', 'MiyaEndingGuardian',
         'AIRoute', 'AIEndingTranscendence', 'AIEndingIsolation',
         'MomoRoute', 'MomoEndingSong', 'MomoEndingEncore',
-        'HanaRoute', 'HanaEndingWitness', 'HanaEndingMyth']
+        'HanaRoute', 'HanaReactMagic', 'HanaFilm', 'HanaClipDeleted', 'HanaTalkHonest', 'HanaFather',
+        'HanaPressure', 'HanaMythPull', 'HanaGuardian', 'HanaEndingWitness', 'HanaEndingMyth',
+        'HanaEndingExposed', 'HanaEndingDiscredited', 'HanaEndingLonely', 'HanaEndingBroken']
         .forEach(label => assert.ok(titlesBlock.includes(label + ':'), `LABEL_TITLES missing ${label}`));
 });
 
@@ -340,7 +342,7 @@ test('every route teaches with a micro-choice before its commitment beat', () =>
         ['MiyaRoute: [', 'ArtWire: effectChoice', 'Embrace: routeChoice'],
         ['AIRoute: [', 'GreetRhythm: effectChoice', 'Connect: routeChoice'],
         ['MomoRoute: [', 'SweetLie: effectChoice', 'SingHerSong: routeChoice'],
-        ['HanaRoute: [', 'AskGently: effectChoice', 'ToGuardian: routeChoice']
+        ['HanaRoute: [', 'AskGently: effectChoice', 'TrustGuardian: routeChoice']
     ];
     beats.forEach(([label, micro, commitment]) => {
         const from = storySource.indexOf(label);
