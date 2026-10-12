@@ -879,7 +879,11 @@ if (typeof window !== 'undefined' && window.Monogatari && window.FailSafe) {
             kurogane: { name: 'Таиши Курогане', color: '#64748b', directory: '', sprites: { normal: 'kurogane_normal.webp' } },
             kaito: { name: 'Кайто Сиба', color: '#a855f7', directory: '', sprites: { normal: 'kaito_normal.webp' } },
             momo: { name: 'Момо Хосизора', color: '#f472b6', directory: '', sprites: { normal: 'momo_normal.webp' } },
-            hana: { name: 'Хана Сироясики', color: '#c4b5fd' },
+            // Hana (PROVISIONAL look, not approved). 'hana' = light stage outfit, used by
+            // story/hana.js. 'hana_dark' = dark summer outfit, registered but not yet placed
+            // in any scene. Expression keys match the core eight (neutral is 'normal').
+            hana: { name: 'Хана Сироясики', color: '#c4b5fd', directory: '', sprites: { normal: 'hana_light_normal.webp', smile: 'hana_light_smile.webp', grin: 'hana_light_grin.webp', angry: 'hana_light_angry.webp', sad: 'hana_light_sad.webp', surprise: 'hana_light_surprise.webp', blush: 'hana_light_blush.webp', serious: 'hana_light_serious.webp' } },
+            hana_dark: { name: 'Хана Сироясики', color: '#c4b5fd', directory: '', sprites: { normal: 'hana_dark_normal.webp', smile: 'hana_dark_smile.webp', grin: 'hana_dark_grin.webp', angry: 'hana_dark_angry.webp', sad: 'hana_dark_sad.webp', surprise: 'hana_dark_surprise.webp', blush: 'hana_dark_blush.webp', serious: 'hana_dark_serious.webp' } },
             radio: { name: 'РАДИО · ЭФИР', color: '#67e8f9', directory: '', sprites: { normal: 'radio_signal.svg' } },
             sys: { name: 'СИСТЕМА СЭЙРИН', color: '#10b981' },
             p: { name: 'Рэн', color: '#facc15' },
