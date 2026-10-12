@@ -1,7 +1,7 @@
 # 01_reference — hana (light outfit, identity lock)
 
 Model: generate_image, with backgrounds/hana_residential_courtyard.webp as the environment reference.
-Verdict: KEEP (kept as characters/hana/hana_reference.png, identity lock only, never matted).
+Verdict: KEEP (kept as characters/hana/hana_reference.webp, identity lock only, never matted).
 Kept: full body, modest light maho shoujo dress, ice-blue to pale-rose panel gradient,
 heterochromia visible, shoulder-length dark brown hair, age-appropriate proportions.
 Broke: figure small in the frame; tights and boots read grey, not the planned tones. Not a blocker for a reference.

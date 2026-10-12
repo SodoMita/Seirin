@@ -1,7 +1,7 @@
 # 12_dark_white_v4_summer — hana (dark outfit, summer, white plate)
 
-Model: generate_image, identity image plates/hana_dark_v3_white.png (outfit change, pose and scale kept).
-Verdict: KEEP (plates/hana_dark_v4_summer_white.png).
+Model: generate_image, identity image plates/hana_dark_v3_white.webp (outfit change, pose and scale kept).
+Verdict: KEEP (plates/hana_dark_v4_summer_white.webp).
 Kept: messy near-black hair, violet and crimson eyes, sharp eyeliner, pose, framing.
 Changed (one outfit change): loose charcoal-navy cotton dress, short sleeves, knee-length hem,
 small crimson ribbon, no cardigan, dark ankle socks instead of tights, dark canvas sneakers.

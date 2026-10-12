@@ -5,20 +5,25 @@ Status: **PROVISIONAL.** Not canon, not approved. `briefs/hana.md` and
 `approved: false`). This card exists so the sprites have a written source; the
 project owner confirms or replaces every item marked *provisional*.
 
+## Deliverable format
+
+- Shipped sprites, plates and references are **lossless WebP** (exact=True). Never PNG.
+  Generator intermediates stay in `_wip/` (gitignored).
+
 ## Version log
 
 - v1: dark brown hair, white-and-ice-blue dress (first draft, reference
-  `hana_reference.png`, superseded).
+  `hana_reference.webp`, superseded).
 - v2: white hair, mostly-white dress (owner request). Reference:
-  `hana_reference_v2.png`.
+  `hana_reference_v2.webp`.
 - v3 (owner request, dark outfit only): messy near-black hair, violet and
   crimson eyes, defiant expression, torn frayed clothing. Light outfit unchanged.
-  Plate: `plates/hana_dark_v3_white.png`. Torn means frayed fabric only;
+  Plate: `plates/hana_dark_v3_white.webp`. Torn means frayed fabric only;
   hemlines knee-length or lower; no skin exposed beyond hands, neck and face.
 - v4 (owner request, dark outfit, summer): loose charcoal-navy cotton dress,
   short sleeves, knee-length hem, small crimson ribbon, no cardigan, dark ankle
   socks instead of tights, dark canvas sneakers. Fitted to mid-July in Japan.
-  Plate: `plates/hana_dark_v4_summer_white.png`. Declined: a smaller, tighter
+  Plate: `plates/hana_dark_v4_summer_white.webp`. Declined: a smaller, tighter
   dress and tears on the tights (sexualized styling of a 13-year-old).
   Pending: teeth-showing grin (head-only edit), black plate, matte.
 

@@ -72,7 +72,10 @@ def main():
 
     out = S.copy()
     out[..., :3] = S[..., :3] * (1 - m[..., None]) + E * m[..., None]
-    Image.fromarray(np.clip(out + 0.5, 0, 255).astype(np.uint8), "RGBA").save(args.out)
+    # Deliverables are lossless WebP (never PNG). exact=True keeps the RGB of
+    # fully transparent pixels, so the sprite round-trips bit-for-bit.
+    Image.fromarray(np.clip(out + 0.5, 0, 255).astype(np.uint8), "RGBA").save(
+        args.out, lossless=True, exact=True, method=6)
     print("wrote %s" % args.out)
 
 
