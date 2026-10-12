@@ -81,6 +81,8 @@
       "age_coding": null,
       "faction": "chorus_abyss",
       "role": "witness and observer; illusionist's daughter, never a combatant",
+      "look_status": "provisional",
+      "look_card": "characters/hana/DESIGN_PROVISIONAL.md",
       "approved": false,
       "answers": {
         "wardrobe": null,
