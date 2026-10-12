@@ -1,35 +1,32 @@
-# 14–27 — hana expression differentials (placeholder set, complete)
-
-Method: head-only edits generated from the SAME outfit plate (never chained), then
-tools/face_differential.py composites the changed pixels inside the locked face box
-(x 250–520, y 180–360 in the 768x1376 canvas) onto the approved matted sprite. The sprite's
-own alpha is kept everywhere. Changed pixels outside the box (about 400–500 per image,
-body-wide generator noise) are discarded.
-
-Format: deliverables are lossless WebP (exact=True). No PNG is shipped. The _wip/ intermediates
-are PNG only because the generator outputs JPG or PNG; they are gitignored.
-
-Light (plate: plates/hana_light_white.webp, base: hana_light_matted.webp):
-- 14 smile — KEEP. Closed-mouth smile. -> hana_light_smile.webp
-- 15 grin — KEEP. Teeth showing, eyes narrowed. -> hana_light_grin.webp
-- 16 angry — KEEP. Brows down, firm frown. -> hana_light_angry.webp
-- 17 sad — KEEP. Brows raised at inner ends. -> hana_light_sad.webp
-- 18 surprise — KEEP. Eyes wide, brows high. -> hana_light_surprise.webp
-- 19 blush — KEEP. Light blush, averted eyes. -> hana_light_blush.webp
-- 20 serious — KEEP. Flat mouth, level brows. -> hana_light_serious.webp
-Light neutral = hana_light_normal.webp (base).
-
-Dark (plate: plates/hana_dark_v4_summer_white.webp, base: hana_dark_matted.webp):
-- 21 smile — KEEP. -> hana_dark_smile.webp
-- 22 grin — KEEP. Teeth showing; seven-background check clean. -> hana_dark_grin.webp
-- 23 angry — KEEP (composite). -> hana_dark_angry.webp
-- 24 sad — KEEP (composite). -> hana_dark_sad.webp
-- 25 surprise — KEEP (composite). -> hana_dark_surprise.webp
-- 26 blush — KEEP (composite). -> hana_dark_blush.webp
-- 27 serious — KEEP (composite). -> hana_dark_serious.webp
-Dark neutral = hana_dark_normal.webp (base).
+# 14–27 — hana expression sprites (placeholder set, mask method)
 
 Status: PLACEHOLDER. Core eight complete for both outfits (neutral + seven). Not approved.
-Matte report for all five new dark expressions matches the dark base (7.32 / 71.93 / 20.75%).
-Seven-background sheet viewed for dark angry: clean. Sheet produced but not yet viewed for dark serious.
-Sad, surprise and blush have a report only, no sheet yet.
+
+## Method (replaces the failed face-box blend)
+- The first attempt blended changed pixels into the neutral sprite inside the face box. It
+  produced doubled eyes (ghosting) and was rejected by the owner. The tool is removed.
+- Second attempt: tools/expression_mask.py. Each expression plate (generated from the same
+  white plate, prompts 14–27) is checked for registration against the neutral plate
+  (body region residual 1.1–1.6 in 255, shift 0). Alpha is always the neutral sprite's own
+  matte. Inside the face box (250–520 x 180–360), colour comes from the expression plate.
+  Partial-alpha edge pixels are un-composited over white (c = (E − 255(1−a)) / a), which removed
+  the dotted outline artefact. The box edge is feathered (6 px). Outside the box the neutral colour is kept.
+- Not triangulated per expression. The expression sprites use the neutral's matte, not
+  white/black triangulation. Per-expression triangulation would need 14 black-plate
+  generations (prompts 28–41, saved, NOT RUN).
+
+## Verified
+- Light and dark sets viewed at face size (neutral, grin, angry, sad): no ghosting, no dotted lines.
+- Alpha identical to the neutral sprite for all 16 shipped sprites (light 20.05/72.41/7.54%,
+  dark 7.32/71.93/20.75%).
+- Seven-background sheet viewed for light grin (before the edge fix) and dark angry (mask
+  method not yet sheet-checked). Recheck before promotion.
+
+## Files
+Light (base: hana_light_normal.webp, white plate: plates/hana_light_white.webp):
+  smile, grin, angry, sad, surprise, blush, serious -> hana_light_<expr>.webp
+  expression plates: plates/hana_light_<expr>_white.webp
+Dark (base: hana_dark_normal.webp, white plate: plates/hana_dark_v4_summer_white.webp):
+  smile, grin, angry, sad, surprise, blush, serious -> hana_dark_<expr>.webp
+  expression plates: plates/hana_dark_<expr>_white.webp
+All shipped copies in game/assets/characters/.
