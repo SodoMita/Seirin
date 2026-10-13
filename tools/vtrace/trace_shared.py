@@ -15,7 +15,7 @@ Pipeline:
   6. fill colour = mean of the sprite pixels in the region
   7. write SVG, rasterise it, report error and the shared-point check
 
-usage: trace_shared.py SPRITE OUT_PREFIX [K] [ERR] [MAJORITY_SIZE] [MIN_AREA] [PREC]
+usage: trace_shared.py SPRITE OUT_PREFIX [K] [ERR] [MAJORITY_SIZE] [MIN_AREA] [PREC] [MASK_SMOOTH]
 """
 import os
 import sys
@@ -28,12 +28,21 @@ from scipy import ndimage
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trace_curves import fit_cubic, _norm  # noqa: E402
 
+MASK_SMOOTH = 0.0  # gaussian sigma on the figure mask of flat renders (px); 0 = off
 PREC = 1  # decimal places kept in the SVG; shared points are rounded once
 
 
 def load(path, pad=2):
-    im = Image.open(path).convert('RGBA')
-    alpha = np.array(im.split()[3]) >= 128
+    raw = Image.open(path)
+    if raw.mode in ('RGBA', 'LA') or (raw.mode == 'P' and 'transparency' in raw.info):
+        im = raw.convert('RGBA')
+        alpha = np.array(im.split()[3]) >= 128
+    else:
+        # flat render on white: figure = any pixel clearly not background white
+        im = raw.convert('RGBA')
+        alpha = np.array(raw.convert('RGB')).min(axis=-1) < 254
+        if MASK_SMOOTH > 0:
+            alpha = ndimage.gaussian_filter(alpha.astype(float), MASK_SMOOTH) > 0.5
     ys, xs = np.where(alpha)
     y0, y1 = max(0, ys.min() - pad), min(alpha.shape[0], ys.max() + 1 + pad)
     x0, x1 = max(0, xs.min() - pad), min(alpha.shape[1], xs.max() + 1 + pad)
@@ -340,6 +349,8 @@ def main():
     min_area = int(sys.argv[6]) if len(sys.argv) > 6 else 40
     global PREC
     PREC = int(sys.argv[7]) if len(sys.argv) > 7 else 1
+    global MASK_SMOOTH
+    MASK_SMOOTH = float(sys.argv[8]) if len(sys.argv) > 8 else 0.0
     rgb, mask = load(src)
     H, W = mask.shape
     lab, _ = labelise(rgb, mask, k)
