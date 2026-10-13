@@ -15,7 +15,7 @@ Pipeline:
   6. fill colour = mean of the sprite pixels in the region
   7. write SVG, rasterise it, report error and the shared-point check
 
-usage: trace_shared.py SPRITE OUT_PREFIX [K] [ERR] [MAJORITY_SIZE] [MIN_AREA]
+usage: trace_shared.py SPRITE OUT_PREFIX [K] [ERR] [MAJORITY_SIZE] [MIN_AREA] [PREC]
 """
 import os
 import sys
@@ -27,6 +27,8 @@ from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trace_curves import fit_cubic, _norm  # noqa: E402
+
+PREC = 1  # decimal places kept in the SVG; shared points are rounded once
 
 
 def load(path, pad=2):
@@ -188,7 +190,7 @@ def fit_chain(ch, err):
     else:
         fit_cubic(pts, t1, t2, err, segs)
     # round once: both regions will use these exact numbers
-    return [[tuple(round(v, 2) for v in p) for p in s] for s in segs]
+    return [[tuple(round(v, PREC) for v in p) for p in s] for s in segs]
 
 
 def region_loops(L, chains, node_chains):
@@ -219,6 +221,44 @@ def region_loops(L, chains, node_chains):
     return loops
 
 
+def _num(u, S):
+    """Integer units (value * S) -> minimal SVG number text."""
+    if PREC == 0:
+        return str(u)
+    neg = u < 0
+    a = abs(u)
+    ip, fp = divmod(a, S)
+    txt = str(ip) if fp == 0 else ('%d.%0*d' % (ip, PREC, fp)).rstrip('0')
+    if txt.startswith('0.'):
+        txt = txt[1:]
+    return ('-' if neg and a else '') + txt
+
+
+def enc_path(segs):
+    """One closed loop as 'M' + one 'c' run in relative units. Exact: uses the stored rounded values."""
+    S = 10 ** PREC
+    q = lambda p: (int(round(p[0] * S)), int(round(p[1] * S)))  # noqa: E731
+    p0 = q(segs[0][0])
+    toks = ['M' + _num(p0[0], S) + ' ' + _num(p0[1], S), 'c']
+    cur = p0
+    for sg in segs:
+        a, b, c = q(sg[1]), q(sg[2]), q(sg[3])
+        for pt in (a, b, c):
+            pass
+        vals = [a[0] - cur[0], a[1] - cur[1], b[0] - cur[0], b[1] - cur[1], c[0] - cur[0], c[1] - cur[1]]
+        toks.append(' '.join(_num(v, S) for v in vals))
+        cur = c
+    body = ''
+    for t in toks:
+        if not body:
+            body = t
+        elif t == 'c' or body.endswith('c'):
+            body += t
+        else:
+            body += ('' if t.startswith('-') else ' ') + t
+    return body + 'z'
+
+
 def fmt(p):
     return '%g %g' % (p[0], p[1])
 
@@ -237,21 +277,14 @@ def build(lab, k_colours, err, target_rgb):
         loops = region_loops(L, chains, node_chains)
         paths = []
         for loop in loops:
-            d = []
-            first = True
+            segs_all = []
             for ci, rev in loop:
                 segs = fitted[ci]
                 if rev:
                     segs = [[s[3], s[2], s[1], s[0]] for s in reversed(segs)]
-                if first:
-                    d.append('M' + fmt(segs[0][0]))
-                    first = False
-                for s in segs:
-                    d.append('C' + fmt(s[1]) + ' ' + fmt(s[2]) + ' ' + fmt(s[3]))
+                segs_all.extend(segs)
                 usage[ci].append((L, [tuple(map(tuple, s)) for s in segs]))
-                # cycles start and end at the same point; the loop closes via 'Z'
-            d.append('Z')
-            paths.append(''.join(d))
+            paths.append(enc_path(segs_all))
         m = lab == L
         col = target_rgb[m].mean(0)
         regions[L] = {'paths': paths, 'fill': tuple(int(round(v)) for v in col), 'loops': loops}
@@ -305,6 +338,8 @@ def main():
     err = float(sys.argv[4]) if len(sys.argv) > 4 else 0.6
     maj = int(sys.argv[5]) if len(sys.argv) > 5 else 5
     min_area = int(sys.argv[6]) if len(sys.argv) > 6 else 40
+    global PREC
+    PREC = int(sys.argv[7]) if len(sys.argv) > 7 else 1
     rgb, mask = load(src)
     H, W = mask.shape
     lab, _ = labelise(rgb, mask, k)
