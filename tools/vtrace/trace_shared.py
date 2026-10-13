@@ -15,7 +15,7 @@ Pipeline:
   6. fill colour = mean of the sprite pixels in the region
   7. write SVG, rasterise it, report error and the shared-point check
 
-usage: trace_shared.py SPRITE OUT_PREFIX [K] [ERR] [MAJORITY_SIZE] [MIN_AREA] [PREC] [MASK_SMOOTH]
+usage: trace_shared.py SPRITE OUT_PREFIX [K] [ERR] [MAJORITY_SIZE] [MIN_AREA] [PREC] [MASK_SMOOTH] [SCALE] [BLUR]
 """
 import os
 import sys
@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trace_curves import fit_cubic, _norm  # noqa: E402
 
 MASK_SMOOTH = 0.0  # gaussian sigma on the figure mask of flat renders (px); 0 = off
+SCALE = 1  # trace on a grid SCALE x finer, coordinates are divided back
 PREC = 1  # decimal places kept in the SVG; shared points are rounded once
 
 
@@ -103,6 +104,19 @@ def merge_small(lab, min_area, passes=3):
         if not changed:
             break
     return lab
+
+
+def upscale_smooth(lab, k, S, sigma):
+    """Upsample the label map S x and blur each region's indicator; argmax gives sub-pixel smooth boundaries."""
+    up = np.repeat(np.repeat(lab, S, axis=0), S, axis=1)
+    best = np.full(up.shape, -np.inf, dtype=np.float32)
+    idx = np.zeros(up.shape, dtype=np.int32)
+    for j in range(k):
+        g = ndimage.gaussian_filter((up == j).astype(np.float32), sigma)
+        better = g > best
+        best[better] = g[better]
+        idx[better] = j
+    return np.where(up >= 0, idx, -1)
 
 
 def trace_chains(lab):
@@ -182,9 +196,9 @@ def smooth(P, closed, iters=8):
 
 def fit_chain(ch, err):
     """Corner points (padded) -> fitted cubic list [p0,c1,c2,p3], in chain order."""
-    raw = [(c - 1.0, r - 1.0) for r, c in ch['pts']]  # undo the 1-px padding
-    P = smooth(raw, ch['cyc'])
-    pts = [tuple(p) for p in P]
+    raw = [(c - 1.0, r - 1.0) for r, c in ch['pts']]  # undo the 1-px padding (trace-grid units)
+    P = smooth(raw, ch['cyc'], iters=8 * SCALE)  # smooth on the trace grid
+    pts = [(float(p[0]) / SCALE, float(p[1]) / SCALE) for p in P]  # back to image pixels
     if ch['cyc']:
         t1 = _norm((pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]))
         t2 = _norm((pts[-2][0] - pts[-1][0], pts[-2][1] - pts[-1][1]))
@@ -272,7 +286,7 @@ def fmt(p):
     return '%g %g' % (p[0], p[1])
 
 
-def build(lab, k_colours, err, target_rgb):
+def build(lab, lab_color, k_colours, err, target_rgb):
     chains = trace_chains(lab)
     fitted = [fit_chain(ch, err) for ch in chains]
     node_chains = defaultdict(list)
@@ -294,7 +308,7 @@ def build(lab, k_colours, err, target_rgb):
                 segs_all.extend(segs)
                 usage[ci].append((L, [tuple(map(tuple, s)) for s in segs]))
             paths.append(enc_path(segs_all))
-        m = lab == L
+        m = lab_color == L
         col = target_rgb[m].mean(0)
         regions[L] = {'paths': paths, 'fill': tuple(int(round(v)) for v in col), 'loops': loops}
     return regions, chains, usage
@@ -351,6 +365,9 @@ def main():
     PREC = int(sys.argv[7]) if len(sys.argv) > 7 else 1
     global MASK_SMOOTH
     MASK_SMOOTH = float(sys.argv[8]) if len(sys.argv) > 8 else 0.0
+    global SCALE
+    SCALE = int(sys.argv[9]) if len(sys.argv) > 9 else 1
+    blur = float(sys.argv[10]) if len(sys.argv) > 10 else 3.0
     rgb, mask = load(src)
     H, W = mask.shape
     lab, _ = labelise(rgb, mask, k)
@@ -359,7 +376,10 @@ def main():
     labels = sorted(set(int(v) for v in np.unique(lab) if v >= 0))
     print('regions', len(labels), 'size', W, H, flush=True)
 
-    regions, chains, usage = build(lab, k, err, rgb)
+    lab_trace = lab
+    if SCALE > 1:
+        lab_trace = upscale_smooth(lab, k, SCALE, blur)
+    regions, chains, usage = build(lab_trace, lab, k, err, rgb)
     interior, bad = check_shared(chains, usage)
     print('chains', len(chains), 'interior', interior, 'shared-check failures', len(bad), bad[:5], flush=True)
 
